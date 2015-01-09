@@ -1,0 +1,210 @@
+<!--
+
+/* ================================================  
+ * Oracle XFiles Demonstration.  
+ *    
+ * Copyright (c) 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * ================================================ */
+
+-->
+
+<NodeMap xmlns="http://xmlns.oracle.com/xdb/pm/demo/search" schemaType="RESVIEW">
+  <Namespaces>
+    <Namespace Prefix="xs">http://www.w3.org/2001/XMLSchema</Namespace>
+    <Namespace Prefix="res">http://xmlns.oracle.com/xdb/XDBResource.xsd</Namespace>
+  </Namespaces>
+  <Element ID="734" Type="res:ResourceType" pathSearch="true" folderRestriction="REPOSITORY">
+    <Name>res:Resource</Name>
+    <Attrs>
+      <Attr ID="705" Type="xs:boolean" BaseType="xs:boolean">res:Hidden</Attr>
+      <Attr ID="706" Type="xs:boolean" BaseType="xs:boolean">res:Invalid</Attr>
+      <Attr ID="707" Type="xs:integer" BaseType="xs:integer">res:VersionID</Attr>
+      <Attr ID="708" Type="xs:integer" BaseType="xs:integer">res:ActivityID</Attr>
+      <Attr ID="738" Type="xs:boolean" BaseType="xs:boolean">res:Container</Attr>
+      <Attr ID="739" Type="xs:boolean" BaseType="xs:boolean">res:CustomRslv</Attr>
+      <Attr ID="742" Type="xs:boolean" BaseType="xs:boolean">res:VersionHistory</Attr>
+      <Attr ID="743" Type="xs:boolean" BaseType="xs:boolean">res:StickyRef</Attr>
+      <Attr ID="744" Type="xs:boolean" BaseType="xs:boolean">res:HierSchmResource</Attr>
+      <Attr ID="753" Type="xs:boolean" BaseType="xs:boolean">res:SizeAccurate</Attr>
+      <Attr ID="756" Type="xs:boolean" BaseType="xs:boolean">res:IsVersionable</Attr>
+      <Attr ID="757" Type="xs:boolean" BaseType="xs:boolean">res:IsCheckedOut</Attr>
+      <Attr ID="758" Type="xs:boolean" BaseType="xs:boolean">res:IsVersion</Attr>
+      <Attr ID="759" Type="xs:boolean" BaseType="xs:boolean">res:IsVCR</Attr>
+      <Attr ID="760" Type="xs:boolean" BaseType="xs:boolean">res:IsVersionHistory</Attr>
+      <Attr ID="761" Type="xs:boolean" BaseType="xs:boolean">res:IsWorkspace</Attr>
+      <Attr ID="776" Type="xs:boolean" BaseType="xs:boolean">res:HasUnresolvedLinks</Attr>
+      <Attr ID="777" Type="xs:boolean" BaseType="xs:boolean">res:IsXMLIndexed</Attr>
+    </Attrs>
+    <Elements>
+      <Element ID="709" Type="xs:dateTime" BaseType="xs:dateTime">
+        <Name>res:CreationDate</Name>
+      </Element>
+      <Element ID="710" Type="xs:dateTime" BaseType="xs:dateTime">
+        <Name>res:ModificationDate</Name>
+      </Element>
+      <Element ID="711" Type="res:ResMetaStr" BaseType="xs:string">
+        <Name>res:Author</Name>
+      </Element>
+      <Element ID="712" Type="res:ResMetaStr" BaseType="xs:string">
+        <Name>res:DisplayName</Name>
+      </Element>
+      <Element ID="713" Type="res:ResMetaStr" BaseType="xs:string">
+        <Name>res:Comment</Name>
+      </Element>
+      <Element ID="714" Type="res:ResMetaStr" BaseType="xs:string">
+        <Name>res:Language</Name>
+      </Element>
+      <Element ID="715" Type="res:ResMetaStr" BaseType="xs:string">
+        <Name>res:CharacterSet</Name>
+      </Element>
+      <Element ID="716" Type="res:ResMetaStr" BaseType="xs:string">
+        <Name>res:ContentType</Name>
+      </Element>
+      <Element ID="717" Type="xs:nonNegativeInteger" BaseType="xs:nonNegativeInteger">
+        <Name>res:RefCount</Name>
+      </Element>
+      <Element ID="718" Type="res:LocksRaw" BaseType="xs:hexBinary">
+        <Name>res:LockBuf</Name>
+      </Element>
+      <Element ID="732" Type="res:ResAclType" value="" valueVisible="visible">
+        <Name>res:ACL</Name>
+        <Attrs/>
+        <Elements/>
+      </Element>
+      <Element ID="719" Type="xs:hexBinary" BaseType="xs:hexBinary">
+        <Name>res:ACLOID</Name>
+      </Element>
+      <Element ID="720" Type="res:OracleUserName" BaseType="xs:string" value="%USER%" valueVisible="visible">
+        <Name>res:Owner</Name>
+      </Element>
+      <Element ID="721" Type="res:GUID" BaseType="xs:hexBinary">
+        <Name>res:OwnerID</Name>
+      </Element>
+      <Element ID="722" Type="res:OracleUserName" BaseType="xs:string" value="%USER%" valueVisible="visible">
+        <Name>res:Creator</Name>
+      </Element>
+      <Element ID="723" Type="res:GUID" BaseType="xs:hexBinary">
+        <Name>res:CreatorID</Name>
+      </Element>
+      <Element ID="724" Type="res:OracleUserName" BaseType="xs:string" value="%USER%" valueVisible="visible" >
+        <Name>res:LastModifier</Name>
+      </Element>
+      <Element ID="725" Type="res:GUID" BaseType="xs:hexBinary">
+        <Name>res:LastModifierID</Name>
+      </Element>
+      <Element ID="726" Type="res:SchElemType" BaseType="xs:string">
+        <Name>res:SchemaElement</Name>
+      </Element>
+      <Element ID="727" Type="xs:nonNegativeInteger" BaseType="xs:nonNegativeInteger">
+        <Name>res:ElNum</Name>
+      </Element>
+      <Element ID="728" Type="xs:hexBinary" BaseType="xs:hexBinary" value="" childValue="" valueVisible="visible">
+        <Name>res:SchOID</Name>
+      </Element>
+      <Element ID="733" Type="res:ResContentsType">
+        <Name>res:Contents</Name>
+        <Attrs/>
+        <Elements/>
+      </Element>
+      <Element ID="729" Type="xs:hexBinary" BaseType="xs:hexBinary">
+        <Name>res:XMLRef</Name>
+      </Element>
+      <Element ID="730" Type="xs:hexBinary" BaseType="xs:hexBinary">
+        <Name>res:XMLLob</Name>
+      </Element>
+      <Element ID="731" Type="xs:nonNegativeInteger" BaseType="xs:nonNegativeInteger">
+        <Name>res:Flags</Name>
+      </Element>
+      <Element ID="740" Type="res:GUID" BaseType="xs:hexBinary">
+        <Name>res:VCRUID</Name>
+      </Element>
+      <Element ID="741" Type="xs:hexBinary" BaseType="xs:hexBinary">
+        <Name>res:Parents</Name>
+      </Element>
+      <Element ID="745" Type="xs:hexBinary" BaseType="XDB$XMLTYPE_REF_LIST_T">
+        <Name>res:SBResExtra</Name>
+      </Element>
+      <Element ID="746" Type="xs:hexBinary" BaseType="xs:hexBinary">
+        <Name>res:Snapshot</Name>
+      </Element>
+      <Element ID="747" Type="res:AttrCopyType">
+        <Name>res:AttrCopy</Name>
+        <Attrs/>
+        <Elements/>
+      </Element>
+      <Element ID="749" Type="xs:hexBinary" BaseType="xs:hexBinary">
+        <Name>res:CtsCopy</Name>
+      </Element>
+      <Element ID="750" Type="xs:hexBinary" BaseType="xs:hexBinary">
+        <Name>res:NodeNum</Name>
+      </Element>
+      <Element ID="751" Type="xs:integer" BaseType="xs:integer">
+        <Name>res:ContentSize</Name>
+      </Element>
+      <Element ID="752" Type="xs:nonNegativeInteger" BaseType="xs:nonNegativeInteger" >
+        <Name>res:SizeOnDisk</Name>
+      </Element>
+      <Element ID="754" Type="res:RCListType">
+        <Name>res:RCList</Name>
+        <Attrs/>
+        <Elements>
+          <Element ID="755" Type="xs:hexBinary" BaseType="xs:hexBinary" value="" valueVisible="visible">
+            <Name>res:OID</Name>
+          </Element>
+        </Elements>
+      </Element>
+      <Element ID="762" Type="xs:string" BaseType="xs:string">
+        <Name>res:Branch</Name>
+      </Element>
+      <Element ID="763" Type="res:OracleUserName" BaseType="xs:string" value="%USER%" valueVisible="visible">
+        <Name>res:CheckedOutBy</Name>
+      </Element>
+      <Element ID="764" Type="res:GUID" BaseType="xs:hexBinary">
+        <Name>res:CheckedOutByID</Name>
+      </Element>
+      <Element ID="765" Type="xs:hexBinary" BaseType="xs:hexBinary">
+        <Name>res:BaseVersion</Name>
+      </Element>
+      <Element ID="766" Type="res:locksType">
+        <Name>res:Locks</Name>
+        <Attrs/>
+        <Elements>
+          <Element ID="767" Type="res:lockType">
+            <Name>res:Lock</Name>
+            <Attrs/>
+            <Elements>
+              <Element ID="768" Type="xs:string" BaseType="xs:string" value="%USER%" valueVisible="visible">
+                <Name>res:LockOwner</Name>
+              </Element>
+              <Element ID="769" Type="res:lockModeType" BaseType="xs:string" value="" valueVisible="visible" >
+                <Name>res:Mode</Name>
+              </Element>
+              <Element ID="770" Type="res:lockTypeType" BaseType="xs:string" value="" valueVisible="visible">
+                <Name>res:Type</Name>
+              </Element>
+              <Element ID="771" Type="res:lockDepthType" BaseType="xs:string" value="" valueVisible="visible">
+                <Name>res:Depth</Name>
+              </Element>
+              <Element ID="772" Type="xs:dateTime" BaseType="xs:dateTime">
+                <Name>res:Expiry</Name>
+              </Element>
+              <Element ID="773" Type="xs:string" BaseType="xs:string">
+                <Name>res:Token</Name>
+              </Element>
+              <Element ID="774" Type="xs:string" BaseType="xs:string">
+                <Name>res:NodeId</Name>
+              </Element>
+            </Elements>
+          </Element>
+        </Elements>
+      </Element>
+    </Elements>
+  </Element>
+</NodeMap>

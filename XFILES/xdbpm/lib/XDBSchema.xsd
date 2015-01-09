@@ -1,0 +1,498 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://xmlns.oracle.com/xdb/xdbpm/XMLSchema" xmlns:xdb="http://xmlns.oracle.com/xdb" xmlns:xdbres="http://xmlns.oracle.com/xdb/XDBResource.xsd" targetNamespace="http://xmlns.oracle.com/xdb/xdbpm/XMLSchema" elementFormDefault="qualified" blockDefault="#all" version="1.0" xdb:schemaURL="http://xmlns.oracle.com/xdb/xdbpm/XMLSchema.xsd" xdb:mapStringToNCHAR="false" xdb:mapUnboundedStringToLob="false" xdb:storeVarrayAsTable="false">
+	<xs:import namespace="http://xmlns.oracle.com/xdb" schemaLocation="http://xmlns.oracle.com/xdb/xdbpm/xdbAnnotations.xsd"/>
+	<xs:simpleType name="derivationChoice">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value=""/>
+			<xs:enumeration value="extension"/>
+			<xs:enumeration value="restriction"/>
+			<xs:enumeration value="list"/>
+			<xs:enumeration value="#all"/>
+			<xs:enumeration value="substitution"/>
+			<xs:enumeration value="union"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="formChoice">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="unqualified"/>
+			<xs:enumeration value="qualified"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="content">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="elementOnly"/>
+			<xs:enumeration value="textOnly"/>
+			<xs:enumeration value="mixed"/>
+			<xs:enumeration value="empty"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="useChoice">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="optional"/>
+			<xs:enumeration value="required"/>
+			<xs:enumeration value="prohibited"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="processChoice">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="skip"/>
+			<xs:enumeration value="lax"/>
+			<xs:enumeration value="strict"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="facet" mixed="false" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute name="value" type="xs:string" xdb:SQLName="VALUE" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="fixed" type="xs:boolean" default="false" xdb:SQLName="FIXED" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="numFacet" mixed="false" xdb:SQLType="XDB$NUMFACET_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute name="value" type="xs:nonNegativeInteger" xdb:SQLName="VALUE" xdb:SQLType="NUMBER" xdb:JavaType="int"/>
+		<xs:attribute name="fixed" type="xs:boolean" default="false" xdb:SQLName="FIXED" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="timeFacet" mixed="false" xdb:SQLType="XDB$TIMEFACET_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute name="value" type="xs:dateTime" xdb:SQLName="VALUE" xdb:SQLType="DATE" xdb:JavaType="TimeStamp"/>
+		<xs:attribute name="fixed" type="xs:boolean" default="false" xdb:SQLName="FIXED" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="whiteSpace" mixed="false" xdb:SQLType="XDB$WHITESPACE_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute name="value" xdb:SQLName="VALUE" xdb:SQLType="XDB$WHITESPACECHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="preserve"/>
+					<xs:enumeration value="replace"/>
+					<xs:enumeration value="collapse"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="fixed" type="xs:boolean" default="false" xdb:SQLName="FIXED" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="simpleType" mixed="false" xdb:SQLType="XDB$SIMPLE_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="restriction" type="simpleDerivationType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="RESTRICTION" xdb:SQLType="XDB$SIMPLE_DERIVATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="list" type="listType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="LIST_TYPE" xdb:SQLType="XDB$LIST_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="union" type="unionType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="UNION_TYPE" xdb:SQLType="XDB$UNION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute ref="xdb:parentSchema"/>
+		<xs:attribute name="name" type="xs:string" xdb:SQLName="NAME" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="abstract" type="xs:boolean" default="false" xdb:SQLName="ABSTRACT" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="final" type="derivationChoice" xdb:SQLName="FINAL_INFO" xdb:SQLType="XDB$DERIVATIONCHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+		<xs:attribute name="typeID" type="xs:integer" xdb:SQLName="TYPEID" xdb:SQLType="NUMBER" xdb:JavaType="int"/>
+		<xs:attribute ref="xdb:SQLType"/>
+	</xs:complexType>
+	<xs:complexType name="complexType" mixed="false" xdb:SQLType="XDB$COMPLEX_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="subtypeRef" type="xs:hexBinary" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="SUBTYPE_REFS" xdb:SQLType="RAW" xdb:JavaType="Reference" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:choice minOccurs="0" maxOccurs="1">
+				<xs:element name="choice" type="modelType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="CHOICE_KID" xdb:SQLType="XDB$MODEL_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$CHOICE_MODEL" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="sequence" type="modelType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="SEQUENCE_KID" xdb:SQLType="XDB$MODEL_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$SEQUENCE_MODEL" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="group" type="groupRefType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="GROUP_KID" xdb:SQLType="XDB$GROUP_REF_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$GROUP_REF" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="all" type="modelType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ALL_KID" xdb:SQLType="XDB$MODEL_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ALL_MODEL" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="simpleContent" type="smplcontentType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="SIMPLECONT" xdb:SQLType="XDB$SIMPLECONTENT_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="complexContent" type="cplxcontentType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="COMPLEXCONTENT" xdb:SQLType="XDB$CONTENT_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			</xs:choice>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="attribute" type="attribute" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ATTRIBUTES" xdb:SQLType="XDB$PROPERTY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRIBUTE" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="attributeGroup" type="attrGroupRefType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ATTR_GROUPS" xdb:SQLType="XDB$ATTRGROUP_REF_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRGROUP_REF" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="anyAttribute" type="anyType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANY_ATTRS" xdb:SQLType="XDB$ANY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ANYATTR" xdb:defaultTableSchema="XDBPM"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute ref="xdb:parentSchema"/>
+		<xs:attribute name="name" type="xs:string" xdb:SQLName="NAME" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="abstract" type="xs:boolean" default="false" xdb:SQLName="ABSTRACT" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+		<xs:attribute name="mixed" type="xs:boolean" default="false" xdb:SQLName="MIXED" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+		<xs:attribute name="final" type="derivationChoice" xdb:SQLName="FINAL_INFO" xdb:SQLType="XDB$DERIVATIONCHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+		<xs:attribute name="block" type="derivationChoice" xdb:SQLName="BLOCK" xdb:SQLType="XDB$DERIVATIONCHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+		<xs:attribute ref="xdb:SQLType"/>
+		<xs:attribute ref="xdb:SQLSchema"/>
+		<xs:attribute ref="xdb:maintainDOM"/>
+		<xs:attribute ref="xdb:baseType"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="typeID" type="xs:integer" xdb:SQLName="TYPEID" xdb:SQLType="NUMBER" xdb:JavaType="int"/>
+	</xs:complexType>
+	<xs:complexType name="attribute" mixed="false" xdb:SQLType="XDB$PROPERTY_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="simpleType" type="simpleType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="SMPL_TYPE_DECL" xdb:SQLType="XDB$SIMPLE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$SIMPLE_TYPE" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute ref="xdb:parentSchema"/>
+		<xs:attribute ref="xdb:propNumber"/>
+		<xs:attribute name="name" type="xs:string" xdb:SQLName="NAME" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="type" type="xs:QName" xdb:SQLName="TYPENAME" xdb:SQLType="XDB$QNAME" xdb:SQLSchema="XDBPM" xdb:JavaType="QNAme"/>
+		<xs:attribute ref="xdb:memByteLength"/>
+		<xs:attribute ref="xdb:memType"/>
+		<xs:attribute ref="xdb:system"/>
+		<xs:attribute ref="xdb:mutable"/>
+		<xs:attribute name="form" type="formChoice" xdb:SQLName="FORM" xdb:SQLType="XDB$FORMCHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+		<xs:attribute ref="xdb:SQLName"/>
+		<xs:attribute ref="xdb:SQLType"/>
+		<xs:attribute ref="xdb:SQLSchema"/>
+		<xs:attribute ref="xdb:JavaType"/>
+		<xs:attribute name="default" type="xs:string" xdb:SQLName="DEFAULT_VALUE" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute ref="xdb:typeRef"/>
+		<xs:attribute name="ref" type="xs:QName" xdb:SQLName="PROPREF_NAME" xdb:SQLType="XDB$QNAME" xdb:SQLSchema="XDBPM" xdb:JavaType="QNAme"/>
+		<xs:attribute ref="xdb:refRef"/>
+		<xs:attribute name="use" type="useChoice" xdb:SQLName="ATTR_USE" xdb:SQLType="XDB$USECHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+		<xs:attribute name="fixed" type="xs:string" xdb:SQLName="FIXED_VALUE" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute ref="xdb:global"/>
+		<xs:attribute ref="xdb:SQLCollType"/>
+		<xs:attribute ref="xdb:SQLCollSchema"/>
+		<xs:attribute ref="xdb:hidden"/>
+		<xs:attribute ref="xdb:transient"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute ref="xdb:baseProp"/>
+	</xs:complexType>
+	<xs:complexType name="element" mixed="false" xdb:maintainDOM="false" xdb:SQLType="XDB$ELEMENT_T" xdb:SQLSchema="XDBPM">
+		<xs:complexContent>
+			<xs:extension base="attribute">
+				<xs:sequence minOccurs="1" maxOccurs="1">
+					<xs:element name="complexType" type="complexType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="CPLX_TYPE_DECL" xdb:SQLType="XDB$COMPLEX_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$COMPLEX_TYPE" xdb:defaultTableSchema="XDBPM"/>
+					<xs:element name="substitutionGroupRef" type="xs:hexBinary" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="SUBS_GROUP_REFS" xdb:SQLType="RAW" xdb:JavaType="Reference" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTable="XDB$ELEMENT" xdb:defaultTableSchema="XDBPM"/>
+					<xs:element name="unique" type="keybase" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="UNIQUES" xdb:SQLType="XDB$KEYBASE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$KEYBASE_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+					<xs:element name="key" type="keybase" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="KEYS" xdb:SQLType="XDB$KEYBASE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$KEYBASE_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+					<xs:element name="keyref" type="keybase" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="KEYREFS" xdb:SQLType="XDB$KEYBASE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$KEYBASE_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+				</xs:sequence>
+				<xs:attribute ref="xdb:baseSQLname"/>
+				<xs:attribute name="substitutionGroup" type="xs:QName" xdb:SQLName="SUBS_GROUP" xdb:SQLType="XDB$QNAME" xdb:SQLSchema="XDBPM" xdb:JavaType="QNAme"/>
+				<xs:attribute name="nillable" type="xs:boolean" default="false" xdb:SQLName="NILLABLE" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+				<xs:attribute name="final" type="derivationChoice" xdb:SQLName="FINAL_INFO" xdb:SQLType="XDB$DERIVATIONCHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+				<xs:attribute name="block" type="derivationChoice" xdb:SQLName="BLOCK" xdb:SQLType="XDB$DERIVATIONCHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+				<xs:attribute name="abstract" type="xs:boolean" default="false" xdb:SQLName="ABSTRACT" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+				<xs:attribute ref="xdb:SQLInline"/>
+				<xs:attribute ref="xdb:JavaInline"/>
+				<xs:attribute ref="xdb:MemInline"/>
+				<xs:attribute ref="xdb:maintainDOM"/>
+				<xs:attribute ref="xdb:defaultTable"/>
+				<xs:attribute ref="xdb:defaultTableSchema"/>
+				<xs:attribute ref="xdb:tableProps"/>
+				<xs:attribute ref="xdb:JavaClassname"/>
+				<xs:attribute ref="xdb:beanClassname"/>
+				<xs:attribute ref="xdb:numCols"/>
+				<xs:attribute ref="xdb:defaultXSL"/>
+				<xs:attribute name="minOccurs" type="xs:integer" default="0" xdb:SQLName="MIN_OCCURS" xdb:SQLType="NUMBER" xdb:JavaType="int"/>
+				<xs:attribute name="maxOccurs" type="xs:string" xdb:SQLName="MAX_OCCURS" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+				<xs:attribute ref="xdb:isFolder"/>
+				<xs:attribute ref="xdb:maintainOrder"/>
+				<xs:attribute ref="xdb:columnProps"/>
+				<xs:attribute ref="xdb:defaultACL"/>
+				<xs:attribute ref="xdb:headElementRef"/>
+				<xs:attribute ref="xdb:translate"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="modelType" mixed="false" xdb:SQLType="XDB$MODEL_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="element" type="element" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ELEMENTS" xdb:SQLType="XDB$ELEMENT_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ELEMENT" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="choice" type="modelType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="CHOICE_KIDS" xdb:SQLType="XDB$MODEL_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$CHOICE_MODEL" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="sequence" type="modelType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="SEQUENCE_KIDS" xdb:SQLType="XDB$MODEL_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$SEQUENCE_MODEL" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="any" type="anyType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANYS" xdb:SQLType="XDB$ANY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ANY" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="group" type="groupRefType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="GROUPS" xdb:SQLType="XDB$GROUP_REF_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$GROUP_REF" xdb:defaultTableSchema="XDBPM"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute ref="xdb:parentSchema"/>
+		<xs:attribute name="minOccurs" type="xs:integer" default="0" xdb:SQLName="MIN_OCCURS" xdb:SQLType="NUMBER" xdb:JavaType="int"/>
+		<xs:attribute name="maxOccurs" type="xs:string" xdb:SQLName="MAX_OCCURS" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="complexDerivationType" mixed="false" xdb:SQLType="XDB$COMPLEX_DERIVATION_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:choice minOccurs="0" maxOccurs="1">
+				<xs:element name="all" type="modelType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ALL_KID" xdb:SQLType="XDB$MODEL_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ALL_MODEL" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="choice" type="modelType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="CHOICE_KID" xdb:SQLType="XDB$MODEL_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$CHOICE_MODEL" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="sequence" type="modelType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="SEQUENCE_KID" xdb:SQLType="XDB$MODEL_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$SEQUENCE_MODEL" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="group" type="groupRefType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="GROUP_KID" xdb:SQLType="XDB$GROUP_REF_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$GROUP_REF" xdb:defaultTableSchema="XDBPM"/>
+			</xs:choice>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="attribute" type="attribute" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ATTRIBUTES" xdb:SQLType="XDB$PROPERTY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRIBUTE" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="anyAttribute" type="anyType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANY_ATTRS" xdb:SQLType="XDB$ANY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ANYATTR" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="attributeGroup" type="attrGroupRefType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ATTR_GROUPS" xdb:SQLType="XDB$ATTRGROUP_REF_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRGROUP_REF" xdb:defaultTableSchema="XDBPM"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="base" type="xs:QName" xdb:SQLName="BASE" xdb:SQLType="XDB$QNAME" xdb:SQLSchema="XDBPM" xdb:JavaType="QNAme"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="cplxcontentType" mixed="false" xdb:SQLType="XDB$CONTENT_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="restriction" type="complexDerivationType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="RESTRICTION" xdb:SQLType="XDB$COMPLEX_DERIVATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="extension" type="complexDerivationType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="EXTENSION" xdb:SQLType="XDB$COMPLEX_DERIVATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute name="mixed" type="xs:boolean" default="false" xdb:SQLName="MIXED" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="simpleDerivationType" mixed="false" xdb:SQLType="XDB$SIMPLE_DERIVATION_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="fractionDigits" type="numFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="FRACTIONDIGITS" xdb:SQLType="XDB$NUMFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="short" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="totalDigits" type="numFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="TOTALDIGITS" xdb:SQLType="XDB$NUMFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="short" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="minLength" type="numFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="MINLENGTH" xdb:SQLType="XDB$NUMFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="maxLength" type="numFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="MAXLENGTH" xdb:SQLType="XDB$NUMFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="whiteSpace" type="whiteSpace" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="WHITESPACE" xdb:SQLType="XDB$WHITESPACE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="period" type="timeFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="PERIOD" xdb:SQLType="XDB$TIMEFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="TimeStamp" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="duration" type="timeFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="DURATION" xdb:SQLType="XDB$TIMEFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="TimeStamp" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="minInclusive" type="facet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="MIN_INCLUSIVE" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="maxInclusive" type="facet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="MAX_INCLUSIVE" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="pattern" type="facet" nillable="false" minOccurs="0" maxOccurs="65535" xdb:SQLName="PATTERN" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLCollType="XDB$FACET_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="enumeration" type="facet" nillable="false" minOccurs="0" maxOccurs="65535" xdb:SQLName="ENUMERATION" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLCollType="XDB$FACET_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="minExclusive" type="facet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="MIN_EXCLUSIVE" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="maxExclusive" type="facet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="MAX_EXCLUSIVE" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="length" type="numFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="LENGTH" xdb:SQLType="XDB$NUMFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="simpleType" type="simpleType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="LCL_SMPL_DECL" xdb:SQLType="XDB$SIMPLE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$SIMPLE_TYPE" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute ref="xdb:baseType"/>
+		<xs:attribute name="base" type="xs:QName" xdb:SQLName="BASE" xdb:SQLType="XDB$QNAME" xdb:SQLSchema="XDBPM" xdb:JavaType="QNAme"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="listType" mixed="false" xdb:SQLType="XDB$LIST_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="simpleType" type="simpleType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="SIMPLE_TYPE" xdb:SQLType="XDB$SIMPLE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$SIMPLE_TYPE" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute name="itemType" type="xs:QName" xdb:SQLName="ITEM_TYPE" xdb:SQLType="XDB$QNAME" xdb:SQLSchema="XDBPM" xdb:JavaType="QNAme"/>
+		<xs:attribute name="typeRef" type="xs:hexBinary" xdb:SQLName="TYPE_REF" xdb:SQLType="RAW" xdb:JavaType="Reference"/>
+	</xs:complexType>
+	<xs:complexType name="unionType" mixed="false" xdb:SQLType="XDB$UNION_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="simpleType" type="simpleType" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="SIMPLE_TYPES" xdb:SQLType="XDB$SIMPLE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$SIMPLE_TYPE" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="typeRef" type="xs:hexBinary" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="TYPE_REFS" xdb:SQLType="RAW" xdb:JavaType="Reference" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute name="memberTypes" type="xs:QName" xdb:SQLName="MEMBER_TYPES" xdb:SQLType="VARCHAR2" xdb:JavaType="QNAme"/>
+	</xs:complexType>
+	<xs:complexType name="anyType" mixed="false" xdb:maintainDOM="false" xdb:SQLType="XDB$ANY_T" xdb:SQLSchema="XDBPM">
+		<xs:complexContent>
+			<xs:extension base="attribute">
+				<xs:attribute name="namespace" type="xs:string" xdb:SQLName="NAMESPACE" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+				<xs:attribute name="processContents" type="processChoice" xdb:SQLName="PROCESS_CONTENTS" xdb:SQLType="XDB$PROCESSCHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+				<xs:attribute name="minOccurs" type="xs:integer" default="0" xdb:SQLName="MIN_OCCURS" xdb:SQLType="NUMBER" xdb:JavaType="int"/>
+				<xs:attribute name="maxOccurs" type="xs:string" xdb:SQLName="MAX_OCCURS" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="appinfo" mixed="true" xdb:SQLType="XDB$APPINFO_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:any minOccurs="0" maxOccurs="1000" xdb:SQLType="VARCHAR2"/>
+		</xs:sequence>
+		<xs:attribute name="source" type="xs:string" xdb:SQLName="SOURCE" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="documentation" mixed="true" xdb:SQLType="XDB$DOCUMENTATION_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:any minOccurs="0" maxOccurs="1000" xdb:SQLType="VARCHAR2"/>
+		</xs:sequence>
+		<xs:attribute name="source" type="xs:string" xdb:SQLName="SOURCE" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="lang" type="xs:string" xdb:SQLName="LANG" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="annotation" mixed="false" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="appinfo" type="appinfo" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="APPINFO" xdb:SQLType="XDB$APPINFO_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$APPINFO_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="documentation" type="documentation" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="DOCUMENTATION" xdb:SQLType="XDB$DOCUMENTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$DOCUMENTATION_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="schema" mixed="false" xdb:SQLType="XDB$SCHEMA_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATIONS" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLCollType="XDB$ANNOTATION_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="simpleType" type="simpleType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="SIMPLE_TYPE" xdb:SQLType="XDB$SIMPLE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$SIMPLE_TYPE" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="complexType" type="complexType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="COMPLEX_TYPES" xdb:SQLType="XDB$COMPLEX_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$COMPLEX_TYPE" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="attribute" type="attribute" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ATTRIBUTES" xdb:SQLType="XDB$PROPERTY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRIBUTE" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="element" type="element" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ELEMENTS" xdb:SQLType="XDB$ELEMENT_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ELEMENT" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="import" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="IMPORTS" xdb:SQLType="XDB$IMPORT_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$IMPORT_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM">
+				<xs:complexType mixed="false">
+					<xs:sequence minOccurs="1" maxOccurs="1">
+						<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+					</xs:sequence>
+					<xs:attribute name="namespace" type="xs:string" xdb:SQLName="NAMESPACE" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+					<xs:attribute name="schemaLocation" type="xs:string" xdb:SQLName="SCHEMA_LOCATION" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+					<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="include" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="INCLUDES" xdb:SQLType="XDB$INCLUDE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$INCLUDE_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM">
+				<xs:complexType mixed="false">
+					<xs:sequence minOccurs="1" maxOccurs="1">
+						<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+					</xs:sequence>
+					<xs:attribute name="schemaLocation" type="xs:string" xdb:SQLName="SCHEMA_LOCATION" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+					<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="group" type="groupDefType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="GROUPS" xdb:SQLType="XDB$GROUP_DEF_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$GROUP_DEF" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="attributeGroup" type="attrGroupDefType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ATTRGROUPS" xdb:SQLType="XDB$ATTRGROUP_DEF_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRGROUP_DEF" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="notation" type="notation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="NOTATIONS" xdb:SQLType="XDB$NOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$NOTATION_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute ref="xdb:schemaURL"/>
+		<xs:attribute name="targetNamespace" type="xs:string" xdb:SQLName="TARGET_NAMESPACE" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="version" type="xs:string" xdb:SQLName="VERSION" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute ref="xdb:numProps"/>
+		<xs:attribute name="finalDefault" type="derivationChoice" xdb:SQLName="FINAL_DEFAULT" xdb:SQLType="XDB$DERIVATIONCHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+		<xs:attribute name="blockDefault" type="derivationChoice" xdb:SQLName="BLOCK_DEFAULT" xdb:SQLType="XDB$DERIVATIONCHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+		<xs:attribute name="attributeFormDefault" type="formChoice" xdb:SQLName="ATTRIBUTE_FORM_DFLT" xdb:SQLType="XDB$FORMCHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+		<xs:attribute name="elementFormDefault" type="formChoice" xdb:SQLName="ELEMENT_FORM_DFLT" xdb:SQLType="XDB$FORMCHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+		<xs:attribute ref="xdb:flags"/>
+		<xs:attribute ref="xdb:mapStringToNCHAR"/>
+		<xs:attribute ref="xdb:mapUnboundedStringToLob"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute ref="xdb:storeVarrayAsTable"/>
+		<xs:attribute ref="xdb:schemaOwner"/>
+		<xs:attribute name="lang" type="xs:string" xdb:SQLName="LANG" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="groupDefType" mixed="false" xdb:SQLType="XDB$GROUP_DEF_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="all" type="modelType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ALL_KID" xdb:SQLType="XDB$MODEL_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ALL_MODEL" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="choice" type="modelType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="CHOICE_KID" xdb:SQLType="XDB$MODEL_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$CHOICE_MODEL" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="sequence" type="modelType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="SEQUENCE_KID" xdb:SQLType="XDB$MODEL_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$SEQUENCE_MODEL" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute ref="xdb:parentSchema"/>
+		<xs:attribute name="name" type="xs:string" xdb:SQLName="NAME" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="groupRefType" mixed="false" xdb:SQLType="XDB$GROUP_REF_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute ref="xdb:parentSchema"/>
+		<xs:attribute name="minOccurs" type="xs:integer" default="0" xdb:SQLName="MIN_OCCURS" xdb:SQLType="NUMBER" xdb:JavaType="int"/>
+		<xs:attribute name="maxOccurs" type="xs:string" xdb:SQLName="MAX_OCCURS" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="ref" type="xs:QName" xdb:SQLName="GROUPREF_NAME" xdb:SQLType="XDB$QNAME" xdb:SQLSchema="XDBPM" xdb:JavaType="QNAme"/>
+		<xs:attribute name="refRef" type="xs:hexBinary" xdb:SQLName="GROUPREF_REF" xdb:SQLType="RAW" xdb:JavaType="Reference"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="attrGroupDefType" mixed="false" xdb:SQLType="XDB$ATTRGROUP_DEF_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="attribute" type="attribute" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="ATTRIBUTES" xdb:SQLType="XDB$PROPERTY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRIBUTE" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="anyAttribute" type="anyType" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="ANY_ATTRS" xdb:SQLType="XDB$ANY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ANYATTR" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="attributeGroup" type="attrGroupRefType" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="ATTR_GROUPS" xdb:SQLType="XDB$ATTRGROUP_REF_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRGROUP_REF" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute ref="xdb:parentSchema"/>
+		<xs:attribute name="name" type="xs:string" xdb:SQLName="NAME" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="attrGroupRefType" mixed="false" xdb:SQLType="XDB$ATTRGROUP_REF_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute ref="xdb:parentSchema"/>
+		<xs:attribute name="hexBinary" type="xs:QName" xdb:SQLName="ATTRGROUP_NAME" xdb:SQLType="XDB$QNAME" xdb:SQLSchema="XDBPM" xdb:JavaType="QNAme"/>
+		<xs:attribute name="refRef" type="xs:hexBinary" xdb:SQLName="ATTRGROUP_REF" xdb:SQLType="RAW" xdb:JavaType="Reference"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="notation" mixed="false" xdb:SQLType="XDB$NOTATION_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" xdb:SQLName="NAME" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="public" type="xs:string" xdb:SQLName="PUBLICVAL" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="system" type="xs:string" xdb:SQLName="SYSTEM" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="xpathspec" mixed="false" xdb:SQLType="XDB$XPATHSPEC_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute name="xpath" type="xs:string" xdb:SQLName="XPATH" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="keybase" mixed="false" xdb:SQLType="XDB$KEYBASE_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="selector" type="xpathspec" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="SELECTOR" xdb:SQLType="XDB$XPATHSPEC_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="field" type="xpathspec" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="FIELDS" xdb:SQLType="XDB$XPATHSPEC_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XPATHSPEC_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" xdb:SQLName="NAME" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		<xs:attribute name="refer" type="xs:QName" xdb:SQLName="REFER" xdb:SQLType="XDB$QNAME" xdb:SQLSchema="XDBPM" xdb:JavaType="QNAme"/>
+	</xs:complexType>
+	<xs:complexType name="simpleContentResType" mixed="false" xdb:SQLType="XDB$SIMPLECONT_RES_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="fractionDigits" type="numFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="FRACTIONDIGITS" xdb:SQLType="XDB$NUMFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="short" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="totalDigits" type="numFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="TOTALDIGITS" xdb:SQLType="XDB$NUMFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="short" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="minLength" type="numFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="MINLENGTH" xdb:SQLType="XDB$NUMFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="maxLength" type="numFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="MAXLENGTH" xdb:SQLType="XDB$NUMFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="whiteSpace" type="whiteSpace" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="WHITESPACE" xdb:SQLType="XDB$WHITESPACE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="period" type="timeFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="PERIOD" xdb:SQLType="XDB$TIMEFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="TimeStamp" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="duration" type="timeFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="DURATION" xdb:SQLType="XDB$TIMEFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="TimeStamp" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="minInclusive" type="facet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="MIN_INCLUSIVE" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="maxInclusive" type="facet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="MAX_INCLUSIVE" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="pattern" type="facet" nillable="false" minOccurs="0" maxOccurs="65535" xdb:SQLName="PATTERN" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLCollType="XDB$FACET_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="enumeration" type="facet" nillable="false" minOccurs="0" maxOccurs="65535" xdb:SQLName="ENUMERATION" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLCollType="XDB$FACET_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="minExclusive" type="facet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="MIN_EXCLUSIVE" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="maxExclusive" type="facet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="MAX_EXCLUSIVE" xdb:SQLType="XDB$FACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="length" type="numFacet" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="LENGTH" xdb:SQLType="XDB$NUMFACET_T" xdb:SQLSchema="XDBPM" xdb:JavaType="int" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="simpleType" type="simpleType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="LCL_SMPL_DECL" xdb:SQLType="XDB$SIMPLE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$SIMPLE_TYPE" xdb:defaultTableSchema="XDBPM"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="attribute" type="attribute" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ATTRIBUTES" xdb:SQLType="XDB$PROPERTY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRIBUTE" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="anyAttribute" type="anyType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANY_ATTRS" xdb:SQLType="XDB$ANY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ANYATTR" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="attributeGroup" type="attrGroupRefType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ATTR_GROUPS" xdb:SQLType="XDB$ATTRGROUP_REF_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRGROUP_REF" xdb:defaultTableSchema="XDBPM"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="base" type="xs:QName" xdb:SQLName="BASE" xdb:SQLType="XDB$QNAME" xdb:SQLSchema="XDBPM" xdb:JavaType="QNAme"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="simpleContentExtType" mixed="false" xdb:SQLType="XDB$SIMPLECONT_EXT_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="attribute" type="attribute" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ATTRIBUTES" xdb:SQLType="XDB$PROPERTY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRIBUTE" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="anyAttribute" type="anyType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANY_ATTRS" xdb:SQLType="XDB$ANY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ANYATTR" xdb:defaultTableSchema="XDBPM"/>
+				<xs:element name="attributeGroup" type="attrGroupRefType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ATTR_GROUPS" xdb:SQLType="XDB$ATTRGROUP_REF_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:SQLInline="false" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRGROUP_REF" xdb:defaultTableSchema="XDBPM"/>
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="base" type="xs:QName" xdb:SQLName="BASE" xdb:SQLType="XDB$QNAME" xdb:SQLSchema="XDBPM" xdb:JavaType="QNAme"/>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:complexType name="smplcontentType" mixed="false" xdb:SQLType="XDB$SIMPLECONTENT_T" xdb:SQLSchema="XDBPM">
+		<xs:sequence minOccurs="1" maxOccurs="1">
+			<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="restriction" type="simpleContentResType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="RESTRICTION" xdb:SQLType="XDB$SIMPLECONT_RES_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			<xs:element name="extension" type="simpleContentExtType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="EXTENSION" xdb:SQLType="XDB$SIMPLECONT_EXT_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	</xs:complexType>
+	<xs:element name="annotation" type="annotation" nillable="false" xdb:SQLName="ANNOTATIONS" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLCollType="XDB$ANNOTATION_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+	<xs:element name="simpleType" type="simpleType" nillable="false" xdb:SQLName="SIMPLE_TYPE" xdb:SQLType="XDB$SIMPLE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTable="XDB$SIMPLE_TYPE" xdb:defaultTableSchema="XDBPM"/>
+	<xs:element name="complexType" type="complexType" nillable="false" xdb:SQLName="COMPLEX_TYPES" xdb:SQLType="XDB$COMPLEX_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTable="XDB$COMPLEX_TYPE" xdb:defaultTableSchema="XDBPM"/>
+	<xs:element name="attribute" type="attribute" nillable="false" xdb:SQLName="ATTRIBUTES" xdb:SQLType="XDB$PROPERTY_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRIBUTE" xdb:defaultTableSchema="XDBPM"/>
+	<xs:element name="element" type="element" nillable="false" xdb:SQLName="ELEMENTS" xdb:SQLType="XDB$ELEMENT_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTable="XDB$ELEMENT" xdb:defaultTableSchema="XDBPM"/>
+	<xs:element name="import" nillable="false" xdb:SQLName="IMPORTS" xdb:SQLType="XDB$IMPORT_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$IMPORT_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM">
+		<xs:complexType mixed="false">
+			<xs:sequence minOccurs="1" maxOccurs="1">
+				<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			</xs:sequence>
+			<xs:attribute name="namespace" type="xs:string" xdb:SQLName="NAMESPACE" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+			<xs:attribute name="schemaLocation" type="xs:string" xdb:SQLName="SCHEMA_LOCATION" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+			<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="include" nillable="false" xdb:SQLName="INCLUDES" xdb:SQLType="XDB$INCLUDE_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$INCLUDE_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM">
+		<xs:complexType mixed="false">
+			<xs:sequence minOccurs="1" maxOccurs="1">
+				<xs:element name="annotation" type="annotation" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ANNOTATION" xdb:SQLType="XDB$ANNOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="String" xdb:SQLInline="true" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+			</xs:sequence>
+			<xs:attribute name="schemaLocation" type="xs:string" xdb:SQLName="SCHEMA_LOCATION" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+			<xs:attribute name="id" type="xs:string" xdb:SQLName="ID" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="group" type="groupDefType" nillable="false" xdb:SQLName="GROUPS" xdb:SQLType="XDB$GROUP_DEF_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTable="XDB$GROUP_DEF" xdb:defaultTableSchema="XDBPM"/>
+	<xs:element name="attributeGroup" type="attrGroupDefType" nillable="false" xdb:SQLName="ATTRGROUPS" xdb:SQLType="XDB$ATTRGROUP_DEF_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTable="XDB$ATTRGROUP_DEF" xdb:defaultTableSchema="XDBPM"/>
+	<xs:element name="notation" type="notation" nillable="false" xdb:SQLName="NOTATIONS" xdb:SQLType="XDB$NOTATION_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:SQLCollType="XDB$NOTATION_LIST_T" xdb:SQLCollSchema="XDBPM" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+	<xs:element name="schema" type="schema" nillable="false" xdb:SQLType="XDB$SCHEMA_T" xdb:SQLSchema="XDBPM" xdb:JavaType="XMLType" xdb:maintainDOM="true" xdb:defaultTable="XDB$SCHEMA" xdb:defaultTableSchema="XDBPM"/>
+	<xs:element name="schemaTop" type="xs:string" abstract="true" nillable="false" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+	<xs:element name="binary" type="xs:hexBinary" abstract="false  " nillable="false" xdb:JavaType="Stream" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+	<xs:element name="text" type="xs:string" nillable="false" xdb:JavaType="Stream" xdb:maintainDOM="false" xdb:defaultTableSchema="XDBPM"/>
+</xs:schema>

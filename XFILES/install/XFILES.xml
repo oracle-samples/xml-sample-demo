@@ -1,0 +1,769 @@
+<!--
+
+/* ================================================  
+ * Oracle XFiles Demonstration.  
+ *    
+ * Copyright (c) 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * ================================================ */
+
+-->
+
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by Mark D. Drake and Geoff Lee (Oracle XML Dev) -->
+<installerConfiguration testSYSDBA="true">
+	<parameters>
+		<parameter name="%DEMONAME%"        value="Oracle XML DB XFiles application"/>
+		<parameter name="%LAUNCHPAD%"       value="XFILES Application"/>
+		<parameter name="%LAUNCHPADFOLDER%" value="%STARTMENU%\Oracle XML DB Demonstrations"/>
+
+		<parameter name="%BASEFOLDER%"      value="/home/%USER%"/>
+		<parameter name="%LOGO%"            value="OracleTransparent3d.png"/>
+
+		<parameter name="enableHTTPTrace"   value="false"/>
+	</parameters>
+
+	<installation>
+		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\xdbpm\XDBPM_SUPPORT %DEMODIRECTORY%\xdbpm</action>
+		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\SQL\XFILES_SYSDBA_TASKS.sql %USER%</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\SQL\XFILES_DBA_TASKS.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\SQL\INSTALL_XFILES.sql %USER%</action>
+	  <action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_PUBLIC_SYNONYMS.sql %USER%</action>
+	  <action type="UPLOAD">
+	  	
+  		<!-- Delete existing Source Code -->
+
+  		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/</remote>
+  		</action>
+
+  		<!-- Recreate Source Code Directory -->
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/Applications</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  		  <local>%DEMODIRECTORY%\src\Xinha-0.96.1.zip</local>
+  			<remote>%BASEFOLDER%/src/Xinha-0.96.1.zip</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  		  <local>%DEMODIRECTORY%\src\famfamfam_silk_icons_v013.zip</local>
+  			<remote>%BASEFOLDER%/src/famfamfam_silk_icons_v013.zip</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  		  <local>%DEMODIRECTORY%\src\bootstrap3-dialog-master.zip</local>
+  			<remote>%BASEFOLDER%/src/bootstrap3-dialog-master.zip</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  		  <local>%DEMODIRECTORY%\src\bootstrap-3.2.0-dist.zip</local>
+  			<remote>%BASEFOLDER%/src/bootstrap-3.2.0-dist.zip</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  		  <local>%DEMODIRECTORY%\src\jquery-2.1.1.min.zip</local>
+  			<remote>%BASEFOLDER%/src/jquery-2.1.1.min.zip</remote>
+  		</action>
+
+
+
+  		<!-- Apex Support -->
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/apex/xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\apex\xsl\ShowTree.xsl</local>
+  			<remote>%BASEFOLDER%/src/apex/xsl/ShowTree.xsl</remote>
+  		</action>
+
+      <!-- Common -->
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/common</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/common/js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\js\common.js</local>
+  			<remote>%BASEFOLDER%/src/common/js/common.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\js\XMLPrettyPrint.js</local>
+  			<remote>%BASEFOLDER%/src/common/js/XMLPrettyPrint.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\js\jsonPrettyPrint.js</local>
+  			<remote>%BASEFOLDER%/src/common/js/jsonPrettyPrint.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\js\renderJSON.js</local>
+  			<remote>%BASEFOLDER%/src/common/js/renderJSON.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\js\xmlDocumentObject.js</local>
+  			<remote>%BASEFOLDER%/src/common/js/xmlDocumentObject.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\js\RestAPI.js</local>
+  			<remote>%BASEFOLDER%/src/common/js/RestAPI.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\js\RestUtilities.js</local>
+  			<remote>%BASEFOLDER%/src/common/js/RestUtilities.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\js\runtime.js</local>
+  			<remote>%BASEFOLDER%/src/common/js/runtime.js</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/common/xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\xsl\wsdl2request.xsl</local>
+  			<remote>%BASEFOLDER%/src/common/xsl/wsdl2request.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\xsl\formatResponse.xsl</local>
+  			<remote>%BASEFOLDER%/src/common/xsl/formatResponse.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\xsl\formatXPlan.xsl</local>
+  			<remote>%BASEFOLDER%/src/common/xsl/formatXPlan.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\xsl\formatDescribe.xsl</local>
+  			<remote>%BASEFOLDER%/src/common/xsl/formatDescribe.xsl</remote>
+  		</action>
+
+      <!-- XFILES Lite HTML Files-->
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/lite</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\XFilesLaunchPad.html</local>
+  			<remote>%BASEFOLDER%/src/lite/XFilesLaunchPad.html</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\aboutXFiles.html</local>
+  			<remote>%BASEFOLDER%/src/lite/aboutXFiles.html</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\Folder.html</local>
+  			<remote>%BASEFOLDER%/src/lite/Folder.html</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\FolderRSS.html</local>
+  			<remote>%BASEFOLDER%/src/lite/FolderRSS.html</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\Resource.html</local>
+  			<remote>%BASEFOLDER%/src/lite/Resource.html</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\Version.html</local>
+  			<remote>%BASEFOLDER%/src/lite/Version.html</remote>
+  		</action>
+
+      <!-- XFILES Lite Javascript Files-->
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/lite/js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\folder.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/folder.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\resource.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/resource.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\version.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/version.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\common.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/common.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\dynamicCode.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/dynamicCode.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\js\userManagement.js</local>
+  			<remote>%BASEFOLDER%/src/common/js/userManagement.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\XinhaInit.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/XinhaInit.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\FolderBrowser.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/FolderBrowser.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\ResourceProperties.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/ResourceProperties.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\VersionHistory.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/VersionHistory.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\UploadFiles.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/UploadFiles.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\XFilesWiki.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/XFilesWiki.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\SourceViewer.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/SourceViewer.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\XMLSchemaList.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/XMLSchemaList.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\XMLIndexList.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/XMLIndexList.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\onPageLoaded.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/onPageLoaded.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\xfilesStatus.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/xfilesStatus.js</remote>
+  		</action>
+
+      <!-- XFILES Lite XSL Files-->
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/lite/xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\common.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/common.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\folderTree.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/folderTree.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\FolderBrowserDialogs.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/FolderBrowserDialogs.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\XFilesRSSFeed.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/XFilesRSSFeed.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\XFilesMappings.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/XFilesMappings.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\FolderBrowser.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/FolderBrowser.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\FolderListing.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/FolderListing.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\FolderFileListing.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/FolderFileListing.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\ResourceProperties.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/ResourceProperties.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\VersionHistory.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/VersionHistory.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\ResourceProperties.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/ResourceProperties.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\UploadFiles.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/UploadFiles.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\UploadFilesStatus.html</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/UploadFilesStatus.html</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\XFilesWiki.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/XFilesWiki.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\SourceViewer.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/SourceViewer.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\XMLIndexList.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/XMLIndexList.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\XMLSchemaList.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/XMLSchemaList.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\plainTextContent.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/plainTextContent.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\xfilesStatus.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/xfilesStatus.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\formatXFilesStatus.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/formatXFilesStatus.xsl</remote>
+  		</action>
+
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\XFilesIconMappings.xml</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/XFilesIconMappings.xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\XFilesMappings.xml</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/XFilesMappings.xml</remote>
+  		</action>
+
+      <!-- XFILES Webservices Demo Support -->
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/WebServices</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\WebServices\webServices.html</local>
+  			<remote>%BASEFOLDER%/src/WebServices/webServices.html</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/WebServices/js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\WebServices\js\simpleSoapExample.js</local>
+  			<remote>%BASEFOLDER%/src/WebServices/js/simpleSoapExample.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\WebServices\js\simpleSoapSupport.js</local>
+  			<remote>%BASEFOLDER%/src/WebServices/js/simpleSoapSupport.js</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/WebServices/xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\WebServices\xsl\webServices.xsl</local>
+  			<remote>%BASEFOLDER%/src/WebServices/xsl/webServices.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\WebServices\xsl\simpleInputForm.xsl</local>
+  			<remote>%BASEFOLDER%/src/WebServices/xsl/simpleInputForm.xsl</remote>
+  		</action>
+  		
+      <!-- XFILE Search Support -->
+      
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/XMLSearch</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xmlIndex.html</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xmlIndex.html</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xmlSchema.html</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xmlSchema.html</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\reposSearch.html</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/reposSearch.html</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\resourceSearch.html</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/resourceSearch.html</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/XMLSearch/js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\js\xmlIndexSearch.js</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/js/xmlIndexSearch.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\js\xmlSchemaSearch.js</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/js/xmlSchemaSearch.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\js\xmlSearch.js</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/js/xmlSearch.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\js\reposSearch.js</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/js/reposSearch.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\js\resourceSearch.js</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/js/resourceSearch.js</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\common.xsl</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xsl/common.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\xmlIndex.xsl</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xsl/xmlIndex.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\xmlSchema.xsl</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xsl/xmlSchema.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\reposSearch.xsl</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xsl/reposSearch.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\resourceSearch.xsl</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xsl/resourceSearch.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\resourceSearchForm.xsl</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xsl/resourceSearchForm.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\resourceList.xsl</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xsl/resourceList.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\uniqueKeyList.xsl</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xsl/uniqueKeyList.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\documentIdList.xsl</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xsl/documentIdList.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\searchTreeView.xsl</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xsl/searchTreeView.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\resourceList.xsl</local>
+  			<remote>%BASEFOLDER%/src/XMLSearch/xsl/resourceList.xsl</remote>
+  		</action>
+
+  		<!-- Web Demonstration Infrastructure -->
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/WebDemo</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\WebDemo\runtime.html</local>
+  			<remote>%BASEFOLDER%/src/WebDemo/runtime.html</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\WebDemo\loader.html</local>
+  			<remote>%BASEFOLDER%/src/WebDemo/loader.html</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/WebDemo/js</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/WebDemo/xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\WebDemo\xsl\runtime.xsl</local>
+  			<remote>%BASEFOLDER%/src/WebDemo/xsl/runtime.xsl</remote>
+  		</action>
+
+      <!-- XMLViewer -->
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/xmlViewer</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\xmlViewer\xmlViewer.html</local>
+  			<remote>%BASEFOLDER%/src/xmlViewer/xmlViewer.html</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/xmlViewer/js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\xmlViewer\js\xmlViewer.js</local>
+  			<remote>%BASEFOLDER%/src/xmlViewer/js/xmlViewer.js</remote>
+  		</action>
+
+      <!-- XFiles Status Page -->
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/xfilesStatus</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\xml\statusPage.xml</local>
+  			<remote>%BASEFOLDER%/xfilesStatus/statusPage.xml</remote>
+  		</action>
+
+      <!-- XFILES Lite CSS Files-->
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/lite/css</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\css\XFiles.css</local>
+  			<remote>%BASEFOLDER%/src/lite/css/XFiles.css</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\css\ErrorDialog.html</local>
+  			<remote>%BASEFOLDER%/src/lite/css/ErrorDialog.html</remote>
+  		</action>
+
+      <!-- ACL and ResConfig documents -->   
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/acls</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/resConfig</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\acls\xfilesUserAcl.xml</local>
+  			<remote>%BASEFOLDER%/src/acls/xfilesUserAcl.xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\acls\denyXFilesUserAcl.xml</local>
+  			<remote>%BASEFOLDER%/src/acls/denyXFilesUserAcl.xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\resConfig\whoamiResConfig.xml</local>
+  			<remote>%BASEFOLDER%/src/resConfig/whoamiResConfig.xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\resConfig\authStatusResConfig.xml</local>
+  			<remote>%BASEFOLDER%/src/resConfig/authStatusResConfig.xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\resConfig\indexPageResConfig.xml</local>
+  			<remote>%BASEFOLDER%/src/resConfig/indexPageResConfig.xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\resConfig\pageHitsResConfig.xml</local>
+  			<remote>%BASEFOLDER%/src/resConfig/pageHitsResConfig.xml</remote>
+  		</action>
+
+      <!-- Images -->   
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/src/images</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\images\%LOGO%</local>
+  			<remote>%BASEFOLDER%/src/images/%LOGO%</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\images\Oracle3d.png</local>
+  			<remote>%BASEFOLDER%/src/images/Oracle3d.png</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\images\OracleTransparent3d.gif</local>
+  			<remote>%BASEFOLDER%/src/images/OracleTransparent3d.gif</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\images\Barber_Pole_Red.gif</local>
+  			<remote>%BASEFOLDER%/src/images/Barber_Pole_Red.gif</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\images\Barber_Pole_Blue.gif</local>
+  			<remote>%BASEFOLDER%/src/images/Barber_Pole_Blue.gif</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\images\AjaxLoading.gif</local>
+  			<remote>%BASEFOLDER%/src/images/AjaxLoading.gif</remote>
+    	</action>
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/Frameworks/Xinha-0.96.1</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/Frameworks/bootstrap3-dialog-master</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/Frameworks/bootstrap-3.2.0-dist</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/Frameworks/jquery-2.1.1</remote>
+  		</action>
+
+  	</action>
+  	<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/famfamfam_silk_icons_v013.zip %BASEFOLDER%/icons/famfamfam          %BASEFOLDER%/icons/famfamfam_silk_icons_v013.log</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/Xinha-0.96.1.zip              %BASEFOLDER%/Frameworks               %BASEFOLDER%/Frameworks/Xinha-0.96.1.log</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/bootstrap3-dialog-master.zip  %BASEFOLDER%/Frameworks               %BASEFOLDER%/Frameworks/bootstrap3-dialog-master.log</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/bootstrap-3.2.0-dist.zip      %BASEFOLDER%/Frameworks               %BASEFOLDER%/Frameworks/bootstrap-3.2.0-dist.log</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/jquery-2.1.1.min.zip          %BASEFOLDER%/Frameworks/jquery-2.1.1  %BASEFOLDER%/Frameworks/jquery-2.1.1.min.log</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\webDemo\sql\XFILES_WEBDEMO_SERVICES.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\SQL\XFILES_STATUS_PAGE.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\PUBLISH_XFILES.sql %LOGO%</action>
+	  <action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\sql\XDB_REPOSITORY_INDEX.sql %DBA% %DBAPASSWORD% %TNSALIAS%</action>
+	  <action type="LAUNCH"></action>
+	</installation>
+  <shortCuts>
+  	<LAUNCH>
+			<shortCut type="url">
+				<name>%LAUNCHPAD%</name>
+				<location>%LAUNCHPADFOLDER%</location>
+				<target>%SERVERURL%/XFILES</target>
+			</shortCut>
+		</LAUNCH>
+  </shortCuts>
+</installerConfiguration>

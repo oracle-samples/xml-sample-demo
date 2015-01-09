@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+/* ================================================  
+ * Oracle XFiles Demonstration.  
+ *    
+ * Copyright (c) 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * ================================================ */
+
+-->
+
+<mapping>
+	<fileExtension>
+		<extension>java</extension>
+		<icon>/XFILES/lib/icons/javaSource.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>js</extension>
+		<icon>/XFILES/lib/icons/jscriptSource.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>sql</extension>
+		<icon>/XFILES/lib/icons/sql.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>doc</extension>
+		<extension>docx</extension>
+		<icon>/XFILES/lib/icons/wordDocument.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>ppt</extension>
+		<extension>pptx</extension>
+		<icon>/XFILES/lib/icons/pptDocument.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>xls</extension>
+		<extension>xlsx</extension>
+		<icon>/XFILES/lib/icons/excelDocument.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>txt</extension>
+		<icon>/XFILES/lib/icons/textDocument.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>xwiki</extension>
+		<icon>/XFILES/lib/icons/wikiDocument.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>xml</extension>
+		<extension>xsd</extension>
+		<extension>xsl</extension>
+		<icon>/XFILES/lib/icons/xmlDocument.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>zip</extension>
+		<icon>/XFILES/lib/icons/zip.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>pdf</extension>
+		<icon>/XFILES/lib/icons/pdf.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>jpeg</extension>
+		<extension>jpg</extension>
+		<icon>/XFILES/lib/icons/imageJPEG.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>gif</extension>
+		<icon>/XFILES/lib/icons/imageGIF.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>tif</extension>
+		<icon>/XFILES/lib/icons/imageTIF.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>bmp</extension>
+		<icon>/XFILES/lib/icons/imageBMP.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>png</extension>
+		<icon>/XFILES/lib/icons/imagePNG.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>avi</extension>
+		<icon>/XFILES/lib/icons/avi.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>mp4</extension>
+		<icon>/XFILES/lib/icons/mp4.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>mov</extension>
+		<icon>/XFILES/lib/icons/mov.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>htm</extension>
+		<extension>html</extension>
+		<icon>/XFILES/lib/icons/htmlPage.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>xhmtl</extension>
+		<icon>/XFILES/lib/icons/xhtmlPage.png</icon>
+	</fileExtension>
+	<fileExtension>
+		<extension>exe</extension>
+		<icon>/XFILES/lib/icons/application.png</icon>
+	</fileExtension>
+	<default>
+		<icon>/XFILES/lib/icons/document.png</icon>
+	</default>
+</mapping>
+

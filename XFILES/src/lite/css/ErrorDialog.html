@@ -1,0 +1,71 @@
+<!--
+
+/* ================================================  
+ * Oracle XFiles Demonstration.  
+ *    
+ * Copyright (c) 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * ================================================ */
+
+-->
+
+		<div style="display: none;" id="genericErrorDialog" onclick="stopBubble(event);">
+			<div style="position:relative; top:0px">
+				<div class="popupOuterEdge" style="z-index: 10000; position:absolute;">
+					<div class="popupBackground">
+						<div class="popupInnerEdge">
+							<div id="errorDialogTitle" class="row popupTitle">XFILES Error encountered</div>
+							<table style="border-width:0px;margin:0px;padding:2px;margin-top:3px;margin-bottom:3px;">
+								<tbody>
+									<tr style="display:none" class="Row" id="errorModule">
+										<td>
+											<div class="labelCol">Module</div>
+										</td>
+										<td class="labelVal">
+											<div id="errorModuleText"/>
+										</td>
+									</tr>
+									<tr style="display:none" class="Row " id="errorType">
+										<td>
+											<div class="labelCol">Type</div>
+										</td>
+										<td class="labelVal">
+											<div id="errorTypeText"/>
+										</td>
+									</tr>
+									<tr style="display:none" class="Row" id="errorTarget">
+										<td>
+											<div class="labelCol">Target</div>
+										</td>
+										<td class="labelVal">
+											<div id="errorTargetText"/>
+										</td>
+									</tr>
+									<tr style="display:none;margin:3px" class="Row" id="errorTraceServer">
+										<td colspan="2" class="alignLeft">
+											<span>Server Trace</span>
+											<pre id="errorTraceServerText" class="inputFormBorder"/>
+										</td>
+									</tr>
+									<tr style="display:none:magin:3px" class="Row" id="errorTraceClient">
+										<td colspan="2" class="alignLeft">
+											<span>Client Trace</span>
+											<pre id="errorTraceClientText" class="inputFormBorder"/>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="alignRight">
+								<img id="btnCancelError" src="/XFILES/lib/icons/cancel.png" alt="Cancel" width="16" height="16" onclick="closeDialog('genericErrorDialog');false"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>

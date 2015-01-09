@@ -1,0 +1,7 @@
+create or replace package UPLOAD_FOLDER_EVENTS
+as
+
+  procedure handlePostLinkIn(P_EVENT dbms_xevent.XDBRepositoryEvent);
+  procedure handlePreLinkIn(P_EVENT dbms_xevent.XDBRepositoryEvent);
+  
+end;

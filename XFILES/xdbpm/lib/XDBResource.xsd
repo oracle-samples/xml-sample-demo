@@ -1,0 +1,154 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xdb="http://xmlns.oracle.com/xdb" xmlns:xdbres="http://xmlns.oracle.com/xdb/XDBResource.xsd" targetNamespace="http://xmlns.oracle.com/xdb/XDBResource.xsd" elementFormDefault="qualified" version="1.0" xdb:schemaURL="http://xmlns.oracle.com/xdb/XDBResource.xsd" xdb:mapStringToNCHAR="false" xdb:mapUnboundedStringToLob="false" xdb:storeVarrayAsTable="false">
+	<simpleType name="OracleUserName">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="4000"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="ResMetaStr">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="128"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="SchElemType">
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="4000"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="GUID">
+		<restriction base="hexBinary">
+			<minLength value="8"/>
+			<maxLength value="32"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="LocksRaw">
+		<restriction base="hexBinary">
+			<minLength value="0"/>
+			<maxLength value="2000"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="lockModeType">
+		<restriction base="string">
+			<enumeration value="exclusive"/>
+			<enumeration value="shared"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="lockTypeType">
+		<restriction base="string">
+			<enumeration value="read-write"/>
+			<enumeration value="write"/>
+			<enumeration value="read"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="lockDepthType">
+		<restriction base="string">
+			<enumeration value="0"/>
+			<enumeration value="infinity"/>
+		</restriction>
+	</simpleType>
+	<complexType name="lockType" mixed="false" xdb:SQLType="XDB$LOCK_T" xdb:SQLSchema="XDBPM">
+		<sequence minOccurs="1" maxOccurs="1">
+			<element name="LockOwner" type="string" nillable="false" minOccurs="1" maxOccurs="1"/>
+			<element name="Mode" type="xdbres:lockModeType" nillable="false" minOccurs="1" maxOccurs="1"/>
+			<element name="Type" type="xdbres:lockTypeType" nillable="false" minOccurs="1" maxOccurs="1"/>
+			<element name="Depth" type="xdbres:lockDepthType" nillable="false" minOccurs="1" maxOccurs="1"/>
+			<element name="Expiry" type="dateTime" nillable="false" minOccurs="0" maxOccurs="1"/>
+			<choice minOccurs="0" maxOccurs="unbounded">
+				<element name="Token" type="string" nillable="false" minOccurs="0" maxOccurs="1"/>
+				<element name="NodeId" type="string" nillable="false" minOccurs="0" maxOccurs="1"/>
+			</choice>
+		</sequence>
+	</complexType>
+	<complexType name="locksType" mixed="false" xdb:SQLType="XDB$LOCKS_T" xdb:SQLSchema="XDBPM">
+		<sequence minOccurs="1" maxOccurs="1">
+			<element name="Lock" type="xdbres:lockType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLType="XDB$LOCK_T" xdb:SQLSchema="XDBPM"/>
+		</sequence>
+	</complexType>
+	<complexType name="ResContentsType" mixed="false" xdb:SQLType="CLOB">
+		<sequence minOccurs="1" maxOccurs="1">
+			<any minOccurs="0" maxOccurs="1"/>
+		</sequence>
+	</complexType>
+	<complexType name="ResAclType" mixed="false" xdb:SQLType="CLOB">
+		<sequence minOccurs="1" maxOccurs="1">
+			<any minOccurs="0" maxOccurs="1"/>
+		</sequence>
+	</complexType>
+	<complexType name="AttrCopyType" mixed="false" xdb:SQLType="CLOB">
+		<sequence minOccurs="1" maxOccurs="1">
+			<any minOccurs="0" maxOccurs="65535"/>
+		</sequence>
+	</complexType>
+	<complexType name="RCListType" mixed="false" xdb:SQLType="XDB$RCLIST_T" xdb:SQLSchema="XDBPM">
+		<sequence minOccurs="1" maxOccurs="1">
+			<element name="OID" type="hexBinary" nillable="false" minOccurs="1" maxOccurs="65535" xdb:SQLName="OID" xdb:SQLType="RAW" xdb:SQLCollType="XDB$OID_LIST_T" xdb:SQLCollSchema="XDBPM"/>
+		</sequence>
+	</complexType>
+	<complexType name="ResourceType" mixed="false" xdb:SQLType="XDB$RESOURCE_T" xdb:SQLSchema="XDBPM">
+		<sequence minOccurs="1" maxOccurs="1">
+			<element name="CreationDate" type="dateTime" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="CREATIONDATE" xdb:SQLType="TIMESTAMP"/>
+			<element name="ModificationDate" type="dateTime" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="MODIFICATIONDATE" xdb:SQLType="TIMESTAMP"/>
+			<element name="Author" type="xdbres:ResMetaStr" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="AUTHOR" xdb:SQLType="VARCHAR2"/>
+			<element name="DisplayName" type="xdbres:ResMetaStr" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="DISPNAME" xdb:SQLType="VARCHAR2"/>
+			<element name="Comment" type="xdbres:ResMetaStr" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="RESCOMMENT" xdb:SQLType="VARCHAR2"/>
+			<element name="Language" type="xdbres:ResMetaStr" default="en" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="LANGUAGE" xdb:SQLType="VARCHAR2"/>
+			<element name="CharacterSet" type="xdbres:ResMetaStr" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="CHARSET" xdb:SQLType="VARCHAR2"/>
+			<element name="ContentType" type="xdbres:ResMetaStr" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="CONTYPE" xdb:SQLType="VARCHAR2"/>
+			<element name="RefCount" type="nonNegativeInteger" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="REFCOUNT" xdb:SQLType="RAW"/>
+			<element name="LockBuf" type="xdbres:LocksRaw" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="LOCKS" xdb:SQLType="RAW"/>
+			<element name="ACL" type="xdbres:ResAclType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLType="CLOB"/>
+			<element name="ACLOID" type="hexBinary" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="ACLOID" xdb:SQLType="RAW"/>
+			<element name="Owner" type="xdbres:OracleUserName" nillable="false" minOccurs="0" maxOccurs="1"/>
+			<element name="OwnerID" type="xdbres:GUID" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="OWNERID" xdb:SQLType="RAW"/>
+			<element name="Creator" type="xdbres:OracleUserName" nillable="false" minOccurs="0" maxOccurs="1"/>
+			<element name="CreatorID" type="xdbres:GUID" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="CREATORID" xdb:SQLType="RAW"/>
+			<element name="LastModifier" type="xdbres:OracleUserName" nillable="false" minOccurs="0" maxOccurs="1"/>
+			<element name="LastModifierID" type="xdbres:GUID" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="LASTMODIFIERID" xdb:SQLType="RAW"/>
+			<element name="SchemaElement" type="xdbres:SchElemType" nillable="false" minOccurs="0" maxOccurs="1"/>
+			<element name="ElNum" type="nonNegativeInteger" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="ELNUM" xdb:SQLType="INTEGER"/>
+			<element name="SchOID" type="hexBinary" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="SCHOID" xdb:SQLType="RAW"/>
+			<element name="Contents" type="xdbres:ResContentsType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLType="CLOB"/>
+			<element name="XMLRef" type="hexBinary" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="XMLREF" xdb:SQLType="RAW"/>
+			<element name="XMLLob" type="hexBinary" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="XMLLOB" xdb:SQLType="BLOB"/>
+			<element name="Flags" type="nonNegativeInteger" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="FLAGS" xdb:SQLType="RAW"/>
+			<element name="VCRUID" type="xdbres:GUID" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="VCRUID" xdb:SQLType="RAW"/>
+			<element name="Parents" type="hexBinary" nillable="false" minOccurs="0" maxOccurs="1000" xdb:SQLName="PARENTS" xdb:SQLType="RAW" xdb:SQLCollType="XDB$PREDECESSOR_LIST_T" xdb:SQLCollSchema="XDBPM"/>
+			<element name="SBResExtra" type="hexBinary" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="SBRESEXTRA" xdb:SQLType="RAW" xdb:SQLCollType="XDB$XMLTYPE_REF_LIST_T" xdb:SQLCollSchema="XDBPM"/>
+			<element name="Snapshot" type="hexBinary" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="SNAPSHOT" xdb:SQLType="RAW"/>
+			<element name="AttrCopy" type="xdbres:AttrCopyType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="ATTRCOPY" xdb:SQLType="BLOB"/>
+			<element name="CtsCopy" type="hexBinary" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="CTSCOPY" xdb:SQLType="BLOB"/>
+			<element name="NodeNum" type="hexBinary" nillable="false" minOccurs="1" maxOccurs="1" xdb:SQLName="NODENUM" xdb:SQLType="RAW"/>
+			<element name="ContentSize" type="integer" nillable="false" minOccurs="0" maxOccurs="1"/>
+			<element name="SizeOnDisk" type="nonNegativeInteger" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="SIZEONDISK" xdb:SQLType="INTEGER"/>
+			<element name="RCList" type="xdbres:RCListType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="RCLIST" xdb:SQLType="XDB$RCLIST_T" xdb:SQLSchema="XDBPM"/>
+			<element name="Branch" type="string" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="BRANCH" xdb:SQLType="VARCHAR2"/>
+			<element name="CheckedOutBy" type="xdbres:OracleUserName" nillable="false" minOccurs="0" maxOccurs="1"/>
+			<element name="CheckedOutByID" type="xdbres:GUID" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="CHECKEDOUTBYID" xdb:SQLType="RAW"/>
+			<element name="BaseVersion" type="hexBinary" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLName="BASEVERSION" xdb:SQLType="RAW"/>
+			<element name="Locks" type="xdbres:locksType" nillable="false" minOccurs="0" maxOccurs="1" xdb:SQLType="XDB$LOCKS_T" xdb:SQLSchema="XDBPM"/>
+			<any namespace="##other" minOccurs="0" maxOccurs="65535" xdb:SQLType="CLOB"/>
+		</sequence>
+		<attribute name="Hidden" type="boolean" default="false"/>
+		<attribute name="Invalid" type="boolean" default="false"/>
+		<attribute name="VersionID" type="integer" xdb:SQLName="VERSIONID" xdb:SQLType="INTEGER"/>
+		<attribute name="ActivityID" type="integer" xdb:SQLName="ACTIVITYID" xdb:SQLType="INTEGER"/>
+		<attribute name="Container" type="boolean" default="false"/>
+		<attribute name="CustomRslv" type="boolean" default="false"/>
+		<attribute name="VersionHistory" type="boolean" default="false"/>
+		<attribute name="StickyRef" type="boolean" default="false"/>
+		<attribute name="HierSchmResource" type="boolean" default="false"/>
+		<attribute name="SizeAccurate" type="boolean" default="false"/>
+		<attribute name="IsVersionable" type="boolean" default="false"/>
+		<attribute name="IsCheckedOut" type="boolean" default="false"/>
+		<attribute name="IsVersion" type="boolean" default="false"/>
+		<attribute name="IsVCR" type="boolean" default="false"/>
+		<attribute name="IsVersionHistory" type="boolean" default="false"/>
+		<attribute name="IsWorkspace" type="boolean" default="false"/>
+		<attribute name="HasUnresolvedLinks" type="boolean" default="false"/>
+		<attribute name="IsXMLIndexed" type="boolean" default="false"/>
+	</complexType>
+	<element name="Resource" type="xdbres:ResourceType" nillable="false" xdb:SQLName="RESOURCE" xdb:SQLType="XDB$RESOURCE_T" xdb:SQLSchema="XDBPM" xdb:defaultTable="XDB$RESOURCE" xdb:defaultTableSchema="XDBPM"/>
+	<element name="Locks" type="xdbres:locksType" nillable="false"/>
+</schema>

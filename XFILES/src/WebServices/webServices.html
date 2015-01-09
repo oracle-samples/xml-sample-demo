@@ -1,0 +1,64 @@
+<!--
+
+/* ================================================  
+ * Oracle XFiles Demonstration.  
+ *    
+ * Copyright (c) 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * ================================================ */
+
+-->
+
+<!doctype html>
+<html>
+	<head>
+		<meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+		<title>Oracle XML DB demonstration framework : Generic Database Native Web Services</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="demo.css">
+		<link rel="stylesheet" href="/XFILES/Frameworks/bootstrap/css/bootstrap.min.css"/>
+		<link rel="stylesheet" href="/XFILES/Frameworks/bootstrap-dialog/css/bootstrap-dialog.min.css"/>
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="/XFILES/Frameworks/bootstrap/css/bootstrap-theme.min.css"/>
+		<!-- Custom styles for this template -->
+		<link rel="stylesheet" charset="UTF-8" type="text/css" href="/XFILES/lite/css/XFiles.css"/>
+	</head>
+  <body onload="init(document.getElementById('pageContent'));" id='body'>
+    <div id="greyLoading" style="position:absolute;  z-index: 100; background: #000000; top:0px; left:0px; width:100%; height:100%; opacity:0.25;filter:alpha(opacity=25);"></div>
+    <div id="pageLoading" style="position:absolute;  z-index: 101; background: transparent; top:0px; left:0px; width:100%; height:100%;">
+      <table height="100%" align="center" border="0">
+  		  <tr align="center">
+  			  <td></td>
+  			  <td height="100%" width="50%" valign="middle">
+  			    <div style="border-width:2px 2px 2px 2px; border-style: ridge; background:#FFFFFF;">
+  				    <a href="#">
+  				      <img src="/XFILES/logo.png" alt="Oracle Files" border="0" style="margin-top: 10px"/>
+  				      <br/>
+  				      <img src="/XFILES/loading.gif" alt="Oracle Files" border="0"/>				 
+  				    </a>
+  			      <br/>
+  			      <p style="margin-bottom: 10px;">Page Loading - Please wait</p>
+  			    </div>
+  			  </td>
+  			  <td></td>
+  		  </tr>
+      </table>
+    </div>
+    <div id="pageContent"></div>
+		<script type="text/javascript" language="javascript" src="/XFILES/common/js/XMLPrettyPrint.js"></script>
+    <script type="text/javascript" language="javascript" src="/XFILES/common/js/jsonPrettyPrint.js"></script>
+		<script language="javascript" src="/XFILES/common/js/common.js"></script>
+		<script language="javascript" src="/XFILES/common/js/xmlDocumentObject.js"></script>
+		<script type="text/javascript" language="javascript" src="/XFILES/common/js/userManagement.js"></script>
+		<script type="text/javascript" language="javascript" src="/XFILES/lite/js/common.js"></script>
+		<script language="javascript" src="/XFILES/WebServices/js/simpleSoapExample.js"></script>
+		<script language="javascript" src="/XFILES/WebServices/js/simpleSoapSupport.js"></script>
+	</body>
+</html>

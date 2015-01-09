@@ -1,0 +1,7 @@
+This is the last version of the sample Document
+
+More text has been added here..
+
+And it's all been rendered using Oracle Text
+
+

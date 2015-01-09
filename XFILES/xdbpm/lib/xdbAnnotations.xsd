@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xdb="http://xmlns.oracle.com/xdb" xmlns="http://xmlns.oracle.com/xdb" targetNamespace="http://xmlns.oracle.com/xdb" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="transientChoice">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value=""/>
+			<xs:enumeration value="generated"/>
+			<xs:enumeration value="manifested"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="javatype">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="String"/>
+			<xs:enumeration value="int"/>
+			<xs:enumeration value="long"/>
+			<xs:enumeration value="short"/>
+			<xs:enumeration value="byte"/>
+			<xs:enumeration value="float"/>
+			<xs:enumeration value="double"/>
+			<xs:enumeration value="BigDecimal"/>
+			<xs:enumeration value="boolean"/>
+			<xs:enumeration value="byteArray"/>
+			<xs:enumeration value="Stream"/>
+			<xs:enumeration value="CharStream"/>
+			<xs:enumeration value="TimeStamp"/>
+			<xs:enumeration value="Reference"/>
+			<xs:enumeration value="QName"/>
+			<xs:enumeration value="Enum"/>
+			<xs:enumeration value="XMLType"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:attribute name="SQLName" type="xs:string" xdb:SQLName="SQLNAME" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="SQLType" type="xs:string" xdb:SQLName="SQLTYPE" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="SQLSchema" type="xs:string" xdb:SQLName="SQLSCHEMA" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="SQLCollType" type="xs:string" xdb:SQLName="SQLCOLLTYPE" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="SQLCollSchema" type="xs:string" xdb:SQLName="SQLCOLLSCHEMA" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="maintainDOM" type="xs:boolean" default="true" xdb:SQLName="MAINTAIN_DOM" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="baseType" type="xs:hexBinary" xdb:SQLName="BASE_TYPE" xdb:SQLType="RAW" xdb:JavaType="Reference"/>
+	<xs:attribute name="parentSchema" type="xs:hexBinary" xdb:SQLName="PARENT_SCHEMA" xdb:SQLType="RAW" xdb:JavaType="Reference"/>
+	<xs:attribute name="baseSQLname" type="xs:string" xdb:SQLName="BASE_SQLNAME" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="propNumber" type="xs:integer" default="0" xdb:SQLName="PROP_NUMBER" xdb:SQLType="NUMBER" xdb:JavaType="int"/>
+	<xs:attribute name="JavaType" type="javatype" xdb:SQLName="JAVA_TYPE" xdb:SQLType="XDB$JAVATYPE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+	<xs:attribute name="memByteLength" type="xs:integer" xdb:SQLName="MEM_BYTE_LENGTH" xdb:SQLType="RAW" xdb:JavaType="short"/>
+	<xs:attribute name="memType" type="xs:integer" xdb:SQLName="MEM_TYPE_CODE" xdb:SQLType="RAW" xdb:JavaType="short"/>
+	<xs:attribute name="system" type="xs:boolean" default="false" xdb:SQLName="SYSTEM" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="mutable" type="xs:boolean" default="false" xdb:SQLName="MUTABLE" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="SQLInline" type="xs:boolean" default="false" xdb:SQLName="SQL_INLINE" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="JavaInline" type="xs:boolean" default="false" xdb:SQLName="JAVA_INLINE" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="MemInline" type="xs:boolean" default="false" xdb:SQLName="MEM_INLINE" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="defaultTable" type="xs:string" xdb:SQLName="DEFAULT_TABLE" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="defaultTableSchema" type="xs:string" xdb:SQLName="DEFAULT_TABLE_SCHEMA" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="tableProps" type="xs:string" xdb:SQLName="TABLE_PROPS" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="JavaClassname" type="xs:string" xdb:SQLName="JAVA_CLASSNAME" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="beanClassname" type="xs:string" xdb:SQLName="BEAN_CLASSNAME" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="numCols" type="xs:integer" xdb:SQLName="NUM_COLS" xdb:SQLType="INTEGER" xdb:JavaType="int"/>
+	<xs:attribute name="defaultXSL" type="xs:string" xdb:SQLName="DEFAULT_XSL" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="isFolder" type="xs:boolean" default="false" xdb:SQLName="IS_FOLDER" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="maintainOrder" type="xs:boolean" default="true" xdb:SQLName="MAINTAIN_ORDER" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="columnProps" type="xs:string" xdb:SQLName="COL_PROPS" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="defaultACL" type="xs:string" xdb:SQLName="DEFAULT_ACL" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="headElementRef" type="xs:hexBinary" xdb:SQLName="HEAD_ELEM_REF" xdb:SQLType="RAW" xdb:JavaType="Reference"/>
+	<xs:attribute name="translate" type="xs:boolean" xdb:SQLName="IS_TRANSLATABLE" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="schemaURL" type="xs:string" xdb:SQLName="SCHEMA_URL" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="numProps" type="xs:nonNegativeInteger" xdb:SQLName="NUM_PROPS" xdb:SQLType="INTEGER" xdb:JavaType="long"/>
+	<xs:attribute name="flags" type="xs:nonNegativeInteger" xdb:SQLName="FLAGS" xdb:SQLType="RAW" xdb:JavaType="long"/>
+	<xs:attribute name="mapStringToNCHAR" type="xs:boolean" default="false" xdb:SQLName="MAP_TO_NCHAR" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="storeVarrayAsTable" type="xs:boolean" default="false" xdb:SQLName="VARRAY_AS_TAB" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="schemaOwner" type="xs:string" xdb:SQLName="SCHEMA_OWNER" xdb:SQLType="VARCHAR2" xdb:JavaType="String"/>
+	<xs:attribute name="mapUnboundedStringToLob" type="xs:boolean" default="false" xdb:SQLName="MAP_TO_LOB" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="typeRef" type="xs:hexBinary" xdb:SQLName="TYPE_REF" xdb:SQLType="RAW" xdb:JavaType="Reference"/>
+	<xs:attribute name="refRef" type="xs:hexBinary" xdb:SQLName="PROPREF_REF" xdb:SQLType="RAW" xdb:JavaType="Reference"/>
+	<xs:attribute name="global" type="xs:boolean" xdb:SQLName="GLOBAL" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="hidden" type="xs:boolean" default="false" xdb:SQLName="HIDDEN" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+	<xs:attribute name="transient" type="transientChoice" xdb:SQLName="TRANSIENT" xdb:SQLType="XDB$TRANSIENTCHOICE" xdb:SQLSchema="XDBPM" xdb:JavaType="Enum"/>
+	<xs:attribute name="baseProp" type="xs:boolean" default="false" xdb:SQLName="BASEPROP" xdb:SQLType="RAW" xdb:JavaType="boolean"/>
+</xs:schema>

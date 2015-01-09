@@ -1,0 +1,63 @@
+<!--
+
+/* ================================================  
+ * Oracle XFiles Demonstration.  
+ *    
+ * Copyright (c) 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * ================================================ */
+
+-->
+
+<Upload>
+  <directories>
+    <directory>/Plays/Comedies</directory>
+    <directory>/Plays/Histories</directory>
+    <directory>/Plays/Tragedies</directory>
+  </directories> 
+  <files replace="true">
+    <file>/Plays/Comedies/A Midsummer Night's Dream.xml</file>
+    <file>/Plays/Comedies/All's Well That Ends Well.xml</file>
+    <file>/Plays/Comedies/As You Like It.xml</file>
+    <file>/Plays/Comedies/Love's Labour's Lost.xml</file>
+    <file>/Plays/Comedies/Measure for Measure.xml</file>
+    <file>/Plays/Comedies/Much Ado about Nothing.xml</file>
+    <file>/Plays/Comedies/The Comedy of Errors.xml</file>
+    <file>/Plays/Comedies/The Merchant of Venice.xml</file>
+    <file>/Plays/Comedies/The Merry Wives of Windsor.xml</file>
+    <file>/Plays/Comedies/The Taming of the Shrew.xml</file>
+    <file>/Plays/Comedies/The Tempest.xml</file>
+    <file>/Plays/Comedies/The Two Gentlemen of Verona.xml</file>
+    <file>/Plays/Comedies/The Winter's Tale.xml</file>
+    <file>/Plays/Comedies/Twelfth Night, or What You Will.xml</file>
+    <file>/Plays/Histories/Cymbeline.xml</file>
+    <file>/Plays/Histories/Pericles, Prince of Tyre.xml</file>
+    <file>/Plays/Histories/The Famous History of the Life of Henry the Eighth.xml</file>
+    <file>/Plays/Histories/The First Part of Henry the Fourth.xml</file>
+    <file>/Plays/Histories/The First Part of Henry the Sixth.xml</file>
+    <file>/Plays/Histories/The History of Troilus and Cressida.xml</file>
+    <file>/Plays/Histories/The Life and Death of King John.xml</file>
+    <file>/Plays/Histories/The Life of Henry the Fifth.xml</file>
+    <file>/Plays/Histories/The Second Part of Henry the Fourth.xml</file>
+    <file>/Plays/Histories/The Second Part of Henry the Sixth.xml</file>
+    <file>/Plays/Histories/The Third Part of Henry the Sixth.xml</file>
+    <file>/Plays/Tragedies/The Tragedy of Antony and Cleopatra.xml</file>
+    <file>/Plays/Tragedies/The Tragedy of Coriolanus.xml</file>
+    <file>/Plays/Tragedies/The Tragedy of Hamlet, Prince of Denmark.xml</file>
+    <file>/Plays/Tragedies/The Tragedy of Julius Caesar.xml</file>
+    <file>/Plays/Tragedies/The Tragedy of King Lear.xml</file>
+    <file>/Plays/Tragedies/The Tragedy of King Richard the Second.xml</file>
+    <file>/Plays/Tragedies/The Tragedy of Macbeth.xml</file>
+    <file>/Plays/Tragedies/The Tragedy of Othello, the Moor.xml</file>
+    <file>/Plays/Tragedies/The Tragedy of Richard the Third.xml</file>
+    <file>/Plays/Tragedies/The Tragedy of Romeo and Juliet.xml</file>
+    <file>/Plays/Tragedies/The Tragedy of Titus Andronicus.xml</file>
+  </files>
+</Upload>
+    
