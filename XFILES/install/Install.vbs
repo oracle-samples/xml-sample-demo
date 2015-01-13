@@ -23,10 +23,14 @@ Const CONFIG_LOAD_FAILED = 1
 
 '   launchPadFolderPath : Path to folder where LaunchPad for the demo will be placed. 
 '                         Typically %STARTMENT%\Oracle XML DB Demonstrations
-                  
-dim XHELPER
+
+dim LINUX
+dim MINSTALLER
+
 dim INSTALLER
 dim FILEMANAGER 
+                    
+dim XHELPER
 dim SQLPLUS
 dim SQLLDR
 dim FTP
@@ -38,11 +42,9 @@ dim CURRENTTIMER
 
 dim ACTION_LIST
 dim ACTION_INDEX
-dim HTA
+
 dim newFolderList 
 
-DIM MINSTALLER
-  
 Sub ShowError(msg)
     MsgBox msg & " : " & Err.Number & " Srce: " & Err.Source & " Desc: " &  Err.Description    
     Err.Clear
@@ -73,7 +75,7 @@ Function doTransformation(INSTALLATION,xslFilename)
 
 End Function
 
-Function writeLogFile(INSTALLER, logFileContent)
+Function writeLogFile(logFileContent)
 
   Dim logFilePath, logFile
 
@@ -106,11 +108,11 @@ Sub ExitHTA
   If (Err.number <> 0) Then
     LOGBUFFER = LOGBUFFER & "Encountered error 0x" & hex(Err.number)  & " : " & Err.Description 
   End If
-  LOGBUFFER = LOGBUFFER & ". Please check installParameters.xml and installation.log and then restart the installation" & vbCRLF   
+  LOGBUFFER = LOGBUFFER & ". Please check installParameters.xml and "& INSTALLER.getDemoFolderName() & " and then restart the installation" & vbCRLF   
   
-  logFilePath = writeLogFile(INSTALLER,LOGBUFFER)
+  logFilePath = writeLogFile(LOGBUFFER)
 
-  If IsObject(MINSTALLER) Then 
+  If not INSTALLER.isInteractiveInstall() Then 
   	Wscript.echo "exitFatalError(): " & errorMessage & ". See " &  vbCRLF & "'"  & logFilePath  & "'" & vbCRLF & " for further details."
   	WScript.Quit
   Else  
@@ -127,7 +129,7 @@ Sub writeLogMessage(logMessage)
 
   LOGBUFFER = LOGBUFFER + logMessage + vbCRLF 
   
-  If IsObject(MINSTALLER) Then 
+  If not INSTALLER.isInteractiveInstall() Then 
   	wscript.echo logMessage
   Else
     Set currentAction = document.getElementById("currentTask")
@@ -239,11 +241,10 @@ Sub installDemo()
   Set SQLLDR		      = new sqlldrControl
   Set FTP             = new ftpControl
   Set REPOS           = new repositoryControl
-  
-  SQLPLUS.initialize INSTALLER   
-  SQLLDR.initialize INSTALLER
-  REPOS.initialize INSTALLER
+  Set MINSTALLER      = Nothing 
+  Set LINUX           = Nothing
     
+  
   showInputForm(INSTALLER.getInstallationParameters())
    
 End Sub
@@ -270,7 +271,7 @@ Sub cancelInstall()
   Dim logFilePath
 
   writeLogMessage "Installation Cancelled"
-  logFilePath = writeLogFile(INSTALLER,LOGBUFFER)
+  logFilePath = writeLogFile(LOGBUFFER)
   self.close()
 
 End Sub
@@ -347,6 +348,7 @@ Function validOracleHome(INSTALLER)
   End If
         
   MsgBox "Unable to locate SQLPLUS executable. Please correct the setting of Oracle Home and try again.",vbOKOnly + vbCritical
+
   validOracleHome = false
   
 End Function
@@ -571,7 +573,7 @@ End Sub
 Sub stageRepositoryContent(CONFIGURAITON, stepID, localFolderPath, remoteFolderPath)
 
      Dim controlFilePath
-     controlFilePath = INSTALLER.getDemoDirectory() + "\install\sqlldr.ctl"
+     controlFilePath = INSTALLER.getInstallFolderPath() + "\sqlldr.ctl"
       
      writeLogMessage "SQLLDR : Type = 'StageContent'. Step = '" + stepId + "'. Local Folder = '" + localFolderPath + ". Remote Folder = '" + remoteFolderPath + "'."  
 
@@ -636,8 +638,12 @@ Sub createFolders(INSTALLER,FILEMANAGER)
   For i = 0 to nodeList.length - 1
      Set folder = nodeList.item(i)
      folderPath = INSTALLER.replaceMacros(folder.text,false)
-     writeLogMessage "CreateFolder : '" + folderPath + "'"
-     FILEMANAGER.createEmptyFolder(folderPath)
+     If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then
+       writeLogMessage "CreateFolder : '" + folderPath + "'"
+       FILEMANAGER.createEmptyFolder(folderPath)
+     Else
+     	 LINUX.newFolderScript(folderPath)
+     End If
   Next 
   
 End Sub
@@ -821,16 +827,19 @@ Sub makeSqlShortCuts(INSTALLER,FILEMANAGER)
 
     shortcutName       = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"name"),false)
     script             = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"script"),false)
-     
-    If (executionMode = "local") Then
-      arguments       = INSTALLER.replaceMacros( username & "/" & password & "@" & tnsAlias & " " + chr(34) + "@%DEMODIRECTORY%\Install\SQL\executeAndPause.sql" & chr(34) & " " & chr(34) + "%DEMODIRECTORY%\%USER%" & script + chr(34),false)
-      FILEMANAGER.makeShortCut INSTALLER, shortcutLocation, shortcutName, INSTALLER.getSQLPLusPath(), iconPath, null, arguments
-    Else
-    	' Assume remote (HTTP) based SQL Execution
-      url = INSTALLER.replaceMacros(INSTALLER.getServerURL() & landingPad & "&target=" & scriptPrefix & script & "&description=" & shortCutName & "&sqlUsername=" & username,false)
-      FILEMANAGER.makeHttpShortCut shortcutLocation, shortcutName, url, iconPath, ""
-    End If
 
+
+		If (not INSTALLER.isScriptGenerator()) Then
+      If (executionMode = "local") Then
+        arguments       = INSTALLER.replaceMacros( username & "/" & password & "@" & tnsAlias & " " + chr(34) + "@%DEMODIRECTORY%\Install\sql\executeAndPause.sql" & chr(34) & " " & chr(34) + "%DEMODIRECTORY%\%USER%" & script + chr(34),false)
+        FILEMANAGER.makeShortCut INSTALLER, shortcutLocation, shortcutName, INSTALLER.getSQLPLusPath(), iconPath, null, arguments
+      Else
+    	  ' Assume remote (HTTP) based SQL Execution
+        url = INSTALLER.replaceMacros(INSTALLER.getServerURL() & landingPad & "&target=" & scriptPrefix & script & "&description=" & shortCutName & "&sqlUsername=" & username,false)
+        FILEMANAGER.makeHttpShortCut shortcutLocation, shortcutName, url, iconPath, ""
+      End If
+		End If
+		
     DEMONSTRATION.addSQLStep shortcutName, scriptPrefix & script, "SQLPLUS.png", username, rerunnable
      
   Next 
@@ -950,7 +959,7 @@ Sub makeFtpScripts(INSTALLER,FILEMANAGER)
   For i = 0 to nodeList.length - 1
 
      scriptFileName  = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"name"),false)
-     scriptFile      = INSTALLER.getScriptsFolderPath() + "\" + scriptFileName + ".ftp"
+     scriptFile      = INSTALLER.getScriptsFolderPath() & FILE_SEPERATOR &scriptFileName + ".ftp"
      targetDirectory = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"URL"),false)
 
      Set ftpFile = FILEMANAGER.CreateTextFile(scriptFile)
@@ -1132,7 +1141,11 @@ End sub
 
 Sub SaveConfiguration (REPOS, remoteDirectory, user, password)
 
-    REPOS.uploadContent DEMONSTRATION.DOCUMENT, remoteDirectory & "/configuration.xml", true, user, password
+		If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
+      REPOS.uploadContent DEMONSTRATION.DOCUMENT, remoteDirectory & "/configuration.xml", True, user, password
+    else
+    	LINUX.uploadConfiguation DEMONSTRATION.DOCUMENT, remoteDirectory, True, user, password
+    End If
 
 End Sub
 
@@ -1140,16 +1153,22 @@ Sub makeLaunchPadEntry(INSTALLER, FILEMANAGER, shortCutType, shortCutName, short
 
     ' Ensure the Launch Pad Folder exists
 
-    FILEMANAGER.makeFolder shortcutLocation
+    If (INSTALLER.isInteractiveInstall()or NOT (MINSTALLER Is Nothing)) Then
 
-    If (shortCutType = "url") Then
-      FILEMANAGER.makeHttpShortcut shortcutLocation, shortcutName, target, icon, arguments  
-    End If
+      FILEMANAGER.makeFolder shortcutLocation
+
+      If (shortCutType = "url") Then
+        FILEMANAGER.makeHttpShortcut shortcutLocation, shortcutName, target, icon, arguments  
+      End If
     
-    If (shortCutType = "lnk") Then
-	    FILEMANAGER.makeShortCut INSTALLER, shortcutLocation, shortCutName, target, icon, directory, arguments
-    End If
+      If (shortCutType = "lnk") Then
+	      FILEMANAGER.makeShortCut INSTALLER, shortcutLocation, shortCutName, target, icon, directory, arguments
+      End If
 
+    Else
+    	LINUX.launchShellScript shortcutName,target,shortCutType
+    End If  
+    
 End Sub
 
 Sub makeLaunchPadEntries(INSTALLER,FILEMANAGER)
@@ -1460,7 +1479,7 @@ Sub doPostInstallActions()
   window.clearTimeOut(CURRENTTIMER)
   installationSuccessful INSTALLER  
   writeLogMessage "Installation Successful"
-  writeLogFile INSTALLER,LOGBUFFER
+  writeLogFile LOGBUFFER
   self.close()
    
 End Sub
@@ -1771,7 +1790,7 @@ Class fileSystemControl
     currentOperation = "  CREATE JUNCTION : Location => '" & location & "', Name => '" & name & "', Target => '" & target & "'."
     writeLogMessage currentOperation
  
-    targetFolderPath = location & "\" & name
+    targetFolderPath = location & FILE_SEPERATOR & name
     
     Set folder = INSTALLER.getFSO().createFolder(targetFolderPath)
 
@@ -1837,7 +1856,6 @@ Class repositoryControl
   Private httpTrace
   Private errorDetails
   Private XHR
-  Private INSTALLER
 
   Private useFtpProtocol
   Private ftpUploadScript
@@ -1845,20 +1863,17 @@ Class repositoryControl
   Private     folderStatusList 
   Private     XMLHTTPRequestID 
   
-  Public Sub initialize(CONFIG)
-
-    Set INSTALLER = CONFIG
-    httpTrace = INSTALLER.doHTTPTrace()
-    useFtpProtocol = INSTALLER.useFtpProtocol()
-    
-  End Sub
-    
+        
   Private Sub Class_Initialize()
   
     XMLHTTPRequestID = "Msxml2.XMLHTTP.6.0"
     ' XMLHTTPRequestID = "Microsoft.XmlHttp"
     Set XHR = CreateObject(XMLHTTPRequestID)
     Set folderStatusList = Nothing
+
+    httpTrace = INSTALLER.doHTTPTrace()
+    useFtpProtocol = INSTALLER.useFtpProtocol()
+
   End Sub   
   
   Public Function getXHR
@@ -2547,12 +2562,6 @@ Class sqlPlusControl
     
   ' Test connection to the database
   
-  Private CONFIGUARTION
-  
-  Public Sub initialize(CONFIG)
-    Set INSTALLER = CONFIG
-  End Sub
-
   Public Function getHttpPort(user, password)
     Dim returnCode
     returnCode = executeSQLPLUS(user, password, "", "sql/getHttpPort.sql")
@@ -2622,15 +2631,13 @@ End Class
 
 Class ftpControl
     
-  Private CONFIGUARTION
-  
   Public Function executeScript(script)
      
      Dim ftpScript, scriptFileName, scriptFilePath, logFilePath
 
      scriptFileName = "FileUpload" & TIMER 
-     scriptFilePath = INSTALLER.getDemoDirectory & "\Install\" & scriptFileName & ".ftp"
-     logFilePath    = INSTALLER.getDemoDirectory & "\Install\" & scriptFileName & ".log"
+     scriptFilePath = INSTALLER.getInstallFolderPath() & FILE_SEPERATOR & scriptFileName & ".ftp"
+     logFilePath    = INSTALLER.getInstallFolderPath() & FILE_SEPERATOR & scriptFileName & ".log"
      
      Set ftpScript = INSTALLER.getFSO().createTextFile(scriptFilePath,true)
      ftpScript.write(script)
@@ -2671,12 +2678,6 @@ End Class
 
 Class sqlldrControl
     
-  Private CONFIGUARTION
-  
-  Public Sub initialize(CONFIG)
-    Set INSTALLER = CONFIG
-  End Sub
-  
   ' Execute SQLLDR as specIfied user
       
   Public Function execute(user, password, controlFile)
@@ -2874,6 +2875,8 @@ Class installationManager
  
   Private WSHELL
   Private FSO
+  Private interactiveInstall
+  Private scriptGenerationMode
   
   Private installationParameters
   Private demonstrationParameters
@@ -2987,12 +2990,12 @@ Class installationManager
     cSubKeys = EnumSubKeys(HKLM,oraclePath,64)
     If not isNull(cSubKeys) Then 
    	  For Each sName In cSubKeys
-        sValue = ReadRegStr (HKLM, oraclePath & "\" & sName, "ORACLE_HOME", 64)
+        sValue = ReadRegStr (HKLM, oraclePath & FILE_SEPERATOR & sName, "ORACLE_HOME", 64)
         If (not IsNull( sValue )) Then
           oracleHome = sValue
-          oracleHomeName = ReadRegStr (HKLM, oraclePath & "\" & sName, "ORACLE_HOME_NAME", 64) 
-          oracleHomeKey = ReadRegStr (HKLM, oraclePath & "\" & sName, "ORACLE_HOME_KEY", 64) 
-          oracleSID = ReadRegStr (HKLM, oraclePath & "\" & sName, "ORACLE_SID", 64) 
+          oracleHomeName = ReadRegStr (HKLM, oraclePath & FILE_SEPERATOR & sName, "ORACLE_HOME_NAME", 64) 
+          oracleHomeKey = ReadRegStr (HKLM, oraclePath & FILE_SEPERATOR & sName, "ORACLE_HOME_KEY", 64) 
+          oracleSID = ReadRegStr (HKLM, oraclePath & FILE_SEPERATOR & sName, "ORACLE_SID", 64) 
 
           processOracleHome OracleHomeList, oracleHome, OracleHomeName, OracleHomeKey, OracleSID
 
@@ -3003,12 +3006,12 @@ Class installationManager
     cSubKeys = EnumSubKeys(HKLM,oraclePath,32)
     If not isNull(cSubKeys) Then 
      	For Each sName In cSubKeys
-        sValue = ReadRegStr (HKLM, oraclePath & "\" & sName, "ORACLE_HOME", 32) 
+        sValue = ReadRegStr (HKLM, oraclePath & FILE_SEPERATOR & sName, "ORACLE_HOME", 32) 
         If (not IsNull( sValue )) Then
           oracleHome = sValue
-          oracleHomeName = ReadRegStr (HKLM, oraclePath & "\" & sName, "ORACLE_HOME_NAME", 64) 
-          oracleHomeKey = ReadRegStr (HKLM, oraclePath & "\" & sName, "ORACLE_HOME_KEY", 64) 
-          oracleSID = ReadRegStr (HKLM, oraclePath & "\" & sName, "ORACLE_SID", 64) 
+          oracleHomeName = ReadRegStr (HKLM, oraclePath & FILE_SEPERATOR & sName, "ORACLE_HOME_NAME", 64) 
+          oracleHomeKey = ReadRegStr (HKLM, oraclePath & FILE_SEPERATOR & sName, "ORACLE_HOME_KEY", 64) 
+          oracleSID = ReadRegStr (HKLM, oraclePath & FILE_SEPERATOR & sName, "ORACLE_SID", 64) 
           
           processOracleHome OracleHomeList, oracleHome, OracleHomeName, OracleHomeKey, OracleSID
           
@@ -3036,14 +3039,11 @@ Class installationManager
 
   Private Function findWordPath()
 
-    Dim wshell, appObject, appPath
-     
-    Set wShell = CreateObject("Wscript.shell")
-    DIM CLSID, REGKEY
+    Dim appObject, appPath, CLSID, REGKEY
     
     On Error Resume Next
           
-    CLSID = wShell.RegRead("HKLM\SOFTWARE\Classes\Word.Application\CLSID\")
+    CLSID = getWShell().RegRead("HKLM\SOFTWARE\Classes\Word.Application\CLSID\")
     If Err.Number = 0 Then
       ' MSGBOX "CLSID for Word.Application = " & CLSID, vbCritical
       If isWindows64 Then
@@ -3054,7 +3054,7 @@ Class installationManager
         ' Wscript.Echo "Detected 32 Bit Environment : Using " & REGKEY
       End If
     
-      appPath = wShell.RegRead(REGKEY)
+      appPath = getWShell().RegRead(REGKEY)
       appPath = Mid(appPath,1,instr(appPath," "))
     Else
       ' MSGBOX "Could Not find CLSID for ""Word.Application"" in registry : Trying to Instantiate ""Word.Application"" ", vbCritical
@@ -3079,14 +3079,11 @@ Class installationManager
 
   Private Function findExcelPath()
 
-    Dim wshell, appObject, appPath
-
-    Set wShell = CreateObject("Wscript.shell")
-    DIM CLSID, REGKEY
+    Dim appObject, appPath, CLSID, REGKEY
     
     On Error Resume Next
            
-    CLSID = wShell.RegRead("HKLM\SOFTWARE\Classes\Excel.Application\CLSID\")
+    CLSID = getWShell().RegRead("HKLM\SOFTWARE\Classes\Excel.Application\CLSID\")
     If Err.Number = 0 Then
       ' Wscript.Echo "CLSID for Word.Application = " & CLSID
       If isWindows64 Then
@@ -3097,7 +3094,7 @@ Class installationManager
         ' Wscript.Echo "Detected 32 Bit Environment : Using " & REGKEY
       End If
     
-      appPath = wShell.RegRead(REGKEY)
+      appPath = getWShell().RegRead(REGKEY)
       appPath = Mid(appPath,1,instr(appPath," "))
     Else
       ' Wscript.Echo "Could Not find CLSID for ""Excel.Application"" in registry : Trying to Instantiate ""Excel.Application"" "
@@ -3118,6 +3115,14 @@ Class installationManager
       
     findExcelPath = rtrim(appPath)
         
+  End Function
+  
+  Public Function setScriptGenerationMode
+    scriptGenerationMode = True
+  End Function
+  
+  Public Function isScriptGenerator()
+    isScriptGenerator = (scriptGenerationMode = True)
   End Function
 
   Public Sub addMacro(key,value)
@@ -3181,11 +3186,22 @@ Class installationManager
 
   Private Sub Class_Initialize()
   
-    dim scriptPath, scriptFile, filename, result, errorMessage, wow6432Node
+    dim installerPath, scriptFile, filename, result, errorMessage, wow6432Node
 
     'scriptPath         = WScript.ScriptFullName
     'Set WSHELL         = WScript.CreateObject("WScript.Shell")
     'Set FSO            = WScript.CreateObject("Scripting.FileSystemObject")
+
+    On Error Resume Next
+    If IsObject(window) Then
+	    interactiveInstall = (Err.Number = 0)
+	  End If
+    On Error Goto 0
+
+    scriptGenerationMode = False
+    If IsObject(LINUX) Then
+    	scriptGenerationMode = True
+    End If
 
     Set WSHELL          = CreateObject("WScript.Shell")
     Set FSO             = CreateObject("Scripting.FileSystemObject")
@@ -3205,14 +3221,24 @@ Class installationManager
     addMacro "%WINWORD%",        findWordPath()
     addMacro "%EXCEL%",          findExcelPath()
 
-    If IsObject(MINSTALLER) Then 
-    	scriptPath = MINSTALLER.getScriptPath()
-    else 
-      scriptPath         = Mid(document.location.href ,9)    
+    If isInteractiveInstall() Then
+      'Interactive : Internet Explorer HTML Application (HTA)
+    	' wscript.Echo "Interactive"
+      installerPath = Mid(document.location.href ,9)    
+    Else
+    	If isScriptGenerator() Then
+        ' Script : Linux Install Script Generator
+	    	' wscript.Echo "Script"
+        installerPath = LINUX.getInstallerPath()
+      Else
+    	  ' Batch : Bulk Install via Command Line
+	    	' wscript.Echo "Batch"
+       	installerPath = MINSTALLER.getInstallerPath()
+      End If
     End If
 
-    ' Wscript.echo scriptPath
-    Set scriptFile     = getFSO().getFile(scriptPath) 
+    ' Wscript.echo "Path =  " & installerPath
+    Set scriptFile = getFSO().getFile(installerPath) 
         
     addMacro "%DEMODIRECTORY%",  scriptFile.parentFolder.parentFolder.path
     addMacro "%DEMOFOLDERNAME%", scriptFile.parentFolder.parentFolder.name
@@ -3232,7 +3258,11 @@ Class installationManager
     loadDemonstrationParameters()
     
   End Sub   
- 
+
+  Public Function isInteractiveInstall()
+    isInteractiveInstall = interactiveInstall
+  End Function
+  
   Public Function getOracleHomeFromRegistry()
     getOracleHomeFromRegistry = oracleHome
   End Function
@@ -3383,15 +3413,28 @@ Class installationManager
  
   Public Function getLogFilePath()
 
-  If IsObject(MINSTALLER) Then 
-    getLogFilePath = getFso().GetParentFolderName(wscript.ScriptFullName) & "\" & getDemoFolderName() & ".log"	
-  Else
-    getLogFilePath = getInstallFolderPath() &  "\" & "installation.log"
-  End If
+		' In Interactive Mode the Log File should be written to the Install Folder (which is where the install should be run from)
+    ' In Script Generation Mode the Log file should be written to the Install Folder
+    ' In Batch Mode the Log file should be written to the Folder that contains the MasterInstallation file
+
+    If isInteractiveInstall() or isScriptGenerator() Then 
+      getLogFilePath = getInstallFolderPath() & FILE_SEPERATOR & getDemoFolderName() & ".log"   
+    Else
+      getLogFilePath = getFso().GetParentFolderName(wscript.ScriptFullName) & FILE_SEPERATOR & getDemoFolderName() & ".log"	
+    End If
+
   End Function
  
+  Public Function getScriptFilePath()
+  
+  	' Only used in ScriptGenerationMode. The script file should be written to the Installation Folder
+
+    getScriptFilePath = LINUX.installerFolder & FILE_SEPERATOR & getDemoFolderName() & ".sh"	
+
+  End Function  
+  
   Public Function getScriptsFolderPath
-    getScriptsFolderPath = getLocalFolderPath()  & FILE_SEPERATOR & "Scripts"
+    getScriptsFolderPath = getLocalFolderPath() & FILE_SEPERATOR & "Scripts"
   End Function
   
   Private Function readInputField(fieldName)
@@ -3498,7 +3541,10 @@ Class installationManager
     addMacro "%SERVERURL%",      "http://" & getHostName() & ":" & getHttpPort()
     addMacro "%DBCONNECTION%",   getUsername() & "/" & getPassword() & "@" & getTNSAlias()
 
-    validOracleHome(INSTALLER) 
+		If (not isScriptGenerator()) Then
+		  validOracleHome(INSTALLER) 
+		End If
+    
 
   End Sub
 

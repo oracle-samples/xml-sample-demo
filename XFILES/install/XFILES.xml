@@ -30,9 +30,9 @@
 
 	<installation>
 		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\xdbpm\XDBPM_SUPPORT %DEMODIRECTORY%\xdbpm</action>
-		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\SQL\XFILES_SYSDBA_TASKS.sql %USER%</action>
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\SQL\XFILES_DBA_TASKS.sql %USER%</action>
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\SQL\INSTALL_XFILES.sql %USER%</action>
+		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_SYSDBA_TASKS.sql %USER%</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_DBA_TASKS.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\INSTALL_XFILES.sql %USER%</action>
 	  <action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_PUBLIC_SYNONYMS.sql %USER%</action>
 	  <action type="UPLOAD">
 	  	
@@ -355,11 +355,6 @@
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\src\lite\xsl\ResourceProperties.xsl</local>
-  			<remote>%BASEFOLDER%/src/lite/xsl/ResourceProperties.xsl</remote>
-  		</action>
-  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
-  			<mode>FORCE</mode>
   			<local>%DEMODIRECTORY%\src\lite\xsl\UploadFiles.xsl</local>
   			<remote>%BASEFOLDER%/src/lite/xsl/UploadFiles.xsl</remote>
   		</action>
@@ -563,12 +558,7 @@
   			<mode>FORCE</mode>
   			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\searchTreeView.xsl</local>
   			<remote>%BASEFOLDER%/src/XMLSearch/xsl/searchTreeView.xsl</remote>
-  		</action>
-  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
-  			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\src\XMLSearch\xsl\resourceList.xsl</local>
-  			<remote>%BASEFOLDER%/src/XMLSearch/xsl/resourceList.xsl</remote>
-  		</action>
+  		</action>1/10/2015 2:03:57 PM
 
   		<!-- Web Demonstration Infrastructure -->
 
@@ -751,8 +741,8 @@
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/bootstrap3-dialog-master.zip  %BASEFOLDER%/Frameworks               %BASEFOLDER%/Frameworks/bootstrap3-dialog-master.log</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/bootstrap-3.2.0-dist.zip      %BASEFOLDER%/Frameworks               %BASEFOLDER%/Frameworks/bootstrap-3.2.0-dist.log</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/jquery-2.1.1.min.zip          %BASEFOLDER%/Frameworks/jquery-2.1.1  %BASEFOLDER%/Frameworks/jquery-2.1.1.min.log</action>
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\webDemo\sql\XFILES_WEBDEMO_SERVICES.sql %USER%</action>
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\SQL\XFILES_STATUS_PAGE.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\WebDemo\sql\XFILES_WEBDEMO_SERVICES.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_STATUS_PAGE.sql %USER%</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\PUBLISH_XFILES.sql %LOGO%</action>
 	  <action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\sql\XDB_REPOSITORY_INDEX.sql %DBA% %DBAPASSWORD% %TNSALIAS%</action>
 	  <action type="LAUNCH"></action>
