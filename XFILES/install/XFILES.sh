@@ -1,5 +1,5 @@
-demohome=$(pwd)
-logfilename=$demohome/XFILES.log
+demohome="$(dirname "$(pwd)")"
+logfilename=$demohome/install/XFILES.log
 echo "Log File : $logfilename"
 rm $logfilename
 DBA=$1
@@ -51,8 +51,8 @@ then
   echo "Installation Failed: See log file for details."
   exit 4
 fi
-sqlplus $DBA/$DBAPWD@$ORACLE_SID as sysdba @$DEMODIR/xdbpm/XDBPM_SUPPORT $DEMODIR/xdbpm
-sqlplus $DBA/$DBAPWD@$ORACLE_SID as sysdba @$DEMODIR/src/sql/XFILES_SYSDBA_TASKS.sql $USER
+sqlplus $DBA/$DBAPWD@$ORACLE_SID as sysdba @$demohome/xdbpm/XDBPM_SUPPORT $demohome/xdbpm
+sqlplus $DBA/$DBAPWD@$ORACLE_SID as sysdba @$demohome/src/sql/XFILES_SYSDBA_TASKS.sql $USER
 sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/src/sql/XFILES_DBA_TASKS.sql $USER
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/INSTALL_XFILES.sql $USER
 sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/src/sql/XFILES_PUBLIC_SYNONYMS.sql $USER
