@@ -52,7 +52,7 @@ The database's native HTTP Server must be enabled. In a multitenant environment 
 
 In Oracle Database 12c use procedure DBMS\_XDB\_CONFIG.setHttpPort to configure the HTTP Port number. In previous version of Oracle Database procedure DBMS\_XDB.setHttpPort is used. After setting the HTTP port execute the command alter system register to make sure that the database is correctly registered with the listener.
 
-![](media/image3.png)
+![](/raw/master/XFILES/media/image3.png)
 
 <span id="_Toc408995832" class="anchor"><span id="_Toc408996336" class="anchor"></span></span>Verifying that the Database's HTTP server is running
 --------------------------------------------------------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ Starting with Oracle Database 12c, as a consequence of enabling digest support, 
 
 If everything is installed and configured correctly the database should respond with an HTTP page similar to the one shown below.
 
-![](media/image5.png)
+![](/raw/master/XFILES/media/image00i5.png)
 
 <span id="_Toc310240961" class="anchor"></span>
 
@@ -94,7 +94,7 @@ The Microsoft article: <http://support.microsoft.com/kb/841215> provide instruct
 
 Download the latest version of the application from GitHub. The application can be found [here](https://github.com/oracle/xml-sample-demo).
 
-![](media/image6.png)
+![](/raw/master/XFILES/media//raw/master/XFILES/image006.png)
 
 Use the Download Zip button to download the contents of the GitHub repository. The Zip file will be called xml-sample-demo-master.zip.
 
@@ -103,7 +103,7 @@ Use the Download Zip button to download the contents of the GitHub repository. T
 
 Note that installing the XFILES application also installs the XDBPM utilities. This means that the installation process will drop and recreate the locked database schema XDBPM.
 
-![](media/image7.png)
+![](/raw/master/XFILES/media/image007.png)
 
 <span id="_Toc310240963" class="anchor"></span>
 
@@ -117,7 +117,7 @@ The install folder is a sub-folder of the XFILES folder.
 
 The install folder contains the files needed to perform the installation. The install is performed using a HTML Application file (**install.hta**) which invokes a VBScript (**install.vbs**). In some cases windows may block these files from accessing remote resources. This can prevent the installation from running successfully against a remote database. To ensure that the **install.hta**, and **install.vbs** files are not blocked, right click on each file and select properties
 
-![](media/image8.png)
+![](/raw/master/XFILES/media/image008.png)
 
 If the General Tab of the properties dialog of either file contains an “unblock” button, click it to allow the file to execute normally.
 
