@@ -38,7 +38,7 @@ In Oracle Database 12c, in a multitenant environment the ANONYMOUS account must 
 
 The system must be configured with enough shared servers to support the number of concurrent requests. When working a Browser and AJAX, a single user can make multiple simultaneous HTTP requests to the database. For a single user it is recommended to have a minimum of 5 shared servers configured. In Oracle Database 12c, in a multitenant configuration shared servers, are a property of the consolidated database instance and have to be configured while connected to the root database.
 
-![](media/image002.png)
+![](media/image2.png)
 
 <span id="_Toc408995830" class="anchor"><span id="_Toc408996334" class="anchor"></span></span>Create the XFILES application schema
 ----------------------------------------------------------------------------------------------------------------------------------
