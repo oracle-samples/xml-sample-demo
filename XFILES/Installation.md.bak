@@ -1,8 +1,3 @@
-<span id="_Toc399206691" class="anchor"><span id="_Toc408995824" class="anchor"><span id="_Toc408996328" class="anchor"></span></span></span>Disclaimer
-=======================================================================================================================================================
-
-<span id="_Toc408995825" class="anchor"></span>The following is intended to outline our general product direction. It is intended for information purposes only, and may not be incorporated into any contract. It is not a commitment to deliver any material, code, or functionality, and should not be relied upon in making purchasing decisions. The development, release, and timing of any features or functionality described for Oracle’s products remains at the sole discretion of Oracle.
-
 <span id="_Toc408996329" class="anchor"></span>
 
 Executive Overview
@@ -38,7 +33,7 @@ In Oracle Database 12c, in a multitenant environment the ANONYMOUS account must 
 
 The system must be configured with enough shared servers to support the number of concurrent requests. When working a Browser and AJAX, a single user can make multiple simultaneous HTTP requests to the database. For a single user it is recommended to have a minimum of 5 shared servers configured. In Oracle Database 12c, in a multitenant configuration shared servers, are a property of the consolidated database instance and have to be configured while connected to the root database.
 
-![](media/image2.png)
+![](media/image002.png)
 
 <span id="_Toc408995830" class="anchor"><span id="_Toc408996334" class="anchor"></span></span>Create the XFILES application schema
 ----------------------------------------------------------------------------------------------------------------------------------

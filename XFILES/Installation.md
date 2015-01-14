@@ -1,8 +1,3 @@
-<span id="_Toc399206691" class="anchor"><span id="_Toc408995824" class="anchor"><span id="_Toc408996328" class="anchor"></span></span></span>Disclaimer
-=======================================================================================================================================================
-
-<span id="_Toc408995825" class="anchor"></span>The following is intended to outline our general product direction. It is intended for information purposes only, and may not be incorporated into any contract. It is not a commitment to deliver any material, code, or functionality, and should not be relied upon in making purchasing decisions. The development, release, and timing of any features or functionality described for Oracle’s products remains at the sole discretion of Oracle.
-
 <span id="_Toc408996329" class="anchor"></span>
 
 Executive Overview
