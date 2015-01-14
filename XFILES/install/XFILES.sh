@@ -2,17 +2,18 @@ demohome=$(pwd)
 logfilename=$demohome/XFILES.log
 echo "Log File : $logfilename"
 rm $logfilename
-DBAPWD=$1
-USERPWD=$2
-ORACLE_SID=$3
-SERVER=$4
+DBA=$1
+DBAPWD=$2
+USER=$3
+USERPWD=$4
+SERVER=$5
 echo "Installation Parameters for Oracle XML DB XFiles application". > $logfilename
 echo "\$DBA         : $DBA" >> $logfilename
 echo "\$USER        : $USER" >> $logfilename
+echo "\$SERVER      : $SERVER" >> $logfilename
+echo "\$DEMOHOME    : $demohome" >> $logfilename
 echo "\$ORACLE_HOME : $ORACLE_HOME" >> $logfilename
 echo "\$ORACLE_SID  : $ORACLE_SID" >> $logfilename
-echo "\$DEMOHOME    : $demohome" >> $logfilename
-echo "\$SERVER      : $SERVER" >> $logfilename
 spexe=$(which sqlplus | head -1)
 echo "sqlplus      : $spexe" >> $logfilename
 sqlplus -L $DBA/$DBAPWD@$ORACLE_SID as sysdba @$demohome/install/sql/VerifyConnection.sql
