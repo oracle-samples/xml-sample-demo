@@ -149,8 +149,8 @@
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\src\common\xsl\wsdl2request.xsl</local>
-  			<remote>%BASEFOLDER%/src/common/xsl/wsdl2request.xsl</remote>
+  			<local>%DEMODIRECTORY%\src\common\xsl\wsdl2Request.xsl</local>
+  			<remote>%BASEFOLDER%/src/common/xsl/wsdl2Request.xsl</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>

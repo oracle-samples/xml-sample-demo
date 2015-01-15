@@ -2749,7 +2749,7 @@ function WsdlCache() {
   }
   
 	function initialize() {
-    requestXSL = loadXSLDocument('/XFILES/common/xsl/wsdl2request.xsl'); 
+    requestXSL = loadXSLDocument('/XFILES/common/xsl/wsdl2Request.xsl'); 
     loadSQLService();
   }
 
