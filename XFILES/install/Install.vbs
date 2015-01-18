@@ -620,11 +620,18 @@ Sub cloneArchives(INSTALLER,FILEMANAGER)
      source  = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"source"),false)
      folder  = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"folder"),false)
      target  = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
-     writeLogMessage "Clone Archives : Archive = '" + source + "'. Target = '" + target + "'."
-     FILEMANAGER.unzipArchive source, folder
-  	  FILEMANAGER.cloneFolder INSTALLER, folder, folder
-     FILEMANAGER.createZipArchive target
-     FILEMANAGER.zipArchive target, folder
+     If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then
+       writeLogMessage "Clone Archives : Archive = '" + source + "'. Target = '" + target + "'."
+       FILEMANAGER.unzipArchive source, folder
+  	   FILEMANAGER.cloneFolder INSTALLER, folder, folder
+       FILEMANAGER.createZipArchive target
+       FILEMANAGER.zipArchive target, folder
+     else
+       LINUX.unzipArchive source, folder
+  	   LINUX.cloneFolder INSTALLER, folder, folder
+       LINUX.createZipArchive target
+       LINUX.zipArchive target, folder
+     End If
   Next 
   
 End Sub
@@ -657,8 +664,12 @@ Sub copyFiles(INSTALLER,FILEMANAGER)
   For i = 0 to nodeList.length - 1
      sourceFile = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"source"),false)
      targetFile = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
-     writeLogMessage "Copy File : Source = '" + sourceFile + "'. Target = '" + targetFile + "'" 
-     FILEMANAGER.copyFile INSTALLER, sourceFile, targetFile
+     If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then
+       writeLogMessage "Copy File : Source = '" + sourceFile + "'. Target = '" + targetFile + "'" 
+       FILEMANAGER.copyFile INSTALLER, sourceFile, targetFile
+     Else
+     	 LINUX.CopyFile INSTALLER, sourceFile, targetFile
+     End If
   Next 
   
 End Sub
@@ -672,8 +683,13 @@ Sub copyFolders(INSTALLER,FILEMANAGER)
   For i = 0 to nodeList.length - 1
      sourceFolder      = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"source"),false)
      targetFolder      = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
-     writeLogMessage "Copy Folder : Source = '" + sourceFolder + "'. Target = '" + targetFolder + "'"
-     FILEMANAGER.copyFolder INSTALLER, sourceFolder, targetFolder
+     If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then
+       writeLogMessage "Copy Folder : Source = '" + sourceFolder + "'. Target = '" + targetFolder + "'"
+       FILEMANAGER.copyFolder INSTALLER, sourceFolder, targetFolder
+     Else
+     	 LINUX.CopyFolder INSTALLER, sourceFolder, targetFolder
+     End If
+     
   Next 
   
 End Sub
@@ -687,8 +703,12 @@ Sub cloneFiles(INSTALLER,FILEMANAGER)
   For i = 0 to nodeList.length - 1
      sourceFile = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"source"),false)
      targetFile = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
-     writeLogMessage "Clone File : Source = '" + sourceFile + "'. Target = '" + targetFile + "'"
-     FILEMANAGER.cloneFile INSTALLER, sourceFile, targetFile
+     If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
+       writeLogMessage "Clone File : Source = '" + sourceFile + "'. Target = '" + targetFile + "'"
+       FILEMANAGER.cloneFile INSTALLER, sourceFile, targetFile
+     Else
+     	 LINUX.cloneFile INSTALLER, sourceFile, targetFile
+     End if
   Next 
   
 End Sub
@@ -702,8 +722,12 @@ Sub cloneFolders(INSTALLER,FILEMANAGER)
   For i = 0 to nodeList.length - 1
      sourceFolder = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"source"),false)
      targetFolder = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
-     writeLogMessage "Clone Folder : Source = '" + sourceFolder + "'. Target = '" + targetFolder + "'"
-     FILEMANAGER.cloneFolder INSTALLER, sourceFolder, targetFolder
+     If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
+       writeLogMessage "Clone Folder : Source = '" + sourceFolder + "'. Target = '" + targetFolder + "'"
+       FILEMANAGER.cloneFolder INSTALLER, sourceFolder, targetFolder
+     Else
+     	 LINUX.cloneFolder INSTALLER, sourceFolder, targetFolder
+     End if
   Next 
   
 End Sub
@@ -717,8 +741,12 @@ Sub unzipArchives(INSTALLER,FILEMANAGER)
   For i = 0 to nodeList.length - 1
      archive = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"source"),false)
      target  = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
-     writeLogMessage "Unzip Archives : Archive = '" + archive + "'. Target = '" + target + "'."
-     FILEMANAGER.unzipArchive archive, target
+     If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
+       writeLogMessage "Unzip Archives : Archive = '" + archive + "'. Target = '" + target + "'."
+       FILEMANAGER.unzipArchive archive, target
+     Else
+     	 LINUX.unzipArchive archive, target
+     End if
   Next 
   
 End Sub
@@ -735,7 +763,12 @@ Sub makeWebFolders(REPOS)
      URL = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"URL"),false)
      shortCutName = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"name"),false)
      shortcutLocation = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"location"),false)
-     REPOS.makeWebFolder shortCutName, URL, shortcutLocation
+     If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
+       REPOS.makeWebFolder shortCutName, URL, shortcutLocation
+     Else
+  	   LINUX.makeWebFolder shortCutName, URL, shortcutLocation
+     End If
+
   Next 
 
 End Sub
@@ -777,12 +810,13 @@ Sub makeNetworkFolderShortcuts(INSTALLER, FILEMGR)
       shortcutLocation   = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"location"),false)
       target             = replace(INSTALLER.getDriveLetter() & URL,"/","\")
       
-      folder = validateRemotePath(INSTALLER, target)
-  
-      directory          = null
-      icon               = "%SystemRoot%\system32\imageres.dll ,3"
-      arguments          = null
-      FILEMANAGER.createJunctionPoint shortcutLocation, shortCutName, target
+      If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
+        folder = validateRemotePath(INSTALLER, target)
+        FILEMANAGER.createJunctionPoint shortcutLocation, shortCutName, target
+      Else
+   	    LINUX.createJunctionPoint shortcutLocation, shortCutName, target
+      End If
+
     Next 
   End If
    
@@ -876,7 +910,10 @@ Sub makeHttpShortCuts(INSTALLER, FILEMANAGER)
     screenshot         = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"screenshot"),false)
     windowName         = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"target"),false)
 
-    FILEMANAGER.makeHttpShortCut shortcutLocation, shortcutName, url, iconPath, arguments
+    If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
+	    FILEMANAGER.makeHttpShortCut shortcutLocation, shortcutName, url, iconPath, arguments
+    End If
+
     DEMONSTRATION.addHTTPStep shortcutName, url, "HTTP.png", username, screenshot, windowName
   Next 
   
@@ -941,7 +978,10 @@ Sub makeViewerShortCuts(INSTALLER, FILEMANAGER)
       remoteURL = INSTALLER.getServerURL() & URL   	
     End if    
     
-    FILEMANAGER.makeHttpShortCut shortcutLocation, shortcutName, remoteURL , iconPath, NULL
+    If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then
+      FILEMANAGER.makeHttpShortCut shortcutLocation, shortcutName, remoteURL , iconPath, NULL
+    End if
+    
     DEMONSTRATION.addViewerStep shortcutName, localURL, "HTTP.png", username, contentType
   Next 
   
@@ -1084,7 +1124,9 @@ Sub makeGeneralShortCuts(INSTALLER,FILEMANAGER)
     icon               = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"icon"),false)
     arguments          = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"arguments"),false)
     
-    FILEMANAGER.makeShortCut INSTALLER, shortcutFolder, shortCutName, target, icon, directory, arguments
+    If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then
+      FILEMANAGER.makeShortCut INSTALLER, shortcutFolder, shortCutName, target, icon, directory, arguments
+    End if
         
     Set nlSimulation   = nodeList.item(i).getElementsByTagName("simulation")
     If nlSimulation.length > 0 Then
@@ -1144,7 +1186,7 @@ Sub SaveConfiguration (REPOS, remoteDirectory, user, password)
 		If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
       REPOS.uploadContent DEMONSTRATION.DOCUMENT, remoteDirectory & "/configuration.xml", True, user, password
     else
-    	LINUX.uploadConfiguation DEMONSTRATION.DOCUMENT, remoteDirectory, True, user, password
+    	LINUX.uploadConfiguation DEMONSTRATION.DOCUMENT, remoteDirectory & "/configuration.xml", True, user, password
     End If
 
 End Sub
@@ -1640,15 +1682,21 @@ Class fileSystemControl
    
     Dim sourceFolder, targetFolder, errorMessage
   
-    On Error Resume Next
-    Set sourceFolder = INSTALLER.getFSO().getFolder(sourceFolderName)
-    If Err.number  <> 0 Then
-    	errorMessage = "cloneFolder(): Fatal Error encountered creatng folder '" & sourceFolderName & "'."
-      exitFatalError(errorMessage)
+		If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
+      On Error Resume Next
+      Set sourceFolder = INSTALLER.getFSO().getFolder(sourceFolderName)
+      If Err.number  <> 0 Then
+    	  errorMessage = "cloneFolder(): Fatal Error encountered creatng folder '" & sourceFolderName & "'."
+        exitFatalError(errorMessage)
+      End If
+      Set targetFolder = INSTALLER.getFSO().getFolder(targetFolderName)
+      cloneSubFolder installParameters, sourceFolder, targetFolder
+    Else
+    	LINUX.cloneFolder installParameters, sourceFolderName,targetFolderName
     End If
-    Set targetFolder = INSTALLER.getFSO().getFolder(targetFolderName)
-    cloneSubFolder installParameters, sourceFolder, targetFolder
+
   End Sub
+   
 
   Public Sub CopyFile(installParameters, sourceFile,targetFile)
     INSTALLER.getFSO().copyFile sourceFile,targetFile
@@ -2683,9 +2731,13 @@ Class sqlldrControl
   Public Function execute(user, password, controlFile)
     
      Dim commandLine
-     commandLine = INSTALLER.getSQLLDRPath() & " -Userid=" & user & "/" & password & "@" & INSTALLER.getTNSAlias() & " control=" & controlFile
-     writeLogMessage commandLine
-     execute = runCommand(commandLine)
+     If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then
+       commandLine = INSTALLER.getSQLLDRPath() & " -Userid=" & user & "/" & password & "@" & INSTALLER.getTNSAlias() & " control=" & controlFile
+       writeLogMessage commandLine
+       execute = runCommand(commandLine)
+     Else
+     	 execute = LINUX.sqlldr(user,password,replace(controlFile,"\","/"))
+     End If
      
   End Function
 
@@ -3129,6 +3181,22 @@ Class installationManager
        macroList.item(key) =  value
   End Sub
   
+  Public function generateSedCommand
+
+       Dim sedCommand, keys, i, key
+
+       sedCommand = "sed"
+       keys = macroList.keys
+       For i = 0 to (UBound(keys))
+        key = keys(i) 
+        sedCommand = sedCommand + " -e ""s|" & key & "|" & replace(macroList.Item(key),"/","\/") & "|g"""
+      Next
+      sedCommand = sedCommand & " -e ""s|\$USER|$USER|g"" -e ""s|\$SERVER|$SERVER|g"""
+      
+      generateSedCommand = sedCommand
+ 
+  End Function
+  
   Public Function replaceMacros(value,skipPasswords)
 
        Dim keys, i, key
@@ -3408,7 +3476,7 @@ Class installationManager
   End Function
 
   Public Function getInstallFolderPath
-    getInstallFolderPath = getDemoDirectory()  & FILE_SEPERATOR & "Install"
+    getInstallFolderPath = getDemoDirectory()  & FILE_SEPERATOR & "install"
   End Function
  
   Public Function getLogFilePath()

@@ -22,8 +22,10 @@ function RestAPI() {
   var collectionName
   var logger = new Array();
   var self = this;
-  
-  var servletPath = '/JSONREST/';
+
+	var servletRoot = '/DBJSON';
+	  
+  var servletPath = servletRoot + "/";
 
   function notConnected() {
   	
@@ -46,6 +48,10 @@ function RestAPI() {
   
   this.setORDS = function() {  
   	isORDS = true;
+  }
+  
+  this.setServletRoot = function(root) {
+  	servletRoot = root + "/";
   }
     
   this.addLogWindow = function () {
@@ -390,7 +396,7 @@ function RestAPI() {
     	servletPath = "/ords/" + schema + "/dbjson/latest/"
     }
     else {
-    	servletPath = "/JSONREST/" + schema + "/";
+    	servletPath = servletRoot + "/" + schema + "/";
     } 
   }
   
