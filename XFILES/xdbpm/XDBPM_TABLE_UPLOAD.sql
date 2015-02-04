@@ -35,7 +35,7 @@ as
        <source>UPLOAD_FOLDER_EVENTS</source>
        <language>PL/SQL</language>
        <events>
-         <Pre-LinkIn/>
+         <Pre-Create/>
          <Post-LinkIn/>
        </events>
      </listener>
@@ -43,20 +43,12 @@ as
    <applicationData/>   
 </ResConfig>';
 
-  C_XML_CONTENT               constant varchar2(32)   := 'XML';
-  C_BINARY_CONTENT            constant varchar2(32)   := 'BINARY';
-  C_TEXT_CONTENT              constant varchar2(32)   := 'TEXT';
-  
-  function XML_CONTENT        return varchar2 deterministic;
-  function BINARY_CONTENT     return varchar2 deterministic;
-  function TEXT_CONTENT       return varchar2 deterministic;  
-  
   function TABLE_UPLOAD_ELEMENT      return varchar2 deterministic;
   function TABLE_UPLOAD_NAMESPACE    return varchar2 deterministic;
   function TABLE_UPLOAD_XPATH        return varchar2 deterministic;
   function TABLE_UPLOAD_PREFIX_X     return varchar2 deterministic;
       
-  function configureUploadFolder(P_UPLOAD_FOLDER VARCHAR2,P_OWNER VARCHAR2,P_OBJECT_NAME VARCHAR2,P_COLUMN_NAME VARCHAR2 DEFAULT 'OBJECT_VALUE',P_CONTENT_TYPE_FILTER VARCHAR2 DEFAULT NULL) return VARCHAR2;
+  function configureUploadFolder(P_UPLOAD_FOLDER VARCHAR2,P_OWNER VARCHAR2,P_OBJECT_NAME VARCHAR2,P_COLUMN_NAME VARCHAR2 DEFAULT 'OBJECT_VALUE') return VARCHAR2;
   function getUploadFolderPath(P_TABLE_NAME VARCHAR2, P_OWNER VARCHAR2 DEFAULT USER)  return VARCHAR2;
   procedure createXMLIndexedTable(P_TABLE_NAME VARCHAR2, P_INDEX_NAME VARCHAR2,P_UPLOAD_FOLDER VARCHAR2 DEFAULT NULL);
 
@@ -74,13 +66,7 @@ as
 --
 NAMESPACE_RESOURCE_CONFIG       constant varchar2(1024)  := 'http://xmlns.oracle.com/xdb/XDBResConfig.xsd';
 PREFIX_DEF_RESOURCE_CONFIG      constant varchar2(1024)  := 'xmlns:rc="' || NAMESPACE_RESOURCE_CONFIG || '"';
-  
-function XML_CONTENT            return varchar2 deterministic as begin return C_XML_CONTENT; end;
---
-function TEXT_CONTENT           return varchar2 deterministic as begin return C_TEXT_CONTENT; end;
---
-function BINARY_CONTENT         return varchar2 deterministic as begin return C_BINARY_CONTENT; end;
---
+--  
 function TABLE_UPLOAD_ELEMENT   return varchar2 deterministic as begin return C_TABLE_UPLOAD_ELEMENT; end;
 --
 function TABLE_UPLOAD_NAMESPACE return varchar2 deterministic as begin return C_TABLE_UPLOAD_NAMESPACE; end;
@@ -107,7 +93,7 @@ begin
 	 
 end;
 --
-function configureUploadFolder(P_UPLOAD_FOLDER VARCHAR2,P_OWNER VARCHAR2,P_OBJECT_NAME VARCHAR2,P_COLUMN_NAME VARCHAR2 DEFAULT 'OBJECT_VALUE',P_CONTENT_TYPE_FILTER VARCHAR2 DEFAULT NULL)
+function configureUploadFolder(P_UPLOAD_FOLDER VARCHAR2,P_OWNER VARCHAR2,P_OBJECT_NAME VARCHAR2,P_COLUMN_NAME VARCHAR2 DEFAULT 'OBJECT_VALUE')
 return VARCHAR2
 as
   V_OBJECT_TYPE          VARCHAR2(32);
@@ -158,7 +144,6 @@ begin
            xmlElement("Table",P_OBJECT_NAME),
            xmlElement("ObjectType",V_OBJECT_TYPE),
            xmlElement("Column",P_COLUMN_NAME),
-           xmlElement("ContentType",P_CONTENT_TYPE_FILTER),
            xmlElement("Folder",V_DOCUMENT_FOLDER_PATH)
         )
    into V_TARGET_METADATA
@@ -214,7 +199,7 @@ begin
   execute immediate 'create index "' || P_INDEX_NAME || '" on "' || P_TABLE_NAME || '" (OBJECT_VALUE) indextype is xdb.XMLIndex';  
    
   if (P_UPLOAD_FOLDER is not NULL) then
-    V_UPLOAD_FOLDER := configureUploadFolder(P_UPLOAD_FOLDER,USER,P_TABLE_NAME,'OBJECT_VALUE',XDBPM_TABLE_UPLOAD.XML_CONTENT);
+    V_UPLOAD_FOLDER := configureUploadFolder(P_UPLOAD_FOLDER,USER,P_TABLE_NAME,'OBJECT_VALUE');
   end if;
      
 end;
