@@ -11,23 +11,8 @@
  *
  * ================================================ */
 
-set echo on
-spool getHttpPort.log
 --
-var returnCode number
+-- Grant Required permissions for Schema Registration etc to the demo user
 --
-declare
-  V_PORT_NUMBER number;
-begin
-$IF DBMS_DB_VERSION.VER_LE_11_2 $THEN
-  V_PORT_NUMBER := DBMS_XDB.getHttpPort();
-$ELSE
-  V_PORT_NUMBER := DBMS_XDB_CONFIG.getHttpPort();
-$END
-  :returnCode := V_PORT_NUMBER;
-end;
+grant ALTER SESSION, CREATE VIEW, XFILES_USER to &USERNAME
 /
---
-print :returnCode
---
-exit :returnCODE

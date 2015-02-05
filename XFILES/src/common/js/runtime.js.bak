@@ -1277,8 +1277,8 @@ function SqlProcessor() {
      	 	 continue;
        }
 
-     	 if (nextLine.substring(0,2) == "*/") {
-     	 	 // Todo : Deal with End Comment Marker not at begining of line
+     	 if (nextLine.indexOf("*/") > -1) {
+     	 	 // Todo : Deal with Code following End Comment.
      	 	 commentBlock = false;
      	 	 continue;
        }
@@ -1294,8 +1294,15 @@ function SqlProcessor() {
 
        if (!statementStarted) {
 
+				 // Skip Blank lines 
+
+         if nextLine.substring(0,1) == "\r") {
+         	 // Todo : Empty Lines ? Eg only containing whitespace..
+					 continue;
+				 }
          // Skip all unsupported SQL*PLUS statements
 
+         	;
 
          if (nextLine.substring(0,4).toLowerCase() == "set ") {
            // Check for set autotrace on explain or set autotrace off
@@ -1475,15 +1482,15 @@ function SqlProcessor() {
   }
 
   function loadFormatDescribeXSL() {
-    FormatDescribeXSL = loadXSLDocument('/XFILES/WebDemo/xsl/formatDescribe.xsl');
+    FormatDescribeXSL = loadXSLDocument('/XFILES/common/xsl/formatDescribe.xsl');
   }
 
   function loadFormatXPlanXSL() {
-    FormatXPlanXSL = loadXSLDocument('/XFILES/WebDemo/xsl/formatXPlan.xsl');
+    FormatXPlanXSL = loadXSLDocument('/XFILES/common/xsl/formatXPlan.xsl');
   }
 
   function loadFormatResponseXSL() {
-    FormatResponseXSL = loadXSLDocument('/XFILES/WebDemo/xsl/formatResponse.xsl');
+    FormatResponseXSL = loadXSLDocument('/XFILES/common/xsl/formatResponse.xsl');
   }
 
 	this.runSQLCommand = function(sqlScript) {

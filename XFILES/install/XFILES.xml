@@ -578,10 +578,6 @@
   		</action>
   		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<remote>%BASEFOLDER%/src/WebDemo/js</remote>
-  		</action>
-  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
-  			<mode>FORCE</mode>
   			<remote>%BASEFOLDER%/src/WebDemo/xsl</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">

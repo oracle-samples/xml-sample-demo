@@ -1277,8 +1277,8 @@ function SqlProcessor() {
      	 	 continue;
        }
 
-     	 if (nextLine.substring(0,2) == "*/") {
-     	 	 // Todo : Deal with End Comment Marker not at begining of line
+     	 if (nextLine.indexOf("*/") > -1) {
+     	 	 // Todo : Deal with Code following End Comment.
      	 	 commentBlock = false;
      	 	 continue;
        }
@@ -1294,8 +1294,15 @@ function SqlProcessor() {
 
        if (!statementStarted) {
 
+				 // Skip Blank lines 
+
+         if (nextLine.substring(0,1) == "\r") {
+         	 // Todo : Empty Lines ? Eg only containing whitespace..
+					 continue;
+				 }
          // Skip all unsupported SQL*PLUS statements
 
+         	;
 
          if (nextLine.substring(0,4).toLowerCase() == "set ") {
            // Check for set autotrace on explain or set autotrace off

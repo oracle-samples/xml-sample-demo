@@ -12,22 +12,14 @@
  * ================================================ */
 
 set echo on
-spool getHttpPort.log
+spool grantPermissions.log
 --
-var returnCode number
+def USERNAME    = &1
 --
-declare
-  V_PORT_NUMBER number;
-begin
-$IF DBMS_DB_VERSION.VER_LE_11_2 $THEN
-  V_PORT_NUMBER := DBMS_XDB.getHttpPort();
-$ELSE
-  V_PORT_NUMBER := DBMS_XDB_CONFIG.getHttpPort();
-$END
-  :returnCode := V_PORT_NUMBER;
-end;
-/
+-- Invoke Required Scripts here..
 --
-print :returnCode
+@@enableSchemaRegistration.sql
 --
-exit :returnCODE
+@@enableAccessToHR.sql
+--
+quit

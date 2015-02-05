@@ -2624,7 +2624,7 @@ Class sqlPlusControl
 
   Public Function testConnection(user, password, role)
     Dim returnCode
-    returnCode = executeSQLPLUS(user, password, role, "sql/VerifyConnection.sql")
+    returnCode = executeSQLPLUS(user, password, role, "sql/verifyConnection.sql")
     If returnCode = 2 Then
     	testConnection = true
     Else

@@ -3252,66 +3252,6 @@ then
     exit 6
 	 fi
 fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/WebDemo/js" | head -1)
-if [ $HttpStatus == "404" ] 
-then
-  HttpStatus=$(curl --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/WebDemo/js" | head -1)
-  echo "MKCOL "$SERVER/home/$USER/src/WebDemo/js":$HttpStatus" >> $logfilename
-  if [ $HttpStatus != "201" ]
-  then
-    echo "Operation Failed - Installation Aborted." >> $logfilename
-    echo "Installation Failed: See log file for details."
-    exit 6
-	 fi
-fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
-if [ $HttpStatus == "404" ] 
-then
-  HttpStatus=$(curl --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
-  echo "MKCOL "$SERVER/home":$HttpStatus" >> $logfilename
-  if [ $HttpStatus != "201" ]
-  then
-    echo "Operation Failed - Installation Aborted." >> $logfilename
-    echo "Installation Failed: See log file for details."
-    exit 6
-	 fi
-fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-if [ $HttpStatus == "404" ] 
-then
-  HttpStatus=$(curl --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-  echo "MKCOL "$SERVER/home/$USER":$HttpStatus" >> $logfilename
-  if [ $HttpStatus != "201" ]
-  then
-    echo "Operation Failed - Installation Aborted." >> $logfilename
-    echo "Installation Failed: See log file for details."
-    exit 6
-	 fi
-fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src" | head -1)
-if [ $HttpStatus == "404" ] 
-then
-  HttpStatus=$(curl --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src" | head -1)
-  echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus" >> $logfilename
-  if [ $HttpStatus != "201" ]
-  then
-    echo "Operation Failed - Installation Aborted." >> $logfilename
-    echo "Installation Failed: See log file for details."
-    exit 6
-	 fi
-fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/WebDemo" | head -1)
-if [ $HttpStatus == "404" ] 
-then
-  HttpStatus=$(curl --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/WebDemo" | head -1)
-  echo "MKCOL "$SERVER/home/$USER/src/WebDemo":$HttpStatus" >> $logfilename
-  if [ $HttpStatus != "201" ]
-  then
-    echo "Operation Failed - Installation Aborted." >> $logfilename
-    echo "Installation Failed: See log file for details."
-    exit 6
-	 fi
-fi
 HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/WebDemo/xsl" | head -1)
 if [ $HttpStatus == "404" ] 
 then
@@ -4340,7 +4280,7 @@ sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/WebDemo/sql/XFILES_WEBDEMO_SERVICES.sql $USER
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_STATUS_PAGE.sql $USER
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/PUBLISH_XFILES.sql OracleTransparent3d.png
-sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/src/sql/XDB_REPOSITORY_INDEX.sql $DBA %DBAPASSWORD% $ORACLE_SID
+sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/src/sql/XDB_REPOSITORY_INDEX.sql $DBA $DBAPWD $ORACLE_SID
 shellscriptName="$demohome/XFILES Application.sh"
 echo "Shell Script : $shellscriptName" >> $logfilename
 echo "Shell Script : $shellscriptName"

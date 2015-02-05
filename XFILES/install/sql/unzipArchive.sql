@@ -12,22 +12,17 @@
  * ================================================ */
 
 set echo on
-spool getHttpPort.log
+spool unzipArchive.log APPEND
 --
-var returnCode number
+def ZIP_FILE_PATH = &1
+def TARGET_FOLDER = &2
+def LOG_FILE_PATH = &3
 --
-declare
-  V_PORT_NUMBER number;
-begin
-$IF DBMS_DB_VERSION.VER_LE_11_2 $THEN
-  V_PORT_NUMBER := DBMS_XDB.getHttpPort();
-$ELSE
-  V_PORT_NUMBER := DBMS_XDB_CONFIG.getHttpPort();
-$END
-  :returnCode := V_PORT_NUMBER;
-end;
+set timing on
+call DBMS_JAVA.SET_OUTPUT(200000)
 /
+set serveroutput on size 200000
 --
-print :returnCode
---
-exit :returnCODE
+call XDB_ZIP_UTILITY.UNZIP('&ZIP_FILE_PATH','&LOG_FILE_PATH','&TARGET_FOLDER',XDB_CONSTANTS.RAISE_ERROR)
+/
+quit

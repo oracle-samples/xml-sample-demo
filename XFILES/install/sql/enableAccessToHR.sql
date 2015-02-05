@@ -11,23 +11,18 @@
  *
  * ================================================ */
 
-set echo on
-spool getHttpPort.log
 --
-var returnCode number
+-- Grant access tables in HR Schema.
 --
-declare
-  V_PORT_NUMBER number;
-begin
-$IF DBMS_DB_VERSION.VER_LE_11_2 $THEN
-  V_PORT_NUMBER := DBMS_XDB.getHttpPort();
-$ELSE
-  V_PORT_NUMBER := DBMS_XDB_CONFIG.getHttpPort();
-$END
-  :returnCode := V_PORT_NUMBER;
-end;
+grant all on HR.COUNTRIES to &USERNAME
 /
---
-print :returnCode
---
-exit :returnCODE
+grant all on HR.LOCATIONS to &USERNAME
+/
+grant all on HR.DEPARTMENTS to &USERNAME
+/
+grant all on HR.EMPLOYEES to &USERNAME
+/
+grant all on HR.JOBS to &USERNAME
+/
+grant all on HR.JOB_HISTORY to &USERNAME
+/

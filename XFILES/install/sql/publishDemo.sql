@@ -12,22 +12,29 @@
  * ================================================ */
 
 set echo on
-spool getHttpPort.log
 --
-var returnCode number
+spool publishDemo.log
+--
+def FOLDER = &1
+--
+def XFILES_SCHEMA = &2
+--
+-- Create index.html in the user's folder pointing to WebDemo application
 --
 declare
-  V_PORT_NUMBER number;
+  V_SOURCE_PATH varchar2(700) := '/home/&XFILES_SCHEMA/src/WebDemo/loader.html';
+  V_TARGET_PATH varchar2(700) := '&FOLDER/index.html'; 
 begin
-$IF DBMS_DB_VERSION.VER_LE_11_2 $THEN
-  V_PORT_NUMBER := DBMS_XDB.getHttpPort();
-$ELSE
-  V_PORT_NUMBER := DBMS_XDB_CONFIG.getHttpPort();
-$END
-  :returnCode := V_PORT_NUMBER;
+  if dbms_xdb.existsResource(V_TARGET_PATH) then
+    dbms_xdb.deleteResource(V_TARGET_PATH);
+  end if;
+  dbms_xdb.setAcl(V_SOURCE_PATH,'/sys/acls/bootstrap_acl.xml');
+  dbms_xdb.link(V_SOURCE_PATH,'&FOLDER','index.html',DBMS_XDB.LINK_TYPE_WEAK);
 end;
 /
+commit
+/
 --
-print :returnCode
+@@postInstallationSteps
 --
-exit :returnCODE
+quit
