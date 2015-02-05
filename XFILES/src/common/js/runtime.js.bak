@@ -36,6 +36,19 @@ function SqlScript(id) {
   var commandId         = 1;
   var statementList     = new Array();
 
+  function stripOracleCopyRightNotice() {
+  	
+  	/* Try to avoid displaying Oracle Copyright notices when processing SQL Scripts.. */
+  	
+    if ((sqlScript[3].indexOf("Copyright (c)") > -1) && (sqlScript[3].indexOf("Oracle and/or its affiliates.  All rights reserved.") > -1)) {
+    	while (sqlScript[0].indexOf("*/") == -1) {
+  	  	sqlScript.shift();
+      }
+      sqlScript.shift();
+      sqlScript.shift();
+    }
+  }
+
   this.getScriptId  = function() {
     return scriptId;
   }
@@ -174,6 +187,7 @@ function SqlScript(id) {
       error = new xfilesException('sqlScript.getSQLScript',11, sqlScriptURL, e);
       throw error;
     }
+    stripOracleCopyRightNotice()
     return sqlScript;
   }
 
@@ -764,13 +778,19 @@ function DemonstrationPlayer() {
 
   this.loadIFrameXML = function(iFrameId,targetURL,contentType) {
   	var iFrame = document.getElementById(iFrameId)
+  	
+  	// Localize the URL
+  	
+    var loc = document.createElement("a");
+    loc.href = targetURL
+  	
   	if ((contentType == "text/xml") || (contentType == "application/xml")) {
-  	  iFrame.src = "/XFILES/xmlViewer/xmlViewer.html?target=" + encodeURIComponent(targetURL);
+  	  iFrame.src = "/XFILES/xmlViewer/xmlViewer.html?target=" + encodeURIComponent(loc.pathname);
   	  return;
   	}
 
   	if ((contentType == "text/plain") || (contentType == "text/html")) {
-  		iFrame.src = targetURL
+  		iFrame.src = loc.pathname
   	  return;
   	}
   }
@@ -1273,11 +1293,12 @@ function SqlProcessor() {
 
      	 if (nextLine.substring(0,2) == "/*") {
      	 	 // Todo : Deal with Start Comment Marker not at begining of line
+     	 	 // Todo : When dealing with the above make sure not to trip over Hints...
      	 	 commentBlock = true;
      	 	 continue;
        }
 
-     	 if (nextLine.indexOf("*/") > -1) {
+     	 if (commentBlock && (nextLine.indexOf("*/") > -1)) {
      	 	 // Todo : Deal with Code following End Comment.
      	 	 commentBlock = false;
      	 	 continue;
@@ -1296,7 +1317,7 @@ function SqlProcessor() {
 
 				 // Skip Blank lines 
 
-         if nextLine.substring(0,1) == "\r") {
+         if (nextLine.substring(0,1) == "\r") {
          	 // Todo : Empty Lines ? Eg only containing whitespace..
 					 continue;
 				 }
