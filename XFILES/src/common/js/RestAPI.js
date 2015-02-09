@@ -51,7 +51,7 @@ function RestAPI() {
   }
   
   this.setServletRoot = function(root) {
-  	servletRoot = root + "/";
+  	servletRoot = root;
   }
     
   this.addLogWindow = function () {

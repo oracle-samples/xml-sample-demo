@@ -12,20 +12,44 @@
  *
  * ================================================ */
 
+set echo on
+spool REPUBLISH_INSTALLED_DEMOS.log
+--
+def XFILES_SCHEMA = &1
 --
 declare
-  V_SOURCE_FOLDER varchar2(700) := XFILES_CONSTANTS.FOLDER_HOME || '/src/WebDemo';
-  V_TARGET_FOLDER varchar2(700) := XFILES_CONSTANTS.FOLDER_ROOT || '/WebDemo';
-  V_RESULT        boolean;
-begin 
-  if dbms_xdb.existsResource(V_TARGET_FOLDER) then
-    dbms_xdb.deleteResource(V_TARGET_FOLDER,DBMS_XDB.DELETE_RECURSIVE_FORCE);
-  end if;
-
-  V_RESULT := dbms_xdb.createFolder(V_TARGET_FOLDER);
-  dbms_xdb.link(V_SOURCE_FOLDER || '/xsl',V_TARGET_FOLDER,'xsl',DBMS_XDB.LINK_TYPE_WEAK);
-  dbms_xdb.link(V_SOURCE_FOLDER || '/runtime.html',V_TARGET_FOLDER,'runtime.html',DBMS_XDB.LINK_TYPE_WEAK);
-  
+  V_SOURCE_PATH varchar2(700) := '/home/&XFILES_SCHEMA/src/WebDemo/loader.html';
+  V_TARGET_FILE varchar2(32)  := 'index.html';
+  V_TARGET_PATH varchar2(700);
+  cursor findConfigFiles 
+  is
+ 	select substr(path,1,instr(path,'/',-1)-1) TARGET
+    from path_view 
+   where XMLEXISTS(
+          'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd";  (: :)
+           /Resource[DisplayName="configuration.xml"]'
+          passing RES
+        );
+begin
+  dbms_xdb.setAcl(V_SOURCE_PATH,'/sys/acls/bootstrap_acl.xml');
+  for c in findConfigFiles loop
+    V_TARGET_PATH := c.TARGET || '/' || V_TARGET_FILE;
+    if dbms_xdb.existsResource(V_TARGET_PATH) then
+      dbms_xdb.deleteResource(V_TARGET_PATH);
+    end if;
+    dbms_xdb.link(V_SOURCE_PATH,c.TARGET,V_TARGET_FILE,DBMS_XDB.LINK_TYPE_WEAK);
+  end loop;
 end;
 /
-  
+commit
+/
+select PATH
+  from PATH_VIEW
+ where RESID = (
+   select RESID 
+     from RESOURCE_VIEW 
+    where equals_path(RES,'/home/&XFILES_SCHEMA/src/WebDemo/loader.html') = 1
+ )
+ order by PATH
+/
+quit
