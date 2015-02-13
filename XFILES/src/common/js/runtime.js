@@ -785,7 +785,14 @@ function DemonstrationPlayer() {
     loc.href = targetURL
   	
   	if ((contentType == "text/xml") || (contentType == "application/xml")) {
-  	  iFrame.src = "/XFILES/xmlViewer/xmlViewer.html?target=" + encodeURIComponent("/" + loc.pathname);
+    	if (loc.pathname.substring(0,1) == "/") {
+    		// Firefox - Will see problem with X-Site Scripting with absolute URL
+    	  iFrame.src = "/XFILES/xmlViewer/xmlViewer.html?target=" + encodeURIComponent(location.protocol + "//" + location.hostname + ":" + location.port + loc.pathname);
+    	}
+    	else {
+    		// Internet Explorer
+    	  iFrame.src = "/XFILES/xmlViewer/xmlViewer.html?target=" + encodeURIComponent("/" + loc.pathname);
+      }	
   	  return;
   	}
 
