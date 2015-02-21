@@ -12,25 +12,25 @@
  *
  * ================================================ */
 
-function init(target) {
+function onPageLoaded() {
+  loadContents();
+}
+
+function loadContents() {
 
   try {
-    initXFilesCommon(target);
-
-    stylesheetURL   =   unescape(getParameter("stylesheet"));  
-    if ((typeof stylesheetURL == "undefined") || (stylesheetURL == "")) {
-      stylesheetURL = '/XFILES/lite/xsl/ResourceProperties.xsl';
-    }
-    
-    includeContent = (getParameter("includeContent") == "true");
-
-    resourceURL = unescape(getParameter("target"));
-    if ((typeof resourceURL == "undefined") || (resourceURL == "")) {
-      resourceURL = '/';
-    }
-    getResource(resourceURL,target,stylesheetURL,includeContent);
+    var contentXML = loadXMLDocument(resourceURL);
+	  transformToHTML(document.getElementById('sourcearea'),contentXML,'/XFILES/common/xsl/formatDBURI.xsl');
   }
   catch (e) {
-    handleException('resource.init',e,null);
+    if (e.status == "AccessDenied") {
+      showUserErrorMessage("Unable to access : " + e.target + ". Access Denied.");
+    }
+    else {
+  		error = new xfilesException('SourceViewer.viewSource',12, resourceURL, e);
+  		throw error;
+    } 
   }
-}
+}                                                                                                                 
+
+ 

@@ -505,7 +505,7 @@ function processDocument(XHR,URL) {
     }
   }
   else {
-    showErrorMessage("Unable to locate template" + URL);
+    showErrorMessage("Unable to locate template " + URL);
     return;
   } 
 }

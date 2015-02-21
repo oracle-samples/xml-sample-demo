@@ -222,3 +222,86 @@ show errors
 --
 grant execute on XFILES_PAGE_COUNTER to public
 /
+create or replace package XFILES_TABLE_CONTENTS
+authid current_user
+as
+  procedure handleRender(P_EVENT dbms_xevent.XDBRepositoryEvent);
+end;
+/
+show errors
+--
+create or replace package body XFILES_TABLE_CONTENTS
+as    
+-- 
+procedure handleRender(P_EVENT dbms_xevent.XDBRepositoryEvent)
+as
+
+  V_RESOURCE_PATH     VARCHAR2(700);
+  V_STACK_TRACE       XMLTYPE;
+  V_PARAMETERS        XMLTYPE;
+
+  V_TABLE_NAME        VARCHAR2(128);
+  V_SCHEMA_NAME       VARCHAR2(128);
+  V_METADATA          XMLTYPE;
+
+  V_INIT_TIME         TIMESTAMP WITH TIME ZONE := SYSTIMESTAMP;
+
+  V_XDB_RESOURCE   DBMS_XDBRESOURCE.XDBResource;
+  V_BINARY_CONTENT BLOB;
+  V_CONTENT_CSID   NUMBER(4);
+  
+begin
+  V_RESOURCE_PATH := DBMS_XEVENT.getName(DBMS_XEVENT.getPath(P_EVENT));
+  V_XDB_RESOURCE  := DBMS_XEVENT.getResource(P_EVENT);
+  V_METADATA := DBMS_XDBRESOURCE.getCustomMetadata(V_XDB_RESOURCE,'/r:Resource/xrc:ContentDefinition',DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R || ' ' || XFILES_CONSTANTS.NSPREFIX_XFILES_RC_XRC);
+  if (V_METADATA is not NULL) then
+    select SCHEMA_NAME, TABLE_NAME
+      into V_SCHEMA_NAME, V_TABLE_NAME
+      from XMLTABLE(
+             XMLNAMESPACES(
+               default 'http://xmlns.oracle.com/xdb/xfiles/resConfig'
+             ),
+             '/ContentDefinition/DBURIType'
+             passing V_METADATA
+             columns
+               SCHEMA_NAME VARCHAR2(128) path  'Schema',
+               TABLE_NAME  VARCHAR2(128) path  'Table',
+               FILTER      VARCHAR2(4000) path 'Filter'
+           );
+  else
+    -- Assume that anything to the left of the last . is a file extension and should be remove
+    -- Assume that the filename (minus any extension) is the table name
+    -- Assume that the folder name is the schema name
+    -- Use DBURITYPE to render content
+
+    if (instr(V_RESOURCE_PATH,'/',-1) > 1) then
+      V_TABLE_NAME := substr(V_RESOURCE_PATH,instr(V_RESOURCE_PATH,'/',-1)+1);  
+      V_SCHEMA_NAME := substr(V_RESOURCE_PATH,1,length(V_RESOURCE_PATH)-(length(V_TABLE_NAME)+1));
+      if (instr(V_TABLE_NAME,'.') > 0) then
+        V_TABLE_NAME := substr(V_TABLE_NAME,1,instr(V_TABLE_NAME,'.',-1)-1);
+      end if;
+      if (instr(V_SCHEMA_NAME,'/',-1) > 1) then
+        V_SCHEMA_NAME := substr(V_SCHEMA_NAME,instr(V_SCHEMA_NAME,'/',-1)+1);
+      end if;
+    end if;
+    
+  end if;
+  
+  DBMS_XEVENT.setRenderStream(P_EVENT,DBURITYPE('/' || V_SCHEMA_NAME || '/' || V_TABLE_NAME).getBlob() );    
+  &XFILES_SCHEMA..XFILES_LOGGING.logPageHit(V_INIT_TIME, V_RESOURCE_PATH);
+exception
+  when others then
+    select XMLELEMENT("resourcePath", V_RESOURCE_PATH)
+      into V_PARAMETERS
+      from dual;
+    V_STACK_TRACE := &XFILES_SCHEMA..XFILES_LOGGING.captureStackTrace();
+    &XFILES_SCHEMA..XFILES_LOGGING.eventErrorRecord('&XFILES_SCHEMA..XFILES_PAGE_COUNTER' ,'HANDLERENDER', V_INIT_TIME, V_PARAMETERS, V_STACK_TRACE);
+end;   
+--
+end;
+/
+--
+show errors
+--
+grant execute on XFILES_TABLE_CONTENTS to public
+/

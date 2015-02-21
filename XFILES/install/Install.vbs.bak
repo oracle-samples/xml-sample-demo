@@ -3496,7 +3496,7 @@ Class installationManager
   
   	' Only used in ScriptGenerationMode. The script file should be written to the Installation Folder
 
-    getScriptFilePath = SCRIPT_GENERATOR.getScriptFolder() & FILE_SEPERATOR & getDemoFolderName() & ".sh"	
+    getScriptFilePath = SCRIPT_GENERATOR.installerFolder & FILE_SEPERATOR & getDemoFolderName() & ".sh"	
 
   End Function  
   

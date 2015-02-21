@@ -667,6 +667,55 @@ function RestAPI() {
     XHR.send(null);
   }   
 
+	this.createCollectionProperties = function (collectionName, sqlType, assignmentMethod) {
+  
+  var collectionSpec = new Object();
+
+  collectionSpec.tableName = collectionName;
+
+  collectionSpec.contentColumn = new Object();
+  collectionSpec.contentColumn.name = 'JSON_DOCUMENT';
+  collectionSpec.contentColumn.sqlType = sqlType;
+  
+  if ((collectionSpec.contentColumn.sqlType == 'CLOB') || (collectionSpec.contentColumn.sqlType == 'BLOB')) { 
+    collectionSpec.contentColumn.compress = "MEDIUM";
+    collectionSpec.contentColumn.cache = true;
+  }
+
+  collectionSpec.keyColumn = new Object();
+  collectionSpec.keyColumn.name = 'ID'
+  collectionSpec.keyColumn.sqlType = 'VARCHAR2';
+  collectionSpec.keyColumn.maxLength = 64;
+  collectionSpec.keyColumn.assignmentMethod = assignmentMethod;
+  
+  collectionSpec.creationTimeColumn = new Object();
+  collectionSpec.creationTimeColumn.name = "DATE_CREATED";
+
+  collectionSpec.lastModifiedColumn = new Object();
+  collectionSpec.lastModifiedColumn.name =  "DATE_LAST_MODIFIED";
+  // collectionSpec.lastModifiedColumn.index = "IDX_LAST_MODIFIED";
+
+  collectionSpec.versionColumn = new Object();
+  collectionSpec.versionColumn.name = "VERSION"; 
+  collectionSpec.versionColumn.method = "SHA256";
+
+  if (collectionSpec.contentColumn.sqlType == 'BLOB') {
+  	collectionSpec.mediaTypeColumn = new Object();
+    collectionSpec.mediaTypeColumn.name = "CONTENT_TYPE"; 
+  }
+ 
+  collectionSpec.readOnly = false;
+
+  /* 
+  var cpDisplay = document.getElementById("cc.Content")
+  cpDisplay.innerHTML = "";
+  jPP.printJson(cpDisplay,null,collectionSpec);
+  */
+
+  return collectionSpec;
+
+  }  
+
   this.createCollection = function (collectionName, collectionProperties, callback) {
 
     if (notConnected()) return;

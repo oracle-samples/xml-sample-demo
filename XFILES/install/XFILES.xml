@@ -167,6 +167,11 @@
   			<local>%DEMODIRECTORY%\src\common\xsl\formatDescribe.xsl</local>
   			<remote>%BASEFOLDER%/src/common/xsl/formatDescribe.xsl</remote>
   		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\common\xsl\formatDBURI.xsl</local>
+  			<remote>%BASEFOLDER%/src/common/xsl/formatDBURI.xsl</remote>
+  		</action>
 
       <!-- XFILES Lite HTML Files-->
 
@@ -278,6 +283,11 @@
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\TableRenderer.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/TableRenderer.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
   			<local>%DEMODIRECTORY%\src\lite\js\XMLSchemaList.js</local>
   			<remote>%BASEFOLDER%/src/lite/js/XMLSchemaList.js</remote>
   		</action>
@@ -372,6 +382,11 @@
   			<mode>FORCE</mode>
   			<local>%DEMODIRECTORY%\src\lite\xsl\SourceViewer.xsl</local>
   			<remote>%BASEFOLDER%/src/lite/xsl/SourceViewer.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\TableRenderer.xsl</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/TableRenderer.xsl</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
@@ -675,6 +690,11 @@
   			<mode>FORCE</mode>
   			<local>%DEMODIRECTORY%\src\resConfig\pageHitsResConfig.xml</local>
   			<remote>%BASEFOLDER%/src/resConfig/pageHitsResConfig.xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\resConfig\tableContentResConfig.xml</local>
+  			<remote>%BASEFOLDER%/src/resConfig/tableContentResConfig.xml</remote>
   		</action>
 
       <!-- Images -->   

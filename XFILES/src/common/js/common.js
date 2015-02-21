@@ -2383,7 +2383,10 @@ var xfilesHandleException = function(module, e, target) {
   	document.getElementById('errorModule').style.display = "block";
 	  document.getElementById('errorModuleText').innerHTML = module;
 	
-   showPageContent();
+	 if (document.getElementById('pageContent')) {
+   	 showPageContent();
+   }
+   
    $('#genericErrorDialog').modal('show') 
 
     if (e.id) {

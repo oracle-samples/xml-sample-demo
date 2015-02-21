@@ -832,6 +832,32 @@ then
   echo "Installation Failed: See $logfilename for details."
   exit 5
 fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/common/xsl/formatDBURI.xsl" | head -1)
+if [ $HttpStatus != "404" ] 
+then
+  if [ $HttpStatus == "200" ] 
+  then
+    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/common/xsl/formatDBURI.xsl" | head -1)
+    if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+    then
+      echo "DELETE(PUT) "$SERVER/home/$USER/src/common/xsl/formatDBURI.xsl":$HttpStatus - Operation Failed" >> $logfilename
+      echo "Installation Failed: See $logfilename for details."
+      exit 5
+    fi
+  else
+    echo "HEAD(PUT) "$SERVER/home/$USER/src/common/xsl/formatDBURI.xsl":$HttpStatus - Operation Failed" >> $logfilename
+    echo "Installation Failed: See $logfilename for details."
+    exit 5
+  fi
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/common/xsl/formatDBURI.xsl" "$SERVER/home/$USER/src/common/xsl/formatDBURI.xsl" | head -1)
+echo "PUT:"$demohome/src/common/xsl/formatDBURI.xsl" --> "$SERVER/home/$USER/src/common/xsl/formatDBURI.xsl":$HttpStatus" >> $logfilename
+if [ $HttpStatus != "201" ] 
+then
+  echo "Operation Failed: Installation Aborted." >> $logfilename
+  echo "Installation Failed: See $logfilename for details."
+  exit 5
+fi
 HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
 if [ $HttpStatus == "404" ] 
 then
@@ -1434,6 +1460,32 @@ then
   echo "Installation Failed: See $logfilename for details."
   exit 5
 fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/lite/js/TableRenderer.js" | head -1)
+if [ $HttpStatus != "404" ] 
+then
+  if [ $HttpStatus == "200" ] 
+  then
+    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/lite/js/TableRenderer.js" | head -1)
+    if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+    then
+      echo "DELETE(PUT) "$SERVER/home/$USER/src/lite/js/TableRenderer.js":$HttpStatus - Operation Failed" >> $logfilename
+      echo "Installation Failed: See $logfilename for details."
+      exit 5
+    fi
+  else
+    echo "HEAD(PUT) "$SERVER/home/$USER/src/lite/js/TableRenderer.js":$HttpStatus - Operation Failed" >> $logfilename
+    echo "Installation Failed: See $logfilename for details."
+    exit 5
+  fi
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/lite/js/TableRenderer.js" "$SERVER/home/$USER/src/lite/js/TableRenderer.js" | head -1)
+echo "PUT:"$demohome/src/lite/js/TableRenderer.js" --> "$SERVER/home/$USER/src/lite/js/TableRenderer.js":$HttpStatus" >> $logfilename
+if [ $HttpStatus != "201" ] 
+then
+  echo "Operation Failed: Installation Aborted." >> $logfilename
+  echo "Installation Failed: See $logfilename for details."
+  exit 5
+fi
 HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/lite/js/XMLSchemaList.js" | head -1)
 if [ $HttpStatus != "404" ] 
 then
@@ -1956,6 +2008,32 @@ then
 fi
 HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/lite/xsl/SourceViewer.xsl" "$SERVER/home/$USER/src/lite/xsl/SourceViewer.xsl" | head -1)
 echo "PUT:"$demohome/src/lite/xsl/SourceViewer.xsl" --> "$SERVER/home/$USER/src/lite/xsl/SourceViewer.xsl":$HttpStatus" >> $logfilename
+if [ $HttpStatus != "201" ] 
+then
+  echo "Operation Failed: Installation Aborted." >> $logfilename
+  echo "Installation Failed: See $logfilename for details."
+  exit 5
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/lite/xsl/TableRenderer.xsl" | head -1)
+if [ $HttpStatus != "404" ] 
+then
+  if [ $HttpStatus == "200" ] 
+  then
+    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/lite/xsl/TableRenderer.xsl" | head -1)
+    if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+    then
+      echo "DELETE(PUT) "$SERVER/home/$USER/src/lite/xsl/TableRenderer.xsl":$HttpStatus - Operation Failed" >> $logfilename
+      echo "Installation Failed: See $logfilename for details."
+      exit 5
+    fi
+  else
+    echo "HEAD(PUT) "$SERVER/home/$USER/src/lite/xsl/TableRenderer.xsl":$HttpStatus - Operation Failed" >> $logfilename
+    echo "Installation Failed: See $logfilename for details."
+    exit 5
+  fi
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/lite/xsl/TableRenderer.xsl" "$SERVER/home/$USER/src/lite/xsl/TableRenderer.xsl" | head -1)
+echo "PUT:"$demohome/src/lite/xsl/TableRenderer.xsl" --> "$SERVER/home/$USER/src/lite/xsl/TableRenderer.xsl":$HttpStatus" >> $logfilename
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename
@@ -3870,6 +3948,32 @@ then
 fi
 HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/resConfig/pageHitsResConfig.xml" "$SERVER/home/$USER/src/resConfig/pageHitsResConfig.xml" | head -1)
 echo "PUT:"$demohome/src/resConfig/pageHitsResConfig.xml" --> "$SERVER/home/$USER/src/resConfig/pageHitsResConfig.xml":$HttpStatus" >> $logfilename
+if [ $HttpStatus != "201" ] 
+then
+  echo "Operation Failed: Installation Aborted." >> $logfilename
+  echo "Installation Failed: See $logfilename for details."
+  exit 5
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/resConfig/tableContentResConfig.xml" | head -1)
+if [ $HttpStatus != "404" ] 
+then
+  if [ $HttpStatus == "200" ] 
+  then
+    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/resConfig/tableContentResConfig.xml" | head -1)
+    if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+    then
+      echo "DELETE(PUT) "$SERVER/home/$USER/src/resConfig/tableContentResConfig.xml":$HttpStatus - Operation Failed" >> $logfilename
+      echo "Installation Failed: See $logfilename for details."
+      exit 5
+    fi
+  else
+    echo "HEAD(PUT) "$SERVER/home/$USER/src/resConfig/tableContentResConfig.xml":$HttpStatus - Operation Failed" >> $logfilename
+    echo "Installation Failed: See $logfilename for details."
+    exit 5
+  fi
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/resConfig/tableContentResConfig.xml" "$SERVER/home/$USER/src/resConfig/tableContentResConfig.xml" | head -1)
+echo "PUT:"$demohome/src/resConfig/tableContentResConfig.xml" --> "$SERVER/home/$USER/src/resConfig/tableContentResConfig.xml":$HttpStatus" >> $logfilename
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename

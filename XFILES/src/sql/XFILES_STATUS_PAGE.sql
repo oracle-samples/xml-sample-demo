@@ -15,6 +15,8 @@
 set echo on
 spool XFILES_STATUS_PAGE.log
 --
+def XFILES_SCHEMA=&1
+--
 create or replace view XFILES_CURRENT_STATUS of XMLType
 with OBJECT ID ( 1 )
 as
@@ -26,7 +28,7 @@ select xmlElement(
        )
   from table(
          XFILES_QUERY_LIST.executeQueryList(
-           xdburitype('/home/XFILES/xfilesStatus/statusPage.xml').getXML()
+           xdburitype('/home/&XFILES_SCHEMA/xfilesStatus/statusPage.xml').getXML()
          )
        )
 /
@@ -40,7 +42,7 @@ end;
 declare 
   V_RESULT      BOOLEAN;
   V_XMLREF      REF XMLTYPE;
-  V_STATUS_PATH VARCHAR2(2000) := '/home/XFILES/xfilesStatus/currentStatus.xml';
+  V_STATUS_PATH VARCHAR2(2000) := '/home/&XFILES_SCHEMA/xfilesStatus/currentStatus.xml';
 begin
 	select REF(CS)
 	  into V_XMLREF
@@ -51,15 +53,29 @@ begin
 	end if;
 	  
 	V_RESULT := DBMS_XDB.createResource(V_STATUS_PATH,V_XMLREF,FALSE);
-	XDB_REPOSITORY_SERVICES.setCustomViewer(V_STATUS_PATH,'/XFILES/lite/xsl/xfilesStatus.xsl');
+	XDB_REPOSITORY_SERVICES.setCustomViewer(V_STATUS_PATH,'/&XFILES_SCHEMA/lite/xsl/xfilesStatus.xsl');
 	commit;
 
 end;
 /
 set long 10000 pages 0
 --
-select xdburitype('/home/XFILES/xfilesStatus/currentStatus.xml').getXML()
+select xdburitype('/home/&XFILES_SCHEMA/xfilesStatus/currentStatus.xml').getXML()
   from DUAL
 /
 --
+declare
+  V_RESULT BOOLEAN;
+begin
+	if (DBMS_XDB.existsResource('/home/&XFILES_SCHEMA/xfilesStatus/PageHits.xml')) then
+	  DBMS_XDB.deleteResource('/home/&XFILES_SCHEMA/xfilesStatus/PageHits.xml');
+	end if;
+	if (DBMS_XDB.existsResource('/home/&XFILES_SCHEMA/xfilesStatus/PageHitsByDate.xml')) then
+  	DBMS_XDB.deleteResource('/home/&XFILES_SCHEMA/xfilesStatus/PageHitsByDate.xml');
+	end if;
+	XDB_REPOSITORY_SERVICES.mapTableToResource('/home/&XFILES_SCHEMA/xfilesStatus/PageHits.xml','&XFILES_SCHEMA','XFILES_PAGE_HITS',NULL);
+	XDB_REPOSITORY_SERVICES.mapTableToResource('/home/&XFILES_SCHEMA/xfilesStatus/PageHitsByDate.xml','&XFILES_SCHEMA','XFILES_PAGE_HITS_BY_DATE',NULL);
+	commit;
+end;
+/	
 quit

@@ -1,3 +1,4 @@
+<!--
 
 /* ================================================  
  * Oracle XFiles Demonstration.  
@@ -12,25 +13,19 @@
  *
  * ================================================ */
 
-function init(target) {
+-->
 
-  try {
-    initXFilesCommon(target);
-
-    stylesheetURL   =   unescape(getParameter("stylesheet"));  
-    if ((typeof stylesheetURL == "undefined") || (stylesheetURL == "")) {
-      stylesheetURL = '/XFILES/lite/xsl/ResourceProperties.xsl';
-    }
-    
-    includeContent = (getParameter("includeContent") == "true");
-
-    resourceURL = unescape(getParameter("target"));
-    if ((typeof resourceURL == "undefined") || (resourceURL == "")) {
-      resourceURL = '/';
-    }
-    getResource(resourceURL,target,stylesheetURL,includeContent);
-  }
-  catch (e) {
-    handleException('resource.init',e,null);
-  }
-}
+<ResConfig xmlns="http://xmlns.oracle.com/xdb/XDBResConfig.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.oracle.com/xdb/XDBResConfig.xsd http://xmlns.oracle.com/xdb/XDBResConfig.xsd">
+	 <!-- This resconfig is used to count the Hits of a particular page -->
+   <event-listeners set-invoker="true">
+     <listener>
+       <description>XFiles Application Redirect</description>
+       <schema>XFILES</schema>
+       <source>XFILES_TABLE_CONTENTS</source>
+       <language>PL/SQL</language>
+       <events>
+         <Render/>
+       </events>
+     </listener>
+   </event-listeners>
+</ResConfig>

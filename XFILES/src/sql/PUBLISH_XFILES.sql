@@ -310,4 +310,9 @@ select r.any_path RES_PATH,
  order by 2,1
 /
 --
+-- Revoke XDB_SET_INVOKER from XFILES
+--
+revoke XDB_SET_INVOKER
+  from XFILES
+/
 quit
