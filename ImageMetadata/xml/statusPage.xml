@@ -1,0 +1,12 @@
+<QueryList>
+
+	<Query>
+	  <title>Image Metadata Records</title>
+		<query>select count(*) from XDBEXT.IMAGE_METADATA_TABLE</query>
+	</Query>
+	<Query>
+	  <title>Pending Image Metadata encoding requests</title>
+		<query>select count(*) from XDBEXT.REPOSITORY_EVENTS_TABLE</query>
+	</Query>
+
+</QueryList>

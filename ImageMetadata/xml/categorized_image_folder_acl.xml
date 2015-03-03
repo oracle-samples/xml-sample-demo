@@ -1,0 +1,13 @@
+<acl description="Protected:Readable, Unlink by PUBLIC, all privileges to OWNER" xmlns="http://xmlns.oracle.com/xdb/acl.xsd" xmlns:dav="DAV:" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.oracle.com/xdb/acl.xsd http://xmlns.oracle.com/xdb/acl.xsd" shared="true">
+  <ace>
+    <grant>true</grant>
+    <principal>PUBLIC</principal>
+    <privilege>
+      <read-properties/>
+      <read-contents/>
+      <read-acl/>
+      <resolve/>
+      <unlink-from/>
+    </privilege>
+  </ace>
+</acl>

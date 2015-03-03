@@ -1,0 +1,370 @@
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by Mark D. Drake and Geoff Lee (Oracle XML Dev) -->
+<installerConfiguration>
+	<parameters>
+		<parameter name="%DEMONAME%"           value="XML Generation using Oracle XML DB"/>
+		<parameter name="%LAUNCHPAD%"          value="XML Generation"/>
+		<parameter name="%LAUNCHPADFOLDER%"    value="%STARTMENU%\Oracle XML DB Demonstrations"/>
+		<parameter name="%SHORTCUTFOLDER%"     value="%DEMODIRECTORY%\%USER%"/>
+
+		<parameter name="%PUBLICFOLDER%"       value="/publishedContent"/>
+		<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/demonstrations/xmlGeneration"/>
+		<parameter name="%HOMEFOLDER%"         value="/home/%USER%"/>
+		<parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/demonstrations/xmlGeneration"/>
+		<parameter name="%XFILES_SCHEMA%"      value="XFILES"/>
+		<parameter name="%XFILES_ROOT%"        value="XFILES"/>
+
+		<parameter name="protocol"             value="HTTP"/>
+		<parameter name="enableHTTPTrace"      value="false"/>
+		<parameter name="silentInstall"        value="false"/>
+	</parameters>
+
+	<installation>
+		<action type="MAKEFOLDERS"/>
+		<action type="CLONEFOLDERS"/>
+
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\grantPermissions.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createHomeFolder.sql</action>
+ 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\%USER%\sql\setup.sql</action>
+ 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\Install\sql\executeAndQuit.sql %DEMODIRECTORY%\%USER%\sql\resetDemo.sql</action>
+
+    <action type="UPLOAD">
+  		<!-- Delete existing Source Code -->
+  		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%</remote>
+  		</action>
+  		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%</remote>
+  		</action>
+  		
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/assets</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\assets\4.5.png</local>
+  			<remote>%DEMOCOMMON%/assets/4.5.png</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\assets\5.5.png</local>
+  			<remote>%DEMOCOMMON%/assets/5.5.png</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\assets\5.6.png</local>
+  			<remote>%DEMOCOMMON%/assets/5.6.png</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\assets\5.8.png</local>
+  			<remote>%DEMOCOMMON%/assets/5.8.png</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\xml\Styles.xml</local>
+  			<remote>%DEMOCOMMON%/xml/Styles.xml</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\xsl\viewDepartment.xsl</local>
+  			<remote>%DEMOCOMMON%/xsl/viewDepartment.xsl</remote>
+  		</action>
+  		
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%/sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\resetDemo.sql</local>
+  			<remote>%DEMOLOCAL%/sql/resetDemo.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\simpleQueries.sql</local>
+  			<remote>%DEMOLOCAL%/sql/simpleQueries.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\nlsExamples.sql</local>
+  			<remote>%DEMOLOCAL%/sql/nlsExamples.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\createXMLView.sql</local>
+  			<remote>%DEMOLOCAL%/sql/createXMLView.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\viewQueries.sql</local>
+  			<remote>%DEMOLOCAL%/sql/viewQueries.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\folderDepartments.sql</local>
+  			<remote>%DEMOLOCAL%/sql/folderDepartments.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\createWorkbooks.sql</local>
+  			<remote>%DEMOLOCAL%/sql/createWorkbooks.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\folderWorkbooks.sql</local>
+  			<remote>%DEMOLOCAL%/sql/folderWorkbooks.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\moveGrantToIT.sql</local>
+  			<remote>%DEMOLOCAL%/sql/moveGrantToIT.sql</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%/Departments</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%/Spreadsheets</remote>
+  		</action>
+    </action>
+    
+		<action type="DAV"/>
+
+ 		<action type="SQL"/>
+		<action type="VIEW"/>
+		<action type="SHELL"/>
+
+		<action type="UPLOAD">
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%/Links</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%SHORTCUTFOLDER%\4.5 View Departments.lnk</local>
+  			<remote>%DEMOLOCAL%/Links/4.5 View Departments.lnk</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%SHORTCUTFOLDER%\5.5 View Spreadsheets.lnk</local>
+  			<remote>%DEMOLOCAL%/Links/5.5 View Spreadsheets.lnk</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%SHORTCUTFOLDER%\5.6 Open Spreadsheet.lnk</local>
+  			<remote>%DEMOLOCAL%/Links/5.6 Open Spreadsheet.lnk</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%SHORTCUTFOLDER%\5.8 Open Updated Spreadsheet.lnk</local>
+  			<remote>%DEMOLOCAL%/Links/5.8 Open Updated Spreadsheet.lnk</remote>
+  		</action>		
+    </action>	
+    	
+		<action type="DEMOCONFIG" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+			<remote>%DEMOLOCAL%</remote>
+		</action>
+		
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishDemo.sql %DEMOLOCAL% %XFILES_SCHEMA%</action>
+		<action type="LAUNCH"/>
+
+	</installation>
+
+	<make>
+		<folders>
+			<folder>%DEMODIRECTORY%\%USER%</folder>
+			<folder>%DEMODIRECTORY%\%USER%\sql</folder>
+			<folder>%DEMODIRECTORY%\%USER%\RepositoryFolders</folder>
+		</folders>
+	</make>
+	
+	<clone>
+		<folders>
+			<folder>
+				<source>%DEMODIRECTORY%\Setup\cloneSource\sql</source>
+				<target>%DEMODIRECTORY%\%USER%\sql</target>
+			</folder>
+		</folders>
+	</clone>
+
+  <shortCuts>
+		<WEBDAV>
+			<shortCut>
+				<name>4.5 Departments on %HOSTNAME%</name>
+				<URL>DEMOLOCAL%/Departments%</URL>
+				<location>%DEMODIRECTORY%\%USER%\RepositoryFolders</location>
+			</shortCut>
+			<shortCut>
+				<name>5.5 Spreadsheets on %HOSTNAME%</name>
+				<URL>%DEMOLOCAL%/Spreadsheets</URL>
+				<location>%DEMODIRECTORY%\%USER%\RepositoryFolders</location>
+			</shortCut>
+		</WEBDAV>
+		
+		<SQL executionMode="local">
+			<defaults>
+				<serverLandingPad>/%XFILES_ROOT%/lite/Resource.html?stylesheet=/%XFILES_ROOT%/WebDemo/xsl/LaunchPad.xsl&amp;includeContent=true</serverLandingPad>
+				<scriptPrefix>%DEMOLOCAL%</scriptPrefix>
+				<username>%USER%</username>
+				<password>%PASSWORD%</password>
+				<tnsAlias>%TNSALIAS%</tnsAlias>
+				<icon>%DEMODIRECTORY%\Install\sqlplus.ico</icon>
+			</defaults>
+			<shortCut>
+				<name>1.0 Reset Demo</name>
+				<script>/sql/resetDemo.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>2.0 Simple Queries</name>
+				<script>/sql/simpleQueries.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>3.0 NLS Example Query</name>
+				<script>/sql/nlsExamples.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>4.0 Create Department View</name>
+				<script>/sql/createXMLView.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>4.1 Query Department View</name>
+				<script>/sql/viewQueries.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>4.4 Folder Department Documents</name>
+				<script>/sql/folderDepartments.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>5.0 Create Department Spreadhseets</name>
+				<script>/sql/createWorkbooks.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>5.1 Folder Department Spreadsheet</name>
+				<script>/sql/folderWorkbooks.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>5.7 Move Grant to the IT Department</name>
+				<script>/sql/moveGrantToIT.sql</script>
+			</shortCut>
+		</SQL>
+		
+		<VIEW>
+			<defaults>
+				<pathPrefix/>
+				<localViewer/>
+				<remoteViewer/>
+				<contentType>application/xml</contentType>
+				<username>%USER%</username>
+			</defaults>
+			<shortCut>
+				<name>4.2 View Document using 'oradb' servlet</name>
+				<target>/oradb/%USER%/DEPARTMENT_XML/ROW[Department[Name="Sales"]]</target>
+				<arguments>contenttype=application/xml&amp;rowsettag=Departments</arguments>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+				<contentType>text/xml</contentType>
+			</shortCut>
+			<shortCut>
+				<name>4.3 Transform Document using 'oradb' servlet</name>
+				<target>/oradb/%USER%/DEPARTMENT_XML/ROW[Department[Name="Sales"]]</target>
+				<arguments>contenttype=text/html&amp;rowsettag=ROWSET&amp;transform=%DEMOCOMMON%/xsl/viewDepartment.xsl</arguments>
+				<contentType>text/html</contentType>
+			</shortCut>
+		  <shortCut>
+				<name>5.4 View Spreadsheet as XML</name>
+				<target>%DEMOLOCAL%/Spreadsheets/IT.xml</target>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+				<contentType>text/xml</contentType>
+			</shortCut>
+		</VIEW>
+		
+		<General>
+			<defaults/>
+			<shortCut>
+				<name>4.5 View Departments</name>
+				<path>%DEMODIRECTORY%\%USER%\RepositoryFolders</path>
+				<directory/>
+				<icon>%SystemRoot%\system32\SHELL32.dll,3</icon>
+				<arguments/>
+				<simulation>
+					<type>Folder</type>
+					<screenshot>4.5.png</screenshot>
+					<URL>%DEMOLOCAL%/Departments</URL>
+				</simulation>
+			</shortCut>
+			<shortCut>
+				<name>5.5 View Spreadsheets</name>
+				<path>%DEMODIRECTORY%\%USER%\RepositoryFolders</path>
+				<directory/>
+				<icon>%SystemRoot%\system32\SHELL32.dll,3</icon>
+				<arguments/>
+				<simulation>
+					<type>Folder</type>
+					<screenshot>5.5.png</screenshot>
+					<URL>%DEMOLOCAL%/Spreadsheets</URL>
+				</simulation>
+			</shortCut>
+			<shortCut>
+				<name>5.6 Open Spreadsheet</name>
+				<path>%EXCEL%</path>
+				<directory>%DEMODIRECTORY%\%USER%</directory>
+				<icon>%EXCEL%,24</icon>
+				<arguments>%SERVERURL%%DEMOLOCAL%/Spreadsheets/IT.xml</arguments>
+				<simulation>
+					<type>Document</type>
+					<screenshot>5.6.png</screenshot>
+					<URL>%DEMOLOCAL%/Spreadsheets/IT.xml</URL>
+				</simulation>
+			</shortCut>
+			<shortCut>
+				<name>5.8 Open Updated Spreadsheet</name>
+				<path>%EXCEL%</path>
+				<directory>%DEMODIRECTORY%\%USER%</directory>
+				<icon>%EXCEL%,24</icon>
+				<arguments>%SERVERURL%%DEMOLOCAL%/Spreadsheets/IT.xml</arguments>
+				<simulation>
+					<type>Document</type>
+					<screenshot>5.8.png</screenshot>
+					<URL>%DEMOLOCAL%/Spreadsheets/IT.xml</URL>
+				</simulation>
+|			</shortCut>
+		</General>
+		
+		<LAUNCH>
+			<shortCut type="url">
+				<name>%LAUNCHPAD%</name>
+				<location>%LAUNCHPADFOLDER%</location>
+				<target>%SERVERURL%%DEMOLOCAL%/index.html</target>
+			</shortCut>
+			<shortCut type="lnk">
+				<name>%LAUNCHPAD% Files</name>
+				<location>%LAUNCHPADFOLDER%</location>
+				<target>%DEMODIRECTORY%\%USER%</target>
+			</shortCut>
+		</LAUNCH>
+	</shortCuts>
+</installerConfiguration>

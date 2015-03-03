@@ -1,0 +1,171 @@
+<Styles xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:x="urn:schemas-microsoft-com:office:excel">
+		<Style ss:ID="Default" ss:Name="Normal">
+			<Alignment ss:Vertical="Bottom" ss:Horizantal="Left"/>
+			<Borders/>
+			<Font/>
+			<Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
+			<NumberFormat/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="Caption">
+			<Font x:Family="Swiss" ss:Bold="1" ss:Italic="1"/>
+		</Style>
+		<Style ss:ID="Bold">
+			<Font x:Family="Swiss" ss:Bold="1"/>
+		</Style>
+		<Style ss:ID="BodyDefault">
+			<Alignment ss:Vertical="Bottom" ss:Horizantal="Left"/>
+			<Borders>
+				<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+			</Borders>
+			<Font/>
+			<Interior ss:Color="#C0C0C0" ss:Pattern="Solid"/>
+			<NumberFormat/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="TableBottom">
+			<Alignment ss:Vertical="Bottom" ss:Horizantal="Left"/>
+			<Borders>
+				<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3"/>
+			</Borders>
+			<Font/>
+			<Interior ss:Color="#C0C0C0" ss:Pattern="Solid"/>
+			<NumberFormat/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="SalaryTotal">
+			<Alignment ss:Vertical="Bottom" ss:Horizantal="Left"/>
+			<Borders>
+				<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3"/>
+			</Borders>
+			<Font/>
+			<Interior ss:Color="#C0C0C0" ss:Pattern="Solid"/>
+			<NumberFormat ss:Format="_(&quot;$&quot;* #,##0.00_);_(&quot;$&quot;* \(#,##0.00\);_(&quot;$&quot;* &quot;-&quot;??_);_(@_)"/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="HeadDefault">
+			<Alignment ss:Vertical="Bottom" ss:Horizantal="Left"/>
+			<Borders/>
+			<Font/>
+			<Interior ss:Color="#00CCFF" ss:Pattern="Solid"/>
+			<NumberFormat/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="HireDate">
+			<Alignment ss:Vertical="Bottom" ss:Horizontal="Right"/>
+			<Borders>
+				<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+			</Borders>
+			<Font/>
+			<Interior ss:Color="#C0C0C0" ss:Pattern="Solid"/>
+			<NumberFormat ss:Format="[ENG][$-409]mmmm\ d\,\ yyyy;@"/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="DepartmentName">
+			<Alignment ss:Vertical="Center" ss:Horizontal="Left"/>
+			<Borders>
+				<Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3"/>
+				<Border ss:Position="Left" ss:LineStyle="Double" ss:Weight="3"/>
+				<Border ss:Position="Right" ss:LineStyle="Double" ss:Weight="3"/>
+				<Border ss:Position="Top" ss:LineStyle="Double" ss:Weight="3"/>
+			</Borders>
+			<Font x:Family="Swiss" ss:Bold="1" ss:Size="18"/>
+			<Interior ss:Color="#FFCC00" ss:Pattern="Solid"/>
+			<NumberFormat/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="BoldCentered">
+			<Alignment ss:Vertical="Bottom" ss:Horizontal="Center"/>
+			<Borders>
+				<Border ss:Position="Top" ss:LineStyle="Double" ss:Weight="3"/>
+				<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+			</Borders>
+			<Font ss:Color="#FFFFFF" x:Family="Swiss" ss:Bold="1"/>
+			<Interior ss:Color="#0000FF" ss:Pattern="Solid"/>
+			<NumberFormat/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="BoldLeft">
+			<Alignment ss:Vertical="Bottom" ss:Horizontal="Left"/>
+			<Borders>
+				<Border ss:Position="Top" ss:LineStyle="Double" ss:Weight="3"/>
+				<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+			</Borders>
+			<Font ss:Color="#FFFFFF" x:Family="Swiss" ss:Bold="1"/>
+			<Interior ss:Color="#0000FF" ss:Pattern="Solid"/>
+			<NumberFormat/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="BoldRight">
+			<Alignment ss:Vertical="Bottom" ss:Horizontal="Right"/>
+			<Borders>
+				<Border ss:Position="Top" ss:LineStyle="Double" ss:Weight="3"/>
+				<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+			</Borders>
+			<Font ss:Color="#FFFFFF" x:Family="Swiss" ss:Bold="1"/>
+			<Interior ss:Color="#0000FF" ss:Pattern="Solid"/>
+			<NumberFormat/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="BodyCentered">
+			<Alignment ss:Vertical="Bottom" ss:Horizontal="Center"/>
+			<Borders>
+				<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+			</Borders>
+			<Font x:Family="Swiss"/>
+			<Interior ss:Color="#C0C0C0" ss:Pattern="Solid"/>
+			<NumberFormat/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="BodyLeft">
+			<Alignment ss:Vertical="Bottom" ss:Horizontal="Left"/>
+			<Borders>
+				<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+			</Borders>
+			<Font x:Family="Swiss"/>
+			<Interior ss:Color="#C0C0C0" ss:Pattern="Solid"/>
+			<NumberFormat/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="BodyRight">
+			<Alignment ss:Vertical="Bottom" ss:Horizontal="Right"/>
+			<Borders>
+				<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+			</Borders>
+			<Font x:Family="Swiss"/>
+			<Interior ss:Color="#C0C0C0" ss:Pattern="Solid"/>
+			<NumberFormat/>
+			<Protection/>
+		</Style>
+		<Style ss:ID="Currency" ss:Name="Currency">
+			<Borders>
+				<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+			</Borders>
+			<Interior ss:Color="#C0C0C0" ss:Pattern="Solid"/>
+			<NumberFormat ss:Format="_(&quot;$&quot;* #,##0.00_);_(&quot;$&quot;* \(#,##0.00\);_(&quot;$&quot;* &quot;-&quot;??_);_(@_)"/>
+		</Style>
+		<Style ss:ID="Percent" ss:Name="Percent">
+			<Borders>
+				<Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+				<Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+			</Borders>
+			<Interior ss:Color="#C0C0C0" ss:Pattern="Solid"/>
+			<NumberFormat ss:Format="0%"/>
+		</Style>
+</Styles>

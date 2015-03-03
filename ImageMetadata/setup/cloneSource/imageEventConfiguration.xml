@@ -1,0 +1,31 @@
+<ResConfig xmlns="http://xmlns.oracle.com/xdb/XDBResConfig.xsd"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://xmlns.oracle.com/xdb/XDBResConfig.xsd
+                       http://xmlns.oracle.com/xdb/XDBResConfig.xsd">  
+
+  <event-listeners>
+
+    <listener>
+      <description>Register event handlers for Asynchronous Events.</description>
+      <schema>%USER%</schema>
+      <source>IMAGE_EVENT_MANAGER</source>
+      <language>PL/SQL</language>
+      <events>
+        <Pre-Create/>
+        <Pre-Delete/>
+        <Post-Create/>
+        <Post-Update/>
+        <Post-Unlock/>
+      </events>
+      <pre-condition>
+        <existsNode>
+          <XPath>/r:Resource[r:ContentType="image/jpeg" or r:ContentType="Application/dicom"]</XPath>
+          <namespace>xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd"</namespace>
+        </existsNode>
+      </pre-condition>
+    </listener>
+
+  </event-listeners>
+
+</ResConfig>
+

@@ -1,0 +1,312 @@
+<installerConfiguration>
+
+	<parameters>
+		<parameter name="%DEMONAME%"       value="Oracle XML DB Repository Metadata and Events"/>
+    
+		<parameter name="%HOMEFOLDER%"     value="/home/%USER%"/>
+		<parameter name="%BASEFOLDER%"     value="%HOMEFOLDER%/imageMetadata"/>
+  	<parameter name="%PUBLICFOLDER%"   value="/publishedContent"/>
+  	<parameter name="%SCHEMAURL%"      value="http://xmlns.oracle.com/xdb/extras/imageMetadata.xsd"/>
+	  <parameter name="%RESCONFIG_PATH%" value="%BASEFOLDER%/xml/imageEventConfiguration.xml"/>
+	  <parameter name="%XFILES_SCHEMA%"  value="XFILES"/>
+		<parameter name="%XFILES_ROOT%"    value="XFILES"/>
+
+		<parameter name="protocol"         value="HTTP"/>
+		<parameter name="enableHTTPTrace"  value="false"/>
+		
+		<parameter name="%DEBUG%"          value="false"/>
+	</parameters>
+
+	<installation>
+
+		<action type="CLONEFILES"/>
+
+    <!-- Load and Delete a dummy ACL to ensure ACLs are loaded correctly -->    
+    <action type="UPLOAD">
+  		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>SKIP</mode>
+  			<remote>/sys/acls/acl_initialization_fix.xml</remote>
+  		</action>
+      <action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\xml\categorized_image_folder_acl.xml</local>
+  			<remote>/sys/acls/acl_initialization_fix.xml</remote>
+  		</action>
+  		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>/sys/acls/acl_initialization_fix.xml</remote>
+  		</action>
+    </action>
+		<!-- Configure XDBExtras Schema -->
+		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\sysdbaTasks.sql %USER%</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\configureXDBExtras.sql %USER%</action>
+
+    <action type="UPLOAD">
+      <!-- Create the SQL Source Folder -->
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/sql</remote>
+  		</action>
+  
+      <!-- Load the Constants Package -->
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\imageMetadataConstants.sql</local>
+  			<remote>%BASEFOLDER%/sql/imageMetadataConstants.sql</remote>
+  		</action>
+  	</action>
+  	<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\imageMetadataConstants.sql %USER%</action>
+
+    <!-- Remove 10gR2 version of the demo -->
+		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\remove10gR2Demo.sql</action>
+        
+		<!-- Remove Legacy versions of Image Metadata XMLSchema -->
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\deleteMetadataSchema.sql %USER%</action>
+
+		<!-- Remove Legacy Event Handler -->
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\removeEventHandler.sql XDBMETADATA /publishedContent/repositoryFeatures/xml/imageEventConfiguration.xml</action>
+
+		<!-- Remove Legacy Event Queue -->
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\removeRepositoryQueue.sql XDBMETADATA</action>
+
+		<!-- Remove Current Event Handler -->
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\removeEventHandler.sql %USER% %RESCONFIG_PATH%</action>
+
+		<!-- Remove Current Event Queue -->
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\removeRepositoryQueue.sql %USER%</action>
+
+    <!-- Image Publishing ACLs -->
+    <action type="UPLOAD">
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>SKIP</mode>
+  			<local>%DEMODIRECTORY%\xml\categorized_image_folder_acl.xml</local>
+  			<remote>/sys/acls/categorized_image_folder_acl.xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>SKIP</mode>
+  			<local>%DEMODIRECTORY%\xml\categorized_image_acl.xml</local>
+  			<remote>/sys/acls/categorized_image_acl.xml</remote>
+  		</action>
+  
+      <!-- Upload and Register and Metadata XML Schema -->
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/xsd</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\xsd\imageMetadata.xsd</local>
+  			<remote>%BASEFOLDER%/xsd/imageMetadata.xsd</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\registerSchema.sql</local>
+  			<remote>%BASEFOLDER%/sql/registerSchema.sql</remote>
+  		</action>
+  	</action>
+
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\registerSchema.sql %BASEFOLDER%/xsd/imageMetadata.xsd</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\patchSchemaLocation.sql %HOSTNAME% %BASEFOLDER%/xsd/imageMetadata.xsd</action>
+
+    <!-- Load the Image Processor Package -->
+    <action type="UPLOAD">
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\imageProcessor.sql</local>
+  			<remote>%BASEFOLDER%/sql/imageProcessor.sql</remote>
+  		</action>
+  	</action>
+
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\imageProcessor.sql %USER% %XFILES_SCHEMA%</action>
+ 
+    <action type="UPLOAD">
+    <!-- Create the Image Processing Queue Package -->
+   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+   			<mode>FORCE</mode>
+   			<local>%DEMODIRECTORY%\sql\repositoryQueue.sql</local>
+   			<remote>%BASEFOLDER%/sql/repositoryQueue.sql</remote>
+   		</action>
+   	</action>
+
+   	<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\repositoryQueue.sql %USER%</action>
+		
+    <action type="UPLOAD">
+  		<!-- Enbled repository events to automatically extract meteadata from Images -->
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\imageEventManager.sql</local>
+  			<remote>%BASEFOLDER%/sql/imageEventManager.sql</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\xml\imageEventConfiguration.xml</local>
+  			<remote>%BASEFOLDER%/xml/imageEventConfiguration.xml</remote>
+  		</action>
+   	</action>  
+
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\imageEventManager.sql %USER% %XFILES_SCHEMA% %DEBUG%</action>
+
+    <action type="UPLOAD">
+  	  <!-- Create the Metadata Services Package -->
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\metadataServices.sql</local>
+  			<remote>%BASEFOLDER%/sql/metadataServices.sql</remote>
+  		</action>
+   	</action>
+
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\metadataServices.sql %USER%</action>
+	
+    <action type="UPLOAD">
+  	  <!-- Enable the Repository Events -->
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\enumerateRepositoryEvents.sql</local>
+  			<remote>%BASEFOLDER%/sql/enumerateRepositoryEvents.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\activateImageEventManager.sql</local>
+  			<remote>%BASEFOLDER%/sql/activateImageEventManager.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\enableEventManager.sql</local>
+  			<remote>%BASEFOLDER%/sql/enableEventManager.sql</remote>
+  		</action>
+   	</action>  
+
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\enableEventManager.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\queueManager.sql %USER%</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\statusPage.sql %USER%</action>
+		
+    <action type="UPLOAD">
+    	
+      <!-- Upload Stylesheets -->
+      
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\xsl\ImageBrowser.xsl</local>
+  			<remote>%BASEFOLDER%/xsl/ImageBrowser.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\xsl\EXIFViewer.xsl</local>
+  			<remote>%BASEFOLDER%/xsl/EXIFViewer.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\xsl\EXIFCommon.xsl</local>
+  			<remote>%BASEFOLDER%/xsl/EXIFCommon.xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\xsl\left-arrow-circle.png</local>
+  			<remote>%BASEFOLDER%/xsl/left-arrow-circle.png</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\xsl\right-arrow-circle.png</local>
+  			<remote>%BASEFOLDER%/xsl/right-arrow-circle.png</remote>
+  		</action>
+  
+      <!-- Upload Javascript -->
+      
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\js\ImageBrowser.js</local>
+  			<remote>%BASEFOLDER%/js/ImageBrowser.js</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\js\EXIFViewer.js</local>
+  			<remote>%BASEFOLDER%/js/EXIFViewer.js</remote>
+  		</action>
+  		
+  		<!-- Create the Categorization Folders -->
+  		
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>SKIP</mode>
+  			<remote>%PUBLICFOLDER%</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>SKIP</mode>
+  			<remote>%PUBLICFOLDER%/categorization</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>SKIP</mode>
+  			<remote>%PUBLICFOLDER%/categorization/images</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>SKIP</mode>
+  			<remote>%PUBLICFOLDER%/categorization/images/manufacturer</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>SKIP</mode>
+  			<remote>%PUBLICFOLDER%/categorization/images/dateTaken</remote>
+  		</action>
+  		
+      <!-- Status Page -->
+      
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\xml\statusPage.xml</local>
+  			<remote>%HOMEFOLDER%/statusPage.xml</remote>
+  		</action>
+  		
+   	</action>
+
+
+    <!-- Image Folder Event : Force the use of ImageBrowser.xsl when viewing image folders -->
+
+		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\imageFolderEvent.sql %USER% %XFILES_SCHEMA% %DEBUG%</action>
+    <action type="UPLOAD">
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\xml\imageBrowserResConfig.xml</local>
+  			<remote>%BASEFOLDER%/xml/imageBrowserResConfig.xml</remote>
+  		</action>
+   	</action>
+
+
+		<!-- Publish the demo -->
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\statusPage.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\publishDemo.sql</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\postInstallationSteps.sql</action>
+
+		<!-- Lock the Metadata Database Schema down -->
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\disableUser.sql %USER%</action>
+
+	</installation>
+
+	<clone>
+		<folders/>
+		<files>
+			<file>
+				<source>%DEMODIRECTORY%\setup\cloneSource\imageEventConfiguration.xml</source>
+				<target>%DEMODIRECTORY%\xml\imageEventConfiguration.xml</target>
+			</file>
+			<file>
+				<source>%DEMODIRECTORY%\setup\cloneSource\imageBrowserResConfig.xml</source>
+				<target>%DEMODIRECTORY%\xml\imageBrowserResConfig.xml</target>
+			</file>
+			<file>
+				<source>%DEMODIRECTORY%\setup\cloneSource\EXIFViewer.js</source>
+				<target>%DEMODIRECTORY%\js\EXIFViewer.js</target>
+			</file>
+		</files>
+	</clone>
+
+</installerConfiguration>

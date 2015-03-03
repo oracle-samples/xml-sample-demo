@@ -1,0 +1,400 @@
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by Mark D. Drake and Geoff Lee (Oracle XML Dev) -->
+<installerConfiguration>
+
+	<parameters>
+		<parameter name="%DEMONAME%"           value="XML Schema Evolution using Oracle XML DB"/>
+		<parameter name="%LAUNCHPAD%"          value="XML Schema Evolution"/>
+		<parameter name="%LAUNCHPADFOLDER%"    value="%STARTMENU%\Oracle XML DB Demonstrations"/>
+		<parameter name="%SHORTCUTFOLDER%"     value="%DEMODIRECTORY%\%USER%"/>
+
+		<parameter name="%PUBLICFOLDER%"       value="/publishedContent"/>
+  	<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/demonstrations/evolution"/>
+		<parameter name="%HOMEFOLDER%"         value="/home/%USER%"/>
+    <parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/demonstrations/evolution"/>
+		<parameter name="%XFILES_SCHEMA%"      value="XFILES"/>
+		<parameter name="%XFILES_ROOT%"        value="XFILES"/>
+
+	  <parameter name="%SCHEMAURL%"          value="%SERVERURL%%DEMOCOMMON%/xsd/purchaseOrder.xsd"/>
+  	<parameter name="%SCHEMAURL2%"         value="%SERVERURL%%DEMOCOMMON%/xsd/shipmentDetails.xsd"/>	
+  	<parameter name="%TABLE1%"             value="PURCHASEORDER"/>
+	  <parameter name="%ROOT_TYPE%"          value="PURCHASEORDER_T"/>	
+	  <parameter name="%DATA_STAGING_TABLE%" value="SAMPLE_DATASET_EVOLVE"/>
+
+		<parameter name="protocol"             value="HTTP"/>
+		<parameter name="enableHTTPTrace"      value="false"/>
+		<parameter name="silentInstall"        value="false"/>
+	</parameters>
+
+	<installation>
+		<action type="MAKEFOLDERS"/>
+		<action type="COPYFOLDERS"/>
+	  <action type="UNZIP"/> 
+		<action type="CLONEFOLDERS"/>
+
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\grantPermissions.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createHomeFolder.sql</action>
+
+ 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\%USER%\sql\setup.sql</action>
+	 	<action type="SQLLDR"/>
+ 		 		
+ 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\Install\sql\executeAndQuit.sql %DEMODIRECTORY%\%USER%\sql\resetDemo.sql</action>
+
+	  <action type="UPLOAD">
+  		<!-- Delete existing Source Code -->
+  
+  		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%</remote>
+  		</action>
+  		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/assets</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\assets\2.1.png</local>
+  			<remote>%DEMOCOMMON%/assets/2.1.png</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/xsd</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\xsd\purchaseOrder.xsd</local>
+  			<remote>%DEMOCOMMON%/xsd/purchaseOrder.xsd</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\xsd\shipmentDetails.xsd</local>
+  			<remote>%DEMOCOMMON%/xsd/shipmentDetails.xsd</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\xsd\purchaseOrder.v2.xsd</local>
+  			<remote>%DEMOCOMMON%/xsd/purchaseOrder.v2.xsd</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\xsd\purchaseOrder.v3.xsd</local>
+  			<remote>%DEMOCOMMON%/xsd/purchaseOrder.v3.xsd</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/xsl</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\xsd\transform.v3.xsl</local>
+  			<remote>%DEMOCOMMON%/xsl/transform.v3.xsl</remote>
+  		</action>
+  
+  	  <action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sampleData\xml\PurchaseOrderWithShipment.v1.xml</local>
+  			<remote>%DEMOCOMMON%/xml/PurchaseOrderWithShipment.v1.xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sampleData\xml\PurchaseOrderWithShipment.v2.xml</local>
+  			<remote>%DEMOCOMMON%/xml/PurchaseOrderWithShipment.v2.xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sampleData\xml\PurchaseOrder.v2.xml</local>
+  			<remote>%DEMOCOMMON%/xml/PurchaseOrder.v2.xml</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sampleData\xml\PurchaseOrder.v3.xml</local>
+  			<remote>%DEMOCOMMON%/xml/PurchaseOrder.v3.xml</remote>
+  		</action>
+  		
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%</remote>
+  		</action>
+  		
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%/sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\resetDemo.sql</local>
+  			<remote>%DEMOLOCAL%/sql/resetDemo.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\registerSchema.sql</local>
+  			<remote>%DEMOLOCAL%/sql/registerSchema.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\registerExtension.sql</local>
+  			<remote>%DEMOLOCAL%/sql/registerExtension.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\inplaceEvolution.sql</local>
+  			<remote>%DEMOLOCAL%/sql/inplaceEvolution.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\copyBasedEvolution1.sql</local>
+  			<remote>%DEMOLOCAL%/sql/copyBasedEvolution1.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\copyBasedEvolution2.sql</local>
+  			<remote>%DEMOLOCAL%/sql/copyBasedEvolution2.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\insertDocument1.sql</local>
+  			<remote>%DEMOLOCAL%/sql/insertDocument1.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\insertDocument2.sql</local>
+  			<remote>%DEMOLOCAL%/sql/insertDocument2.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\insertDocument3.sql</local>
+  			<remote>%DEMOLOCAL%/sql/insertDocument3.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\insertDocument4.sql</local>
+  			<remote>%DEMOLOCAL%/sql/insertDocument4.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\addDateCreated.sql</local>
+  			<remote>%DEMOLOCAL%/sql/addDateCreated.sql</remote>
+  		</action>
+  	</action>
+  
+		<action type="VIEW"/>
+	 	<action type="SQL"/>
+
+		<action type="DEMOCONFIG" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+			<remote>%DEMOLOCAL%</remote>
+		</action>
+
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishDemo.sql %DEMOLOCAL% %XFILES_SCHEMA%</action>
+		<action type="LAUNCH"/>
+
+	</installation>
+	
+	<make>
+		<folders>
+			<folder>%DEMODIRECTORY%\%USER%</folder>
+			<folder>%DEMODIRECTORY%\%USER%\xsd</folder>
+			<folder>%DEMODIRECTORY%\%USER%\sql</folder>
+			<folder>%DEMODIRECTORY%\%USER%\sampleData</folder>
+			<folder>%DEMODIRECTORY%\%USER%\sampleData\xml</folder>
+		</folders>
+	</make>
+
+	<copy>
+		<files/>
+		<folders>
+			<folder>
+				<source>%DEMODIRECTORY%\setup\xml</source>
+				<target>%DEMODIRECTORY%\%USER%\sampleData\xml</target>
+			</folder>
+		</folders>
+	</copy>
+
+	<clone>
+		<folders>
+			<folder>
+				<source>%DEMODIRECTORY%\setup\sql</source>
+				<target>%DEMODIRECTORY%\%USER%\sql</target>
+			</folder>
+			<folder>
+				<source>%DEMODIRECTORY%\%USER%\sampleData\xml</source>
+				<target>%DEMODIRECTORY%\%USER%\sampleData\xml</target>
+			</folder>
+			<folder>
+				<source>%DEMODIRECTORY%\setup\sqlldr</source>
+				<target>%DEMODIRECTORY%\%USER%\sampleData</target>
+			</folder>
+			<folder>
+				<source>%DEMODIRECTORY%\setup\xsd</source>
+				<target>%DEMODIRECTORY%\%USER%\xsd</target>
+			</folder>
+		</folders>
+		<files/>
+	</clone>
+	
+	<unzip>
+		<archives>
+			<archive>
+				<source>%DEMODIRECTORY%\setup\sampleData.zip</source>
+				<target>%DEMODIRECTORY%\%USER%\sampleData\xml</target>
+		  </archive>
+	  </archives>
+	</unzip>
+	
+	<sqlldr>
+		<jobs>
+			<job type="dataLoad">
+			  <controlFile>%DEMODIRECTORY%\%USER%\sampleData\sampleData.ctl</controlFile>
+			</job>
+		</jobs>
+	</sqlldr>
+	
+	<shortCuts>
+		<SQL executionMode="local">
+			<defaults>
+  	  	<serverLandingPad>/%XFILES_ROOT%/lite/Resource.html?stylesheet=/%XFILES_ROOT%/WebDemo/xsl/LaunchPad.xsl&amp;includeContent=true</serverLandingPad>
+  	  	<scriptPrefix>%DEMOLOCAL%</scriptPrefix>
+  	  	<username>%USER%</username>
+  	  	<password>%PASSWORD%</password>
+  	  	<tnsAlias>%TNSALIAS%</tnsAlias>
+  	  	<icon>%DEMODIRECTORY%\Install\sqlplus.ico</icon>
+  	  </defaults>
+  	  <shortCut>
+  	  	<name>1.0 Reset Demo</name>
+  	  	<script>/sql/resetDemo.sql</script>
+  	  </shortCut>
+  	  <shortCut>
+  	  	<name>1.2 Register Schema</name>
+  	  	<script>/sql/registerSchema.sql</script>
+  	  </shortCut>
+  	  <shortCut>
+  	  	<name>2.0 Insert Purchase Order with Shipment</name>
+  	  	<script>/sql/insertDocument1.sql</script>
+  	  </shortCut>
+  	  <shortCut>
+  	  	<name>2.3 Register Extension Schema</name>
+  	  	<script>/sql/registerExtension.sql</script>
+  	  </shortCut>
+  	  <shortCut>
+  	  	<name>2.5 Insert Purchase Order with Shipment Type</name>
+  	  	<script>/sql/insertDocument2.sql</script>
+  	  </shortCut>
+  	  <shortCut>
+  	  	<name>3.0 Insert Purchase Order</name>
+  	  	<script>/sql/insertDocument3.sql</script>
+  	  </shortCut>
+  	  <shortCut>
+  	  	<name>3.3 In-Place XML Schema Evolution</name>
+  	  	<script>/sql/inplaceEvolution.sql</script>
+  	  </shortCut>
+  	  <shortCut>
+  	  	<name>4.0 Insert Purchase Order</name>
+  	  	<script>/sql/insertDocument4.sql</script>
+  	  </shortCut>
+  	  <shortCut>
+  	  	<name>4.2 In-Place XML Schema Evolution</name>
+  	  	<script>/sql/copyBasedEvolution1.sql</script>
+  	  </shortCut>
+  	  <shortCut>
+  	  	<name>4.5 Copy-Based XML Schema Evolution</name>
+  	  	<script>/sql/copyBasedEvolution2.sql</script>
+  	  </shortCut>
+  	  <shortCut>
+  	  	<name>4.6 Add Date Created</name>
+  	  	<script>/sql/addDateCreated.sql</script>
+  	  </shortCut>
+  	</SQL>
+
+  	<VIEW>
+			<defaults>
+				<pathPrefix/>
+				<localViewer/>
+				<remoteViewer/>
+				<contentType>text/plain</contentType>
+				<username>%USER%</username>
+				<arguments/>
+			</defaults>
+		  <shortCut>
+				<name>1.1 Purchase Order XMLSchema [Baseline]</name>
+				<target>%DEMOCOMMON%/xsd/purchaseOrder.xsd</target>
+				<contentType>text/xml</contentType>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+			</shortCut>
+		  <shortCut>
+				<name>2.1 Purchase Order with Shipment</name>
+				<target>%DEMOCOMMON%/xml/PurchaseOrderWithShipment.v1.xml</target>
+				<contentType>text/xml</contentType>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+			</shortCut>
+		  <shortCut>
+				<name>2.2 Shipment Details XML Schema</name>
+				<target>%DEMOCOMMON%/xsd/shipmentDetails.xsd</target>
+				<contentType>text/xml</contentType>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+			</shortCut>
+		  <shortCut>
+				<name>2.4 Purchase Order with Shipment Type</name>
+				<target>%DEMOCOMMON%/xml/PurchaseOrderWithShipment.v2.xml</target>
+				<contentType>text/xml</contentType>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+			</shortCut>
+		  <shortCut>
+				<name>3.1 Revised Purchase Order</name>
+				<target>%DEMOCOMMON%/xml/PurchaseOrder.v2.xml</target>
+				<contentType>text/xml</contentType>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+			</shortCut>
+		  <shortCut>
+				<name>3.2 Revised Purchase Order XML Schema</name>
+				<target>%DEMOCOMMON%/xsd/purchaseOrder.v2.xsd</target>
+				<contentType>text/xml</contentType>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+			</shortCut>
+		  <shortCut>
+				<name>4.1 Revised Purchase Order</name>
+				<target>%DEMOCOMMON%/xml/PurchaseOrder.v3.xml</target>
+				<contentType>text/xml</contentType>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+			</shortCut>
+		  <shortCut>
+				<name>4.3 Revised Purchase Order XML Schema</name>
+				<target>%DEMOCOMMON%/xsd/purchaseOrder.v3.xsd</target>
+				<contentType>text/xml</contentType>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+			</shortCut>
+		  <shortCut>
+				<name>4.4 Stylesheet </name>
+				<target>%DEMOCOMMON%/xsl/transform.v3.xsl</target>
+				<contentType>text/xml</contentType>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+			</shortCut>
+  	</VIEW>
+
+  	<LAUNCH>
+			<shortCut type="url">
+				<name>%LAUNCHPAD%</name>
+				<location>%LAUNCHPADFOLDER%</location>
+				<target>%SERVERURL%%DEMOLOCAL%/index.html</target>
+			</shortCut>
+			<shortCut type="lnk">
+				<name>%LAUNCHPAD% Files</name>
+				<location>%LAUNCHPADFOLDER%</location>
+				<target>%DEMODIRECTORY%\%USER%</target>
+			</shortCut>
+		</LAUNCH>
+	</shortCuts>
+</installerConfiguration>

@@ -1,0 +1,212 @@
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by Mark D. Drake and Geoff Lee (Oracle XML Dev) -->
+<installerConfiguration>
+	<parameters>
+		<parameter name="%DEMONAME%"           value="Using XQuery in Oracle XML DB"/>
+		<parameter name="%LAUNCHPAD%"          value="XQuery Demonstraton"/>
+		<parameter name="%LAUNCHPADFOLDER%"    value="%STARTMENU%\Oracle XML DB Demonstrations"/>
+		<parameter name="%SHORTCUTFOLDER%"     value="%DEMODIRECTORY%\%USER%"/>
+
+		<parameter name="%PUBLICFOLDER%"       value="/publishedContent"/>
+		<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/demonstrations/XQuery"/>
+		<parameter name="%HOMEFOLDER%"         value="/home/%USER%"/>
+		<parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/demonstrations/XQuery"/>
+		<parameter name="%XFILES_SCHEMA%"      value="XFILES"/>
+		<parameter name="%XFILES_ROOT%"        value="XFILES"/>
+
+		<parameter name="%SCHEMAURL%"          value="%SERVERURL%%DEMOCOMMON%/xsd/purchaseOrder.xsd"/>
+		<parameter name="%TABLE1%"             value="PURCHASEORDER"/>
+		<parameter name="%ROOT_TYPE%"          value="PURCHASEORDER_T"/>
+   	<parameter name="%DATA_STAGING_TABLE%" value="SAMPLE_DATASET_XQUERY"/>
+		<parameter name="%XMLVIEW1%"           value="DEPARTMENT_XML"/>
+		<parameter name="%VIEW1%"              value="PURCHASEORDER_MASTER_VIEW"/>
+		<parameter name="%VIEW2%"              value="PURCHASEORDER_DETAIL_VIEW"/>
+
+		<parameter name="protocol"             value="HTTP"/>
+		<parameter name="enableHTTPTrace"      value="false"/>
+	</parameters>
+	
+	<installation>
+		<action type="MAKEFOLDERS"/>
+	  <action type="UNZIP"/> 
+		<action type="CLONEFOLDERS"/>
+
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\grantPermissions.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createHomeFolder.sql</action>
+
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\%USER%\sql\setup.sql</action>
+	 	<action type="SQLLDR"/>
+
+ 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\Install\sql\executeAndQuit.sql %DEMODIRECTORY%\%USER%\sql\resetDemo.sql</action>
+
+	  <action type="UPLOAD">
+  		<!-- Delete existing Source Code -->
+  		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%</remote>
+  		</action>
+  		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/xsd</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\xsd\purchaseOrder.xsd</local>
+  			<remote>%DEMOCOMMON%/xsd/purchaseOrder.xsd</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%/sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\resetDemo.sql</local>
+  			<remote>%DEMOLOCAL%/sql/resetDemo.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\registerSchema.sql</local>
+  			<remote>%DEMOLOCAL%/sql/registerSchema.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\simpleExpressions.xqy</local>
+  			<remote>%DEMOLOCAL%/sql/simpleExpressions.xqy</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\relationalExpressions.xqy</local>
+  			<remote>%DEMOLOCAL%/sql/relationalExpressions.xqy</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\createXMLView.sql</local>
+  			<remote>%DEMOLOCAL%/sql/createXMLView.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\xmlViewExpressions.xqy</local>
+  			<remote>%DEMOLOCAL%/sql/xmlViewExpressions.xqy</remote>
+  		</action>
+  	</action>
+  		
+		<action type="SHELL"/>
+	 	<action type="SQL"/>
+
+		<action type="DEMOCONFIG" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+			<remote>%DEMOLOCAL%</remote>
+		</action>
+	 	
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishDemo.sql %DEMOLOCAL% %XFILES_SCHEMA%</action>
+		<action type="LAUNCH"/>
+		
+	</installation>
+	
+	<make>
+		<folders>
+			<folder>%DEMODIRECTORY%\%USER%</folder>
+			<folder>%DEMODIRECTORY%\%USER%\sql</folder>
+			<folder>%DEMODIRECTORY%\%USER%\sampleData</folder>
+			<folder>%DEMODIRECTORY%\%USER%\sampleData\xml</folder>
+		</folders>
+	</make>
+
+	<clone>
+		<folders>
+			<folder>
+				<source>%DEMODIRECTORY%\setup\sql</source>
+				<target>%DEMODIRECTORY%\%USER%\sql</target>
+			</folder>
+			<folder>
+				<source>%DEMODIRECTORY%\setup\sqlldr</source>
+				<target>%DEMODIRECTORY%\%USER%\sampleData</target>
+			</folder>
+			<folder>
+				<source>%DEMODIRECTORY%\%USER%\sampleData\xml</source>
+				<target>%DEMODIRECTORY%\%USER%\sampleData\xml</target>
+			</folder>
+		</folders>
+	</clone>
+
+	<unzip>
+		<archives>
+			<archive>
+				<source>%DEMODIRECTORY%\setup\sampleData.zip</source>
+				<target>%DEMODIRECTORY%\%USER%\sampleData\xml</target>
+		  </archive>
+	  </archives>
+	</unzip>
+	
+	<sqlldr>
+		<jobs>
+			<job type="dataLoad">
+			  <controlFile>%DEMODIRECTORY%\%USER%\sampleData\sampleData.ctl</controlFile>
+			</job>
+		</jobs>
+	</sqlldr>
+	
+	<shortCuts>
+		<SQL executionMode="local">
+			<defaults>
+				<serverLandingPad>/XFILES/lite/Resource.html?stylesheet=/XFILES/WebDemo/xsl/LaunchPad.xsl&amp;includeContent=true</serverLandingPad>
+				<scriptPrefix>%DEMOLOCAL%</scriptPrefix>
+				<username>%USER%</username>
+				<password>%PASSWORD%</password>
+				<tnsAlias>%TNSALIAS%</tnsAlias>
+				<icon>%DEMODIRECTORY%\Install\sqlplus.ico</icon>
+			</defaults>
+			<shortCut>
+				<name>1.0 Reset Demo</name>
+				<script>/sql/resetDemo.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>2.0 Register Schema</name>
+				<script>/sql/registerSchema.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>3.0 XQuery Operations on XML Content</name>
+				<script>/sql/simpleExpressions.xqy</script>
+			</shortCut>
+			<shortCut>
+				<name>4.0 XQuery Operations on Relational Data</name>
+				<script>/sql/relationalExpressions.xqy</script>
+			</shortCut>
+			<shortCut>
+				<name>5.0 XML Views of Relational Data</name>
+				<script>/sql/createXMLView.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>5.1 XQuery operations on XML Views</name>
+				<script>/sql/xmlViewExpressions.xqy</script>
+			</shortCut>
+		</SQL>
+
+		<LAUNCH>
+			<shortCut type="url">
+				<name>%LAUNCHPAD%</name>
+				<location>%LAUNCHPADFOLDER%</location>
+				<target>%SERVERURL%%DEMOLOCAL%/index.html</target>
+			</shortCut>
+			<shortCut type="lnk">
+				<name>%LAUNCHPAD% Files</name>
+				<location>%LAUNCHPADFOLDER%</location>
+				<target>%DEMODIRECTORY%\%USER%</target>
+			</shortCut>
+		</LAUNCH>
+	</shortCuts>
+</installerConfiguration>

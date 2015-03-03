@@ -1,0 +1,179 @@
+<!-- edited with XMLSpy v2010 rel. 2 (x64) (http://www.altova.com) by Mark D Drake (Oracle XML DB) -->
+<!-- edited with XMLSPY v2004 rel. 2 U (http://www.xmlspy.com) by Mark D. Drake (Oracle XML DB) -->
+<!-- edited with XML Spy v4.0 U (http://www.xmlspy.com) by Mark (Drake) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+	<xs:element name="PurchaseOrder" type="PurchaseOrderType"/>
+	<xs:complexType name="PurchaseOrderType">
+		<xs:sequence>
+			<xs:element name="Reference" type="ReferenceType"/>
+			<xs:element name="Actions" type="ActionsType"/>
+			<xs:element name="Rejection" type="RejectionType" minOccurs="0"/>
+			<xs:element name="Requestor" type="RequestorType"/>
+			<xs:element name="User" type="UserType"/>
+			<xs:element name="CostCenter" type="CostCenterType"/>
+			<xs:element name="ShippingInstructions" type="ShippingInstructionsType"/>
+			<xs:element name="SpecialInstructions" type="SpecialInstructionsType"/>
+			<xs:element name="LineItems" type="LineItemsType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LineItemsType">
+		<xs:sequence>
+			<xs:element name="LineItem" type="LineItemType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LineItemType">
+		<xs:sequence>
+			<xs:element name="Part" type="PartType"/>
+			<xs:element name="Quantity" type="quantityType"/>
+		</xs:sequence>
+		<xs:attribute name="ItemNumber" type="xs:integer"/>
+	</xs:complexType>
+	<xs:complexType name="PartType">
+		<xs:simpleContent>
+			<xs:extension base="UPCCodeType">
+				<xs:attribute name="Description" type="DescriptionType" use="required"/>
+				<xs:attribute name="UnitPrice" type="moneyType" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:simpleType name="ReferenceType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="18"/>
+			<xs:maxLength value="30"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ActionsType">
+		<xs:sequence>
+			<xs:element name="Action" maxOccurs="4">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="User" type="UserType"/>
+						<xs:element name="Date" type="DateType" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RejectionType">
+		<xs:all>
+			<xs:element name="User" type="UserType" minOccurs="0"/>
+			<xs:element name="Date" type="DateType" minOccurs="0"/>
+			<xs:element name="Comments" type="CommentsType" minOccurs="0"/>
+		</xs:all>
+	</xs:complexType>
+	<xs:complexType name="ShippingInstructionsType">
+		<xs:sequence>
+			<xs:element name="name" type="NameType" minOccurs="0"/>
+			<xs:element name="address" type="AddressType" minOccurs="0"/>
+			<xs:element name="telephone" type="TelephoneType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="moneyType">
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="2"/>
+			<xs:totalDigits value="12"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="quantityType">
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="4"/>
+			<xs:totalDigits value="8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="UserType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="RequestorType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="0"/>
+			<xs:maxLength value="128"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CostCenterType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="4"/>
+			<xs:enumeration value=""/>
+			<xs:enumeration value="A0"/>
+			<xs:enumeration value="A10"/>
+			<xs:enumeration value="A20"/>
+			<xs:enumeration value="A30"/>
+			<xs:enumeration value="A40"/>
+			<xs:enumeration value="A50"/>
+			<xs:enumeration value="A60"/>
+			<xs:enumeration value="A70"/>
+			<xs:enumeration value="A80"/>
+			<xs:enumeration value="A90"/>
+			<xs:enumeration value="A100"/>
+			<xs:enumeration value="A110"/>
+			<xs:enumeration value="B0"/>
+			<xs:enumeration value="B10"/>
+			<xs:enumeration value="B20"/>
+			<xs:enumeration value="B30"/>
+			<xs:enumeration value="B40"/>
+			<xs:enumeration value="B50"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="VendorType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="0"/>
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PurchaseOrderNumberType">
+		<xs:restriction base="xs:integer"/>
+	</xs:simpleType>
+	<xs:simpleType name="SpecialInstructionsType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="0"/>
+			<xs:maxLength value="2048"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NameType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="AddressType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="0"/>
+			<xs:maxLength value="256"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TelephoneType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="24"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DateType">
+		<xs:restriction base="xs:date"/>
+	</xs:simpleType>
+	<xs:simpleType name="CommentsType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="2048"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DescriptionType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="256"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="UPCCodeType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="11"/>
+			<xs:maxLength value="14"/>
+			<xs:pattern value="\d{11}"/>
+			<xs:pattern value="\d{12}"/>
+			<xs:pattern value="\d{13}"/>
+			<xs:pattern value="\d{14}"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
+

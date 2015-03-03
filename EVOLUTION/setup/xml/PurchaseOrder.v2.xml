@@ -1,0 +1,67 @@
+<PurchaseOrder xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="%SCHEMAURL%">
+   <Reference>ABULL-20100809203001137PDT</Reference>
+   <Actions>
+      <Action>
+         <User>ACABRIO</User>
+      </Action>
+   </Actions>
+   <Rejection/>
+   <Requestor>Alexis Bull</Requestor>
+   <User>ABULL</User>
+   <CostCenter>B50</CostCenter>
+   <ShippingInstructions>
+      <name>Alexis Bull</name>
+      <address>2011 Interiors Blvd,
+South San Francisco,
+California 99236
+United States of America</address>
+      <telephone>950-720-3387</telephone>
+      <billingAddress>
+      		<StreetLine1>500 Redwood Shores Parkway</StreetLine1>
+      		<StreetLine2>Mail Stop 4op-706</StreetLine2>
+      		<City>Redwood Shores</City>
+      		<State>CA</State>
+      		<ZipCode>94065</ZipCode>
+      		<Country>USA</Country>
+      </billingAddress>	
+   </ShippingInstructions>
+   <SpecialInstructions>COD</SpecialInstructions>
+   <LineItems>
+      <LineItem ItemNumber="1" xsi:type="LineItemWithShipmentsType">
+         <Part Description="Scary Movie" UnitPrice="19.95">717951004857</Part>
+         <Quantity>5.0</Quantity>
+         <Shipments>
+			 <Shipment>
+				 <ShipmentDate>2010-10-27T14:00:00Z</ShipmentDate>
+				 <QuantityShipped>3.0</QuantityShipped>
+				</Shipment>
+			 <Shipment>
+				 <ShipmentDate>2010-10-31T14:00:00Z</ShipmentDate>
+				 <QuantityShipped>2.0</QuantityShipped>
+				</Shipment>
+         </Shipments>
+      </LineItem>
+      <LineItem ItemNumber="2" xsi:type="LineItemWithShipmentsType">
+         <Part Description="The Faculty" UnitPrice="19.95">717951002280</Part>
+         <Quantity>2.0</Quantity>
+         <Shipments>
+			 <Shipment>
+				 <ShipmentDate>2010-10-27T14:00:00Z</ShipmentDate>
+				 <QuantityShipped>2.0</QuantityShipped>
+				</Shipment>
+         </Shipments>
+      </LineItem>
+      <LineItem ItemNumber="3" xsi:type="LineItemWithShipmentsType">
+         <Part Description="Phantom of the Paradise" UnitPrice="27.95">24543023777</Part>
+         <Quantity>3.0</Quantity>
+         <Shipments>
+			 <Shipment>
+				 <ShipmentDate>2010-10-27T14:00:00Z</ShipmentDate>
+				 <QuantityShipped>3.0</QuantityShipped>
+				</Shipment>
+         </Shipments>
+      </LineItem>
+   </LineItems>
+   <Notes>A Lot of text can go here....</Notes>
+</PurchaseOrder>
+

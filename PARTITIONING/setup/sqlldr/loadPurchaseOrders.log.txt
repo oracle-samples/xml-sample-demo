@@ -1,0 +1,49 @@
+SQL*Loader: Release 12.1.0.1.0 - Production on Sat Sep 7 16:54:28 2013
+
+Copyright (c) 1982, 2013, Oracle and/or its affiliates.  All rights reserved.
+
+Control File:   %DEMODIRECTORY%\%USER%\sampleData\purchaseOrderFiles.ctl
+Data File:      %DEMODIRECTORY%\%USER%\sampleData\purchaseOrderFiles.dat
+  Bad File:     %DEMODIRECTORY%\%USER%\sampleData\purchaseOrderFiles.bad
+  Discard File:  none specified
+ 
+ (Allow all discards)
+
+Number to load: ALL
+Number to skip: 0
+Errors allowed: 50
+Bind array:     64 rows, maximum of 256000 bytes
+Continuation:    none specified
+Path used:      Conventional
+
+Table PURCHASEORDER, loaded from every logical record.
+Insert option in effect for this table: APPEND
+
+   Column Name                  Position   Len  Term Encl Datatype
+------------------------------ ---------- ----- ---- ---- ---------------------
+FILENAME                            FIRST   120           CHARACTER            
+  (FILLER FIELD)
+XMLDATA                           DERIVED     *  EOF      CHARACTER            
+    Dynamic LOBFILE.  Filename in field FILENAME
+
+
+Table PURCHASEORDER:
+  10000 Rows successfully loaded.
+  0 Rows not loaded due to data errors.
+  0 Rows not loaded because all WHEN clauses were failed.
+  0 Rows not loaded because all fields were null.
+
+
+Space allocated for bind array:                   8320 bytes(64 rows)
+Read   buffer bytes: 1048576
+
+Total logical records skipped:          0
+Total logical records read:         10000
+Total logical records rejected:         0
+Total logical records discarded:        0
+
+Run began on Sat Sep 07 16:54:28 2013
+Run ended on Sat Sep 07 16:54:49 2013
+
+Elapsed time was:     00:00:20.54
+CPU time was:         00:00:02.82

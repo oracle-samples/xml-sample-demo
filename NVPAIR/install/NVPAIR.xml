@@ -1,0 +1,237 @@
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by Mark D. Drake and Geoff Lee (Oracle XML Dev) -->
+<installerConfiguration>
+	<parameters>
+		<parameter name="%DEMONAME%" value="Name Value Pair Optimization : Oracle Database 12c (12.1.0.2.0)"/>
+		<parameter name="%LAUNCHPAD%" value="Hands on Lab (12.1.0.2.0)"/>
+		<parameter name="%LAUNCHPADFOLDER%" value="%STARTMENU%\NV Pair Optimization"/>
+		<parameter name="%SHORTCUTFOLDER%" value="%DEMODIRECTORY%\%USER%"/>
+
+		<parameter name="%PUBLICFOLDER%" value="/publishedContent"/>
+		<parameter name="%DEMOCOMMON%" value="%PUBLICFOLDER%/demonstrations/NVPairs"/>
+		<parameter name="%HOMEFOLDER%" value="/home/%USER%"/>
+		<parameter name="%DEMOLOCAL%" value="%HOMEFOLDER%/demonstrations/NVPairs"/>
+		<parameter name="%XFILES_SCHEMA%" value="XFILES"/>
+
+		<parameter name="enableHTTPTrace" value="false"/>
+		<parameter name="silentInstall" value="false"/>
+	</parameters>
+
+	<installation>
+		<action type="MAKEFOLDERS"/>
+
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\grantPermissions.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createHomeFolder.sql</action>
+
+    <!--
+		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\setup\runSetup.sql %USER% %PASSWORD% %TNSALIAS% %DEMODIRECTORY%\setup</action>
+		-->
+ 		
+	  <action type="UPLOAD">
+  		<!-- Delete existing Source Code -->
+  		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+	  		<mode>FORCE</mode>
+		  	<remote>%DEMOCOMMON%</remote>
+  		</action>
+	  	<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+ 		  	<mode>FORCE</mode>
+ 			  <remote>%DEMOLOCAL%</remote>
+ 		  </action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%</remote>
+  		</action>
+  		
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/xsd</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\xsd\NVPairXMLSchema.xsd</local>
+  			<remote>%DEMOCOMMON%/xsd/NVPairXMLSchema.xsd</remote>
+  		</action>
+  		
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%/sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\reset.sql</local>
+  			<remote>%DEMOLOCAL%/sql/reset.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\registerSchema.sql</local>
+  			<remote>%DEMOLOCAL%/sql/registerSchema.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\describeObjects.sql</local>
+  			<remote>%DEMOLOCAL%/sql/describeObjects.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\loadSampleData.sql</local>
+  			<remote>%DEMOLOCAL%/sql/loadSampleData.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\createDepartmentView.sql</local>
+  			<remote>%DEMOLOCAL%/sql/createDepartmentView.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\createEmployeeView.sql</local>
+  			<remote>%DEMOLOCAL%/sql/createEmployeeView.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\createIndexes.sql</local>
+  			<remote>%DEMOLOCAL%/sql/createIndexes.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\createStructuredIndex.sql</local>
+  			<remote>%DEMOLOCAL%/sql/createStructuredIndex.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\indexOptimizedDepartmentView.sql</local>
+  			<remote>%DEMOLOCAL%/sql/indexOptimizedDepartmentView.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\sql\indexOptimizedEmployeeView.sql</local>
+  			<remote>%DEMOLOCAL%/sql/indexOptimizedEmployeeView.sql</remote>
+  		</action>
+
+ 			<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%/manual</remote>
+  		</action>
+<!--
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\manual.zip</local>
+  			<remote>%DEMOLOCAL%/manual/manual.zip</remote>
+  		</action>
+-->  		
+  	</action>
+
+<!--
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\unzipArchive.sql %DEMOLOCAL%/manual/manual.zip %DEMOLOCAL% %DEMOLOCAL%/manual/manual.log</action>
+-->  		
+
+		<action type="SQL"/>
+		<action type="VIEW"/>
+
+		<action type="DEMOCONFIG" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+			<remote>%DEMOLOCAL%</remote>
+		</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishDemo.sql %DEMOLOCAL% %XFILES_SCHEMA%</action>
+		<action type="LAUNCH"/>
+	</installation>
+
+	<make>
+		<folders>
+			<folder>%DEMODIRECTORY%\%USER%</folder>
+		</folders>
+	</make>	
+	
+	<shortCuts>
+		<SQL executionMode="local">
+			<defaults>
+				<serverLandingPad>/XFILES/lite/Resource.html?stylesheet=/XFILES/WebDemo/xsl/LaunchPad.xsl&amp;includeContent=true</serverLandingPad>
+				<scriptPrefix>%DEMOLOCAL%</scriptPrefix>
+				<username>%USER%</username>
+				<password>%PASSWORD%</password>
+				<tnsAlias>%TNSALIAS%</tnsAlias>
+				<icon>%DEMODIRECTORY%\Install\sqlplus.ico</icon>
+			</defaults>
+			<shortCut>
+				<name>0.0 Reset Demo</name>
+				<script>/sql/reset.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>1.1 Register XMLSchema</name>
+				<script>/sql/registerSchema.sql</script>
+			</shortCut>
+<!--
+			<shortCut>
+				<name>1.2 Describe Objects</name>
+				<script>/sql/describeObjects.sql</script>
+			</shortCut>
+-->			
+			<shortCut>
+				<name>1.3 Load Sample Data</name>
+				<script>/sql/loadSampleData.sql</script>
+				<rerunnable>true</rerunnable>
+			</shortCut>
+			<shortCut>
+				<name>2.0 Department View</name>
+				<script>/sql/createDepartmentView.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>2.1 Employee View</name>
+				<script>/sql/createEmployeeView.sql</script>
+				<rerunnable>true</rerunnable>
+			</shortCut>
+			<shortCut>
+				<name>3.0 Create Indexes</name>
+				<script>/sql/createIndexes.sql</script>
+				<rerunnable>true</rerunnable>
+			</shortCut>
+			<shortCut>
+				<name>4.0 Create Structured Index</name>
+				<script>/sql/createStructuredIndex.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>4.1 Index Optimized Department View</name>
+				<script>/sql/indexOptimizedDepartmentView.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>4.2 Index Optimzied Employee View</name>
+				<script>/sql/indexOptimizedEmployeeView.sql</script>
+				<rerunnable>true</rerunnable>
+			</shortCut>
+
+			
+		</SQL>
+
+	  <VIEW>
+			<defaults>
+				<pathPrefix/>
+				<localViewer/>
+				<remoteViewer/>
+				<contentType>text/plain</contentType>
+				<username>%USER%</username>
+				<arguments/>
+			</defaults>
+		  <shortCut>
+				<name>1.0 NV Pair XMLSchema</name>
+				<target>%DEMOCOMMON%/xsd/NVPairXMLSchema.xsd</target>
+				<contentType>text/xml</contentType>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+			</shortCut>
+		</VIEW>		
+		<LAUNCH>
+			<shortCut type="url">
+				<name>%LAUNCHPAD%</name>
+				<location>%LAUNCHPADFOLDER%</location>
+				<target>%SERVERURL%%DEMOLOCAL%/index.html</target>
+			</shortCut>
+			<shortCut type="lnk">
+				<name>%LAUNCHPAD% Files</name>
+				<location>%LAUNCHPADFOLDER%</location>
+				<target>%DEMODIRECTORY%\%USER%</target>
+			</shortCut>
+		</LAUNCH>
+  </shortCuts>
+</installerConfiguration>

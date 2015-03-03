@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="%SCHEMAURL%"/>
+	<xs:complexType name="ShipmentType">
+		<xs:sequence>
+			<xs:element name="ShipmentDate" type="xs:dateTime"/>
+			<xs:element name="QuantityShipped" type="quantityType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ShipmentsType">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element name="Shipment" type="ShipmentType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LineItemWithShipmentsType">
+		<xs:complexContent>
+			<xs:extension base="LineItemType">
+				<xs:sequence>
+					<xs:element name="Shipments" type="ShipmentsType"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

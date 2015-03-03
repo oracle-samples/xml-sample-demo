@@ -1,0 +1,30 @@
+<ResConfig xmlns="http://xmlns.oracle.com/xdb/XDBResConfig.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.oracle.com/xdb/XDBResConfig.xsd http://xmlns.oracle.com/xdb/XDBResConfig.xsd">
+  <event-listeners set-invoker="true">
+    <listener>
+      <description>XFiles Application Redirect</description>
+      <schema>%USER%</schema>
+      <source>INSTALL_IMAGE_BROWSER</source>
+      <language>PL/SQL</language>
+      <events>
+        <Post-LinkTo/>
+      </events>
+      <pre-condition>
+        <existsNode>
+          <XPath>/r:Resource[@Container="true"]</XPath>
+          <namespace>xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd"</namespace>
+        </existsNode>
+      </pre-condition>     
+    </listener>
+  </event-listeners>
+  <defaultChildConfig>
+    <configuration>
+      <pre-condition>
+        <existsNode>
+          <XPath>/r:Resource[@Container="true"]</XPath>
+          <namespace>xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd"</namespace>
+        </existsNode>
+      </pre-condition>
+      <path>/home/%USER%/imageMetadata/xml/imageBrowserResConfig.xml</path>
+    </configuration>
+  </defaultChildConfig>
+</ResConfig>

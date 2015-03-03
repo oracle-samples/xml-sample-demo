@@ -1,0 +1,59 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:complexType name="DataSetType">
+		<xs:sequence>
+			<xs:element ref="DataItem" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="objectType" type="xs:string"/>
+		<xs:attribute name="objectId" type="xs:string"/>
+	</xs:complexType>
+	<xs:element name="DataSet" type="DataSetType">
+		<xs:unique name="uniqueName">
+			<xs:selector xpath="*"/>
+			<xs:field xpath="@name"/>
+		</xs:unique>
+	</xs:element>
+	<xs:complexType name="DataItemType">
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="integerType">
+		<xs:complexContent>
+			<xs:extension base="DataItemType">
+				<xs:attribute name="value" type="xs:integer"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="dateType">
+		<xs:complexContent>
+			<xs:extension base="DataItemType">
+				<xs:attribute name="value" type="xs:date"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="dateTimeType">
+		<xs:complexContent>
+			<xs:extension base="DataItemType">
+				<xs:attribute name="value" type="xs:dateTime"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="floatType">
+		<xs:complexContent>
+			<xs:extension base="DataItemType">
+				<xs:attribute name="value" type="xs:float"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="stringType">
+		<xs:complexContent>
+			<xs:extension base="DataItemType">
+				<xs:attribute name="value" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="DataItem" type="DataItemType"/>
+	<xs:element name="StringValue" type="stringType" substitutionGroup="DataItem"/>
+	<xs:element name="IntegerValue" type="integerType" substitutionGroup="DataItem"/>
+	<xs:element name="DateValue" type="dateType" substitutionGroup="DataItem"/>
+	<xs:element name="DateTimeValue" type="dateTimeType" substitutionGroup="DataItem"/>
+	<xs:element name="FloatValue" type="floatType" substitutionGroup="DataItem"/>
+</xs:schema>
