@@ -2,7 +2,7 @@
 Executive Overview
 ==================
 
-The XML DB PARTITIONING example is a browser based demonstration that provides a brief overview of how to store, index, query and update XML content stored in Oracle Database 12c.
+The XML DB PARTITIONING example is a browser based demonstration that provides a brief overview of how to partition XML data based on the contents of the XML documents. It is primarily focused on partitioning of Schema based XML that has been stored using the Object-Relational storage mechanism. 
 
 Installation Instructions
 =========================
