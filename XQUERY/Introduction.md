@@ -2,7 +2,7 @@
 Executive Overview
 ==================
 
-The XML DB XQUERY example is a browser based demonstration that provides a brief overview of how to store, index, query and update XML content stored in Oracle Database 12c.
+The XML DB XQUERY example is a browser based demonstration that provides a brief overview of  how to write 'pure' XQUery based applications against XMLDB. It shows how the XMLTable operations makes it possible for all of your queries to be expressed as pure XQuery with having to make any additional use of SQL.
 
 Installation Instructions
 =========================
