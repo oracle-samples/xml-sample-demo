@@ -2,7 +2,7 @@
 Executive Overview
 ==================
 
-The XML DB NVPAIR example is a browser based demonstration that provides a brief overview of how to store, index, query and update XML content stored in Oracle Database 12c.
+The XML DB NVPAIR example is a browser based demonstration that explains Oracle's preferred mechansim for represneting name-value pairs using XML. This demo explains an XML Schema that can be used for name-value pair storage, and that supports strong data-typing of the value (enabling enforcement of number, string, date etc), and how to index this model to achieve optimial performance.
 
 Installation Instructions
 =========================
