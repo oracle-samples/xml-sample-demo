@@ -2,7 +2,7 @@
 Executive Overview
 ==================
 
-The XML DB INTRODUCTION example is a browser based demonstration that provides a brief overview of how to store, index, query and update XML content stored in Oracle Database 12c.
+The XML DB INTRODUCTION example is a browser based demonstration that provides a brief overview of how to store, index, query and update XML content stored in Oracle Database 12c. It is based on XML Schema and Object-Relational storage.
 
 Installation Instructions
 =========================
