@@ -115,7 +115,7 @@ The URL of the Database’s HTTP Listener.
 Verify the Installation was successful
 ======================================
 
-Once the script has completed check the INTRODUCTION.log file for any Verify that the installation completed successfully by opening a browser and navigating to the following URL http://hostname:port/XFILES. Login as the user specified during the installation procedure and click on the “Home” button [![](media/image12.png)].
+Once the script has completed check the INTRODUCTION.log file for any Verify that the installation completed successfully by opening a browser and navigating to the following URL http://hostname:port/XFILES. Login as the user specified during the installation procedure and click on the “Home” button [![](media/image012.png)].
 
 This will display the user’s home folder
 
