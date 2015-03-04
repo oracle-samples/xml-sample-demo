@@ -2,7 +2,7 @@
 Executive Overview
 ==================
 
-The XML DB FULLTEXT example is a browser based demonstration that provides a brief overview of how to store, index, query and update XML content stored in Oracle Database 12c.
+The XML DB FULLTEXT example is a browser based demonstration that provides a basic introduction to the XQuery Full-Text standard. It shows how to perform full-text (keywork, phrase, etc) searching of XML content stored in XMLDB. It also explains how to index XML content stored in XMLDB to optimize XQuery Full-Text expressions.
 
 Installation Instructions
 =========================
