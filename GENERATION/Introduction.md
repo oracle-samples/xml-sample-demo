@@ -2,7 +2,7 @@
 Executive Overview
 ==================
 
-The XML DB GENERATION example is a browser based demonstration that provides a brief overview of how to store, index, query and update XML content stored in Oracle Database 12c.
+The XML DB GENERATION example is a browser based demonstration that provides an overview of how to use SQL/XML functionality included as part of XMLDB to generate XML documents from relational data. It also shows how relational data can be viewed as XML content and queried using XQuery.
 
 Installation Instructions
 =========================
