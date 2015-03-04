@@ -2,7 +2,7 @@
 Executive Overview
 ==================
 
-The XML DB INTRODUCTION example is a browser based demonstration that provides a brief overview of how to store, index, query and update XML content stored in Oracle Database 12c.
+The XML DB PARTITIONING example is a browser based demonstration that provides a brief overview of how to store, index, query and update XML content stored in Oracle Database 12c.
 
 Installation Instructions
 =========================
@@ -47,7 +47,7 @@ Use the Download Zip button to download the contents of the GitHub repository. T
 <span id="_Toc310240962" class="anchor"><span id="_Toc413168752" class="anchor"></span></span>Windows Installation
 ==================================================================================================================
 
-Unzip the archive. This will create a folder called xml-sample-demo-master with a subfolder INTRODUCTION.
+Unzip the archive. This will create a folder called xml-sample-demo-master with a subfolder PARTITIONING.
 
 ![](media/image005.png)
 
@@ -87,7 +87,7 @@ Select the correct Oracle Home for the SQL\*PLUS installation. Make sure that al
 
 ![](media/image009.png)
 
-The results of the installation can be found in the INTRODUCTION.log file.
+The results of the installation can be found in the PARTITIONING.log file.
 
 Linux Installation
 ==================
@@ -96,7 +96,7 @@ A simple install script is provided to allow XFILES to be installed from a Linux
 
 ![](media/image010.png)
 
-The demonstration is installed using the INTRODUCTION.sh script found in the folder xml-sample-demo/ /INTRODUCTION/install.
+The demonstration is installed using the PARTITIONING.sh script found in the folder xml-sample-demo/ /PARTITIONING/install.
 
 To run the installation script first set the current directory to the install directory. Make sure that the environment variables ORACLE\_HOME and ORACLE\_SID are set correctly.Invoke the XFILES.sh script passing the following arguments on the command line
 
@@ -115,14 +115,14 @@ The URL of the Database’s HTTP Listener.
 Verify the Installation was successful
 ======================================
 
-Once the script has completed check the INTRODUCTION.log file for any Verify that the installation completed successfully by opening a browser and navigating to the following URL http://hostname:port/XFILES. Login as the user specified during the installation procedure and click on the “Home” button [![](media/image012.png)].
+Once the script has completed check the PARTITIONING.log file for any Verify that the installation completed successfully by opening a browser and navigating to the following URL http://hostname:port/XFILES. Login as the user specified during the installation procedure and click on the “Home” button [![](media/image012.png)].
 
 This will display the user’s home folder
 
 ![](media/image013.png)
 
-If the demonstration was installed successfully, the home folder should contain a folder call demonstrations which will contain a folder called “Introduction”.
+If the demonstration was installed successfully, the home folder should contain a folder call demonstrations which will contain a folder called “partitioning”.
 
-Navigate to the “Introduction” folder and click the index.html file. This should open a new browser tab or window, ready to run the first step of the example.
+Navigate to the “partitioning” folder and click the index.html file. This should open a new browser tab or window, ready to run the first step of the example.
 
 ![](media/image014.png)

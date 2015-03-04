@@ -121,8 +121,8 @@ This will display the user’s home folder
 
 ![](media/image013.png)
 
-If the demonstration was installed successfully, the home folder should contain a folder call demonstrations which will contain a folder called “Introduction”.
+If the demonstration was installed successfully, the home folder should contain a folder call demonstrations which will contain a folder called “introduction”.
 
-Navigate to the “Introduction” folder and click the index.html file. This should open a new browser tab or window, ready to run the first step of the example.
+Navigate to the “introduction” folder and click the index.html file. This should open a new browser tab or window, ready to run the first step of the example.
 
 ![](media/image014.png)
