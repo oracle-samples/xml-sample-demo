@@ -11,7 +11,32 @@
  *
  * ================================================ */
 
-DEF SCRIPT = &1
+spool configureDatabase.log
 set echo on
-@@&SCRIPT
-exit
+--
+def USERNAME = &1
+--
+def PASSWORD = &2
+--
+def HTTPPORT = &3
+--
+def FTPPORT = &4
+--
+grant connect, resource, unlimited tablespace to &USERNAME identified by &PASSWORD
+/
+begin
+  if DBMS_XDB.getHTTPPort() != &HTTPPORT then
+    DBMS_XDB.setHTTPPort(&HTTPPORT);
+  end if;
+
+  if DBMS_XDB.getFTPPort() != &FTPPORT then
+    DBMS_XDB.setFTPPort(&FTPPORT);
+  end if;
+end;
+/
+--
+alter system register
+/
+quit
+
+ 

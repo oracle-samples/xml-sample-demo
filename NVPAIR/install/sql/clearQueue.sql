@@ -11,7 +11,20 @@
  *
  * ================================================ */
 
-DEF SCRIPT = &1
-set echo on
-@@&SCRIPT
-exit
+--
+DEF XFILES_SCHEMA = &1
+--
+DECLARE
+  po dbms_aqadm.aq$_purge_options_t;
+BEGIN
+   commit;
+   po.block := TRUE;
+   DBMS_AQADM.PURGE_QUEUE_TABLE(
+     queue_table     => '&XFILES_SCHEMA..LOG_RECORD_QUEUE_TABLE',
+     purge_condition => NULL,
+     purge_options   => po);
+   commit;
+END;
+/
+--
+

@@ -23,4 +23,3 @@ def USERNAME    = &1
 @@enableAccessToHR.sql
 --
 quit
-

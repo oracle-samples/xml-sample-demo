@@ -24,7 +24,7 @@ Const CONFIG_LOAD_FAILED = 1
 '   launchPadFolderPath : Path to folder where LaunchPad for the demo will be placed. 
 '                         Typically %STARTMENT%\Oracle XML DB Demonstrations
 
-dim LINUX
+dim SCRIPT_GENERATOR
 dim MINSTALLER
 
 dim INSTALLER
@@ -233,18 +233,17 @@ Sub installDemo()
   LOGBUFFER = ""
   window.resizeTo 580,375
   
-  Set XHELPER         = new xmlHelper
-  Set INSTALLER       = new installationManager  
-  Set DEMONSTRATION   = new demonstrationConfiguration
-  Set FILEMANAGER     = new fileSystemControl
-  Set SQLPLUS         = new sqlPlusControl
-  Set SQLLDR		      = new sqlldrControl
-  Set FTP             = new ftpControl
-  Set REPOS           = new repositoryControl
-  Set MINSTALLER      = Nothing 
-  Set LINUX           = Nothing
+  Set XHELPER          = new xmlHelper
+  Set INSTALLER        = new installationManager  
+  Set DEMONSTRATION    = new demonstrationConfiguration
+  Set FILEMANAGER      = new fileSystemControl
+  Set SQLPLUS          = new sqlPlusControl
+  Set SQLLDR		       = new sqlldrControl
+  Set FTP              = new ftpControl
+  Set REPOS            = new repositoryControl
+  Set MINSTALLER       = Nothing 
+  Set SCRIPT_GENERATOR = Nothing
     
-  
   showInputForm(INSTALLER.getInstallationParameters())
    
 End Sub
@@ -595,13 +594,13 @@ Sub sqlldrJobs(INSTALLER)
      
      If jobType = "stageResources" Then
        stepId = job.getAttribute("stepId")
-       localFolderPath = INSTALLER.replaceMacros(XHELPER.getTextNode(job,"localFolder"),false)
-       remoteFolderPath = INSTALLER.replaceMacros(XHELPER.getTextNode(job,"remoteFolder"),false)
+       localFolderPath = XHELPER.getTextNode(job,"localFolder")
+       remoteFolderPath = XHELPER.getTextNode(job,"remoteFolder")
      	 stageRepositoryContent INSTALLER, stepId, localFolderPath, remoteFolderPath
      End If
      	 
      If jobType = "dataLoad"  Then	 
-       controlFilePath = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(job,"controlFile"),false)
+       controlFilePath = XHELPER.getOptionalTextNode(job,"controlFile")
        writeLogMessage "SQLLDR : Type = 'dataLoad'. Control File = '" + controlFilePath + "'."  
        SQLLDR.execute INSTALLER.getUsername(), INSTALLER.getPassword(), controlFilePath
      End If
@@ -617,9 +616,9 @@ Sub cloneArchives(INSTALLER,FILEMANAGER)
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/cloneList/archives/archive")
 
   For i = 0 to nodeList.length - 1
-     source  = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"source"),false)
-     folder  = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"folder"),false)
-     target  = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
+     source  = XHELPER.getTextNode(nodeList.item(i),"source")
+     folder  = XHELPER.getTextNode(nodeList.item(i),"folder")
+     target  = XHELPER.getTextNode(nodeList.item(i),"target")
      If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then
        writeLogMessage "Clone Archives : Archive = '" + source + "'. Target = '" + target + "'."
        FILEMANAGER.unzipArchive source, folder
@@ -627,10 +626,10 @@ Sub cloneArchives(INSTALLER,FILEMANAGER)
        FILEMANAGER.createZipArchive target
        FILEMANAGER.zipArchive target, folder
      else
-       LINUX.unzipArchive source, folder
-  	   LINUX.cloneFolder INSTALLER, folder, folder
-       LINUX.createZipArchive target
-       LINUX.zipArchive target, folder
+       SCRIPT_GENERATOR.unzipArchive source, folder
+  	   SCRIPT_GENERATOR.cloneFolder INSTALLER, folder, folder
+       SCRIPT_GENERATOR.createZipArchive target
+       SCRIPT_GENERATOR.zipArchive target, folder
      End If
   Next 
   
@@ -649,7 +648,7 @@ Sub createFolders(INSTALLER,FILEMANAGER)
        writeLogMessage "CreateFolder : '" + folderPath + "'"
        FILEMANAGER.createEmptyFolder(folderPath)
      Else
-     	 LINUX.newFolderScript(folderPath)
+     	 SCRIPT_GENERATOR.newFolderScript(folderPath)
      End If
   Next 
   
@@ -662,13 +661,13 @@ Sub copyFiles(INSTALLER,FILEMANAGER)
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/copy/files/file")
 
   For i = 0 to nodeList.length - 1
-     sourceFile = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"source"),false)
-     targetFile = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
+     sourceFile = XHELPER.getTextNode(nodeList.item(i),"source")
+     targetFile = XHELPER.getTextNode(nodeList.item(i),"target")
      If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then
        writeLogMessage "Copy File : Source = '" + sourceFile + "'. Target = '" + targetFile + "'" 
        FILEMANAGER.copyFile INSTALLER, sourceFile, targetFile
      Else
-     	 LINUX.CopyFile INSTALLER, sourceFile, targetFile
+     	 SCRIPT_GENERATOR.CopyFile INSTALLER, sourceFile, targetFile
      End If
   Next 
   
@@ -681,13 +680,13 @@ Sub copyFolders(INSTALLER,FILEMANAGER)
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/copy/folders/folder")
 
   For i = 0 to nodeList.length - 1
-     sourceFolder      = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"source"),false)
-     targetFolder      = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
+     sourceFolder      = XHELPER.getTextNode(nodeList.item(i),"source")
+     targetFolder      = XHELPER.getTextNode(nodeList.item(i),"target")
      If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then
        writeLogMessage "Copy Folder : Source = '" + sourceFolder + "'. Target = '" + targetFolder + "'"
        FILEMANAGER.copyFolder INSTALLER, sourceFolder, targetFolder
      Else
-     	 LINUX.CopyFolder INSTALLER, sourceFolder, targetFolder
+     	 SCRIPT_GENERATOR.CopyFolder INSTALLER, sourceFolder, targetFolder
      End If
      
   Next 
@@ -701,13 +700,13 @@ Sub cloneFiles(INSTALLER,FILEMANAGER)
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/clone/files/file")
 
   For i = 0 to nodeList.length - 1
-     sourceFile = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"source"),false)
-     targetFile = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
+     sourceFile = XHELPER.getTextNode(nodeList.item(i),"source")
+     targetFile = XHELPER.getTextNode(nodeList.item(i),"target")
      If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
        writeLogMessage "Clone File : Source = '" + sourceFile + "'. Target = '" + targetFile + "'"
        FILEMANAGER.cloneFile INSTALLER, sourceFile, targetFile
      Else
-     	 LINUX.cloneFile INSTALLER, sourceFile, targetFile
+     	 SCRIPT_GENERATOR.cloneFile INSTALLER, sourceFile, targetFile
      End if
   Next 
   
@@ -720,13 +719,13 @@ Sub cloneFolders(INSTALLER,FILEMANAGER)
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/clone/folders/folder")
 
   For i = 0 to nodeList.length - 1
-     sourceFolder = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"source"),false)
-     targetFolder = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
+     sourceFolder = XHELPER.getTextNode(nodeList.item(i),"source")
+     targetFolder = XHELPER.getTextNode(nodeList.item(i),"target")
      If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
        writeLogMessage "Clone Folder : Source = '" + sourceFolder + "'. Target = '" + targetFolder + "'"
        FILEMANAGER.cloneFolder INSTALLER, sourceFolder, targetFolder
      Else
-     	 LINUX.cloneFolder INSTALLER, sourceFolder, targetFolder
+     	 SCRIPT_GENERATOR.cloneFolder INSTALLER, sourceFolder, targetFolder
      End if
   Next 
   
@@ -739,13 +738,13 @@ Sub unzipArchives(INSTALLER,FILEMANAGER)
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/unzip/archives/archive")
 
   For i = 0 to nodeList.length - 1
-     archive = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"source"),false)
-     target  = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
+     archive = XHELPER.getTextNode(nodeList.item(i),"source")
+     target  = XHELPER.getTextNode(nodeList.item(i),"target")
      If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
        writeLogMessage "Unzip Archives : Archive = '" + archive + "'. Target = '" + target + "'."
        FILEMANAGER.unzipArchive archive, target
      Else
-     	 LINUX.unzipArchive archive, target
+     	 SCRIPT_GENERATOR.unzipArchive archive, target
      End if
   Next 
   
@@ -760,13 +759,13 @@ Sub makeWebFolders(REPOS)
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/shortCuts/WEBDAV/shortCut")
 
   For i = 0 to nodeList.length - 1
-     URL = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"URL"),false)
-     shortCutName = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"name"),false)
-     shortcutLocation = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"location"),false)
+     URL = XHELPER.getTextNode(nodeList.item(i),"URL")
+     shortCutName = XHELPER.getTextNode(nodeList.item(i),"name")
+     shortcutLocation = XHELPER.getTextNode(nodeList.item(i),"location")
      If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
        REPOS.makeWebFolder shortCutName, URL, shortcutLocation
      Else
-  	   LINUX.makeWebFolder shortCutName, URL, shortcutLocation
+  	   SCRIPT_GENERATOR.makeWebFolder shortCutName, URL, shortcutLocation
      End If
 
   Next 
@@ -805,16 +804,16 @@ Sub makeNetworkFolderShortcuts(INSTALLER, FILEMGR)
   If (nodelist.length > 0) Then
   	  
     For i = 0 to nodeList.length - 1
-      URL                = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"URL"),false)
-      shortCutName       = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"name"),false)
-      shortcutLocation   = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"location"),false)
+      URL                = XHELPER.getTextNode(nodeList.item(i),"URL")
+      shortCutName       = XHELPER.getTextNode(nodeList.item(i),"name")
+      shortcutLocation   = XHELPER.getTextNode(nodeList.item(i),"location")
       target             = replace(INSTALLER.getDriveLetter() & URL,"/","\")
       
       If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
         folder = validateRemotePath(INSTALLER, target)
         FILEMANAGER.createJunctionPoint shortcutLocation, shortCutName, target
       Else
-   	    LINUX.createJunctionPoint shortcutLocation, shortCutName, target
+   	    SCRIPT_GENERATOR.createJunctionPoint shortcutLocation, shortCutName, target
       End If
 
     Next 
@@ -835,32 +834,32 @@ Sub makeSqlShortCuts(INSTALLER,FILEMANAGER)
     
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/shortCuts/SQL/defaults")
   For i = 0 to nodeList.length - 1
-    defaultShortcutLocation   = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"location",INSTALLER.getShortcutFolderPath()),false)
-    defaultUsername           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"username",INSTALLER.getUsername()),false)
-    defaultPassword           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"password",INSTALLER.getPassword()),false)
-    defaultTNSAlias           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"tnsAlias",INSTALLER.getTNSAlias()),false)
-    defaultIconPath           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"icon","%DEMODIRECTORY%\Install\SQLPLUS.ICO"),false)
+    defaultShortcutLocation   = XHELPER.getDefaultTextNode(nodeList.item(i),"location",INSTALLER.getShortcutFolderPath())
+    defaultUsername           = XHELPER.getDefaultTextNode(nodeList.item(i),"username",INSTALLER.getUsername())
+    defaultPassword           = XHELPER.getDefaultTextNode(nodeList.item(i),"password",INSTALLER.getPassword())
+    defaultTNSAlias           = XHELPER.getDefaultTextNode(nodeList.item(i),"tnsAlias",INSTALLER.getTNSAlias())
+    defaultIconPath           = XHELPER.getDefaultTextNode(nodeList.item(i),"icon","%DEMODIRECTORY%\Install\SQLPLUS.ICO")
 
-    defaultLandingPad         = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"serverLandingPad"),false)
-    defaultScriptPrefix       = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"scriptPrefix"),false)
-    defaultArguments          = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"arguments"),false)                                     
+    defaultLandingPad         = XHELPER.getOptionalTextNode(nodeList.item(i),"serverLandingPad")
+    defaultScriptPrefix       = XHELPER.getOptionalTextNode(nodeList.item(i),"scriptPrefix")
+    defaultArguments          = XHELPER.getOptionalTextNode(nodeList.item(i),"arguments")                                     
   Next 
 
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/shortCuts/SQL/shortCut")
 
   For i = 0 to nodeList.length - 1
-    landingPad         = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"landingPad",defaultLandingPad),false)
-    shortcutLocation   = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"location",defaultShortcutLocation),false)
-    scriptPrefix       = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"scriptPrefix",defaultScriptPrefix),false)
-    username           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"username",defaultUsername),false)
-    password           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"passsword",defaultPassword),false)
-    tnsAlias           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"tnsAlias",defaultTNSAlias),false)
-    arguments          = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"arguments",defaultArguments),false)                                      
-    iconPath           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"icon",defaultIconPath),false)
-    rerunnable         = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"rerunnable","false"),false)
+    landingPad         = XHELPER.getDefaultTextNode(nodeList.item(i),"landingPad",defaultLandingPad)
+    shortcutLocation   = XHELPER.getDefaultTextNode(nodeList.item(i),"location",defaultShortcutLocation)
+    scriptPrefix       = XHELPER.getDefaultTextNode(nodeList.item(i),"scriptPrefix",defaultScriptPrefix)
+    username           = XHELPER.getDefaultTextNode(nodeList.item(i),"username",defaultUsername)
+    password           = XHELPER.getDefaultTextNode(nodeList.item(i),"passsword",defaultPassword)
+    tnsAlias           = XHELPER.getDefaultTextNode(nodeList.item(i),"tnsAlias",defaultTNSAlias)
+    arguments          = XHELPER.getDefaultTextNode(nodeList.item(i),"arguments",defaultArguments)                                    
+    iconPath           = XHELPER.getDefaultTextNode(nodeList.item(i),"icon",defaultIconPath)
+    rerunnable         = XHELPER.getDefaultTextNode(nodeList.item(i),"rerunnable","false")
 
-    shortcutName       = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"name"),false)
-    script             = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"script"),false)
+    shortcutName       = XHELPER.getTextNode(nodeList.item(i),"name")
+    script             = XHELPER.getTextNode(nodeList.item(i),"script")
 
 
 		If (not INSTALLER.isScriptGenerator()) Then
@@ -889,26 +888,26 @@ Sub makeHttpShortCuts(INSTALLER, FILEMANAGER)
 
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/shortCuts/HTTP/defaults")
   For i = 0 to nodeList.length - 1
-    defaultShortcutLocation   = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"location",INSTALLER.getShortcutFolderPath()),false)
-    defaultUsername           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"username",INSTALLER.getUsername()),false)
-    defaultIconPath           = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"icon"),false)
+    defaultShortcutLocation   = XHELPER.getDefaultTextNode(nodeList.item(i),"location",INSTALLER.getShortcutFolderPath())
+    defaultUsername           = XHELPER.getDefaultTextNode(nodeList.item(i),"username",INSTALLER.getUsername())
+    defaultIconPath           = XHELPER.getOptionalTextNode(nodeList.item(i),"icon")
 
-    defaultArguments          = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"arguments"),false)
+    defaultArguments          = XHELPER.getOptionalTextNode(nodeList.item(i),"arguments")
   Next 
 
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/shortCuts/HTTP/shortCut")
 
   For i = 0 to nodeList.length - 1
-    shortcutLocation   = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"location",defaultShortcutLocation),false)
-    username           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"username",defaultUsername),false)
-    iconPath           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"icon",defaultIconPath),false)
-    arguments          = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"arguments",defaultArguments),false)                                     
+    shortcutLocation   = XHELPER.getDefaultTextNode(nodeList.item(i),"location",defaultShortcutLocation)
+    username           = XHELPER.getDefaultTextNode(nodeList.item(i),"username",defaultUsername)
+    iconPath           = XHELPER.getDefaultTextNode(nodeList.item(i),"icon",defaultIconPath)
+    arguments          = XHELPER.getDefaultTextNode(nodeList.item(i),"arguments",defaultArguments)                                    
 
-    shortcutName       = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"name"),false)
-    url                = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"URL"),false)
+    shortcutName       = XHELPER.getTextNode(nodeList.item(i),"name")
+    url                = XHELPER.getTextNode(nodeList.item(i),"URL")
 
-    screenshot         = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"screenshot"),false)
-    windowName         = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"target"),false)
+    screenshot         = XHELPER.getOptionalTextNode(nodeList.item(i),"screenshot")
+    windowName         = XHELPER.getOptionalTextNode(nodeList.item(i),"target")
 
     If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
 	    FILEMANAGER.makeHttpShortCut shortcutLocation, shortcutName, url, iconPath, arguments
@@ -932,32 +931,32 @@ Sub makeViewerShortCuts(INSTALLER, FILEMANAGER)
 
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/shortCuts/VIEW/defaults")
   For i = 0 to nodeList.length - 1
-    defaultShortcutLocation   = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"location",INSTALLER.getShortcutFolderPath()),false)
-    defaultUsername           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"username",INSTALLER.getUsername()),false)
-    defaultIconPath           = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"icon"),false)
+    defaultShortcutLocation   = XHELPER.getDefaultTextNode(nodeList.item(i),"location",INSTALLER.getShortcutFolderPath())
+    defaultUsername           = XHELPER.getDefaultTextNode(nodeList.item(i),"username",INSTALLER.getUsername())
+    defaultIconPath           = XHELPER.getOptionalTextNode(nodeList.item(i),"icon")
 
-    defaultRemoteViewer       = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"remoteViewer"),false)
-    defaultLocalViewer        = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"localViewer"),false)
-    defaultContentType        = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"contentType"),false)
-    defaultPathPrefix         = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"pathPrefix"),false)
-    defaultArguments          = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"arguments"),false)                                  
+    defaultRemoteViewer       = XHELPER.getOptionalTextNode(nodeList.item(i),"remoteViewer")
+    defaultLocalViewer        = XHELPER.getOptionalTextNode(nodeList.item(i),"localViewer")
+    defaultContentType        = XHELPER.getOptionalTextNode(nodeList.item(i),"contentType")
+    defaultPathPrefix         = XHELPER.getOptionalTextNode(nodeList.item(i),"pathPrefix")
+    defaultArguments          = XHELPER.getOptionalTextNode(nodeList.item(i),"arguments")                                 
   Next 
 
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/shortCuts/VIEW/shortCut")
 
   For i = 0 to nodeList.length - 1
-    shortcutLocation   = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"location",defaultShortcutLocation),false)
-    username           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"username",defaultUsername),false)
-    iconPath           = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"icon",defaultIconPath),false)
+    shortcutLocation   = XHELPER.getDefaultTextNode(nodeList.item(i),"location",defaultShortcutLocation)
+    username           = XHELPER.getDefaultTextNode(nodeList.item(i),"username",defaultUsername)
+    iconPath           = XHELPER.getDefaultTextNode(nodeList.item(i),"icon",defaultIconPath)
 
-    remoteViewer       = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"remoteViewer",defaultRemoteViewer),false)
-    localViewer        = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"localViewer",defaultLocalViewer),false)
-    contentType        = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"contentType",defaultContentType),false)
-    pathPrefix         = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"pathPrefix",defaultPathPrefix),false)
-    arguments          = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"arguments",defaultArguments),false)                                      
+    remoteViewer       = XHELPER.getDefaultTextNode(nodeList.item(i),"remoteViewer",defaultRemoteViewer)
+    localViewer        = XHELPER.getDefaultTextNode(nodeList.item(i),"localViewer",defaultLocalViewer)
+    contentType        = XHELPER.getDefaultTextNode(nodeList.item(i),"contentType",defaultContentType)
+    pathPrefix         = XHELPER.getDefaultTextNode(nodeList.item(i),"pathPrefix",defaultPathPrefix)
+    arguments          = XHELPER.getDefaultTextNode(nodeList.item(i),"arguments",defaultArguments)                                  
 
-    shortcutName       = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"name"),false)
-    target             = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"target"),false)
+    shortcutName       = XHELPER.getTextNode(nodeList.item(i),"name")
+    target             = XHELPER.getTextNode(nodeList.item(i),"target")
 
     URL = pathPrefix & target
     
@@ -998,9 +997,9 @@ Sub makeFtpScripts(INSTALLER,FILEMANAGER)
 
   For i = 0 to nodeList.length - 1
 
-     scriptFileName  = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"name"),false)
+     scriptFileName  = XHELPER.getTextNode(nodeList.item(i),"name")
      scriptFile      = INSTALLER.getScriptsFolderPath() & FILE_SEPERATOR &scriptFileName + ".ftp"
-     targetDirectory = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"URL"),false)
+     targetDirectory = XHELPER.getTextNode(nodeList.item(i),"URL")
 
      Set ftpFile = FILEMANAGER.CreateTextFile(scriptFile)
      createFtpScript ftpFile, INSTALLER.getHostName(), INSTALLER.getFtpPort(), _
@@ -1074,20 +1073,20 @@ Function processSimulation(simulation, shortcutName, defaultLinkFolder, defaultS
   Set simulationDetails = DOCUMENT.createElement("simulation")
   simulationDetails.setAttribute "type", XHELPER.getOptionalTextNode(simulation,"type")
   
-  linkFolder         = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(simulation,"remoteLinkLocation",defaultLinkFolder),false)
+  linkFolder         = XHELPER.getDefaultTextNode(simulation,"remoteLinkLocation",defaultLinkFolder)
   link               = linkFolder & "/" & shortcutName & ".lnk"
   simulationDetails.setAttribute "lnkPath", link
   
-  screenshotFolder   = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(simulation,"screenshotLocation",defaultScreenshotFolder),false)
+  screenshotFolder   = XHELPER.getDefaultTextNode(simulation,"screenshotLocation",defaultScreenshotFolder)
   screenshot         = screenshotFolder & "/" & XHELPER.getOptionalTextNode(simulation,"screenshot")
   simulationDetails.setAttribute "screenshotPath", screenshot
   
-  url         = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(simulation,"URL"),false)
+  url         = XHELPER.getOptionalTextNode(simulation,"URL")
   if (not IsNull(url)) then
   	simulationDetails.setAttribute "URL", url
   End if
 
-  SQL         = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(simulation,"SQL"),false)
+  SQL         = XHELPER.getOptionalTextNode(simulation,"SQL")
   if (not IsNull(SQL)) then
   	simulationDetails.setAttribute "SQL", SQL
   End if
@@ -1107,8 +1106,8 @@ Sub makeGeneralShortCuts(INSTALLER,FILEMANAGER)
 
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/shortCuts/General/defaults")
   For i = 0 to nodeList.length - 1
-    defaultLinkFolder         = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"remoteLinkLocation","%DEMOLOCAL%/Links"),false)
-    defaultScreenshotFolder   = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"screenshotLocation","%DEMOCOMMON%/assets"),false)
+    defaultLinkFolder         = XHELPER.getDefaultTextNode(nodeList.item(i),"remoteLinkLocation","%DEMOLOCAL%/Links")
+    defaultScreenshotFolder   = XHELPER.getDefaultTextNode(nodeList.item(i),"screenshotLocation","%DEMOCOMMON%/assets")
   Next
   
   Dim shortCutName, shortcutFolder, target, directory, icon, arguments, remoteIcon 
@@ -1117,12 +1116,12 @@ Sub makeGeneralShortCuts(INSTALLER,FILEMANAGER)
   Set nodeList = INSTALLER.getDemonstrationParameter("/installerConfiguration/shortCuts/General/shortCut")
 
   For i = 0 to nodeList.length - 1
-    shortCutName       = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"name"),false)
-    shortcutFolder     = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(nodeList.item(i),"location",defaultShortcutFolder),false)
-    target             = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"path"),false)
-    directory          = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"directory"),false)
-    icon               = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"icon"),false)
-    arguments          = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"arguments"),false)
+    shortCutName       = XHELPER.getTextNode(nodeList.item(i),"name")
+    shortcutFolder     = XHELPER.getDefaultTextNode(nodeList.item(i),"location",defaultShortcutFolder)
+    target             = XHELPER.getOptionalTextNode(nodeList.item(i),"path")
+    directory          = XHELPER.getOptionalTextNode(nodeList.item(i),"directory")
+    icon               = XHELPER.getOptionalTextNode(nodeList.item(i),"icon")
+    arguments          = XHELPER.getOptionalTextNode(nodeList.item(i),"arguments")
     
     If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then
       FILEMANAGER.makeShortCut INSTALLER, shortcutFolder, shortCutName, target, icon, directory, arguments
@@ -1155,14 +1154,14 @@ Sub makeFavorites(INSTALLER,FILEMANAGER)
     linkFolderPath = FILEMANAGER.makeFavoritesFolder(linkFolderName)
     
     For i = 0 to nodeList.length - 1
-      shortCutName       = INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"name"),false)
-      target             = INSTALLER.getServerURL() & INSTALLER.replaceMacros(XHELPER.getTextNode(nodeList.item(i),"localPath"),false)
-      shortcutLocation   = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"location"),false)
-      arguments          = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"arguments"),false)
-      icon               = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"icon"),false)
+      shortCutName       = XHELPER.getTextNode(nodeList.item(i),"name")
+      target             = INSTALLER.getServerURL() & XHELPER.getTextNode(nodeList.item(i),"localPath")
+      shortcutLocation   = XHELPER.getOptionalTextNode(nodeList.item(i),"location")
+      arguments          = XHELPER.getOptionalTextNode(nodeList.item(i),"arguments")
+      icon               = XHELPER.getOptionalTextNode(nodeList.item(i),"icon")
 
-      screenshot         = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"screenshot"),false)
-      windowName         = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(nodeList.item(i),"target"),false)
+      screenshot         = XHELPER.getOptionalTextNode(nodeList.item(i),"screenshot")
+      windowName         = XHELPER.getOptionalTextNode(nodeList.item(i),"target")
 
       FILEMANAGER.makeHttpShortCut shortcutLocation, shortCutName,  target, icon, arguments
       DEMONSTRATION.addHTTPStep shortcutName, target, icon, INSTALLER.getUsername(),screenshot, windowName
@@ -1186,7 +1185,7 @@ Sub SaveConfiguration (REPOS, remoteDirectory, user, password)
 		If (INSTALLER.isInteractiveInstall() or NOT (MINSTALLER Is Nothing)) Then	
       REPOS.uploadContent DEMONSTRATION.DOCUMENT, remoteDirectory & "/configuration.xml", True, user, password
     else
-    	LINUX.uploadConfiguation DEMONSTRATION.DOCUMENT, remoteDirectory & "/configuration.xml", True, user, password
+    	SCRIPT_GENERATOR.uploadConfiguation DEMONSTRATION.DOCUMENT, remoteDirectory & "/configuration.xml", True, user, password
     End If
 
 End Sub
@@ -1208,7 +1207,7 @@ Sub makeLaunchPadEntry(INSTALLER, FILEMANAGER, shortCutType, shortCutName, short
       End If
 
     Else
-    	LINUX.launchShellScript shortcutName,target,shortCutType
+    	SCRIPT_GENERATOR.launchShellScript shortcutName,target,shortCutType
     End If  
     
 End Sub
@@ -1222,12 +1221,12 @@ Sub makeLaunchPadEntries(INSTALLER,FILEMANAGER)
   For i = 0 to nodeList.length - 1
     Set shortCut       = nodeList.item(i)
     shortCutType       = shortCut.getAttribute("type")
-    shortCutName       = INSTALLER.replaceMacros(XHELPER.getTextNode(shortCut,"name"),false)
-    shortcutLocation   = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(shortCut,"location",Installer.getLaunchPadFolderPath()),false)
-    target             = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(shortCut,"target"),false)
-    icon               = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(shortCut,"icon"),false)
-    directory          = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(shortCut,"directory"),false)
-    arguments          = INSTALLER.replaceMacros(XHELPER.getOptionalTextNode(shortCut,"arguments"),false)
+    shortCutName       = XHELPER.getTextNode(shortCut,"name")
+    shortcutLocation   = XHELPER.getDefaultTextNode(shortCut,"location",Installer.getLaunchPadFolderPath())
+    target             = XHELPER.getOptionalTextNode(shortCut,"target")
+    icon               = XHELPER.getOptionalTextNode(shortCut,"icon")
+    directory          = XHELPER.getOptionalTextNode(shortCut,"directory")
+    arguments          = XHELPER.getOptionalTextNode(shortCut,"arguments")
 
     makeLaunchPadEntry INSTALLER, FILEMANAGER, shortCutType, shortCutName, shortcutLocation, target, icon, directory, arguments
 
@@ -1253,25 +1252,25 @@ Sub ProcessFileUploadList(fileList)
     
     Select Case actionType
       Case "PUT" 
-        mode   = INSTALLER.replaceMacros(XHELPER.getDefaultTextNode(action,"mode","SKIP"),false)
-        local  = INSTALLER.replaceMacros(XHELPER.getTextNode(action,"local"),false)
-        remote = INSTALLER.replaceMacros(XHELPER.getTextNode(action,"remote"),false)
+        mode   = XHELPER.getDefaultTextNode(action,"mode","SKIP")
+        local  = XHELPER.getTextNode(action,"local")
+        remote = XHELPER.getTextNode(action,"remote")
         stepDescription = "  PUT : '" & local & "' --> '" & remote & "'."
         writeLogMessage stepDescription
         REPOS.uploadFile local, remote, mode, user, password
         stepDescription = stepDescription & " Status = " & REPOS.getXHR().status & " [" + REPOS.getXHR().statusText + "]."
         writeLogMessage stepDescription
       Case "MKCOL" 
-        mode   = INSTALLER.replaceMacros(XHELPER.getTextNode(action,"mode"),false) = "FORCE"
-        remote = INSTALLER.replaceMacros(XHELPER.getTextNode(action,"remote"),false)
+        mode   = XHELPER.getTextNode(action,"mode") = "FORCE"
+        remote = XHELPER.getTextNode(action,"remote")
         stepDescription = "  MKDIR : '" & remote & "'."
         writeLogMessage stepDescription
         REPOS.makeDir remote, mode, user, password
         stepDescription = stepDescription & " Status = " & REPOS.getXHR().status & " [" + REPOS.getXHR().statusText + "]."
         writeLogMessage stepDescription
       Case "DELETE" 
-        mode   = INSTALLER.replaceMacros(XHELPER.getTextNode(action,"mode"),false) = "FORCE"
-        remote = INSTALLER.replaceMacros(XHELPER.getTextNode(action,"remote"),false)
+        mode   = XHELPER.getTextNode(action,"mode") = "FORCE"
+        remote = XHELPER.getTextNode(action,"remote")
         stepDescription = "  DELETE : '" & remote & "'."
         writeLogMessage stepDescription
         REPOS.doDelete remote, user, password
@@ -1375,7 +1374,7 @@ Sub doAction(action,step)
       writeLogMessage stepDescription
       makeFavorites INSTALLER,FILEMANAGER
     Case "DEMOCONFIG" 
-      remote = INSTALLER.replaceMacros(XHELPER.getTextNode(action,"remote"),false)
+      remote = XHELPER.getTextNode(action,"remote")
       stepDescription = "Step " & step & " Save demonstration Configuration."
       writeLogMessage stepDescription
       saveConfiguration REPOS, remote, user, password
@@ -1692,7 +1691,7 @@ Class fileSystemControl
       Set targetFolder = INSTALLER.getFSO().getFolder(targetFolderName)
       cloneSubFolder installParameters, sourceFolder, targetFolder
     Else
-    	LINUX.cloneFolder installParameters, sourceFolderName,targetFolderName
+    	SCRIPT_GENERATOR.cloneFolder installParameters, sourceFolderName,targetFolderName
     End If
 
   End Sub
@@ -2624,7 +2623,7 @@ Class sqlPlusControl
 
   Public Function testConnection(user, password, role)
     Dim returnCode
-    returnCode = executeSQLPLUS(user, password, role, "sql/VerifyConnection.sql")
+    returnCode = executeSQLPLUS(user, password, role, "sql/verifyConnection.sql")
     If returnCode = 2 Then
     	testConnection = true
     Else
@@ -2736,7 +2735,7 @@ Class sqlldrControl
        writeLogMessage commandLine
        execute = runCommand(commandLine)
      Else
-     	 execute = LINUX.sqlldr(user,password,replace(controlFile,"\","/"))
+     	 execute = SCRIPT_GENERATOR.sqlldr(user,password,replace(controlFile,"\","/"))
      End If
      
   End Function
@@ -3267,7 +3266,7 @@ Class installationManager
     On Error Goto 0
 
     scriptGenerationMode = False
-    If IsObject(LINUX) Then
+    If IsObject(SCRIPT_GENERATOR) Then
     	scriptGenerationMode = True
     End If
 
@@ -3295,9 +3294,9 @@ Class installationManager
       installerPath = Mid(document.location.href ,9)    
     Else
     	If isScriptGenerator() Then
-        ' Script : Linux Install Script Generator
-	    	' wscript.Echo "Script"
-        installerPath = LINUX.getInstallerPath()
+        ' Script : Install Script Generator
+	    	' wscript.Echo "Script Generation Mode"
+        installerPath = SCRIPT_GENERATOR.getInstallerPath()
       Else
     	  ' Batch : Bulk Install via Command Line
 	    	' wscript.Echo "Batch"
@@ -3497,7 +3496,7 @@ Class installationManager
   
   	' Only used in ScriptGenerationMode. The script file should be written to the Installation Folder
 
-    getScriptFilePath = LINUX.installerFolder & FILE_SEPERATOR & getDemoFolderName() & ".sh"	
+    getScriptFilePath = SCRIPT_GENERATOR.getScriptFolder() & FILE_SEPERATOR & getDemoFolderName() & ".sh"	
 
   End Function  
   

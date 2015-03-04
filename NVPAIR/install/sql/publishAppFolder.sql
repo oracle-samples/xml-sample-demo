@@ -11,7 +11,37 @@
  *
  * ================================================ */
 
-DEF SCRIPT = &1
 set echo on
-@@&SCRIPT
-exit
+--
+spool publishAppFolder.log
+--
+def FOLDER = &1
+--
+-- Create index.html in the user's folder pointing to WebDemo application
+--
+declare
+  V_SOURCE_PATH varchar2(700) := XFILES_CONSTANTS.FOLDER_APPLICATIONS_PRIVATE || '/&FOLDER';
+  V_TARGET_PATH varchar2(700) := XFILES_CONSTANTS.FOLDER_APPLICATIONS_PUBLIC || '/&FOLDER';
+
+  cursor publishResources is
+  select path 
+    from path_view
+   where under_path(res,V_SOURCE_PATH) = 1;
+
+begin
+  if dbms_xdb.existsResource(V_TARGET_PATH) then
+    dbms_xdb.deleteResource(V_TARGET_PATH);
+  end if;
+  dbms_xdb.setAcl(V_SOURCE_PATH,'/sys/acls/bootstrap_acl.xml');
+  for res in publishResources loop
+    dbms_xdb.setACL(res.path,XDB_CONSTANTS.ACL_BOOTSTRAP);
+  end loop;
+  dbms_xdb.link(V_SOURCE_PATH,XFILES_CONSTANTS.FOLDER_APPLICATIONS_PUBLIC,'&FOLDER',DBMS_XDB.LINK_TYPE_WEAK);
+end;
+/
+commit
+/
+--
+@@postInstallationSteps
+--
+quit
