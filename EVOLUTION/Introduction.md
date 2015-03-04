@@ -2,7 +2,7 @@
 Executive Overview
 ==================
 
-The XML DB EVOLUTION example is a browser based demonstration that provides a brief overview of how to store, index, query and update XML content stored in Oracle Database 12c.
+The XML DB EVOLUTION example is a browser based demonstration that explains how to manage changes to XML Schemas that have been registered with XMLDB and used to optimize storage, indexing and query operations on XML documents stored in the database. In explains how to use the W3C XML Schema standard's extension mechanism to create an extension XML Schema that defines additive changes to an XML Schema already registered with XMLDB, and how to register the extension XML schema with the database. It also shows how to use in-place and copy based evolution to update an existing XML schema without making use of the extension mechanism.
 
 Installation Instructions
 =========================
