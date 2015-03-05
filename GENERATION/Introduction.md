@@ -56,7 +56,7 @@ Unzip the archive. This will create a folder called xml-sample-demo-master with 
 Locate the Install Folder
 -------------------------
 
-The install folder is a sub-folder of the INSTALLATION folder.
+The install folder is a sub-folder of the GENERATION folder.
 
 Set correct permissions on the installer files.
 -----------------------------------------------
