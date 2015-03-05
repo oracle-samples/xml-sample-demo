@@ -2,7 +2,7 @@
 Executive Overview
 ==================
 
-The XML DB FULLTEXT example is a browser based demonstration that provides a basic introduction to the XQuery Full-Text standard. It shows how to perform full-text (keywork, phrase, etc) searching of XML content stored in XMLDB. It also explains how to index XML content stored in XMLDB to optimize XQuery Full-Text expressions.
+The XML DB FULLTEXT example is a browser based demonstration that provides a basic introduction to the XQuery Full-Text standard. It shows how to perform full-text (keyword, phrase, etc) searching of XML content stored in XMLDB. It also explains how to index XML content stored in XMLDB to optimize XQuery Full-Text expressions.
 
 Installation Instructions
 =========================
@@ -56,7 +56,7 @@ Unzip the archive. This will create a folder called xml-sample-demo-master with 
 Locate the Install Folder
 -------------------------
 
-The install folder is a sub-folder of the INSTALLATION folder.
+The install folder is a sub-folder of the FULLTEXT-LITE folder.
 
 Set correct permissions on the installer files.
 -----------------------------------------------
@@ -87,7 +87,7 @@ Select the correct Oracle Home for the SQL\*PLUS installation. Make sure that al
 
 ![](media/image009.png)
 
-The results of the installation can be found in the FULLTEXT.log file.
+The results of the installation can be found in the FULLTEXT-LITE.log file.
 
 Linux Installation
 ==================
@@ -96,9 +96,9 @@ A simple install script is provided to allow the example to be installed from a 
 
 ![](media/image010.png)
 
-The demonstration is installed using the FULLTEXT.sh script found in the folder xml-sample-demo/ /FULLTEXT/install.
+The demonstration is installed using the FULLTEXT-LITE.sh script found in the folder xml-sample-demo/ /FULLTEXT-LITE/install.
 
-To run the installation script first set the current directory to the install directory. Make sure that the environment variables ORACLE\_HOME and ORACLE\_SID are set correctly.Invoke the XFILES.sh script passing the following arguments on the command line
+To run the installation script first set the current directory to the install directory. Make sure that the environment variables ORACLE\_HOME and ORACLE\_SID are set correctly. Invoke the FULLTEXT-LITE.sh script passing the following arguments on the command line
 
 DBA User. This must be a DBA
 
@@ -115,7 +115,7 @@ The URL of the Database’s HTTP Listener.
 Verify the Installation was successful
 ======================================
 
-Once the script has completed check the FULLTEXT.log file for any errors. If there are no errors in the log file verify that the installation completed successfully by opening a browser and navigating to the following URL http://hostname:port/XFILES. Login as the user specified during the installation procedure and click on the “Home” button [![](media/image012.png)].
+Once the script has completed check the FULLTEXT-LITE.log file for any errors. If there are no errors in the log file verify that the installation completed successfully by opening a browser and navigating to the following URL http://hostname:port/XFILES. Login as the user specified during the installation procedure and click on the “Home” button [![](media/image012.png)].
 
 This will display the user’s home folder
 
