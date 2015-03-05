@@ -598,7 +598,6 @@ then
 fi
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/enableEventManager.sql $USER
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/queueManager.sql $USER
-sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/sql/statusPage.sql $USER
 HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
 if [ $HttpStatus == "404" ] 
 then
@@ -990,9 +989,6 @@ then
   echo "Installation Failed: See $logfilename for details."
   exit 5
 fi
-sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/sql/statusPage.sql $USER
-sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/publishDemo.sql
-sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/postInstallationSteps.sql
 sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/disableUser.sql $USER
 echo "Installation Complete" >> $logfilename
 echo "Installation Complete: See $logfilename for details."

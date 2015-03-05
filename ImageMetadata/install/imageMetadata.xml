@@ -182,7 +182,6 @@
 
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\enableEventManager.sql %USER%</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\queueManager.sql %USER%</action>
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\statusPage.sql %USER%</action>
 		
     <action type="UPLOAD">
     	
@@ -282,9 +281,6 @@
 
 
 		<!-- Publish the demo -->
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\statusPage.sql %USER%</action>
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\publishDemo.sql</action>
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\postInstallationSteps.sql</action>
 
 		<!-- Lock the Metadata Database Schema down -->
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\disableUser.sql %USER%</action>
