@@ -98,7 +98,7 @@ A simple install script is provided to allow the example to be installed from a 
 
 The demonstration is installed using the INTRODUCTION.sh script found in the folder xml-sample-demo/ /INTRODUCTION/install.
 
-To run the installation script first set the current directory to the install directory. Make sure that the environment variables ORACLE\_HOME and ORACLE\_SID are set correctly.Invoke the XFILES.sh script passing the following arguments on the command line
+To run the installation script first set the current directory to the install directory. Make sure that the environment variables ORACLE\_HOME and ORACLE\_SID are set correctly.Invoke the INTRODUCTION.sh script passing the following arguments on the command line
 
 DBA User. This must be a DBA
 
