@@ -56,7 +56,7 @@ Unzip the archive. This will create a folder called xml-sample-demo-master with 
 Locate the Install Folder
 -------------------------
 
-The install folder is a sub-folder of the INSTALLATION folder.
+The install folder is a sub-folder of the PARTITIONING folder.
 
 Set correct permissions on the installer files.
 -----------------------------------------------
@@ -96,7 +96,7 @@ A simple install script is provided to allow the example to be installed from a 
 
 ![](media/image010.png)
 
-The demonstration is installed using the PARTITIONING.sh script found in the folder xml-sample-demo/ /PARTITIONING/install.
+The demonstration is installed using the PARTITIONING.sh script found in the folder xml-sample-demo/PARTITIONING/install.
 
 To run the installation script first set the current directory to the install directory. Make sure that the environment variables ORACLE\_HOME and ORACLE\_SID are set correctly. Invoke the PARTITIONING.sh script passing the following arguments on the command line
 
