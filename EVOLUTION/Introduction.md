@@ -96,7 +96,7 @@ A simple install script is provided to allow the example to be installed from a 
 
 ![](media/image010.png)
 
-The demonstration is installed using the EVOLUTION.sh script found in the folder xml-sample-demo/ /EVOLUTION/install.
+The demonstration is installed using the EVOLUTION.sh script found in the folder xml-sample-demo/EVOLUTION/install.
 
 To run the installation script first set the current directory to the install directory. Make sure that the environment variables ORACLE\_HOME and ORACLE\_SID are set correctly. Invoke the EVOLUTION.sh script passing the following arguments on the command line
 
