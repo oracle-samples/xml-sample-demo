@@ -121,7 +121,11 @@ This will display the user’s home folder
 
 ![](media/image013.png)
 
+<<<<<<< HEAD
 If the demonstration was installed successfully, the home folder contains a folder called “demonstrations” which inturn contains a folder called “evolution”.
+=======
+If the demonstration was installed successfully, the home folder should contain a folder called "demonstrations" which inturn contains a folder called “evolution”.
+>>>>>>> origin/master
 
 Navigate to the “evolution” folder and click the index.html file. This should open a new browser tab or window, ready to run the first step of the example.
 
