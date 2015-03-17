@@ -47,7 +47,7 @@ Use the Download Zip button to download the contents of the GitHub repository. T
 <span id="_Toc310240962" class="anchor"><span id="_Toc413168752" class="anchor"></span></span>Windows Installation
 ==================================================================================================================
 
-Unzip the archive. This will create a folder called xml-sample-demo-master with a subfolder FULLTEXT.
+Unzip the archive. This will create a folder called xml-sample-demo-master with a subfolder FULLTEXT-LITE.
 
 ![](media/image005.png)
 
@@ -121,7 +121,7 @@ This will display the user’s home folder
 
 ![](media/image013.png)
 
-If the demonstration was installed successfully, the home folder should contain a folder call demonstrations which will contain a folder called “fullText”.
+If the demonstration was installed successfully, the home folder contains a folder called “demonstrations” which inturn contains a folder called “fullText”.
 
 Navigate to the “fullText” folder and click the index.html file. This should open a new browser tab or window, ready to run the first step of the example.
 

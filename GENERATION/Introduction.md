@@ -98,7 +98,7 @@ A simple install script is provided to allow the example to be installed from a 
 
 The demonstration is installed using the GENERATION.sh script found in the folder xml-sample-demo/GENERATION/install.
 
-To run the installation script first set the current directory to the install directory. Make sure that the environment variables ORACLE\_HOME and ORACLE\_SID are set correctly.Invoke the XFILES.sh script passing the following arguments on the command line
+To run the installation script first set the current directory to the install directory. Make sure that the environment variables ORACLE\_HOME and ORACLE\_SID are set correctly.Invoke the GENERATION.sh script passing the following arguments on the command line
 
 DBA User. This must be a DBA
 
@@ -121,7 +121,7 @@ This will display the user’s home folder
 
 ![](media/image013.png)
 
-If the demonstration was installed successfully, the home folder should contain a folder call demonstrations which will contain a folder called “xmlGeneration”.
+If the demonstration was installed successfully, the home folder contains a folder called “demonstrations” which inturn contains a folder called “xmlGeneration”.
 
 Navigate to the “xmlGeneration” folder and click the index.html file. This should open a new browser tab or window, ready to run the first step of the example.
 
