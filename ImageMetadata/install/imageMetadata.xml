@@ -193,8 +193,8 @@
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\xsl\ImageBrowser.xsl</local>
-  			<remote>%BASEFOLDER%/xsl/ImageBrowser.xsl</remote>
+  			<local>%DEMODIRECTORY%\xsl\ImageGallery.xsl</local>
+  			<remote>%BASEFOLDER%/xsl/ImageGallery.xsl</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
@@ -225,8 +225,8 @@
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\js\ImageBrowser.js</local>
-  			<remote>%BASEFOLDER%/js/ImageBrowser.js</remote>
+  			<local>%DEMODIRECTORY%\js\ImageGallery.js</local>
+  			<remote>%BASEFOLDER%/js/ImageGallery.js</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
@@ -244,18 +244,6 @@
   			<mode>SKIP</mode>
   			<remote>%PUBLICFOLDER%/categorization</remote>
   		</action>
-  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
-  			<mode>SKIP</mode>
-  			<remote>%PUBLICFOLDER%/categorization/images</remote>
-  		</action>
-  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
-  			<mode>SKIP</mode>
-  			<remote>%PUBLICFOLDER%/categorization/images/manufacturer</remote>
-  		</action>
-  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
-  			<mode>SKIP</mode>
-  			<remote>%PUBLICFOLDER%/categorization/images/dateTaken</remote>
-  		</action>
   		
       <!-- Status Page -->
       
@@ -268,19 +256,21 @@
    	</action>
 
 
-    <!-- Image Folder Event : Force the use of ImageBrowser.xsl when viewing image folders -->
+    <!-- Image Gallery Event : Force the use of ImageGallery.xsl when viewing image folders -->
 
-		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\imageFolderEvent.sql %USER% %XFILES_SCHEMA% %DEBUG%</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\enableImageGallery.sql %USER%</action>
     <action type="UPLOAD">
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\xml\imageBrowserResConfig.xml</local>
-  			<remote>%BASEFOLDER%/xml/imageBrowserResConfig.xml</remote>
+  			<local>%DEMODIRECTORY%\xml\imageGalleryResConfig.xml</local>
+  			<remote>%BASEFOLDER%/xml/imageGalleryResConfig.xml</remote>
   		</action>
    	</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\createImageCategoryFolders.sql %USER%</action>
 
 
 		<!-- Publish the demo -->
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishAppFolder.sql %USER% imageMetadata</action>
 
 		<!-- Lock the Metadata Database Schema down -->
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\disableUser.sql %USER%</action>
@@ -295,8 +285,8 @@
 				<target>%DEMODIRECTORY%\xml\imageEventConfiguration.xml</target>
 			</file>
 			<file>
-				<source>%DEMODIRECTORY%\setup\cloneSource\imageBrowserResConfig.xml</source>
-				<target>%DEMODIRECTORY%\xml\imageBrowserResConfig.xml</target>
+				<source>%DEMODIRECTORY%\setup\cloneSource\imageGalleryResConfig.xml</source>
+				<target>%DEMODIRECTORY%\xml\imageGalleryResConfig.xml</target>
 			</file>
 			<file>
 				<source>%DEMODIRECTORY%\setup\cloneSource\EXIFViewer.js</source>

@@ -56,6 +56,7 @@
 				<xsl:call-template name="setViewerDialog"/>
 				<xsl:call-template name="setPrincipleDialog"/>
 				<xsl:call-template name="deepOperationDialog"/>
+				<xsl:call-template name="publishDialog"/>
 				<xsl:call-template name="deleteDialog"/>
 				<xsl:call-template name="checkInDialog"/>
 				<xsl:call-template name="folderPickerDialog"/>

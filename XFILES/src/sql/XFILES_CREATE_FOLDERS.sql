@@ -66,8 +66,18 @@ begin
   end if;
 
   V_RESULT := dbms_xdb.createFolder(XFILES_CONSTANTS.FOLDER_APPLICATIONS_PUBLIC);
-  commit;
   
+  --
+  -- Viewers : Softlinks to XSL Stylesheets that can function as a custom viewer.
+  -- 
+
+  if dbms_xdb.existsResource(XFILES_CONSTANTS.FOLDER_VIEWERS_PUBLIC) then 
+    dbms_xdb.deleteResource(XFILES_CONSTANTS.FOLDER_VIEWERS_PUBLIC,DBMS_XDB.DELETE_RECURSIVE);
+  end if;
+
+  V_RESULT := dbms_xdb.createFolder(XFILES_CONSTANTS.FOLDER_VIEWERS_PUBLIC);
+  commit;
+
 end;
 /
 --

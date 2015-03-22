@@ -87,7 +87,7 @@ The Microsoft article: <http://support.microsoft.com/kb/841215> provide instruct
 <span id="_Toc408995835" class="anchor"><span id="_Toc408996339" class="anchor"></span></span>Download and extract the Installation media
 -----------------------------------------------------------------------------------------------------------------------------------------
 
-Download the latest version of the application from GitHub. The application can be found [here](https://github.com/oracle/xml-sample-demo).
+Download the latest version of the application from GitHub. The application can be found [here](https://github.com/oracle/xml-sample-demo/).
 
 ![](/raw/master/XFILES/media/image006.png)
 
@@ -154,7 +154,7 @@ A simple install script is provided to allow XFILES to be installed from a Linux
 
 ![](/raw/master/XFILES/media/image013.png)
 
-The demonstration is installed using the XFILES.sh script found in the folder xml-sample-demo/master/XFILES/install.
+The demonstration is installed using the XFILES.sh script found in the folder xml-sample-demo-master/master/XFILES/install.
 
 To run the installation script first set the current directory to the install directory. Make sure that the environment variables ORACLE\_HOME and ORACLE\_SID are set correctly.Invoke the XFILES.sh script passing the following arguments on the command line
 

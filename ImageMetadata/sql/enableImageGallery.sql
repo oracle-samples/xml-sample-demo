@@ -12,13 +12,13 @@
  * ================================================ */
 
 set echo on
-spool imageFolderEvent.log
+spool sqlOperations.log APPEND
 --
 def OWNER = &1
 --
 alter session set CURRENT_SCHEMA = &OWNER
 /
-create or replace package INSTALL_IMAGE_BROWSER
+create or replace package ENABLE_IMAGE_GALLERY
 authid CURRENT_USER
 as
   procedure handlePostLinkTo(P_EVENT dbms_xevent.XDBRepositoryEvent);
@@ -28,14 +28,14 @@ show errors
 --
 set define off
 --
-create or replace package body INSTALL_IMAGE_BROWSER
+create or replace package body ENABLE_IMAGE_GALLERY
 as    
 -- 
 procedure handlePostLinkTo(P_EVENT dbms_xevent.XDBRepositoryEvent)
 as
   V_RESOURCE_PATH     VARCHAR2(700);
   V_METADATA          XMLTYPE;
-  V_VIEWER_PATH       VARCHAR2(200) := '/XFILES/Applications/imageMetadata/xsl/ImageBrowser.xsl';
+  V_VIEWER_PATH       VARCHAR2(200) := XDB_METADATA_CONSTANTS.XSL_IMAGE_GALLERY;
   V_NAMESPACE         VARCHAR2(200) := 'xmlns="' || XFILES_CONSTANTS.ELEMENT_CUSTOM_VIEWER || '"';
 begin
 	
@@ -93,8 +93,8 @@ declare
            passing rv.RES as "R"
          );
 begin
-  for r in getResConfigUsage(XDB_METADATA_CONSTANTS.RESCONFIG_IMAGE_BROWSER) loop
-    DBMS_RESCONFIG.deleteResConfig(r.RESOURCE_PATH,XDB_METADATA_CONSTANTS.RESCONFIG_IMAGE_BROWSER,DBMS_RESCONFIG.DELETE_RESOURCE );
+  for r in getResConfigUsage(XDB_METADATA_CONSTANTS.RESCONFIG_IMAGE_GALLERY) loop
+    DBMS_RESCONFIG.deleteResConfig(r.RESOURCE_PATH,XDB_METADATA_CONSTANTS.RESCONFIG_IMAGE_GALLERY,DBMS_RESCONFIG.DELETE_RESOURCE );
   end loop;
   commit;
 end;
@@ -102,7 +102,7 @@ end;
 set define on
 --
 GRANT EXECUTE 
-   on INSTALL_IMAGE_BROWSER 
+   on ENABLE_IMAGE_GALLERY 
    to public;
 /
 grant INHERIT PRIVILEGES 

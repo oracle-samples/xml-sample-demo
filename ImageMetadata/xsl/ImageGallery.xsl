@@ -116,67 +116,125 @@
 			</div>
 		</div>
 	</xsl:template>
-	<xsl:template name="addThumbnail">
-		<xsl:param name="Name"/>
-		<xsl:param name="RESID"/>
-		<span style="padding-left:10;">
-			<img style="height:150px;">
-				<xsl:attribute name="src"><xsl:value-of select="concat('/sys/oid/',xfiles:ResourceStatus/xfiles:Resid)"/></xsl:attribute>
-				<xsl:attribute name="alt"><xsl:value-of select="$Name"/></xsl:attribute>
-			</img>
-		</span>
-	</xsl:template>
 	<xsl:template name="showImages">
-		<xsl:call-template name="XFilesSeperator">
-			<xsl:with-param name="height" select="'29px'"/>
-		</xsl:call-template>
-		<div id="imagePreviews" class="imagePreviews" style="margin:10px;">
-			<xsl:for-each select="xfiles:DirectoryContents/r:Resource[substring-before(r:ContentType,'/')='image']">
-				<div class="imagePreview">
-					<xsl:attribute name="id"><xsl:value-of select="concat('imagePreview.',position())"/></xsl:attribute>
-					<xsl:attribute name="style"><xsl:text>vertical-align: middle; text-align: center;display:</xsl:text><xsl:choose><xsl:when test="position()=1">block;</xsl:when><xsl:otherwise><xsl:text>none;</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
-					<!--
-						<xsl:attribute name="style">
-                             <xsl:text>height:400px;background:url(</xsl:text>
-                              <xsl:value-of select="concat('http://localhost/sys/oid/',xfiles:ResourceStatus/xfiles:Resid)"/>
-                              <xsl:text>) no-repeat center center; margin 20; display:</xsl:text>
-                              <xsl:choose><xsl:when test="position() = 1">
-                                   <xsl:text>block</xsl:text></xsl:when>
-                                   <xsl:otherwise><xsl:text>none</xsl:text></xsl:otherwise>
-                              </xsl:choose>
-                              <xsl:text>;</xsl:text>
-                        </xsl:attribute>
-                    -->
-					<img style="height:400px;margin:auto;">
-						<xsl:attribute name="src"><xsl:value-of select="concat('/sys/oid/',xfiles:ResourceStatus/xfiles:Resid)"/></xsl:attribute>
-						<xsl:attribute name="alt"><xsl:value-of select="r:DisplayName"/></xsl:attribute>
-					</img>
+        <style>
+            /* jssor slider arrow navigator skin 05 css */
+            /*
+            .jssora05l              (normal)
+            .jssora05r              (normal)
+            .jssora05l:hover        (normal mouseover)
+            .jssora05r:hover        (normal mouseover)
+            .jssora05ldn            (mousedown)
+            .jssora05rdn            (mousedown)
+            */
+            .jssora05l, .jssora05r, .jssora05ldn, .jssora05rdn
+            {
+            	position: absolute;
+            	cursor: pointer;
+            	display: block;
+                background: url(../img/a17.png) no-repeat;
+                overflow:hidden;
+            }
+            .jssora05l { background-position: -10px -40px; }
+            .jssora05r { background-position: -70px -40px; }
+            .jssora05l:hover { background-position: -130px -40px; }
+            .jssora05r:hover { background-position: -190px -40px; }
+            .jssora05ldn { background-position: -250px -40px; }
+            .jssora05rdn { background-position: -310px -40px; }
+        </style>
+        <style>`
+                /* jssor slider thumbnail navigator skin 01 css */
+                /*
+                .jssort01 .p           (normal)
+                .jssort01 .p:hover     (normal mouseover)
+                .jssort01 .pav           (active)
+                .jssort01 .pav:hover     (active mouseover)
+                .jssort01 .pdn           (mousedown)
+                */
+                .jssort01 .w {
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                    width: 100%;
+                    height: 100%;
+                }
+
+                .jssort01 .c {
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                    width: 68px;
+                    height: 68px;
+                    border: #000 2px solid;
+                }
+
+                .jssort01 .p:hover .c, .jssort01 .pav:hover .c, .jssort01 .pav .c {
+                    background: url(../img/t01.png) center center;
+                    border-width: 0px;
+                    top: 2px;
+                    left: 2px;
+                    width: 68px;
+                    height: 68px;
+                }
+
+                .jssort01 .p:hover .c, .jssort01 .pav:hover .c {
+                    top: 0px;
+                    left: 0px;
+                    width: 70px;
+                    height: 70px;
+                    border: #fff 1px solid;
+                }
+            </style>
+
+		<div id="slider1_container" style="position: relative; top: 0px; left: 0px; width: 800px;height: 456px; background: #191919; overflow: hidden;">
+
+        <!-- Loading Screen
+			<div u="loading" style="position: absolute; top: 0px; left: 0px;">
+				<div style="filter: alpha(opacity=70); opacity:0.7; position: absolute; display: block;background-color: #000000; top: 0px; left: 0px;width: 100%;height:100%;">
 				</div>
-			</xsl:for-each>
-		</div>
-		<div style="clear:both;"/>
-		<xsl:if test="count(xfiles:DirectoryContents/r:Resource[substring-before(r:ContentType,'/')='image']) > 1">
-			<div style="display:table">
-				<span style="display:table-cell; padding-right:10px; vertical-align: middle;" onclick="rotateCarouselLeft()">
-					<img src="/XFILES/Applications/imageMetadata/xsl/left-arrow-circle.png" alt=""/>
-				</span>
-				<span id="thumbnailCarousel" class="thumbnailCarousel" style="height:100px;position:relative;left:0px; top:0px;overflow:hidden;display:inline-block;">
-					<xsl:for-each select="xfiles:DirectoryContents/r:Resource[substring-before(r:ContentType,'/')='image']">
-						<span class="thumbnail" style="margin-right:10px;height:100px;display=inline-block;">
-							<xsl:attribute name="id"><xsl:value-of select="concat('thumbnail.',position())"/></xsl:attribute>
-							<img style="height:100px;">
-								<xsl:attribute name="src"><xsl:value-of select="concat('/sys/oid/',xfiles:ResourceStatus/xfiles:Resid)"/></xsl:attribute>
-								<xsl:attribute name="onclick"><xsl:value-of select="concat('syncPanels(',position(),');return false;')"/></xsl:attribute>
-								<xsl:attribute name="alt"><xsl:value-of select="r:DisplayName"/></xsl:attribute>
-							</img>
-						</span>
-					</xsl:for-each>
-				</span>
-				<span style="display:table-cell;vertical-align: middle;" onclick="rotateCarouselRight()">
-					<img src="/XFILES/Applications/imageMetadata/xsl/right-arrow-circle.png/" alt=""/>
-				</span>
+				<div style="position: absolute; display: block; background: url(../img/loading.gif) no-repeat center center; top: 0px; left: 0px;width: 100%;height:100%;">
+				</div>
 			</div>
-		</xsl:if>
+        -->
+			<!-- Slides Container -->
+			<div u="slides" style="cursor: move; position: absolute; left: 0px; top: 0px; width: 800px; height: 356px; overflow: hidden;">
+				<xsl:for-each select="xfiles:DirectoryContents/r:Resource[substring-before(r:ContentType,'/')='image']">  
+		            <div>
+						<img u="image">
+							<xsl:attribute name="src"><xsl:value-of select="concat('/sys/oid/',xfiles:ResourceStatus/xfiles:Resid)"/></xsl:attribute>
+							<xsl:attribute name="alt"><xsl:value-of select="r:DisplayName"/></xsl:attribute>
+						</img>
+						<img u="thumb">
+							<xsl:attribute name="src"><xsl:value-of select="concat('/sys/oid/',xfiles:ResourceStatus/xfiles:Resid)"/></xsl:attribute>
+							<xsl:attribute name="alt"><xsl:value-of select="r:DisplayName"/></xsl:attribute>
+						</img>
+					</div>
+				</xsl:for-each>
+			</div>
+			<!-- <script>jssor_slider1_starter('slider1_container');</script> -->
+        <!-- Arrow Left -->
+        <span u="arrowleft" class="jssora05l" style="width: 40px; height: 40px; top: 158px; left: 8px;">
+        </span>
+        <!-- Arrow Right -->
+        <span u="arrowright" class="jssora05r" style="width: 40px; height: 40px; top: 158px; right: 8px">
+        </span>
+        <!-- Arrow Navigator Skin End -->
+        
+        <!-- Thumbnail Navigator Skin Begin -->
+        <div u="thumbnavigator" class="jssort01" style="position: absolute; width: 800px; height: 100px; left:0px; bottom: 0px;">
+            <!-- Thumbnail Item Skin Begin -->
+            <div u="slides" style="cursor: move;">
+                <div u="prototype" class="p" style="position: absolute; width: 72px; height: 72px; top: 0; left: 0;">
+                    <div class="w"><div u="thumbnailtemplate" style=" width: 100%; height: 100%; border: none;position:absolute; top: 0; left: 0;"></div></div>
+                    <div class="c">
+                    </div>
+                </div>
+            </div>
+            <!-- Thumbnail Item Skin End -->
+        </div>
+        <!-- Thumbnail Navigator Skin End -->
+        <a style="display: none" href="http://www.jssor.com">Image Slider</a>
+	</div>
 	</xsl:template>
 	<xsl:template name="imageBrowser">
 		<div id="folderListing" style="width:350px; left:10px; position:fixed;">
@@ -209,7 +267,11 @@
 					<xsl:when test="xfiles:DirectoryContents/r:Resource[substring-before(r:ContentType,'/')='image']">
 						<div id="localScriptList" style="display:none;">
 							<span>/XFILES/lite/js/FolderBrowser.js</span>
-							<span>/XFILES/Applications/imageMetadata/js/ImageBrowser.js</span>
+							<span>/XFILES/Applications/imageMetadata/js/ImageGallery.js</span>
+							<!-- use jssor.slider.min.js instead for release -->
+							<!-- jssor.slider.min.js = (jssor.js + jssor.slider.js) -->
+							<span>/XFILES/Frameworks/jssor/js/jssor.js</span>
+							<span>/XFILES/Frameworks/jssor/js/jssor.slider.js</span>
 						</div>
 						<xsl:call-template name="imageBrowser"/>
 					</xsl:when>

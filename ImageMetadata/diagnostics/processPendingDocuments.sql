@@ -12,6 +12,8 @@
  * ================================================ */
 
 --
+set echo on
+spool processPendingDocuments.log
 def OWNER = &1
 --
 select count(*) 

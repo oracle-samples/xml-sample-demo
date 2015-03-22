@@ -1271,6 +1271,64 @@ begin
   
 end;
 --
+function getPublicIndexPageContent(P_PRINCIPLE VARCHAR2) 
+return VARCHAR2
+as
+begin
+/*
+  select xmlElement
+         (
+           "html",
+           xmlattributes('http://www.w3.org/1999/xhtml' as "xmlns"),
+           xmlElement
+           (
+             "head",
+             xmlElement("title",'Welcome to the public folder of ' || P_PRINCIPLE),
+             xmlElement
+             (
+               "meta",
+               xmlattributes
+               (
+                 'refresh' as "http-equiv", 
+                 '0;url=/sys/servlets/XFILES/FolderProcessor?xmldoc=' || XDB_CONSTANTS.FOLDER_PUBLIC || '/' || P_PRINCIPLE || '&listDir=true&xsldoc=/XFILES/xsl/FolderBrowser.xsl&contentType=text/html' as "content"
+               )
+             ),
+             xmlElement
+             (
+               "link",
+               xmlAttributes
+               (
+                 'stylesheet' as "rel",
+                 'UTF-8' as "charset",
+                 'text/css' as "type",
+                 '/XFILES/lib/css/xdb-en-ie-6.css' as "href"
+               )
+             )
+           ),
+           xmlElement
+           (
+             "body",
+             xmlElement("p",'Welcome to the public folder of ' || P_PRINCIPLE)
+           )
+         ).getClobVal()
+    into V_INDEX_PAGE_XHTML
+    from dual;
+*/
+return 
+'<html>
+	<head>
+		<title>Welcome to the Published Page of ' || P_PRINCIPLE || '.</title>
+		<script language="javascript">
+		  function doRedirect() {
+   		    window.location.href = "/XFILES/lite/Folder.html?target=" + escape("' || XDB_CONSTANTS.FOLDER_PUBLIC || '/' || P_PRINCIPLE || '");
+		  }
+		</script>
+	</head>
+	<body onload="doRedirect()">
+	</body>
+</html>';
+end;
+--
 procedure createPublicFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
 as
   V_PRINCIPLE_NAME    VARCHAR2(32)  := upper(P_PRINCIPLE);
@@ -1311,51 +1369,13 @@ begin
 
   XDBPM_XDB.setAcl(V_PUBLIC_FOLDER,'/sys/acls/bootstrap_acl.xml');
 
-  -- Create adex.html for the public Folder
+  -- Create an index.html for the public Folder
   
-  select xmlElement
-         (
-           "html",
-           xmlattributes('http://www.w3.org/1999/xhtml' as "xmlns"),
-           xmlElement
-           (
-             "head",
-             xmlElement("title",'Welcome to the public folder of ' || V_PRINCIPLE_NAME),
-             xmlElement
-             (
-               "meta",
-               xmlattributes
-               (
-                 'refresh' as "http-equiv", 
-                 '0;url=/sys/servlets/XFILES/FolderProcessor?xmldoc=' || XDB_CONSTANTS.FOLDER_PUBLIC || '/' || V_PRINCIPLE_NAME || '&listDir=true&xsldoc=/XFILES/xsl/FolderBrowser.xsl&contentType=text/html' as "content"
-               )
-             ),
-             xmlElement
-             (
-               "link",
-               xmlAttributes
-               (
-                 'stylesheet' as "rel",
-                 'UTF-8' as "charset",
-                 'text/css' as "type",
-                 '/XFILES/lib/css/xdb-en-ie-6.css' as "href"
-               )
-             )
-           ),
-           xmlElement
-           (
-             "body",
-             xmlElement("p",'Welcome to the public folder of ' || V_PRINCIPLE_NAME)
-           )
-         ).getClobVal()
-    into V_INDEX_PAGE_XHTML
-    from dual;
-
   if (XDBPM_XDB.existsResource(V_INDEX_PAGE)) then
     XDBPM_XDB.deleteResource(V_INDEX_PAGE,DBMS_XDB.DELETE_RECURSIVE_FORCE);
   end if;
  
-  V_RESULT := XDBPM_XDB.createResource(V_INDEX_PAGE,V_INDEX_PAGE_XHTML);
+  V_RESULT := XDBPM_XDB.createResource(V_INDEX_PAGE,getPublicIndexPageContent(V_PRINCIPLE_NAME));
 
   --
   -- Ensure the User owns their Public folder and all of its content
@@ -1420,31 +1440,18 @@ end;
 --
 procedure setPublicIndexPageContent(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
 as
-  V_INDEX_PAGE_CONTENT CLOB := 
-'<html>
-	<head>
-		<titleWelcome to the Published Page of ' || P_PRINCIPLE || '.</title>
-		<script type="">
-		  function doRedirect {
-   		    window.location.href = "/XFILES/lite/FolderBrowser.html?target=" + escape(' || XDB_CONSTANTS.FOLDER_PUBLIC || '/' || P_PRINCIPLE || ');
-		  }
-		</script>
-	</head>
-	<body onload="doRedirect()">
-	</body>
-</html>';
- 
   V_INDEX_PAGE_PATH   VARCHAR(1024) := XDB_CONSTANTS.FOLDER_HOME || '/' || P_PRINCIPLE || XDB_CONSTANTS.FOLDER_PUBLIC || '/index.html';
   V_RESULT            BOOLEAN;
 begin
 
-  -- Create adex.html for the public Folder
+  -- Create Index.html for the public Folder
 
   if (XDBPM_XDB.existsResource(V_INDEX_PAGE_PATH)) then
     XDBPM_XDB.deleteResource(V_INDEX_PAGE_PATH,DBMS_XDB.DELETE_FORCE);
   end if;
  
-  V_RESULT := XDBPM_XDB.createResource(V_INDEX_PAGE_PATH,V_INDEX_PAGE_CONTENT);
+  V_RESULT := XDBPM_XDB.createResource(V_INDEX_PAGE_PATH,getPublicIndexPageContent(P_PRINCIPLE));
+  XDBPM_HELPER.changeOwner(V_INDEX_PAGE_PATH,P_PRINCIPLE);
 end;
 --
 function getComplexType(P_PROP_NUMBER NUMBER, P_SCHEMA_NAMESPACE_MAPPINGS VARCHAR2) 

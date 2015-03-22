@@ -22,6 +22,7 @@ as
   C_FOLDER_APPLICATIONS_PUBLIC          constant VARCHAR2(700) := C_FOLDER_ROOT           || '/Applications';                                    
   C_FOLDER_FRAMEWORKS_PRIVATE           constant VARCHAR2(700) := C_FOLDER_HOME           || '/Frameworks';
   C_FOLDER_FRAMEWORKS_PUBLIC            constant VARCHAR2(700) := C_FOLDER_ROOT           || '/Frameworks';
+  C_FOLDER_VIEWERS_PUBLIC               constant VARCHAR2(700) := C_FOLDER_ROOT           || '/Viewers';
  
   C_NAMESPACE_XFILES                    constant VARCHAR2(128) := DBMS_XDB_CONSTANTS.NAMESPACE_ORACLE_XDB || '/xfiles';
   C_NAMESPACE_XFILES_RSS                constant VARCHAR2(128) := C_NAMESPACE_XFILES      || '/rss';
@@ -70,6 +71,7 @@ as
   function FOLDER_APPLICATIONS_PUBLIC   return VARCHAR2 deterministic;
   function FOLDER_FRAMEWORKS_PRIVATE    return VARCHAR2 deterministic;
   function FOLDER_FRAMEWORKS_PUBLIC     return VARCHAR2 deterministic;
+  function FOLDER_VIEWERS_PUBLIC        return VARCHAR2 deterministic;
                                        
   function NAMESPACE_XFILES             return VARCHAR2 deterministic;
   function NAMESPACE_XFILES_RSS         return VARCHAR2 deterministic;
@@ -150,6 +152,13 @@ return VARCHAR2 deterministic
 as 
 begin
   return C_FOLDER_FRAMEWORKS_PUBLIC;
+end;
+--
+function FOLDER_VIEWERS_PUBLIC
+return VARCHAR2 deterministic
+as 
+begin
+  return C_FOLDER_VIEWERS_PUBLIC;
 end;
 --
 function NAMESPACE_XFILES

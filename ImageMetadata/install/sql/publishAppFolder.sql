@@ -15,12 +15,14 @@ set echo on
 --
 spool publishAppFolder.log
 --
-def FOLDER = &1
+def USER = &1
+--
+def FOLDER = &2
 --
 -- Create index.html in the user's folder pointing to WebDemo application
 --
 declare
-  V_SOURCE_PATH varchar2(700) := XFILES_CONSTANTS.FOLDER_APPLICATIONS_PRIVATE || '/&FOLDER';
+  V_SOURCE_PATH varchar2(700) := XDB_CONSTANTS.FOLDER_HOME || '/&USER/&FOLDER';
   V_TARGET_PATH varchar2(700) := XFILES_CONSTANTS.FOLDER_APPLICATIONS_PUBLIC || '/&FOLDER';
 
   cursor publishResources is

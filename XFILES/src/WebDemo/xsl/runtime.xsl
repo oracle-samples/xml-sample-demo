@@ -295,7 +295,7 @@
 							<xsl:when test="stepType='VIEW'">
 								<a>
 									<xsl:attribute name="href"><xsl:value-of select="link"></xsl:value-of></xsl:attribute>
-									<xsl:attribute name="onclick"><xsl:text>demoPlayer.loadIFrameXML('</xsl:text><xsl:value-of select="concat(position(),'.iFrame')"/><xsl:text>','</xsl:text><xsl:value-of select="link"/><xsl:text>','</xsl:text><xsl:value-of select="link/@contentType"/><xsl:text>');return false</xsl:text></xsl:attribute>
+									<xsl:attribute name="onclick"><xsl:text>demoPlayer.loadIFrame('</xsl:text><xsl:value-of select="concat(position(),'.iFrame')"/><xsl:text>','</xsl:text><xsl:value-of select="link"/><xsl:text>','</xsl:text><xsl:value-of select="link/@contentType"/><xsl:text>');return false</xsl:text></xsl:attribute>
 									<xsl:value-of select="name"/>
 								</a>
 							</xsl:when>

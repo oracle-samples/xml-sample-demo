@@ -27,20 +27,22 @@ as
 
   C_FOLDER_IMAGE_METADATA          constant VARCHAR2(700) := XDB_CONSTANTS.FOLDER_HOME || '/' || '&METADATA_OWNER' || '/' || 'imageMetadata';
   C_RESCONFIG_IMAGE_METADATA       constant VARCHAR2(700) := C_FOLDER_IMAGE_METADATA   || '/' || 'xml/imageEventConfiguration.xml';
-  C_RESCONFIG_IMAGE_BROWSER        constant VARCHAR2(700) := C_FOLDER_IMAGE_METADATA   || '/' || 'xml/imageBrowserResConfig.xml';
+  C_RESCONFIG_IMAGE_GALLERY        constant VARCHAR2(700) := C_FOLDER_IMAGE_METADATA   || '/' || 'xml/imageGalleryResConfig.xml';
   
   C_ACL_CATEGORIZED_IMAGE_FOLDER   constant VARCHAR2(700) := XDB_CONSTANTS.FOLDER_SYSTEM_ACLS || '/' || 'categorized_image_folder_acl.xml';
   C_ACL_CATEGORIZED_IMAGE          constant VARCHAR2(700) := XDB_CONSTANTS.FOLDER_SYSTEM_ACLS || '/' || 'categorized_image_acl.xml';
   
   
-  C_PATH_CATEGORIZED_CONTENT     constant VARCHAR2(700) := XDB_CONSTANTS.FOLDER_PUBLIC || '/categorization'; 
-  C_PATH_CATEGORIZED_IMAGES      constant VARCHAR2(700) := C_PATH_CATEGORIZED_CONTENT  || '/images'; 
-  C_PATH_IMAGES_BY_MANUFACTURER  constant VARCHAR2(700) := C_PATH_CATEGORIZED_IMAGES   || '/manufacturer'; 
-  C_PATH_IMAGES_BY_DATE_TAKEN    constant VARCHAR2(700) := C_PATH_CATEGORIZED_IMAGES   || '/dateTaken'; 
+  C_PATH_CATEGORIZED_CONTENT       constant VARCHAR2(700) := XDB_CONSTANTS.FOLDER_PUBLIC || '/categorization'; 
+  C_PATH_CATEGORIZED_IMAGES        constant VARCHAR2(700) := C_PATH_CATEGORIZED_CONTENT  || '/images'; 
+  C_PATH_IMAGES_BY_MANUFACTURER    constant VARCHAR2(700) := C_PATH_CATEGORIZED_IMAGES   || '/manufacturer'; 
+  C_PATH_IMAGES_BY_DATE_TAKEN      constant VARCHAR2(700) := C_PATH_CATEGORIZED_IMAGES   || '/dateTaken'; 
+
+  C_PATH_XSL_IMAGE_GALLERY         constant VARCHAR2(700) := XFILES_CONSTANTS.FOLDER_APPLICATIONS_PUBLIC   || '/imageMetadata/xsl/ImageGallery.xsl'; 
 
   function FOLDER_IMAGE_METADATA        return VARCHAR2 deterministic;
   function RESCONFIG_IMAGE_METADATA     return VARCHAR2 deterministic;
-  function RESCONFIG_IMAGE_BROWSER      return VARCHAR2 deterministic;
+  function RESCONFIG_IMAGE_GALLERY      return VARCHAR2 deterministic;
 
   function NAMESPACE_IMAGE_METADATA     return VARCHAR2 deterministic;
   function SCHEMAURL_IMAGE_METADATA     return VARCHAR2 deterministic;
@@ -54,6 +56,8 @@ as
 
   function ACL_CATEGORIZED_IMAGE          return VARCHAR2 deterministic;
   function ACL_CATEGORIZED_IMAGE_FOLDER   return VARCHAR2 deterministic;
+
+  function XSL_IMAGE_GALLERY              return VARCHAR2 deterministic;
 
 end;
 /
@@ -72,7 +76,7 @@ as
 
   function FOLDER_IMAGE_METADATA          return VARCHAR2 deterministic as begin return C_FOLDER_IMAGE_METADATA; end;
   function RESCONFIG_IMAGE_METADATA       return VARCHAR2 deterministic as begin return C_RESCONFIG_IMAGE_METADATA; end;
-  function RESCONFIG_IMAGE_BROWSER        return VARCHAR2 deterministic as begin return C_RESCONFIG_IMAGE_BROWSER; end;
+  function RESCONFIG_IMAGE_GALLERY        return VARCHAR2 deterministic as begin return C_RESCONFIG_IMAGE_GALLERY; end;
 
   function FOLDER_CATEGORIZED_CONTENT     return VARCHAR2 deterministic as begin return C_PATH_CATEGORIZED_CONTENT;  end;
   function FOLDER_CATEGORIZED_IMAGES      return VARCHAR2 deterministic as begin return C_PATH_CATEGORIZED_IMAGES;  end;
@@ -81,7 +85,9 @@ as
 
   function ACL_CATEGORIZED_IMAGE          return VARCHAR2 deterministic as begin return C_ACL_CATEGORIZED_IMAGE;  end;
   function ACL_CATEGORIZED_IMAGE_FOLDER   return VARCHAR2 deterministic as begin return C_ACL_CATEGORIZED_IMAGE_FOLDER;  end;
-
+  
+  function XSL_IMAGE_GALLERY              return VARCHAR2 deterministic as begin return C_PATH_XSL_IMAGE_GALLERY;  end;
+  
 end;
 /
 show errors

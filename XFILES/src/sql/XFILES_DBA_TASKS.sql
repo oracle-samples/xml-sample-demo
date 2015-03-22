@@ -17,6 +17,15 @@ spool XFILES_DBA_TASKS.log
 --
 def XFILES_SCHEMA = &1
 --
+--
+begin
+	XDB_OUTPUT.createLogFile('/public/xFilesInstallation.log',TRUE);
+	XDB_OUTPUT.writeLogFileEntry('Start: XFILES_DBA_TASKS.sql');
+	XDB_OUTPUT.writeLogFileEntry('XFILES_SCHEMA = &XFILES_SCHEMA');
+	XDB_OUTPUT.flushLogFile();
+end;
+/
+--
 -- Enable Anonymous access to XML DB Repository
 --
 ALTER SESSION SET XML_DB_EVENTS = DISABLE
@@ -148,6 +157,8 @@ declare
   XMLSCHEMA_LIST               VARCHAR2(700) := XFILES_HOME || '/configuration/xmlSchema/xmlSchemaList.xml';
                              
   V_RESULT                     BOOLEAN;
+  V_COUNTER                    NUMBER;
+  V_TARGET_NAME                VARCHAR2(4000);
 
   cursor getAclUsage(C_ACL_PATH VARCHAR2)
   is
@@ -242,68 +253,102 @@ declare
     where RESCONFIG_PATH like C_FOLDER_PATH || '%';
                 
 begin
-
-  -- Remove Repository Resource configurations under /XFILES
-
-  for r in getRepositoryResConfigs(XFILES_ROOT) loop
-    DBMS_RESCONFIG.deleteRepositoryResConfig(r.POSITION);
-  end loop;
-  commit;
-
-  -- Remove Repository Resource configurations under /home/XFILES
-
-  for r in getRepositoryResConfigs(XFILES_HOME) loop
-    DBMS_RESCONFIG.deleteRepositoryResConfig(r.POSITION);
-  end loop;
-  commit;
-
-	
-  -- Remove Resource configurations from any documents under /home/XFILES that are protected by Resource Configurations under /home/XFILES
-
-  for r in getResConfigUsage(XFILES_HOME) loop
-    DBMS_RESCONFIG.deleteResConfig(r.RESOURCE_PATH,r.RESCONFIG_PATH,DBMS_RESCONFIG.DELETE_RESOURCE );
-  end loop;
-  commit;
-
-  -- Move any Resource Configurations that protected resources outside of /home/XFILES into an archive folder 
-  -- outside of /home/XFILES
-
-  
-
-
-  XDB_UTILITIES.mkdir(FOLDER_RESCONFIG_ARCHIVE,TRUE);
-  for r in getResConfigsInUse(XFILES_HOME) loop
-    DBMS_XDB.renameResource(r.RESCONFIG_PATH, FOLDER_RESCONFIG_ARCHIVE, 'resConfig-' || to_char(systimestamp,'YYYY-MM-DD"T"HH24MISS.FFTZHTZM') || '.xml');
-  end loop;
-  commit;
-
-  XDB_UTILITIES.freeAcl(ACL_ALLOW_XFILES_USERS,'/sys/acls/all_owner_acl.xml');
-  XDB_UTILITIES.freeAcl(ACL_DENY_XFILES_USERS,'/sys/acls/all_owner_acl.xml');
-    
+ 
 	if DBMS_XDB.existsResource(XMLINDEX_LIST) then
+    XDB_OUTPUT.writeLogFileEntry('Delete: ' || XMLINDEX_LIST);
+    XDB_OUTPUT.flushLogFile();
     dbms_xdb.deleteResource(XMLINDEX_LIST,DBMS_XDB.DELETE_FORCE);
   end if;
   commit;
 
 	if DBMS_XDB.existsResource(XMLSCHEMA_LIST) then
+    XDB_OUTPUT.writeLogFileEntry('Delete: ' || XMLSCHEMA_LIST);
+    XDB_OUTPUT.flushLogFile();
     dbms_xdb.deleteResource(XMLSCHEMA_LIST,DBMS_XDB.DELETE_FORCE);
   end if ;
   commit;
 
   if (DBMS_XDB.existsResource(UNAUTHENTICATED_DOCUMENT)) then
+    XDB_OUTPUT.writeLogFileEntry('Delete: ' || UNAUTHENTICATED_DOCUMENT);
+    XDB_OUTPUT.flushLogFile();
     DBMS_XDB.deleteResource(UNAUTHENTICATED_DOCUMENT);
   end if;  
   commit;
 
   if (DBMS_XDB.existsResource(WHOAMI_DOCUMENT)) then
+    XDB_OUTPUT.writeLogFileEntry('Delete: ' || WHOAMI_DOCUMENT);
+    XDB_OUTPUT.flushLogFile();
     DBMS_XDB.deleteResource(WHOAMI_DOCUMENT);
   end if;  
   commit;
 
   if (DBMS_XDB.existsResource(AUTH_STATUS_DOCUMENT)) then
+    XDB_OUTPUT.writeLogFileEntry('Delete: ' || AUTH_STATUS_DOCUMENT);
+    XDB_OUTPUT.flushLogFile();
     DBMS_XDB.deleteResource(AUTH_STATUS_DOCUMENT);
   end if;  
   commit;
+
+  -- Remove Repository Resource configurations under /XFILES
+  XDB_OUTPUT.writeLogFileEntry('Delete Repository Resconfig under ' || XFILES_ROOT);
+  XDB_OUTPUT.flushLogFile();
+
+  for r in getRepositoryResConfigs(XFILES_ROOT) loop
+    XDB_OUTPUT.writeLogFileEntry(r.RESCONFIG_PATH);
+    DBMS_RESCONFIG.deleteRepositoryResConfig(r.POSITION);
+    XDB_OUTPUT.flushLogFile();
+  end loop;
+  commit;
+
+  -- Remove Repository Resource configurations under /home/XFILES
+  XDB_OUTPUT.writeLogFileEntry('Delete Repository Resconfig under ' || XFILES_HOME);
+  XDB_OUTPUT.flushLogFile();
+
+  for r in getRepositoryResConfigs(XFILES_HOME) loop
+    DBMS_RESCONFIG.deleteRepositoryResConfig(r.POSITION);
+    XDB_OUTPUT.flushLogFile();
+    DBMS_RESCONFIG.deleteRepositoryResConfig(r.POSITION);
+  end loop;
+  commit;
+
+  XDB_OUTPUT.writeLogFileEntry('Delete  Resconfig under ' || XFILES_HOME);
+  XDB_OUTPUT.flushLogFile();
+	
+  -- Remove Resource configurations from any documents under /home/XFILES that are protected by Resource Configurations under /home/XFILES
+
+  for r in getResConfigUsage(XFILES_HOME) loop
+    XDB_OUTPUT.writeLogFileEntry(r.RESCONFIG_PATH);
+    XDB_OUTPUT.flushLogFile();
+    DBMS_RESCONFIG.deleteResConfig(r.RESOURCE_PATH,r.RESCONFIG_PATH,DBMS_RESCONFIG.DELETE_RESOURCE );
+  end loop;
+  commit;
+
+  -- Move any Resource Configurations that protect resources outside of /home/XFILES into an archive folder 
+  -- outside of /home/XFILES  
+
+
+  XDB_UTILITIES.mkdir(FOLDER_RESCONFIG_ARCHIVE,TRUE);
+  XDB_OUTPUT.writeLogFileEntry('Moving Resconfigs under ' || XFILES_HOME  || ' to ' || FOLDER_RESCONFIG_ARCHIVE);
+  XDB_OUTPUT.flushLogFile();
+
+  V_COUNTER := 0;
+  for r in getResConfigsInUse(XFILES_HOME) loop
+    V_COUNTER := V_COUNTER + 1;
+    V_TARGET_NAME := 'resConfig-' || to_char(systimestamp,'YYYY-MM-DD"T"HH24MISS') || '.' || LPAD(V_COUNTER,3,'0') || '.xml';
+    XDB_OUTPUT.writeLogFileEntry(r.RESCONFIG_PATH || ' --> ' || V_TARGET_NAME);
+    XDB_OUTPUT.flushLogFile();
+    DBMS_XDB.renameResource(r.RESCONFIG_PATH, FOLDER_RESCONFIG_ARCHIVE, V_TARGET_NAME);
+  end loop;
+  commit;
+
+  XDB_OUTPUT.writeLogFileEntry('Free ACL:' || ACL_ALLOW_XFILES_USERS);
+  XDB_OUTPUT.flushLogFile();
+  XDB_UTILITIES.freeAcl(ACL_ALLOW_XFILES_USERS,'/sys/acls/all_owner_acl.xml');
+
+  XDB_OUTPUT.writeLogFileEntry('Free ACL:' || ACL_DENY_XFILES_USERS);
+  XDB_OUTPUT.flushLogFile();
+  XDB_UTILITIES.freeAcl(ACL_DENY_XFILES_USERS,'/sys/acls/all_owner_acl.xml');
+    
   
   /*
   **
@@ -321,21 +366,34 @@ begin
   -- End Workaround
 
   if (DBMS_XDB.existsResource(XFILES_ROOT)) then
+    XDB_OUTPUT.writeLogFileEntry('Delete: ' || XFILES_ROOT);
+    XDB_OUTPUT.flushLogFile();
     DBMS_XDB.deleteResource(XFILES_ROOT,DBMS_XDB.DELETE_RECURSIVE_FORCE);
   end if;
   commit;
   
 	if DBMS_XDB.existsResource(XFILES_HOME) then
+    XDB_OUTPUT.writeLogFileEntry('Delete: ' || XFILES_HOME);
+    XDB_OUTPUT.flushLogFile();
     DBMS_XDB.deleteResource(XFILES_HOME,DBMS_XDB.DELETE_RECURSIVE_FORCE);
   end if ;
   commit;
   
+	XDB_OUTPUT.writeLogFileEntry('Create: ' || XFILES_HOME);
+  XDB_OUTPUT.flushLogFile();
   V_RESULT := DBMS_XDB.createFolder(XFILES_ROOT);
   DBMS_XDB.setAcl(XFILES_ROOT,'/sys/acls/bootstrap_acl.xml');
   DBMS_XDB.changeOwner(XFILES_ROOT,'&XFILES_SCHEMA');
   commit;
 
 end;
+/
+column LOG format A240
+set pages 100 lines 250 trimspool on
+set long 1000000
+--
+select xdburitype('/public/xFilesInstallation.log').getClob() LOG
+  from dual
 /
 select PATH
   from PATH_VIEW 

@@ -776,7 +776,7 @@ function DemonstrationPlayer() {
     }
   }
 
-  this.loadIFrameXML = function(iFrameId,targetURL,contentType) {
+  this.loadIFrame = function(iFrameId,targetURL,contentType) {
   	var iFrame = document.getElementById(iFrameId)
   	
   	// Localize the URL
@@ -797,7 +797,12 @@ function DemonstrationPlayer() {
   	}
 
   	if ((contentType == "text/plain") || (contentType == "text/html")) {
-  		iFrame.src = loc.pathname
+    	if (loc.pathname.substring(0,1) == "/") {
+    		iFrame.src = loc.pathname
+    	}
+      else {
+  		  iFrame.src = "/" + loc.pathname
+  		}
   	  return;
   	}
   }

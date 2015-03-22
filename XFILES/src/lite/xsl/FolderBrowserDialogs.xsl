@@ -220,6 +220,48 @@
 			</div>
 		</span>
 	</xsl:template>
+	<xsl:template name="publishDialog">
+		<span style="display: none;" id="publishDialog" onclick="stopBubble(event)">
+			<div style="position:relative; top: 0px;">
+				<div class="popupOuterEdge" style="top: -7px; right: 15px;">
+					<div class="popupBackground">
+						<div class="popupInnerEdge">
+							<div id="publishTitle" class="row popupTitle">
+								<xsl:text>Publish Resources Dialog</xsl:text>
+							</div>
+							<div class="row" style="height:5px;"/>
+							<div class="row alignLeft">
+								<input type="checkbox" id="deepPublish"/>
+								<span style="width:10px; display:inline-block;"/>
+								<a href="#" class="toolTip">
+									<label for="deepPublish" id="deepPublishLabel">
+										<xsl:text>Include Subfolders</xsl:text>
+										<span id="deepPublishHint" class="hint">Checked  : Operations on a Folder and are applied to all descendants of the folder. Unchecked : Operations on a folder are restricted to files in the selected folder. Child folders are not processed.</span>
+									</label>
+								</a>
+							</div>
+							<div class="row alignLeft">
+								<input type="checkbox" id="publicPublish"/>
+								<span style="width:10px; display:inline-block;"/>
+								<a href="#" class="toolTip">
+									<label for="publicPublish" id="publicPublishLabel">
+										<xsl:text>Make Public</xsl:text>
+										<span id="publicPublishHint" class="hint">Apply the bootstrap ACL to each resource making it readable by anyone including ANONYMOUS</span>
+									</label>
+								</a>
+							</div>
+							<div class="row" style="height:5px;"/>
+							<div class="row alignRight">
+								<img id="btnCancelOperation" src="/XFILES/lib/icons/cancel.png" alt="Cancel Operation" border="0" width="16" height="16" onclick="closePopupDialog();false"/>
+								<span style="width:10px; display:inline-block;"/>
+								<img id="btnDoOperation" src="/XFILES/lib/icons/accept.png" alt="Apply Operation" border="0" width="16" height="16" onclick="doPublishOperation(document.getElementById('deepPublish'),document.getElementById('publicPublish'));false"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</span>
+	</xsl:template>
 	<xsl:template name="checkInDialog">
 		<span style="display: none;" id="checkInDialog" onclick="stopBubble(event)">
 			<div style="position:relative; top: 0px;">

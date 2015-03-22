@@ -61,9 +61,10 @@ as
     C_ACL_READONLY_ALL            constant VARCHAR2(700) := C_PATH_SYSTEM_ACLS  || '/' || 'ro_all_acl.xml';
     C_ACL_BOOTSTRAP               constant VARCHAR2(700) := C_PATH_SYSTEM_ACLS  || '/' || 'bootstrap_acl.xml';
 
-    C_PATH_USER_HOME   constant VARCHAR2(700) := C_PATH_HOME || '/' || XDBPM_USERNAME.GET_USERNAME();
-    C_PATH_USER_DEBUG  constant VARCHAR2(128) := C_PATH_DEBUG || '/' || XDBPM_USERNAME.GET_USERNAME();
-    C_PATH_USER_PUBLIC constant VARCHAR2(700) := C_PATH_PUBLIC || '/' || XDBPM_USERNAME.GET_USERNAME(); 
+    C_PATH_USER_HOME        constant VARCHAR2(700) := C_PATH_HOME        || '/' || XDBPM_USERNAME.GET_USERNAME();
+    C_PATH_USER_DEBUG       constant VARCHAR2(128) := C_PATH_DEBUG       || '/' || XDBPM_USERNAME.GET_USERNAME();
+    C_PATH_USER_PUBLIC      constant VARCHAR2(700) := C_PATH_PUBLIC      || '/' || XDBPM_USERNAME.GET_USERNAME(); 
+    C_PATH_USER_HOME_PUBLIC constant VARCHAR2(700) := C_PATH_USER_HOME   || C_PATH_PUBLIC; 
 
     C_VERSION         constant VARCHAR2(12)  := 'VERSION';
     C_OVERWRITE       constant VARCHAR2(12)  := 'OVERWRITE';
@@ -81,12 +82,13 @@ as
     function ACL_READONLY_ALL                   return VARCHAR2 deterministic;
     function ACL_BOOTSTRAP                      return VARCHAR2 deterministic;
 
-    function FOLDER_HOME          return VARCHAR2 deterministic;
-    function FOLDER_DEBUG         return VARCHAR2 deterministic;
-    function FOLDER_PUBLIC        return VARCHAR2 deterministic;
-    function FOLDER_USER_HOME     return VARCHAR2 deterministic;
-    function FOLDER_USER_DEBUG    return VARCHAR2 deterministic;
-    function FOLDER_USER_PUBLIC   return VARCHAR2 deterministic;
+    function FOLDER_HOME               return VARCHAR2 deterministic;
+    function FOLDER_DEBUG              return VARCHAR2 deterministic;
+    function FOLDER_PUBLIC             return VARCHAR2 deterministic;
+    function FOLDER_USER_HOME          return VARCHAR2 deterministic;
+    function FOLDER_USER_DEBUG         return VARCHAR2 deterministic;
+    function FOLDER_USER_PUBLIC        return VARCHAR2 deterministic;
+    function FOLDER_USER_HOME_PUBLIC   return VARCHAR2 deterministic;
 
     function ENCODING_UTF8        return VARCHAR2 deterministic;
     function ENCODING_WIN1252     return VARCHAR2 deterministic;
@@ -137,6 +139,8 @@ function FOLDER_USER_HOME                    return VARCHAR2 deterministic as be
 function FOLDER_USER_DEBUG                   return VARCHAR2 deterministic as begin return C_PATH_USER_DEBUG; end;
 --                                           
 function FOLDER_USER_PUBLIC                  return VARCHAR2 deterministic as begin return C_PATH_USER_PUBLIC; end;
+--                                           
+function FOLDER_USER_HOME_PUBLIC             return VARCHAR2 deterministic as begin return C_PATH_USER_HOME_PUBLIC; end;
 --                                           
 function ENCODING_UTF8                       return VARCHAR2 deterministic as begin return DBMS_XDB_CONSTANTS.ENCODING_UTF8; end;
 --                                           

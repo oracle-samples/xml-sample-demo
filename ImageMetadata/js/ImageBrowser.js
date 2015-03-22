@@ -16,7 +16,7 @@ var first
 var last 
 
 function onPageLoaded() {
-   var preview = document.getElementById('imagePreview.1');
+	 var preview = document.getElementById('imagePreview.1');
  	 resizeImagePreview(preview);
 }
 

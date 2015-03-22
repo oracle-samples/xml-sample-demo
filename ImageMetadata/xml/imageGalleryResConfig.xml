@@ -3,7 +3,7 @@
     <listener>
       <description>XFiles Application Redirect</description>
       <schema>XDBEXT</schema>
-      <source>INSTALL_IMAGE_BROWSER</source>
+      <source>ENABLE_IMAGE_GALLERY</source>
       <language>PL/SQL</language>
       <events>
         <Post-LinkTo/>
@@ -24,7 +24,7 @@
           <namespace>xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd"</namespace>
         </existsNode>
       </pre-condition>
-      <path>/home/XDBEXT/imageMetadata/xml/imageBrowserResConfig.xml</path>
+      <path>/home/XDBEXT/imageMetadata/xml/imageGalleryResConfig.xml</path>
     </configuration>
   </defaultChildConfig>
 </ResConfig>

@@ -116,7 +116,7 @@
 		<div id="localScriptList" style="display:none;">
 			<span>/XFILES/Applications/imageMetadata/js/EXIFViewer.js</span>
 			<span>/XFILES/lite/js/XinhaInit.js</span>
-			<span>/XFILES/Xinha/XinhaCore.js</span>
+			<span>/XFILES/Frameworks/Xinha/XinhaCore.js</span>
 		</div>
 		<xsl:call-template name="XFilesHeader">
 			<xsl:with-param name="action" select="'View Image'"/>

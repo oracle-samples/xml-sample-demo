@@ -38,7 +38,7 @@ Confirm that the user that will be used to run the example code can login to the
 <span id="_Toc310240961" class="anchor"><span id="_Toc413168751" class="anchor"></span></span>Download and extract the Installation media
 -----------------------------------------------------------------------------------------------------------------------------------------
 
-Download the latest version of the application from GitHub. The application can be found [here](https://github.com/oracle/xml-sample-demo).
+Download the latest version of the application from GitHub. The application can be found [here](https://github.com/oracle/xml-sample-demo/).
 
 ![](media/image004.png)
 
@@ -96,7 +96,7 @@ A simple install script is provided to allow the example to be installed from a 
 
 ![](media/image010.png)
 
-The demonstration is installed using the FULLTEXT-LITE.sh script found in the folder xml-sample-demo/FULLTEXT-LITE/install.
+The demonstration is installed using the FULLTEXT-LITE.sh script found in the folder xml-sample-demo-master/FULLTEXT-LITE/install.
 
 To run the installation script first set the current directory to the install directory. Make sure that the environment variables ORACLE\_HOME and ORACLE\_SID are set correctly. Invoke the FULLTEXT-LITE.sh script passing the following arguments on the command line
 

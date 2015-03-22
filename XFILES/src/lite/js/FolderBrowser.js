@@ -595,7 +595,7 @@ function unlockResourceList(resourceListXML, deepOption) {
    
 }  
 
-function publishResourceList(resourceListXML, deepOption) {
+function publishResourceList(resourceListXML, deepOption, publicOption) {
 
   var module  = "PUBLISHRESOURCELIST";
   var actionName = "Publish Resource"
@@ -604,6 +604,7 @@ function publishResourceList(resourceListXML, deepOption) {
   	var targetFolder = "/home/" + httpUsername + "/publishedContent";
 	  var parameters = new Object;
 	  parameters["P_DEEP-BOOLEAN-IN"]             = deepOption
+	  parameters["P_MAKE_PUBLIC-BOOLEAN-IN"]      = publicOption
   	doListOperation(resourceListXML, parameters, module, actionName, targetFolder );
   }
   catch (e) {
@@ -775,6 +776,18 @@ function doDeepOperation(mode) {
 
 }
 
+function doPublishOperation(mode,public) {
+
+  // Deep operation has been confirmed. 
+  
+  closePopupDialog();
+  var deep = booleanToNumber(mode.checked);
+  var makePublic = booleanToNumber(public.checked);
+  publishResourceList(currentResourceList,deep,makePublic);
+
+}
+
+
 function updatePrinciple(newOwner,mode) {
 
   try {
@@ -907,13 +920,18 @@ function openDeepOperationDialog(evt,action,resourceList,operation) {
   	titleBar.innerHTML = "Unlock Options";
   }
 
-  if (action == "PUBLISH") {
-  	titleBar.innerHTML = "Publish Options";
-  }
-
   currentOperation = operation;
   currentResourceList = resourceList;
   var dialog = document.getElementById("deepOperationDialog");  
+  openPopupDialog(evt, dialog);  
+
+}
+
+function openPublishDialog(evt,action,resourceList,operation) {
+
+  currentOperation = operation;
+  currentResourceList = resourceList;
+  var dialog = document.getElementById("publishDialog");  
   openPopupDialog(evt, dialog);  
 
 }
@@ -1090,14 +1108,7 @@ function processAction(evt,action) {
   }
 
   if (action == "PUBLISH") {
-    if (folderSelected) {
-       openDeepOperationDialog(evt,action,currentResourceList,publishResourceList)
-    }
-    else {
-      if (confirm("Publish selected documents ?")) {
-        publishResourceList(currentResourceList,false);
-      }
-    }
+    openPublishDialog(evt,action,currentResourceList,publishResourceList)
     return;
   }
      

@@ -35,7 +35,7 @@
 	<xsl:template match="/">
 		<div id="localScriptList" style="display:none;">
 			<span>/XFILES/lite/js/XinhaInit.js</span>
-			<span>/XFILES/Xinha/XinhaCore.js</span>
+			<span>/XFILES/Frameworks/Xinha/XinhaCore.js</span>
 			<span>/XFILES/lite/js/XFilesWiki.js</span>
 		</div>
 		<div id="localScripts" style="display:none;"/>

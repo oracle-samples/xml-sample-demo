@@ -30,7 +30,7 @@ update RESOURCE_VIEW
    set RES = deleteXML
              (
                 RES,
-                'r:Resource/r:Contents/mapping/contentType[contentType="image/jpeg"]',
+                '/r:Resource/r:Contents/mapping/contentType[contentType="image/jpeg"]',
                 DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R
              )
  where equals_path(res,XFILES_CONSTANTS.FOLDER_HOME || '/src/lite/xsl/XFilesMappings.xml') = 1
@@ -39,7 +39,7 @@ update RESOURCE_VIEW
    set RES = insertChildXML
              (
                 RES,
-                'r:Resource/r:Contents/mapping',
+                '/r:Resource/r:Contents/mapping',
                 'contentType',
                 xmltype('<contentType>
 		                       <contentType>image/jpeg</contentType>
@@ -54,7 +54,7 @@ update RESOURCE_VIEW
    set RES = deleteXML
              (
                 RES,
-                'r:Resource/r:Contents/mapping/contentType[contentType="image/pjpeg"]',
+                '/r:Resource/r:Contents/mapping/contentType[contentType="image/pjpeg"]',
                 DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R
              )
  where equals_path(res,XFILES_CONSTANTS.FOLDER_HOME || '/src/lite/xsl/XFilesMappings.xml') = 1
@@ -63,7 +63,7 @@ update RESOURCE_VIEW
    set RES = insertChildXML
              (
                 RES,
-                'r:Resource/r:Contents/mapping',
+                '/r:Resource/r:Contents/mapping',
                 'contentType',
                 xmltype('<contentType>
 		                       <contentType>image/pjpeg</contentType>
