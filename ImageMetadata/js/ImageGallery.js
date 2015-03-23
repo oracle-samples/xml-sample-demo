@@ -156,6 +156,16 @@ jssor_slider1_starter = function (containerId) {
         , { $Duration: 1200, $Delay: 20, $Clip: 12, $SlideOut: true, $Assembly: 260, $Easing: { $Clip: $JssorEasing$.$EaseOutCubic, $Opacity: $JssorEasing$.$EaseLinear }, $Opacity: 2 }
         ];
 
+		var _CaptionTransitions = [];
+    //Left to Right
+    _CaptionTransitions["L-R"] = { $Duration: 800, $FlyDirection: 1 };
+    //Right to Left
+    _CaptionTransitions["R-L"] = { $Duration: 800, $FlyDirection: 2 };
+    //Top to Bottom
+    _CaptionTransitions["T-B"] = { $Duration: 800, $FlyDirection: 4 };
+    //Bottom to Top
+    _CaptionTransitions["B-T"] = { $Duration: 800, $FlyDirection: 8 };
+
     var options = {
     	  $FillMode: 1,
         $AutoPlay: true,                                    //[Optional] Whether to auto play, to enable slideshow, this option must be set to true, default value is false
@@ -184,6 +194,13 @@ jssor_slider1_starter = function (containerId) {
             $SpacingX: 8,                                   //[Optional] Horizontal space between each thumbnail in pixel, default value is 0
             $DisplayPieces: 10,                             //[Optional] Number of pieces to display, default value is 1
             $ParkingPosition: 360                           //[Optional] The offset position to park thumbnail
+        },
+        
+        $CaptionSliderOptions: {
+            $Class: $JssorCaptionSlider$,
+            $CaptionTransitions: _CaptionTransitions,
+            $PlayInMode: 1,
+            $PlayOutMode: 3
         }
     };
 
