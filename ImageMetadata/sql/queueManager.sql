@@ -22,11 +22,13 @@ create or replace package QUEUE_MANAGER
 as
   C_QUEUE_NAME        constant VARCHAR2(256) := '&OWNER..REPOSITORY_EVENTS_QUEUE';
   C_QUEUE_TABLE_NAME  constant VARCHAR2(256) := '&OWNER..REPOSITORY_EVENTS_TABLE';
+  C_QUEUE_LOG_FILE    constant VARCHAR2(256) :=  XDB_CONSTANTS.FOLDER_HOME || '/&OWNER/emptyQueueOperation.log';
   
   procedure stopQueue;
   procedure purgeQueueTable;
   procedure startQueue;
   procedure emptyQueue;
+  function  emptyQueue return CLOB;
 end;
 /
 show errors
@@ -97,6 +99,14 @@ begin
   end;
 end;
 --
+function emptyQueue 
+return CLOB
+as
+begin
+  emptyQueue();
+  return xdburitype(C_QUEUE_LOG_FILE).getClob();
+end;
+--
 procedure emptyQueue
 as
   pending          number(32);  
@@ -106,15 +116,29 @@ as
   enq_msgid        raw(16);
   V_XML_PAYLOAD    XMLType;
 begin
+	 XDB_OUTPUT.createLogFile(C_QUEUE_LOG_FILE,TRUE);
+	 XDB_OUTPUT.writeLogFileEntry('Processing Pending Entries in "' || XDB_ASYNCHRONOUS_EVENTS.REPOSITORY_EVENTS_QUEUE || '"');
+	 XDB_OUTPUT.flushLogFile();
+	 
    select count(*)
      into PENDING
      from &OWNER..REPOSITORY_EVENTS_TABLE;
      
+	 XDB_OUTPUT.writeLogFileEntry('Processing ' || PENDING || ' Messages');
+	 XDB_OUTPUT.flushLogFile();
+          
    for i in 1..PENDING loop
      DBMS_AQ.DEQUEUE(XDB_ASYNCHRONOUS_EVENTS.REPOSITORY_EVENTS_QUEUE, deq_ct, msg_prop, V_XML_PAYLOAD, enq_msgid);
+		 XDB_OUTPUT.writeLogFileEntry(XDB_CONSTANTS.FOLDER_HOME || 'Message [' || i || ']');
+		 XDB_OUTPUT.writeLogFileEntry(V_XML_PAYLOAD);
+		 XDB_OUTPUT.flushLogFile();
      &OWNER..IMAGE_PROCESSOR.HANDLE_EVENT(V_XML_PAYLOAD);
+	   commit;
    end loop;
-   commit;
+   
+	 XDB_OUTPUT.writeLogFileEntry('Processing Completed');
+	 XDB_OUTPUT.flushLogFile();
+   
 end;
 --
 end;

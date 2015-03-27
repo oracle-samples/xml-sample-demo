@@ -23,7 +23,7 @@ as
   procedure CHANGEOWNER(P_RESOURCE_PATH VARCHAR2, P_NEW_OWNER VARCHAR2, P_DEEP BOOLEAN DEFAULT FALSE);
   procedure CHECKIN(P_RESOURCE_PATH VARCHAR2,P_COMMENT VARCHAR2, P_DEEP BOOLEAN DEFAULT FALSE);
   procedure CHECKOUT(P_RESOURCE_PATH VARCHAR2, P_DEEP BOOLEAN DEFAULT FALSE);
-  procedure COPYRESOURCE(P_RESOURCE_PATH VARCHAR2, P_TARGET_FOLDER VARCHAR2,P_DEEP BOOLEAN DEFAULT FALSE);
+  procedure COPYRESOURCE(P_RESOURCE_PATH VARCHAR2, P_TARGET_FOLDER VARCHAR2,P_DEEP BOOLEAN DEFAULT FALSE, P_DUPLICATE_POLICY VARCHAR2 DEFAULT XDB_CONSTANTS.RAISE_ERROR);
   procedure CREATEFOLDER(P_FOLDER_PATH VARCHAR2, P_DESCRIPTION VARCHAR2, P_TIMEZONE_OFFSET NUMBER DEFAULT 0);
   procedure CREATEWIKIPAGE(P_RESOURCE_PATH VARCHAR2, P_DESCRIPTION VARCHAR2, P_TIMEZONE_OFFSET NUMBER DEFAULT 0);
   procedure CREATEZIPFILE(P_RESOURCE_PATH VARCHAR2, P_DESCRIPTION VARCHAR2, P_RESOURCE_LIST XMLType,  P_TIMEZONE_OFFSET NUMBER DEFAULT 0);
@@ -37,10 +37,10 @@ as
   procedure SETACL(P_RESOURCE_PATH VARCHAR2, P_ACL_PATH VARCHAR2,P_DEEP BOOLEAN DEFAULT FALSE);
   procedure SETRSSFEED(P_FOLDER_PATH VARCHAR2, P_ENABLE BOOLEAN, P_ITEMS_CHANGED_IN VARCHAR2, P_DEEP BOOLEAN DEFAULT FALSE);
   procedure UNLOCKRESOURCE(P_RESOURCE_PATH VARCHAR2, P_DEEP BOOLEAN DEFAULT FALSE);
-  procedure UNZIP(P_FOLDER_PATH VARCHAR2, P_RESOURCE_PATH VARCHAR2, P_DUPLICATE_ACTION VARCHAR2);
-  procedure UPLOADRESOURCE(P_RESOURCE_PATH VARCHAR2, P_CONTENT BLOB, P_CONTENT_TYPE VARCHAR2, P_DESCRIPTION VARCHAR2, P_LANGUAGE VARCHAR2, P_CHARACTER_SET VARCHAR2, P_DUPLICATE_POLICY VARCHAR2);
+  procedure UNZIP(P_FOLDER_PATH VARCHAR2, P_RESOURCE_PATH VARCHAR2, P_DUPLICATE_POLICY VARCHAR2 DEFAULT XDB_CONSTANTS.RAISE_ERROR);
+  procedure UPLOADRESOURCE(P_RESOURCE_PATH VARCHAR2, P_CONTENT BLOB, P_CONTENT_TYPE VARCHAR2, P_DESCRIPTION VARCHAR2, P_LANGUAGE VARCHAR2, P_CHARACTER_SET VARCHAR2, P_DUPLICATE_POLICY VARCHAR2 DEFAULT XDB_CONSTANTS.RAISE_ERROR);
   function  UPDATEPROPERTIES(P_RESOURCE_PATH VARCHAR2, P_NEW_VALUES XMLType, P_TIMEZONE_OFFSET NUMBER DEFAULT 0) return VARCHAR2;
-  procedure setCustomViewer(P_RESOURCE_PATH VARCHAR2,P_VIEWER_PATH VARCHAR2,P_ARGUMENTS VARCHAR2 DEFAULT NULL);
+  procedure setCustomViewer(P_RESOURCE_PATH VARCHAR2,P_VIEWER_PATH VARCHAR2, P_METHOD VARCHAR2 DEFAULT NULL);
   procedure mapTableToResource(P_RESOURCE_PATH  VARCHAR2,P_SCHEMA_NAME VARCHAR2 DEFAULT USER,P_TABLE_NAME VARCHAR2, P_FILTER VARCHAR2 DEFAULT NULL);
   procedure addResConfig(P_RESOURCE_PATH VARCHAR2, P_RESCONFIG_PATH VARCHAR2);
   procedure addPageHitCounter(P_RESOURCE_PATH VARCHAR2);
@@ -391,8 +391,8 @@ as
 
 begin  
 	$IF $$DEBUG $THEN
-     XDB_OUTPUT.createlogFile('/public/XDB_REPOSITORY_SERVICES.log',FALSE);
-     XDB_OUTPUT.addLogFileEntry('Processing Resource "' || P_RESOURCE_PATH || '". Include Contents = ' || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_INCLUDE_CONTENTS));
+     XDB_OUTPUT.writeLogFileEntry('getResource P_RESOURCE_PATH    : ' || P_RESOURCE_PATH);
+     XDB_OUTPUT.writeLogFileEntry('getResource P_INCLUDE_CONTENTS : ' || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_INCLUDE_CONTENTS));
      XDB_OUTPUT.flushLogFile();
   $END
   
@@ -437,9 +437,13 @@ begin
   DBMS_XMLDOM.setVersion(V_RESOURCE_DOCUMENT, '1.0'); 
   DBMS_XMLDOM.setCharset(V_RESOURCE_DOCUMENT, 'UTF8');
   P_RESOURCE  := DBMS_XMLDOM.getXMLType(V_RESOURCE_DOCUMENT);
-  -- xdb_debug.addTraceFileEntry(P_RESOURCE);
-  -- xdb_debug.addTraceFileEntry('Processing Complete.');
-  -- xdb_debug.writeToTraceFile();
+
+	$IF $$DEBUG $THEN
+     XDB_OUTPUT.writeLogFileEntry('getResource P_RESOURCE :');
+     XDB_OUTPUT.writeLogFileEntry(P_RESOURCE);
+     XDB_OUTPUT.writeLogFileEntry('getResource : Processing Complete.');
+     XDB_OUTPUT.flushLogFile();
+  $END
 
 end;
 --
@@ -471,7 +475,6 @@ as
          SUBSTR(PATH,INSTR(PATH,'/',-1)+1) LINK, 
          RESID, 
          RES,
-         
          XMLQUERY(
            'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
             declare namespace xfiles = "http://xmlns.oracle.com/xdb/xfiles"; (: :)
@@ -506,10 +509,37 @@ begin
   **
   */
 
+	$IF $$DEBUG $THEN
+     XDB_OUTPUT.writeLogFileEntry('getFolderListingInternal : Fetching Children.');
+     XDB_OUTPUT.flushLogFile();
+  $END
+
   for b in getBindings loop
-    V_RESOURCE_NODE     := cloneResource(b.RES,DBMS_XMLDOM.makeNode(V_BINDINGS_ELEMENT),FALSE, P_INCLUDE_EXTENDED_METADATA, P_TIMEZONE_OFFSET,NULL);
-    V_RESOURCE_STATUS   := DBMS_XMLDOM.appendChild(V_RESOURCE_NODE,getResourceStatus(b.RESID,b.LINK,b.PATH,V_BINDINGS_DOCUMENT,b.CUSTOM_VIEWER));
+  	$IF $$DEBUG $THEN
+       XDB_OUTPUT.writeLogFileEntry('getFolderListingInternal b.PATH               : ' || b.PATH);
+       XDB_OUTPUT.flushLogFile();
+    $END
+    begin
+      V_RESOURCE_NODE     := cloneResource(b.RES,DBMS_XMLDOM.makeNode(V_BINDINGS_ELEMENT),FALSE, P_INCLUDE_EXTENDED_METADATA, P_TIMEZONE_OFFSET,NULL);
+      V_RESOURCE_STATUS   := DBMS_XMLDOM.appendChild(V_RESOURCE_NODE,getResourceStatus(b.RESID,b.LINK,b.PATH,V_BINDINGS_DOCUMENT,b.CUSTOM_VIEWER));
+  $IF $$DEBUG $THEN
+    exception
+      when others then
+           XDB_OUTPUT.writeLogFileEntry('getFolderListing STACK TRACE : ');
+           XDB_OUTPUT.writeLogFileEntry(XFILES_LOGGING.captureStackTrace());
+           XDB_OUTPUT.flushLogFile();
+        RAISE;
+  $END
+    end;
   end loop;
+$IF $$DEBUG $THEN
+exception
+  when others then
+    XDB_OUTPUT.writeLogFileEntry('getFolderListing STACK TRACE : ');
+    XDB_OUTPUT.writeLogFileEntry(XFILES_LOGGING.captureStackTrace());
+    XDB_OUTPUT.flushLogFile();
+    RAISE;
+$END
 end;
 --
 procedure getVersionHistoryInternal(P_RESID RAW, P_TIMEZONE_OFFSET NUMBER, P_VERSION_HISTORY IN OUT XMLTYPE)
@@ -599,11 +629,27 @@ as
   V_RESID             RAW(16);
   V_CHILDREN          XMLTYPE;
 begin
+
+	$IF $$DEBUG $THEN
+     XDB_OUTPUT.writeLogFileEntry('getFolderListing P_FOLDER_PATH               : ' || P_FOLDER_PATH);
+     XDB_OUTPUT.writeLogFileEntry('getFolderListing P_INCLUDE_EXTENDED_METADATA : ' || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_INCLUDE_EXTENDED_METADATA));
+     XDB_OUTPUT.flushLogFile();
+  $END
+
   DBMS_XDB_PRINT.setPrintMode(PRINT_SUPPRESS_CONTENT);
   getResource(P_FOLDER_PATH, FALSE, P_TIMEZONE_OFFSET, P_FOLDER, V_RESID);
   getFolderListingInternal(P_FOLDER_PATH, P_INCLUDE_EXTENDED_METADATA, P_TIMEZONE_OFFSET, V_CHILDREN);
   P_FOLDER := P_FOLDER.appendChildXML('/Resource',V_CHILDREN,'xmlns="http://xmlns.oracle.com/xdb/XDBResource.xsd"');
   DBMS_XDB_PRINT.clearPrintMode(PRINT_SUPPRESS_CONTENT);
+
+	$IF $$DEBUG $THEN
+     XDB_OUTPUT.writeLogFileEntry('getFolderListing P_FOLDER :');
+     XDB_OUTPUT.writeLogFileEntry(P_FOLDER);
+     XDB_OUTPUT.writeLogFileEntry('getFolderListing : Processing Complete.');
+     XDB_OUTPUT.flushLogFile();
+  $END
+
+
 end;
 --
 procedure GETVERSIONHISTORY(P_RESOURCE_PATH IN VARCHAR2, P_TIMEZONE_OFFSET NUMBER DEFAULT 0, P_RESOURCE IN OUT XMLType)
@@ -663,48 +709,31 @@ begin
   XFILES_WIKI_SERVICES.createWikiPage(P_RESOURCE_PATH,P_DESCRIPTION);
 end;
 --
-procedure setFolderACLInternal(P_FOLDER_PATH VARCHAR2, P_ACL_PATH VARCHAR2)
+procedure setACLInternal(P_RESOURCE_PATH VARCHAR2, P_ACL_PATH VARCHAR2, P_DEEP BOOLEAN)
 as
-  cursor getDocumentListing
+
+  cursor getListing
   is
-  select path
+  select PATH
     from PATH_VIEW
-   where under_path(res,1,P_FOLDER_PATH) = 1
-     and existsNode(res,'/r:Resource[@Container="false"]',XDB_NAMESPACES.RESOURCE_PREFIX_R) = 1;
-  -- and xmlExists('declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; $res/Resource[@Container=xs:boolean("false")]' passing RES as "res");
+   where under_path(res,P_RESOURCE_PATH) = 1;
+
 begin
+
+  DBMS_XDB.setACL(P_RESOURCE_PATH,P_ACL_PATH);
  
-  DBMS_XDB.setACL(P_FOLDER_PATH,P_ACL_PATH);
-  
-  for d in getDocumentListing loop
-    DBMS_XDB.setACL(d.PATH,P_ACL_PATH);
-  end loop;
+  if (isFolder(P_RESOURCE_PATH) and P_DEEP) then
+	  for r in getListing loop
+  	  DBMS_XDB.setACL(r.PATH,P_ACL_PATH);
+  	end loop;
+  end if;
+
 end;
 --
 procedure SETACL(P_RESOURCE_PATH VARCHAR2, P_ACL_PATH VARCHAR2, P_DEEP BOOLEAN DEFAULT FALSE)
 as
-  cursor getFolderListing
-  is
-  select PATH
-    from PATH_VIEW
-   where under_path(res,P_RESOURCE_PATH,1) = 1
-     and existsNode(res,'/r:Resource[@Container="true"]',XDB_NAMESPACES.RESOURCE_PREFIX_R) = 1;
-  -- and xmlExists('declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; $res/Resource[@Container=xs:boolean("true")]' passing RES as "res");
 begin
-
-  if (not P_DEEP) then
-    DBMS_XDB.setACL(P_RESOURCE_PATH,P_ACL_PATH);
-  else
-    if (isFolder(P_RESOURCE_PATH)) then    
-      -- Set the ACL for the folder and all documents
-      setFolderACLInternal(P_RESOURCE_PATH,P_ACL_PATH);
-      -- Set the ACL for all subfolders
-      for f in getFolderListing loop
-        setFolderACLInternal(f.PATH,P_ACL_PATH);
-      end loop;
-    end if;
-  end if;
-  
+  setACLInternal(P_RESOURCE_PATH,P_ACL_PATH,P_DEEP);
 end;
 --
 procedure CHANGEOWNER(P_RESOURCE_PATH VARCHAR2, P_NEW_OWNER VARCHAR2, P_DEEP BOOLEAN DEFAULT FALSE)
@@ -1032,171 +1061,277 @@ begin
   DBMS_XDB.renameResource(P_RESOURCE_PATH,substr(P_RESOURCE_PATH,1,instr(P_RESOURCE_PATH,'/',-1)-1),P_NEW_NAME);
 end;
 --
-procedure copyResourceInternal(P_SOURCE_PATH VARCHAR2, P_TARGET_FOLDER VARCHAR2)
+procedure copyCreateDocument(P_TARGET_PATH VARCHAR2, P_SOURCE_PATH VARCHAR2, P_DUPLICATE_POLICY VARCHAR2)
 as
-  V_TARGET_NAME VARCHAR2(256);
-  V_TARGET_PATH VARCHAR2(1024);
-  V_RESULT      BOOLEAN;
-begin
-  V_TARGET_NAME := substr(P_SOURCE_PATH,instr(P_SOURCE_PATH,'/',-1)+1);
-  V_TARGET_PATH := P_TARGET_FOLDER || '/' || V_TARGET_NAME;      
-  if (not DBMS_XDB.existsResource(V_TARGET_PATH)) then
-    V_RESULT := DBMS_XDB.createResource(V_TARGET_PATH,xdburitype(P_SOURCE_PATH).getBlob());
+  V_RESOURCE          DBMS_XDBRESOURCE.XDBResource;
+  V_RESOURCE_ELEMENT  DBMS_XMLDOM.DOMElement;
+  V_RESID             RAW(16);
+  V_RESULT            BOOLEAN;
+begin	
+
+  $IF $$DEBUG $THEN
+     XDB_OUTPUT.writeLogFileEntry('copyCreateDocument P_TARGET_PATH :' || P_TARGET_PATH );
+     XDB_OUTPUT.writeLogFileEntry('copyCreateDocument P_SOURCE_PATH :' || P_SOURCE_PATH );
+     XDB_OUTPUT.flushLogFile();
+	$END
+
+
+  if (not DBMS_XDB.existsResource(P_TARGET_PATH)) then
+    V_RESULT := DBMS_XDB.createResource(P_TARGET_PATH,xdburitype(P_SOURCE_PATH).getBlob());
+    return;
+  end if;      
+
+
+	if (P_DUPLICATE_POLICY = XDB_CONSTANTS.SKIP) then
+	  return;
+	end if;
+
+  if (P_DUPLICATE_POLICY = XDB_CONSTANTS.RAISE_ERROR) then
+    -- Error will be thrown if item exists
+    V_RESULT := DBMS_XDB.createResource(P_TARGET_PATH,xdburitype(P_SOURCE_PATH).getBlob());
+    return;
+  end if;
+    
+  if (P_DUPLICATE_POLICY = XDB_CONSTANTS.OVERWRITE) then
+    V_RESOURCE := DBMS_XDB.getResource(P_TARGET_PATH);
+    setContent(P_TARGET_PATH,xdburitype(P_SOURCE_PATH).getBlob());
+    DBMS_XDB.refreshContentSize(P_TARGET_PATH);
+  end if;
+
+  if (P_DUPLICATE_POLICY = XDB_CONSTANTS.VERSION) then
+    V_RESOURCE := DBMS_XDB.getResource(P_TARGET_PATH);
+    V_RESOURCE_ELEMENT := DBMS_XMLDOM.getDocumentElement(DBMS_XDBRESOURCE.makeDocument(V_RESOURCE));
+    if (DBMS_XMLDOM.getAttribute(V_RESOURCE_ELEMENT,'IsVersion') = 'false') then
+      V_RESID := DBMS_XDB_VERSION.makeVersioned(P_TARGET_PATH);
+    end if;
+    if (DBMS_XMLDOM.getAttribute(V_RESOURCE_ELEMENT,'IsCheckedOut') = 'true') then
+      setContent(P_TARGET_PATH,xdburitype(P_SOURCE_PATH).getBlob());
+      DBMS_XDB.refreshContentSize(P_TARGET_PATH);
+    else
+      DBMS_XDB_VERSION.checkOut(P_TARGET_PATH);
+      setContent(P_TARGET_PATH,xdburitype(P_SOURCE_PATH).getBlob());
+      V_RESID := DBMS_XDB_VERSION.checkIn(P_TARGET_PATH);
+      DBMS_XDB.refreshContentSize(P_TARGET_PATH);
+    end if;	         
+    return;
   end if;
 end;    
 --
-procedure copyFolderInternal(P_FOLDER_PATH VARCHAR2,P_TARGET_FOLDER VARCHAR2)
+procedure copyCreateFolder(P_TARGET_FOLDER VARCHAR2,P_SOURCE_PATH VARCHAR2)
 as
-  V_TARGET_NAME VARCHAR2(256);
-  V_TARGET_PATH VARCHAR2(1024);
   V_RESOURCE    DBMS_XDBRESOURCE.XDBResource;
   V_RESULT      BOOLEAN;
   
-  cursor getDocumentListing
-  is
-  select path
-    from PATH_VIEW
-   where under_path(res,1,P_FOLDER_PATH) = 1
-     and existsNode(res,'/r:Resource[@Container="false"]',XDB_NAMESPACES.RESOURCE_PREFIX_R) = 1;
-  -- and xmlExists('declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; $res/Resource[@Container=xs:boolean("false")]' passing RES as "res");
-
 begin
-  V_TARGET_NAME := substr(P_FOLDER_PATH,instr(P_FOLDER_PATH,'/',-1)+1);
-  V_TARGET_PATH := P_TARGET_FOLDER || '/' || V_TARGET_NAME;      
 
-  if (not DBMS_XDB.existsResource(V_TARGET_PATH)) then
-    V_RESULT := DBMS_XDB.createFolder(V_TARGET_PATH);
-    V_RESOURCE := DBMS_XDB.getResource(V_TARGET_PATH);
-    DBMS_XDBRESOURCE.setComment(V_RESOURCE,'Copy of ' || P_FOLDER_PATH);
+  $IF $$DEBUG $THEN
+     XDB_OUTPUT.writeLogFileEntry('copyCreateFolder P_TARGET_FOLDER : ' || P_TARGET_FOLDER );
+     XDB_OUTPUT.flushLogFile();
+	$END
+  
+  if (not DBMS_XDB.existsResource(P_TARGET_FOLDER)) then
+    V_RESULT := DBMS_XDB.createFolder(P_TARGET_FOLDER);
+    V_RESOURCE := DBMS_XDB.getResource(P_TARGET_FOLDER);
+    DBMS_XDBRESOURCE.setComment(V_RESOURCE,'Copy of ' || P_SOURCE_PATH);
     DBMS_XDBRESOURCE.save(V_RESOURCE);
   end if;
   
-  for d in getDocumentListing loop
-    copyResourceInternal(d.PATH,V_TARGET_PATH);
-  end loop;
-  
 end;
 --
-procedure COPYRESOURCE(P_RESOURCE_PATH VARCHAR2, P_TARGET_FOLDER VARCHAR2,P_DEEP BOOLEAN DEFAULT FALSE)
+procedure COPYRESOURCE(P_RESOURCE_PATH VARCHAR2, P_TARGET_FOLDER VARCHAR2, P_DEEP BOOLEAN DEFAULT FALSE, P_DUPLICATE_POLICY VARCHAR2 DEFAULT XDB_CONSTANTS.RAISE_ERROR)
 as
-  V_TARGET_FOLDER     VARCHAR2(1024);
-  V_TARGET_NAME       VARCHAR2(256);
-  V_RELATIVE_PATH     VARCHAR2(1024);
+  V_TARGET_PATH       VARCHAR2(1024);
+  V_PARENT_PATH       VARCHAR2(1024) := substr(P_RESOURCE_PATH,1,instr(P_RESOURCE_PATH,'/',-1)-1);
 
-  cursor getFolderListing
+  cursor deepFolderListing
   is
   select PATH
     from PATH_VIEW
    where under_path(res,P_RESOURCE_PATH,1) = 1
-     and existsNode(res,'/r:Resource[@Container="true"]',XDB_NAMESPACES.RESOURCE_PREFIX_R) = 1;
-  -- and xmlExists('declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; $res/Resource[@Container=xs:boolean("true")]' passing RES as "res");
+     and existsNode(res,'/r:Resource[@Container="true"]',XDB_NAMESPACES.RESOURCE_PREFIX_R) = 1
+  -- and xmlExists('declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; $res/Resource[@Container=xs:boolean("true")]' passing RES as "res")
+   order by DEPTH(1);
   
-begin
-  if (not isFolder(P_RESOURCE_PATH)) then    
-    copyResourceInternal(P_RESOURCE_PATH,P_TARGET_FOLDER);
-  else
-    V_TARGET_NAME   := substr(P_RESOURCE_PATH,instr(P_RESOURCE_PATH,'/',-1)+1);
-    V_TARGET_FOLDER := P_TARGET_FOLDER || '/' || V_TARGET_NAME;
-    if (not P_DEEP) then
-      copyFolderInternal(V_TARGET_FOLDER,P_TARGET_FOLDER);
-    else
-      for f in getFolderListing loop
-        V_RELATIVE_PATH := substr(f.PATH,length(P_RESOURCE_PATH) + 1);
-        V_RELATIVE_PATH := substr(V_RELATIVE_PATH,1,instr(V_RELATIVE_PATH,'/',-1)-1);
-        copyFolderInternal(f.PATH,P_TARGET_FOLDER || V_RELATIVE_PATH);
-      end loop;
-    end if;
-  end if;
-end;
---
-procedure publishResourceInternal(P_SOURCE_PATH VARCHAR2, P_TARGET_FOLDER VARCHAR2, P_MAKE_PUBLIC BOOLEAN)
-as
-  V_TARGET_NAME VARCHAR2(256);
-  V_TARGET_PATH VARCHAR2(1024);
-begin
-  V_TARGET_NAME := substr(P_SOURCE_PATH,instr(P_SOURCE_PATH,'/',-1)+1);
-  V_TARGET_PATH := P_TARGET_FOLDER || '/' || V_TARGET_NAME;      
-  if (not DBMS_XDB.existsResource(V_TARGET_PATH)) then
-    DBMS_XDB.link(P_SOURCE_PATH,P_TARGET_FOLDER,V_TARGET_NAME,DBMS_XDB.LINK_TYPE_WEAK);
-    if (P_MAKE_PUBLIC) then
-      DBMS_XDB.setACL(V_TARGET_PATH,'/sys/acls/bootstrap_acl.xml');
-    end if;
-  end if;
-end;    
---
-procedure publishFolderInternal(P_FOLDER_PATH VARCHAR2,P_TARGET_FOLDER VARCHAR2, P_MAKE_PUBLIC BOOLEAN)
-as
-  V_TARGET_NAME VARCHAR2(256);
-  V_TARGET_PATH VARCHAR2(1024);
-  V_RESOURCE    DBMS_XDBRESOURCE.XDBResource;
-  V_RESULT      BOOLEAN;
-
-  cursor getDocumentListing
+  cursor deepDocumentListing
   is
-  select path
+  select PATH
     from PATH_VIEW
-   where under_path(res,1,P_FOLDER_PATH) = 1
+   where under_path(res,P_RESOURCE_PATH,1) = 1
+     and existsNode(res,'/r:Resource[@Container="false"]',XDB_NAMESPACES.RESOURCE_PREFIX_R) = 1
+  -- and xmlExists('declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; $res/Resource[@Container=xs:boolean("false")]' passing RES as "res")
+   order by DEPTH(1);
+
+  cursor shallowDocumentListing
+  is
+  select PATH
+    from PATH_VIEW
+   where under_path(res,1,P_RESOURCE_PATH) = 1
      and existsNode(res,'/r:Resource[@Container="false"]',XDB_NAMESPACES.RESOURCE_PREFIX_R) = 1;
   -- and xmlExists('declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; $res/Resource[@Container=xs:boolean("false")]' passing RES as "res");
 
 begin
-  V_TARGET_NAME := substr(P_FOLDER_PATH,instr(P_FOLDER_PATH,'/',-1)+1);
-  V_TARGET_PATH := P_TARGET_FOLDER || '/' || V_TARGET_NAME;      
+	
+	-- ToDo : Code to handle '/' as SOURCE.
+	-- ToDo : Code to handle Source == Target.
+	
+  -- If the target is a document copy the content to the target folder.
+  -- If the target is a folder and deep is false do a shallow copy.
+  -- If the target is a folder and deep is true to a deep copy.
 
-  if (not DBMS_XDB.existsResource(V_TARGET_PATH)) then
-    V_RESULT := DBMS_XDB.createFolder(V_TARGET_PATH);
-    if (P_MAKE_PUBLIC) then
-      DBMS_XDB.setACL(V_TARGET_PATH,'/sys/acls/ro_all_acl.xml');
-    end if;
-    V_RESOURCE := DBMS_XDB.getResource(V_TARGET_PATH);
-    DBMS_XDBRESOURCE.setComment(V_RESOURCE,'Published version of ' || P_FOLDER_PATH);
+  $IF $$DEBUG $THEN
+     XDB_OUTPUT.writeLogFileEntry('copyResource P_RESOURCE_PATH    : ' || P_RESOURCE_PATH);
+     XDB_OUTPUT.writeLogFileEntry('copyResource P_TARGET_FOLDER    : ' || P_TARGET_FOLDER);
+     XDB_OUTPUT.writeLogFileEntry('copyResource P_DEEP             : ' || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_DEEP));
+     XDB_OUTPUT.writeLogFileEntry('copyResource P_DUPLICATE_POLICY : ' || P_DUPLICATE_POLICY);
+     XDB_OUTPUT.writeLogFileEntry('copyResource V_PARENT_PATH      : ' || V_PARENT_PATH);
+     XDB_OUTPUT.flushLogFile();
+	$END
+  
+  if (isFolder(P_RESOURCE_PATH)) then  
+    V_TARGET_PATH := P_TARGET_FOLDER || '/' || substr(P_RESOURCE_PATH,length(V_PARENT_PATH) + 1);
+    copyCreateFolder(V_TARGET_PATH, P_RESOURCE_PATH);
+    if (P_DEEP) then
+      for f in deepFolderListing loop
+        V_TARGET_PATH := P_TARGET_FOLDER || '/' || substr(f.PATH,length(V_PARENT_PATH) + 1);
+        copyCreateFolder(V_TARGET_PATH,f.PATH);
+    	end loop;
+      for d in deepDocumentListing loop
+        V_TARGET_PATH := P_TARGET_FOLDER ||  substr(d.PATH,length(V_PARENT_PATH) + 1);
+		    copyCreateDocument(V_TARGET_PATH,d.PATH,P_DUPLICATE_POLICY);
+      end loop;  
+    else
+      for d in shallowDocumentListing loop
+        V_TARGET_PATH := P_TARGET_FOLDER ||  substr(d.PATH,length(V_PARENT_PATH) + 1);
+		    copyCreateDocument(V_TARGET_PATH,d.PATH,P_DUPLICATE_POLICY);
+			end loop;      
+    end if;    
+  else  
+    V_TARGET_PATH := P_TARGET_FOLDER || '/' || substr(P_RESOURCE_PATH,instr(P_RESOURCE_PATH,'/',-1)+1);
+    copyCreateDocument(V_TARGET_PATH,P_RESOURCE_PATH,P_DUPLICATE_POLICY);
+  end if;
+
+
+  $IF $$DEBUG $THEN
+	  XDB_OUTPUT.flushLogFile();
+	$END  
+end;
+--
+procedure publishFolder(P_TARGET_FOLDER VARCHAR2,P_SOURCE_PATH VARCHAR2,P_MAKE_PUBLIC BOOLEAN)
+as
+  V_RESOURCE    DBMS_XDBRESOURCE.XDBResource;
+  V_RESULT      BOOLEAN;
+  
+begin
+
+  $IF $$DEBUG $THEN
+     XDB_OUTPUT.writeLogFileEntry('copyCreateFolder P_TARGET_FOLDER : ' || P_TARGET_FOLDER );
+     XDB_OUTPUT.flushLogFile();
+	$END
+  
+  if (not DBMS_XDB.existsResource(P_TARGET_FOLDER)) then
+    V_RESULT := DBMS_XDB.createFolder(P_TARGET_FOLDER);
+    V_RESOURCE := DBMS_XDB.getResource(P_TARGET_FOLDER);
+    DBMS_XDBRESOURCE.setComment(V_RESOURCE,'Published Version of ' || P_SOURCE_PATH);
     DBMS_XDBRESOURCE.save(V_RESOURCE);
   end if;
+
+  if (P_MAKE_PUBLIC) then
+	  DBMS_XDB.setACL(P_SOURCE_PATH,'/sys/acls/bootstrap_acl.xml');
+	end if;
   
-  for d in getDocumentListing loop
-    publishResourceInternal(d.PATH,V_TARGET_PATH,P_MAKE_PUBLIC);
-  end loop;
 end;
+--
+procedure publishResourceInternal(P_TARGET_PATH VARCHAR2, P_SOURCE_PATH VARCHAR2, P_MAKE_PUBLIC BOOLEAN)
+as
+  V_TARGET_NAME   VARCHAR2(256);
+  V_TARGET_FOLDER VARCHAR2(1024);
+begin
+  V_TARGET_NAME   := substr(P_TARGET_PATH,instr(P_TARGET_PATH,'/',-1)+1);
+  V_TARGET_FOLDER := substr(P_TARGET_PATH,1,instr(P_TARGET_PATH,'/',-1)-1);
+  if (not DBMS_XDB.existsResource(P_TARGET_PATH)) then
+    DBMS_XDB.link(P_SOURCE_PATH,V_TARGET_FOLDER,V_TARGET_NAME,DBMS_XDB.LINK_TYPE_WEAK);
+    if (P_MAKE_PUBLIC) then
+      DBMS_XDB.setACL(P_SOURCE_PATH,'/sys/acls/bootstrap_acl.xml');
+    end if;
+  end if;
+end;    
 --
 procedure PUBLISHRESOURCE(P_RESOURCE_PATH VARCHAR2, P_DEEP BOOLEAN DEFAULT FALSE, P_MAKE_PUBLIC BOOLEAN DEFAULT FALSE)
 as
+  V_TARGET_PATH       VARCHAR2(1024);
   V_TARGET_FOLDER     VARCHAR2(1024);
-  V_TARGET_NAME       VARCHAR2(256);
-  V_RELATIVE_PATH     VARCHAR2(1024);
-
-  cursor getFolderListing
+  V_PARENT_PATH       VARCHAR2(1024) := substr(P_RESOURCE_PATH,1,instr(P_RESOURCE_PATH,'/',-1)-1);
+  
+  cursor deepResourceListing
   is
   select PATH
     from PATH_VIEW
    where under_path(res,P_RESOURCE_PATH,1) = 1
-     and existsNode(res,'/r:Resource[@Container="true"]',XDB_NAMESPACES.RESOURCE_PREFIX_R) = 1;
-  -- and xmlExists('declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; $res/Resource[@Container=xs:boolean("true")]' passing RES as "res");
-  
+  -- and xmlExists('declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; $res/Resource[@Container=xs:boolean("false")]' passing RES as "res")
+   order by DEPTH(1);
+
+  cursor shallowDocumentListing
+  is
+  select PATH
+    from PATH_VIEW
+   where under_path(res,1,P_RESOURCE_PATH) = 1
+     and existsNode(res,'/r:Resource[@Container="false"]',XDB_NAMESPACES.RESOURCE_PREFIX_R) = 1;
+  -- and xmlExists('declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; $res/Resource[@Container=xs:boolean("false")]' passing RES as "res");
+
 begin
+	
+	-- ToDo : Code to handle '/' as SOURCE.
+	-- ToDo : Code to handle Source == Target.
+	
+  -- If the target is a document create a link to the document in the User's publishedContent Folder.
+  -- If the target is a folder and deep is false create a copy of the Folder in the User's publishedContent Folder and soft link the documents from the source file.
+  -- If the target is a folder and deep is true create a link to the Folder in the User's publishedContentFolder
+  
+  -- If MakePublic is true for a shallow copy alter the ACL of all documents in the sourceFolder;
+  -- If MakePublic is true for a deep copy alter the ACL of all documents and folders under the sourceFolder
+
+  $IF $$DEBUG $THEN
+     XDB_OUTPUT.writeLogFileEntry('publishResource P_RESOURCE_PATH  : ' || P_RESOURCE_PATH);
+     XDB_OUTPUT.writeLogFileEntry('publishResource P_DEEP           : ' || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_DEEP));
+     XDB_OUTPUT.writeLogFileEntry('publishResource P_MAKE_PUBLIC    : ' || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_MAKE_PUBLIC));
+     XDB_OUTPUT.flushLogFile();
+	$END
+  
   if (not DBMS_XDB.existsResource(XDB_CONSTANTS.FOLDER_USER_PUBLIC)) then
     XDB_UTILITIES.createPublicFolder();
   else
     XDB_UTILITIES.setPublicIndexPageContent();
   end if;
   
-  if (not isFolder(P_RESOURCE_PATH)) then    
-    publishResourceInternal(P_RESOURCE_PATH,XDB_CONSTANTS.FOLDER_USER_PUBLIC,P_MAKE_PUBLIC);
-  else
-    V_TARGET_NAME   := substr(P_RESOURCE_PATH,instr(P_RESOURCE_PATH,'/',-1)+1);
-    V_TARGET_FOLDER := XDB_CONSTANTS.FOLDER_USER_PUBLIC || '/' || V_TARGET_NAME;
-    if (not P_DEEP) then
-      publishFolderInternal(P_RESOURCE_PATH,XDB_CONSTANTS.FOLDER_USER_PUBLIC,P_MAKE_PUBLIC);
+  if (isFolder(P_RESOURCE_PATH)) then  
+    V_TARGET_PATH := XDB_CONSTANTS.FOLDER_USER_PUBLIC || '/' || substr(P_RESOURCE_PATH,length(V_PARENT_PATH) + 1);
+    if (P_DEEP) then
+	    publishResourceInternal(V_TARGET_PATH,P_RESOURCE_PATH,P_MAKE_PUBLIC);
+	    if (P_MAKE_PUBLIC) then
+	      for r in deepResourceListing loop
+		      DBMS_XDB.setACL(r.PATH,'/sys/acls/bootstrap_acl.xml');
+	      end loop;
+	    end if;	      
     else
-      for f in getFolderListing loop
-        V_RELATIVE_PATH := substr(f.PATH,length(P_RESOURCE_PATH) + 1);
-        V_RELATIVE_PATH := substr(V_RELATIVE_PATH,1,instr(V_RELATIVE_PATH,'/',-1)-1);
-        publishFolderInternal(f.PATH,XDB_CONSTANTS.FOLDER_USER_PUBLIC || V_RELATIVE_PATH,P_MAKE_PUBLIC);
-      end loop;
-    end if;
+    	publishFolder(V_TARGET_PATH,P_RESOURCE_PATH,P_MAKE_PUBLIC);
+    	V_TARGET_FOLDER := V_TARGET_PATH;
+      for d in shallowDocumentListing loop
+	    	V_TARGET_PATH := V_TARGET_FOLDER || substr(d.PATH,instr(d.PATH,'/',-1)+1);
+		    publishResourceInternal(V_TARGET_PATH,d.PATH,P_MAKE_PUBLIC);
+      end loop;  
+    end if;    
+  else  
+    V_TARGET_PATH := XDB_CONSTANTS.FOLDER_USER_PUBLIC || '/' || substr(P_RESOURCE_PATH,instr(P_RESOURCE_PATH,'/',-1)+1);
+    publishResourceInternal(V_TARGET_PATH,P_RESOURCE_PATH,P_MAKE_PUBLIC);
   end if;
+
+
+  $IF $$DEBUG $THEN
+	  XDB_OUTPUT.flushLogFile();
+	$END  
 end;
 --
-procedure UPLOADRESOURCE(P_RESOURCE_PATH VARCHAR2, P_CONTENT BLOB, P_CONTENT_TYPE VARCHAR2, P_DESCRIPTION VARCHAR2, P_LANGUAGE VARCHAR2, P_CHARACTER_SET VARCHAR2, P_DUPLICATE_POLICY VARCHAR2)
+procedure UPLOADRESOURCE(P_RESOURCE_PATH VARCHAR2, P_CONTENT BLOB, P_CONTENT_TYPE VARCHAR2, P_DESCRIPTION VARCHAR2, P_LANGUAGE VARCHAR2, P_CHARACTER_SET VARCHAR2, P_DUPLICATE_POLICY VARCHAR2 DEFAULT XDB_CONSTANTS.RAISE_ERROR)
 as
 /*
     Positibilites
@@ -1218,11 +1353,11 @@ as
 
   V_PARAMETERS        XMLType;
   V_STACK_TRACE       XMLType;
+  V_RESID             RAW(16);
   V_INIT              TIMESTAMP WITH TIME ZONE := SYSTIMESTAMP;
   V_RESULT            BOOLEAN;
   V_RESOURCE          DBMS_XDBRESOURCE.XDBResource;
   V_RESOURCE_ELEMENT  DBMS_XMLDOM.DOMElement;
-  V_RESID             RAW(16);
 begin
   if (not DBMS_XDB.existsResource(P_RESOURCE_PATH)) then
     V_RESULT := DBMS_XDB.createResource(P_RESOURCE_PATH,P_CONTENT);
@@ -1314,10 +1449,10 @@ begin
   
 end;
 --
-procedure UNZIP(P_FOLDER_PATH VARCHAR2, P_RESOURCE_PATH VARCHAR2, P_DUPLICATE_ACTION VARCHAR2)
+procedure UNZIP(P_FOLDER_PATH VARCHAR2, P_RESOURCE_PATH VARCHAR2, P_DUPLICATE_POLICY VARCHAR2 DEFAULT XDB_CONSTANTS.RAISE_ERROR)
 as
 begin
-  XDB_IMPORT_UTILITIES.unzip(P_RESOURCE_PATH,P_FOLDER_PATH,NULL,P_DUPLICATE_ACTION);
+  XDB_IMPORT_UTILITIES.unzip(P_RESOURCE_PATH,P_FOLDER_PATH,NULL,P_DUPLICATE_POLICY);
 end;
 --
 procedure createIndexPage(P_FOLDER_PATH VARCHAR2) 
@@ -1456,7 +1591,7 @@ begin
   return V_RESOURCE_PATH;
 end;
 --
-procedure setCustomViewer(P_RESOURCE_PATH VARCHAR2,P_VIEWER_PATH VARCHAR2,P_ARGUMENTS VARCHAR2 DEFAULT NULL)
+procedure setCustomViewer(P_RESOURCE_PATH VARCHAR2,P_VIEWER_PATH VARCHAR2,P_METHOD VARCHAR2 DEFAULT NULL)
 as
   V_RESOURCE          DBMS_XDBRESOURCE.XDBResource;
   V_METADATA          XMLTYPE;
@@ -1467,17 +1602,18 @@ begin
   if (P_VIEWER_PATH is not NULL) then
     
     select XMLElement( 
-             evalname(XFILES_CONSTANTS.ELEMENT_CUSTOM_VIEWER),
+  	         evalname(XFILES_CONSTANTS.ELEMENT_CUSTOM_VIEWER),
              xmlAttributes(
-               XFILES_CONSTANTS.NAMESPACE_XFILES as "xmlns",
-               P_ARGUMENTS as "Arguments"
-             ),
-             P_VIEWER_PATH
+    	         XFILES_CONSTANTS.NAMESPACE_XFILES as "xmlns",
+       	       P_METHOD as "method"
+         	   ),
+           	 P_VIEWER_PATH
            )
       into V_METADATA
-      from DUAL;
+    	from DUAL;
 
     DBMS_XDB.appendResourceMetadata(P_RESOURCE_PATH,V_METADATA);
+
   end if;
 end;
 --
@@ -1508,7 +1644,7 @@ end;
 begin
 	NULL;
   $IF $$DEBUG $THEN
-     XDB_OUTPUT.createlogFile('/public/XDB_REPOSITORY_SERVICES.log',FALSE);
+     XDB_OUTPUT.createLogFile('/public/XDB_REPOSITORY_SERVICES.log',FALSE);
      XDB_OUTPUT.writeLogFileEntry('Tracing initialized for XDB_REPOSITORY_SERVICES');
      XDB_OUTPUT.flushLogFile();
   $END

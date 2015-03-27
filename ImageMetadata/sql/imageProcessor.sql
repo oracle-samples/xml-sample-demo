@@ -271,15 +271,21 @@ begin
     into V_PARAMETERS
     from dual;
 
-  V_EVENT_TYPE := P_PAYLOAD.extract('/re:EventDetail/re:eventType/text()',XDB_NAMESPACES.RESOURCE_EVENT_PREFIX_RE).getNumberVal();
-  V_TARGET_RESOURCE := P_PAYLOAD.extract('/re:EventDetail/re:resourcePath/text()',XDB_NAMESPACES.RESOURCE_EVENT_PREFIX_RE).getStringVal();
-  
-  if (P_PAYLOAD.existsNode('/re:EventDetail/re:existingMetadata/text()',XDB_NAMESPACES.RESOURCE_EVENT_PREFIX_RE)) = 1 then
-    select HEXTOREF(P_PAYLOAD.extract('/re:EventDetail/re:existingMetadata/text()',XDB_NAMESPACES.RESOURCE_EVENT_PREFIX_RE).getStringVal())
-      into V_TARGET_METADATA 
-      from dual;
-  end if;
-    
+  select EVENT_TYPE, TARGET_RESOURCE, HEXTOREF(TARGET_METADATA)
+    into V_EVENT_TYPE, V_TARGET_RESOURCE, V_TARGET_METADATA
+    from XMLTABLE(
+           XMLNAMESPACES(
+             -- XDB_NAMESPACES.RESOURCE_EVENT_PREFIX_RE as "re"
+             'http://xmlns.oracle.com/xdb/pm/resourceEvent' as "re"
+           ),
+           '/re:EventDetail'
+           passing P_PAYLOAD
+           columns
+             EVENT_TYPE      varchar2(4000) path 're:eventType/text()',
+             TARGET_RESOURCE varchar2(4000) path 're:resourcePath/text()',
+             TARGET_METADATA varchar2(4000) path 're:existingMetadata/text()'
+        );
+            
   CASE V_EVENT_TYPE 
     WHEN DBMS_XEVENT.POST_CREATE_EVENT THEN 
       insertImageMetadata(V_TARGET_RESOURCE);

@@ -51,12 +51,12 @@ then
   echo "Installation Failed: See $logfilename for details."
   exit 4
 fi
-cp "$demohome/setup/cloneSource/imageEventConfiguration.xml" "$demohome/xml/imageEventConfiguration.xml"
-sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\Mark D Drake\AppData\Roaming\Microsoft\Windows\Start Menu|g" -e "s|%WINWORD%|C:\PROGRA~2\MICROS~2\Office12\WINWORD.EXE|g" -e "s|%EXCEL%|C:\PROGRA~2\MICROS~2\Office12\EXCEL.EXE|g" -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|ImageMetadata|g" -e "s|%DEMONAME%|Oracle XML DB Repository Metadata and Events|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%BASEFOLDER%|\/home\/%USER%\/imageMetadata|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/xdb\/extras\/imageMetadata.xsd|g" -e "s|%RESCONFIG_PATH%|\/home\/%USER%\/imageMetadata\/xml\/imageEventConfiguration.xml|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%DEBUG%|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i "$demohome/xml/imageEventConfiguration.xml"
-cp "$demohome/setup/cloneSource/imageGalleryResConfig.xml" "$demohome/xml/imageGalleryResConfig.xml"
-sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\Mark D Drake\AppData\Roaming\Microsoft\Windows\Start Menu|g" -e "s|%WINWORD%|C:\PROGRA~2\MICROS~2\Office12\WINWORD.EXE|g" -e "s|%EXCEL%|C:\PROGRA~2\MICROS~2\Office12\EXCEL.EXE|g" -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|ImageMetadata|g" -e "s|%DEMONAME%|Oracle XML DB Repository Metadata and Events|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%BASEFOLDER%|\/home\/%USER%\/imageMetadata|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/xdb\/extras\/imageMetadata.xsd|g" -e "s|%RESCONFIG_PATH%|\/home\/%USER%\/imageMetadata\/xml\/imageEventConfiguration.xml|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%DEBUG%|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i "$demohome/xml/imageGalleryResConfig.xml"
+cp "$demohome/setup/cloneSource/imageEventConfiguration.xml" "$demohome/resConfig/imageEventConfiguration.xml"
+sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\Mark D Drake\AppData\Roaming\Microsoft\Windows\Start Menu|g" -e "s|%WINWORD%|C:\PROGRA~2\MICROS~2\Office12\WINWORD.EXE|g" -e "s|%EXCEL%|C:\PROGRA~2\MICROS~2\Office12\EXCEL.EXE|g" -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|ImageMetadata|g" -e "s|%DEMONAME%|Oracle XML DB Repository Metadata and Events|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%BASEFOLDER%|\/home\/%USER%\/imageMetadata|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/xdb\/extras\/imageMetadata.xsd|g" -e "s|%RESCONFIG_PATH%|\/home\/%USER%\/imageMetadata\/resConfig\/imageEventConfiguration.xml|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%DEBUG%|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i "$demohome/resConfig/imageEventConfiguration.xml"
+cp "$demohome/setup/cloneSource/imageGalleryResConfig.xml" "$demohome/resConfig/imageGalleryResConfig.xml"
+sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\Mark D Drake\AppData\Roaming\Microsoft\Windows\Start Menu|g" -e "s|%WINWORD%|C:\PROGRA~2\MICROS~2\Office12\WINWORD.EXE|g" -e "s|%EXCEL%|C:\PROGRA~2\MICROS~2\Office12\EXCEL.EXE|g" -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|ImageMetadata|g" -e "s|%DEMONAME%|Oracle XML DB Repository Metadata and Events|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%BASEFOLDER%|\/home\/%USER%\/imageMetadata|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/xdb\/extras\/imageMetadata.xsd|g" -e "s|%RESCONFIG_PATH%|\/home\/%USER%\/imageMetadata\/resConfig\/imageEventConfiguration.xml|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%DEBUG%|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i "$demohome/resConfig/imageGalleryResConfig.xml"
 cp "$demohome/setup/cloneSource/EXIFViewer.js" "$demohome/js/EXIFViewer.js"
-sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\Mark D Drake\AppData\Roaming\Microsoft\Windows\Start Menu|g" -e "s|%WINWORD%|C:\PROGRA~2\MICROS~2\Office12\WINWORD.EXE|g" -e "s|%EXCEL%|C:\PROGRA~2\MICROS~2\Office12\EXCEL.EXE|g" -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|ImageMetadata|g" -e "s|%DEMONAME%|Oracle XML DB Repository Metadata and Events|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%BASEFOLDER%|\/home\/%USER%\/imageMetadata|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/xdb\/extras\/imageMetadata.xsd|g" -e "s|%RESCONFIG_PATH%|\/home\/%USER%\/imageMetadata\/xml\/imageEventConfiguration.xml|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%DEBUG%|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i "$demohome/js/EXIFViewer.js"
+sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\Mark D Drake\AppData\Roaming\Microsoft\Windows\Start Menu|g" -e "s|%WINWORD%|C:\PROGRA~2\MICROS~2\Office12\WINWORD.EXE|g" -e "s|%EXCEL%|C:\PROGRA~2\MICROS~2\Office12\EXCEL.EXE|g" -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|ImageMetadata|g" -e "s|%DEMONAME%|Oracle XML DB Repository Metadata and Events|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%BASEFOLDER%|\/home\/%USER%\/imageMetadata|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/xdb\/extras\/imageMetadata.xsd|g" -e "s|%RESCONFIG_PATH%|\/home\/%USER%\/imageMetadata\/resConfig\/imageEventConfiguration.xml|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%DEBUG%|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i "$demohome/js/EXIFViewer.js"
 HttpStatus=$(curl --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/acl_initialization_fix.xml" | head -1)
 echo "DELETE "$SERVER/sys/acls/acl_initialization_fix.xml":$HttpStatus" >> $logfilename
 if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ] && [ $HttpStatus != "404" ] 
@@ -83,8 +83,8 @@ then
     exit 5
   fi
 fi
-HttpStatus=$(curl --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xml/categorized_image_folder_acl.xml" "$SERVER/sys/acls/acl_initialization_fix.xml" | head -1)
-echo "PUT:"$demohome/xml/categorized_image_folder_acl.xml" --> "$SERVER/sys/acls/acl_initialization_fix.xml":$HttpStatus" >> $logfilename
+HttpStatus=$(curl --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/acls/categorized_image_folder_acl.xml" "$SERVER/sys/acls/acl_initialization_fix.xml" | head -1)
+echo "PUT:"$demohome/acls/categorized_image_folder_acl.xml" --> "$SERVER/sys/acls/acl_initialization_fix.xml":$HttpStatus" >> $logfilename
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename
@@ -180,7 +180,7 @@ sqlplus $DBA/$DBAPWD@$ORACLE_SID as sysdba @$demohome/install/sql/remove10gR2Dem
 sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/deleteMetadataSchema.sql $USER
 sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/removeEventHandler.sql XDBMETADATA /publishedContent/repositoryFeatures/xml/imageEventConfiguration.xml
 sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/removeRepositoryQueue.sql XDBMETADATA
-sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/removeEventHandler.sql $USER /home/$USER/imageMetadata/xml/imageEventConfiguration.xml
+sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/removeEventHandler.sql $USER /home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml
 sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/removeRepositoryQueue.sql $USER
 HttpStatus=$(curl --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/categorized_image_folder_acl.xml" | head -1)
 if [ $HttpStatus != "404" ] 
@@ -200,8 +200,8 @@ then
     exit 5
   fi
 fi
-HttpStatus=$(curl --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xml/categorized_image_folder_acl.xml" "$SERVER/sys/acls/categorized_image_folder_acl.xml" | head -1)
-echo "PUT:"$demohome/xml/categorized_image_folder_acl.xml" --> "$SERVER/sys/acls/categorized_image_folder_acl.xml":$HttpStatus" >> $logfilename
+HttpStatus=$(curl --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/acls/categorized_image_folder_acl.xml" "$SERVER/sys/acls/categorized_image_folder_acl.xml" | head -1)
+echo "PUT:"$demohome/acls/categorized_image_folder_acl.xml" --> "$SERVER/sys/acls/categorized_image_folder_acl.xml":$HttpStatus" >> $logfilename
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename
@@ -226,8 +226,8 @@ then
     exit 5
   fi
 fi
-HttpStatus=$(curl --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xml/categorized_image_acl.xml" "$SERVER/sys/acls/categorized_image_acl.xml" | head -1)
-echo "PUT:"$demohome/xml/categorized_image_acl.xml" --> "$SERVER/sys/acls/categorized_image_acl.xml":$HttpStatus" >> $logfilename
+HttpStatus=$(curl --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/acls/categorized_image_acl.xml" "$SERVER/sys/acls/categorized_image_acl.xml" | head -1)
+echo "PUT:"$demohome/acls/categorized_image_acl.xml" --> "$SERVER/sys/acls/categorized_image_acl.xml":$HttpStatus" >> $logfilename
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename
@@ -452,11 +452,11 @@ then
     exit 6
 	 fi
 fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xml" | head -1)
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig" | head -1)
 if [ $HttpStatus == "404" ] 
 then
-  HttpStatus=$(curl --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xml" | head -1)
-  echo "MKCOL "$SERVER/home/$USER/imageMetadata/xml":$HttpStatus" >> $logfilename
+  HttpStatus=$(curl --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig" | head -1)
+  echo "MKCOL "$SERVER/home/$USER/imageMetadata/resConfig":$HttpStatus" >> $logfilename
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed - Installation Aborted." >> $logfilename
@@ -464,26 +464,26 @@ then
     exit 6
 	 fi
 fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xml/imageEventConfiguration.xml" | head -1)
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml" | head -1)
 if [ $HttpStatus != "404" ] 
 then
   if [ $HttpStatus == "200" ] 
   then
-    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xml/imageEventConfiguration.xml" | head -1)
+    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml" | head -1)
     if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
     then
-      echo "DELETE(PUT) "$SERVER/home/$USER/imageMetadata/xml/imageEventConfiguration.xml":$HttpStatus - Operation Failed" >> $logfilename
+      echo "DELETE(PUT) "$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml":$HttpStatus - Operation Failed" >> $logfilename
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   else
-    echo "HEAD(PUT) "$SERVER/home/$USER/imageMetadata/xml/imageEventConfiguration.xml":$HttpStatus - Operation Failed" >> $logfilename
+    echo "HEAD(PUT) "$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml":$HttpStatus - Operation Failed" >> $logfilename
     echo "Installation Failed: See $logfilename for details."
     exit 5
   fi
 fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xml/imageEventConfiguration.xml" "$SERVER/home/$USER/imageMetadata/xml/imageEventConfiguration.xml" | head -1)
-echo "PUT:"$demohome/xml/imageEventConfiguration.xml" --> "$SERVER/home/$USER/imageMetadata/xml/imageEventConfiguration.xml":$HttpStatus" >> $logfilename
+HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/resConfig/imageEventConfiguration.xml" "$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml" | head -1)
+echo "PUT:"$demohome/resConfig/imageEventConfiguration.xml" --> "$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml":$HttpStatus" >> $logfilename
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename
@@ -900,53 +900,27 @@ then
     exit 6
 	 fi
 fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/statusPage.xml" | head -1)
-if [ $HttpStatus != "404" ] 
-then
-  if [ $HttpStatus == "200" ] 
-  then
-    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/statusPage.xml" | head -1)
-    if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
-    then
-      echo "DELETE(PUT) "$SERVER/home/$USER/statusPage.xml":$HttpStatus - Operation Failed" >> $logfilename
-      echo "Installation Failed: See $logfilename for details."
-      exit 5
-    fi
-  else
-    echo "HEAD(PUT) "$SERVER/home/$USER/statusPage.xml":$HttpStatus - Operation Failed" >> $logfilename
-    echo "Installation Failed: See $logfilename for details."
-    exit 5
-  fi
-fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xml/statusPage.xml" "$SERVER/home/$USER/statusPage.xml" | head -1)
-echo "PUT:"$demohome/xml/statusPage.xml" --> "$SERVER/home/$USER/statusPage.xml":$HttpStatus" >> $logfilename
-if [ $HttpStatus != "201" ] 
-then
-  echo "Operation Failed: Installation Aborted." >> $logfilename
-  echo "Installation Failed: See $logfilename for details."
-  exit 5
-fi
 sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/sql/enableImageGallery.sql $USER
-HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xml/imageGalleryResConfig.xml" | head -1)
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml" | head -1)
 if [ $HttpStatus != "404" ] 
 then
   if [ $HttpStatus == "200" ] 
   then
-    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xml/imageGalleryResConfig.xml" | head -1)
+    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml" | head -1)
     if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
     then
-      echo "DELETE(PUT) "$SERVER/home/$USER/imageMetadata/xml/imageGalleryResConfig.xml":$HttpStatus - Operation Failed" >> $logfilename
+      echo "DELETE(PUT) "$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml":$HttpStatus - Operation Failed" >> $logfilename
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   else
-    echo "HEAD(PUT) "$SERVER/home/$USER/imageMetadata/xml/imageGalleryResConfig.xml":$HttpStatus - Operation Failed" >> $logfilename
+    echo "HEAD(PUT) "$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml":$HttpStatus - Operation Failed" >> $logfilename
     echo "Installation Failed: See $logfilename for details."
     exit 5
   fi
 fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xml/imageGalleryResConfig.xml" "$SERVER/home/$USER/imageMetadata/xml/imageGalleryResConfig.xml" | head -1)
-echo "PUT:"$demohome/xml/imageGalleryResConfig.xml" --> "$SERVER/home/$USER/imageMetadata/xml/imageGalleryResConfig.xml":$HttpStatus" >> $logfilename
+HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/resConfig/imageGalleryResConfig.xml" "$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml" | head -1)
+echo "PUT:"$demohome/resConfig/imageGalleryResConfig.xml" --> "$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml":$HttpStatus" >> $logfilename
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename
@@ -954,7 +928,7 @@ then
   exit 5
 fi
 sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/sql/createImageCategoryFolders.sql $USER
-sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/publishAppFolder.sql $USER imageMetadata
+sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/publishAppFolder.sql $USER imageMetadata XFILES
 sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/disableUser.sql $USER
 echo "Installation Complete" >> $logfilename
 echo "Installation Complete: See $logfilename for details."

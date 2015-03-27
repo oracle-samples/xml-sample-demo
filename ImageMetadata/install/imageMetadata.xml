@@ -7,7 +7,7 @@
 		<parameter name="%BASEFOLDER%"     value="%HOMEFOLDER%/imageMetadata"/>
   	<parameter name="%PUBLICFOLDER%"   value="/publishedContent"/>
   	<parameter name="%SCHEMAURL%"      value="http://xmlns.oracle.com/xdb/extras/imageMetadata.xsd"/>
-	  <parameter name="%RESCONFIG_PATH%" value="%BASEFOLDER%/xml/imageEventConfiguration.xml"/>
+	  <parameter name="%RESCONFIG_PATH%" value="%BASEFOLDER%/resConfig/imageEventConfiguration.xml"/>
 	  <parameter name="%XFILES_SCHEMA%"  value="XFILES"/>
 		<parameter name="%XFILES_ROOT%"    value="XFILES"/>
 
@@ -29,7 +29,7 @@
   		</action>
       <action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\xml\categorized_image_folder_acl.xml</local>
+  			<local>%DEMODIRECTORY%\acls\categorized_image_folder_acl.xml</local>
   			<remote>/sys/acls/acl_initialization_fix.xml</remote>
   		</action>
   		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
@@ -79,12 +79,12 @@
     <action type="UPLOAD">
   		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
   			<mode>SKIP</mode>
-  			<local>%DEMODIRECTORY%\xml\categorized_image_folder_acl.xml</local>
+  			<local>%DEMODIRECTORY%\acls\categorized_image_folder_acl.xml</local>
   			<remote>/sys/acls/categorized_image_folder_acl.xml</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
   			<mode>SKIP</mode>
-  			<local>%DEMODIRECTORY%\xml\categorized_image_acl.xml</local>
+  			<local>%DEMODIRECTORY%\acls\categorized_image_acl.xml</local>
   			<remote>/sys/acls/categorized_image_acl.xml</remote>
   		</action>
   
@@ -139,12 +139,12 @@
   		</action>
   		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<remote>%BASEFOLDER%/xml</remote>
+  			<remote>%BASEFOLDER%/resConfig</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\xml\imageEventConfiguration.xml</local>
-  			<remote>%BASEFOLDER%/xml/imageEventConfiguration.xml</remote>
+  			<local>%DEMODIRECTORY%\resConfig\imageEventConfiguration.xml</local>
+  			<remote>%BASEFOLDER%/resConfig/imageEventConfiguration.xml</remote>
   		</action>
    	</action>  
 
@@ -244,15 +244,7 @@
   			<mode>SKIP</mode>
   			<remote>%PUBLICFOLDER%/categorization</remote>
   		</action>
-  		
-      <!-- Status Page -->
-      
-  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
-  			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\xml\statusPage.xml</local>
-  			<remote>%HOMEFOLDER%/statusPage.xml</remote>
-  		</action>
-  		
+  		 		
    	</action>
 
 
@@ -262,15 +254,15 @@
     <action type="UPLOAD">
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\xml\imageGalleryResConfig.xml</local>
-  			<remote>%BASEFOLDER%/xml/imageGalleryResConfig.xml</remote>
+  			<local>%DEMODIRECTORY%\resConfig\imageGalleryResConfig.xml</local>
+  			<remote>%BASEFOLDER%/resConfig/imageGalleryResConfig.xml</remote>
   		</action>
    	</action>
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\createImageCategoryFolders.sql %USER%</action>
 
 
 		<!-- Publish the demo -->
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishAppFolder.sql %USER% imageMetadata</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishAppFolder.sql %USER% imageMetadata %XFILES_SCHEMA%</action>
 
 		<!-- Lock the Metadata Database Schema down -->
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\disableUser.sql %USER%</action>
@@ -282,11 +274,11 @@
 		<files>
 			<file>
 				<source>%DEMODIRECTORY%\setup\cloneSource\imageEventConfiguration.xml</source>
-				<target>%DEMODIRECTORY%\xml\imageEventConfiguration.xml</target>
+				<target>%DEMODIRECTORY%\resConfig\imageEventConfiguration.xml</target>
 			</file>
 			<file>
 				<source>%DEMODIRECTORY%\setup\cloneSource\imageGalleryResConfig.xml</source>
-				<target>%DEMODIRECTORY%\xml\imageGalleryResConfig.xml</target>
+				<target>%DEMODIRECTORY%\resConfig\imageGalleryResConfig.xml</target>
 			</file>
 			<file>
 				<source>%DEMODIRECTORY%\setup\cloneSource\EXIFViewer.js</source>

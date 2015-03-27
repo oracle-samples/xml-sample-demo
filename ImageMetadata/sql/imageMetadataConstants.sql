@@ -26,8 +26,8 @@ as
   C_NSMAPPINGS_IMAGE_METADATA      constant VARCHAR2(256) := XDB_NAMESPACES.RESOURCE_PREFIX_R || ' ' || XDB_NAMESPACES.EXIF_PREFIX_EXIF || ' ' || C_NSPREFIX_IMAGE_METADATA_IMG;
 
   C_FOLDER_IMAGE_METADATA          constant VARCHAR2(700) := XDB_CONSTANTS.FOLDER_HOME || '/' || '&METADATA_OWNER' || '/' || 'imageMetadata';
-  C_RESCONFIG_IMAGE_METADATA       constant VARCHAR2(700) := C_FOLDER_IMAGE_METADATA   || '/' || 'xml/imageEventConfiguration.xml';
-  C_RESCONFIG_IMAGE_GALLERY        constant VARCHAR2(700) := C_FOLDER_IMAGE_METADATA   || '/' || 'xml/imageGalleryResConfig.xml';
+  C_RESCONFIG_IMAGE_METADATA       constant VARCHAR2(700) := C_FOLDER_IMAGE_METADATA   || '/' || 'resConfig/imageEventConfiguration.xml';
+  C_RESCONFIG_IMAGE_GALLERY        constant VARCHAR2(700) := C_FOLDER_IMAGE_METADATA   || '/' || 'resConfig/imageGalleryResConfig.xml';
   
   C_ACL_CATEGORIZED_IMAGE_FOLDER   constant VARCHAR2(700) := XDB_CONSTANTS.FOLDER_SYSTEM_ACLS || '/' || 'categorized_image_folder_acl.xml';
   C_ACL_CATEGORIZED_IMAGE          constant VARCHAR2(700) := XDB_CONSTANTS.FOLDER_SYSTEM_ACLS || '/' || 'categorized_image_acl.xml';

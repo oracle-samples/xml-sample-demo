@@ -98,7 +98,7 @@
 							<xsl:attribute name="alt"><xsl:value-of select="r:DisplayName"/></xsl:attribute>
 						</img>
 						<div u="caption" t="B-T" style="position: absolute; top: 30px; left: 30px; width: 50px;height: 50px; color:white">
-							<xsl:value-of select="r:DisplayName"/><
+							<xsl:value-of select="r:DisplayName"/>
 						</div>
 					</div>
 				</xsl:for-each>
@@ -132,7 +132,7 @@
 		<div id="imageProperties" style="width:300px;right:10px; position:fixed;display:inline-block">
 			<xsl:for-each select="xfiles:DirectoryContents/r:Resource[substring-before(r:ContentType,'/')='image']">
 				<div>
-					<xsl:attribute name="id"><xsl:value-of select="concat('imageProperties.',position())"/></xsl:attribute>
+					<xsl:attribute name="id"><xsl:value-of select="concat('imageProperties.',position()-1)"/></xsl:attribute>
 					<xsl:attribute name="style"><xsl:text>display:</xsl:text><xsl:choose><xsl:when test="position()=1">block;</xsl:when><xsl:otherwise><xsl:text>none;</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
 					<xsl:call-template name="Properties"/>
 				</div>
@@ -145,22 +145,32 @@
 			<xsl:with-param name="fastPath" select="'true'"/>
 		</xsl:call-template>
 		<div class="XFilesBody">
-			<div id="localScriptList" style="display:none;">
-				<span>/XFILES/lite/js/FolderBrowser.js</span>
-				<span>/XFILES/Applications/imageMetadata/js/ImageGallery.js</span>
-				<!-- use jssor.slider.min.js instead for release -->
-				<!-- jssor.slider.min.js = (jssor.js + jssor.slider.js) -->
-				<span>/XFILES/Frameworks/jssor/js/jssor.js</span>
-				<span>/XFILES/Frameworks/jssor/js/jssor.slider.js</span>
-			</div>
-			<xsl:call-template name="XFilesSeperator">
-				<xsl:with-param name="height" select="'29px'"/>
-			</xsl:call-template>
-			<xsl:for-each select="/r:Resource">
-				<div>
-					<xsl:call-template name="showGallery"></xsl:call-template>
-					<xsl:call-template name="showProperties"></xsl:call-template>
-				</div>
+			<xsl:for-each select="/r:Resource">		
+				<xsl:choose>
+					<xsl:when test="xfiles:DirectoryContents/r:Resource[substring-before(r:ContentType,'/')='image']">
+						<div id="localScriptList" style="display:none;">
+							<span>/XFILES/lite/js/FolderBrowser.js</span>
+							<span>/XFILES/Applications/imageMetadata/js/ImageGallery.js</span>
+							<!-- use jssor.slider.min.js instead for release -->
+							<!-- jssor.slider.min.js = (jssor.js + jssor.slider.js) -->
+							<span>/XFILES/Frameworks/jssor/js/jssor.js</span>
+							<span>/XFILES/Frameworks/jssor/js/jssor.slider.js</span>
+						</div>
+						<div>
+							<xsl:call-template name="XFilesSeperator">
+								<xsl:with-param name="height" select="'29px'"/>
+							</xsl:call-template>
+							<xsl:call-template name="showGallery"></xsl:call-template>
+							<xsl:call-template name="showProperties"></xsl:call-template>
+						</div>
+					</xsl:when>
+					<xsl:otherwise>
+						<div id="localScriptList" style="display:none;">
+							<span>/XFILES/lite/js/FolderBrowser.js</span>
+						</div>
+						<xsl:call-template name="listFolderContents"/>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:for-each>
 		</div>
 		<div style="clear:both"/>

@@ -129,28 +129,40 @@
 		<div id="localScriptList" style="display:none;">
 			<span>/XFILES/lite/js/UploadFiles.js</span>
 		</div>
-		<div style="padding:0px;margin:0px;border:0px">
-			<xsl:call-template name="genericErrorDialog"/>
-			<div class="formAreaBackground">
-				<div style="xfilesIndent">
-					<!-- <xsl:for-each select="r:Resource"> -->
-						<input type="hidden" id="status" value="%STATUS%" name="STATUS"/>
-						<input type="hidden" id="errorCode" value="%ERROR_CODE%" name="ERROR_CODE"/>
-						<input type="hidden" id="errorMessage" value="%ERROR_MESSAGE%" name="ERROR_MESSAGE"/>
-						<input type="hidden" id="repositoryPath" value="%REPOSITORY_PATH%" name="REPOSITORY_PATH"/>
-						<form id="uploadFiles" name="uploadFiles" style="margin:0px" enctype="multipart/form-data" method="POST" action="/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.UPLOAD">
-							<xsl:call-template name="parameters"/>
-							<xsl:call-template name="addFileUploadDialog"/>
-						</form>
-				<!--	</xsl:for-each> -->
+		<xsl:call-template name="genericErrorDialog"/>		
+			<div class="modal-content">
+				<div class="modal-header">
+					<div>
+						<button type="button" class="close" data-dismiss="modal" onclick="parent.closeUploadFilesDialog();false();"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+						<h4 class="modal-title text-left" id="uploadFilesDialogTitle">UploadFiles</h4>
+					</div>
 				</div>
-				<div class="alignRight">
-					<img id="btnCancelIUploadFiles" src="/XFILES/lib/icons/cancel.png" alt="Cancel Operation" border="0" width="16" height="16" onclick="parent.closePopupDialog();false"/>
-					<span style="width:10px; display:inline-block;"/>
-					<img id="btnDoUploadFiles" src="/XFILES/lib/icons/save.png" alt="Upload Files" border="0" width="16" height="16" onclick="doUploadFiles();"/>
-					<span style="width:10px; display:inline-block;"/>
+				<div class="modal-body">
+					<div class="form-horizontal" style="padding-left:20px; padding-right:20px;">
+						<div class="form-group">
+							<input type="hidden" id="status" value="%STATUS%" name="STATUS"/>
+							<input type="hidden" id="errorCode" value="%ERROR_CODE%" name="ERROR_CODE"/>
+							<input type="hidden" id="errorMessage" value="%ERROR_MESSAGE%" name="ERROR_MESSAGE"/>
+							<input type="hidden" id="repositoryPath" value="%REPOSITORY_PATH%" name="REPOSITORY_PATH"/>
+							<form id="uploadFiles" name="uploadFiles" style="margin:0px" enctype="multipart/form-data" method="POST" action="/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.UPLOAD">
+								<xsl:call-template name="parameters"/>
+								<xsl:call-template name="addFileUploadDialog"/>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<div>
+						<button id="btnCancelIUploadFiles" type="button" class="btn btn-default btn-med" data-dismiss="modal" onclick="parent.closeUploadFilesDialog();false();">
+							<span class="glyphicon glyphicon-ban-circle"></span>
+						</button>
+						<button id="btnDoUploadFiles" type="button" class="btn btn-default btn-med"  onclick="doUploadFiles();">
+							<span class="glyphicon glyphicon-save"></span>
+						</button>
+					</div>
 				</div>
 			</div>
-		</div>
 	</xsl:template>
 </xsl:stylesheet>
+
+

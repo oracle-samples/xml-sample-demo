@@ -121,9 +121,21 @@ function createNewFolder(folderName, folderDescription) {
     return;
   }
   
-  closePopupDialog();
+ 	closeModalDialog('newFolderDialog');
   createFolder(resourceURL + "/" + folderName, folderDescription, document.getElementById("pageContent"));
   
+}
+
+function openModalDialog(dialogName) {
+
+  $('#' + dialogName).modal('show');
+
+}
+
+function closeModalDialog(dialogName) {
+
+  $('#' + dialogName).modal('hide');
+
 }
 
 function openNewFolderDialog(evt) {
@@ -131,8 +143,7 @@ function openNewFolderDialog(evt) {
   document.getElementById("newFolderName").value = "";
   document.getElementById("newFolderDescription").value = "";
 
-  var dialog = document.getElementById("newFolderDialog");
-  openPopupDialog(evt, dialog)
+	openModalDialog('newFolderDialog');
 
 }
 
@@ -183,7 +194,7 @@ function createNewWikiPage(wikiPageName, wikiPageDescription) {
     return;
   }
   
-  closePopupDialog();
+  closeModalDialog('newWikiPageDialog');
   createWikiPage(resourceURL + "/" + wikiPageName, wikiPageDescription, document.getElementById("pageContent"));
   
 }
@@ -193,9 +204,7 @@ function openNewWikiPageDialog(evt) {
   document.getElementById("newWikiPageName").value = "";
   document.getElementById("newWikiPageDescription").value = "";
   
-  var dialog = document.getElementById("newWikiPageDialog");
-  openPopupDialog(evt, dialog);
-
+	openModalDialog('newWikiPageDialog');
 }
 
 function processCreateZipFile(response, outputWindow) {
@@ -215,8 +224,7 @@ function openDeleteDialog(evt, resourceList) {
 
   // Open the Delete Dialog. Delete Processing will be performed by deleteResources()
 
-	var dialog = document.getElementById("deleteDialog");
-  openPopupDialog(evt,dialog);
+  openModalDialog("deleteDialog");
 
 }
 
@@ -266,19 +274,19 @@ function openFolderPicker(evt, action, resourceList, operation) {
   document.getElementById("doUnzipArchive").style.display="NONE";
 
   if (action == "COPY") {
-  	document.getElementById("folderPickerTitle").innerHTML="Copy : Target Folder"
+  	document.getElementById("folderPickerDialogTitle").innerHTML="Copy : Select Target Folder"
     document.getElementById("recursiveOperationDialog").style.display="BLOCK";
     document.getElementById("unzipDuplicateAction").style.display="NONE";
   }
   
   if (action == "MOVE") {
-  	document.getElementById("folderPickerTitle").innerHTML="Move : Target Folder"
+  	document.getElementById("folderPickerDialogTitle").innerHTML="Move : Select Target Folder"
     document.getElementById("recursiveOperationDialog").style.display="NONE";
     document.getElementById("unzipDuplicateAction").style.display="NONE";
   }
 
   if (action == "LINK") {
-  	document.getElementById("folderPickerTitle").innerHTML="Link : Target Folder"
+  	document.getElementById("folderPickerDialogTitle").innerHTML="Link : Select Target Folder"
     document.getElementById("recursiveOperationDialog").style.display="NONE";
     document.getElementById("unzipDuplicateAction").style.display="NONE";
   }
@@ -286,7 +294,7 @@ function openFolderPicker(evt, action, resourceList, operation) {
   if (action == "UNZIP") {
 	  document.getElementById("doTargetFolder").style.display="NONE";
 	  document.getElementById("doUnzipArchive").style.display="BLOCK";
-  	document.getElementById("folderPickerTitle").innerHTML="Unzip : Target Folder";
+  	document.getElementById("folderPickerDialogTitle").innerHTML="Unzip : Select Target Folder";
     document.getElementById("recursiveOperationDialog").style.display="NONE";
     document.getElementById("unzipDuplicateAction").style.display="BLOCK";
   }
@@ -303,8 +311,7 @@ function openFolderPicker(evt, action, resourceList, operation) {
   mgr.sendSoapRequest(parameters);
 
   document.getElementById("treeControl").style.display="none";
-  var dialog = document.getElementById("folderPickerDialog");
-  openPopupDialog(evt,dialog);  
+  openModalDialog('folderPickerDialog');
   document.getElementById("treeLoading").style.display="block";
 
 }
@@ -327,8 +334,7 @@ function openPrincipleDialog(evt,resourceList) {
   mgr.executeSQL(sqlQuery);  
   
   currentResourceList = resourceList;
-  var dialog = document.getElementById("setPrincipleDialog");
-  openPopupDialog(evt,dialog);  
+  openModalDialog('setPrincipleDialog');
 
 }
 
@@ -353,9 +359,7 @@ function openACLDialog(evt,resourceList) {
   mgr.executeSQL(sqlQuery);  
   
   currentResourceList = resourceList;
-  var dialog = document.getElementById("setACLDialog");
-  openPopupDialog(evt,dialog);  
-
+  openModalDialog("setACLDialog");
 }
 
 function openViewerDialog(evt,resourceList) {
@@ -381,8 +385,7 @@ function openViewerDialog(evt,resourceList) {
   mgr.executeSQL(sqlQuery);  
   
   currentResourceList = resourceList;
-  var dialog = document.getElementById("setViewerDialog");
-  openPopupDialog(evt,dialog);  
+  openModalDialog("setViewerDialog");
 
 }
 
@@ -390,9 +393,7 @@ function openCheckInDialog(evt, resourceList) {
 
   // Open the Check-in Dialog. Delete Processing will be performed by checkInResources()
   currentResourceList = resourceList;
-  var dialog = document.getElementById("checkInDialog")
-  openPopupDialog(evt, dialog);
-
+  openModalDialog("checkInDialog");
 }
 
 function createZipFile(zipFileName, zipFileDescription, resourceListXML, outputWindow) {
@@ -432,7 +433,7 @@ function createNewZipFile(zipFileName, zipFileDescription) {
     return;
   }
   
-  closePopupDialog();
+  closeModalDialog('newZipFileDialog');
   createZipFile(resourceURL + "/" + zipFileName, zipFileName, currentResourceList, document.getElementById("pageContent"));
   
 }
@@ -443,8 +444,7 @@ function openNewZipFileDialog(evt,resourceList) {
   document.getElementById("newZipFileDescription").value = "";
 
   currentResourceList = resourceList;
-  var dialog = document.getElementById("newZipFileDialog");
-  openPopupDialog(evt, dialog);
+  openModalDialog('newZipFileDialog');
 
 }
 
@@ -496,15 +496,16 @@ function doListOperation(resourceListXML, parameters, module, actionName, target
     
 }
 
-function copyResourceList(resourceListXML, targetFolder, deep) {
+function copyResourceList(resourceListXML, targetFolder, deep, duplicatePolicy) {
 
   var module  = "COPYRESOURCELIST";
   var actionName = "Copy"
 
   try {
   	var parameters = new Object;
-  	parameters["P_TARGET_FOLDER-VARCHAR2-IN"]   = targetFolder;
-  	parameters["P_DEEP-BOOLEAN-IN"]             = deep;
+  	parameters["P_TARGET_FOLDER-VARCHAR2-IN"]     = targetFolder;
+  	parameters["P_DEEP-BOOLEAN-IN"]               = deep;
+  	parameters["P_DUPLICATE_POLICY-VARCHAR2-IN"]  = duplicatePolicy;
   	doListOperation(resourceListXML, parameters, module, actionName, targetFolder);
   }
   catch (e) {
@@ -630,14 +631,15 @@ function setAclList(resourceListXML, newACL, deep) {
 
 }
 
-function setViewerList(resourceListXML, newViewer) {
+function setViewerList(resourceListXML, newViewer, renderingMethod) {
 
   var module  = "SETCUSTOMVIEWERLIST";
   var actionName = "Set Viewer";
 
   try {
   	var parameters = new Object;
-	  parameters["P_VIEWER_PATH-VARCHAR2-IN"]        = newViewer
+	  parameters["P_VIEWER_PATH-VARCHAR2-IN"] = newViewer
+	  parameters["P_METHOD-VARCHAR2-IN"]      = renderingMethod
 	  doListOperation(resourceListXML, parameters, module, actionName, null);
   }
   catch (e) {
@@ -719,7 +721,7 @@ function unzipResourceList(resourceListXML, targetFolder, duplicateAction) {
   try {
 	  var parameters = new Object;
 	  parameters["P_FOLDER_PATH-VARCHAR2-IN"]       = targetFolder
-	  parameters["P_DUPLICATE_ACTION-VARCHAR2-IN"]  = duplicateAction
+	  parameters["P_DUPLICATE_POLICY-VARCHAR2-IN"]  = duplicateAction
 	  doListOperation(resourceListXML, parameters, module, actionName, targetFolder);
   }
   catch (e) {
@@ -745,14 +747,25 @@ function addHitCounter(resourceListXML, deepOption) {
 
 function deleteResources(deepOption, forceOption) {
 
-  closePopupDialog();
-  var deep = booleanToNumber(deepOption.checked);
-  var force = booleanToNumber(forceOption.checked);
-  deleteResourceList(currentResourceList, deep, force);
+
+  try {
+  	var callback = function(result) {
+		  closeModalDialog('deleteDialog');
+  		if (result) {
+			  var deep = booleanToNumber(deepOption.checked);
+  			var force = booleanToNumber(forceOption.checked);
+  			deleteResourceList(currentResourceList, deep, force);
+      }
+    }
+    BootstrapDialog.confirm("Delete selected documents ?",callback)
+  }
+  catch (e) {
+    handleException("FolderBrowser.deleteResources",e,null);
+  }   
 
 }
 
-function updateTargetFolder(mode) {
+function updateTargetFolder(checkboxDeep,radioDuplicate) {
 
   var targetFolder = targetFolderTree.getOpenFolder()
   if (!targetFolder) {
@@ -760,42 +773,78 @@ function updateTargetFolder(mode) {
     return;
   }
   
-  closePopupDialog();
-  var deep = booleanToNumber(mode.checked);
-  currentOperation(currentResourceList,targetFolder,deep);
-
-}
-
-function doDeepOperation(mode) {
-
-  // Deep operation has been confirmed. 
-  
-  closePopupDialog();
-  var deep = booleanToNumber(mode.checked);
-  currentOperation(currentResourceList,deep);
-
-}
-
-function doPublishOperation(mode,public) {
-
-  // Deep operation has been confirmed. 
-  
-  closePopupDialog();
-  var deep = booleanToNumber(mode.checked);
-  var makePublic = booleanToNumber(public.checked);
-  publishResourceList(currentResourceList,deep,makePublic);
-
-}
-
-
-function updatePrinciple(newOwner,mode) {
+  var duplicateAction
+  for (var i=0;i<radioDuplicate.length;i++) {
+    if (radioDuplicate[i].checked) {
+      duplicateAction = radioDuplicate[i].value 
+      break;
+    }
+  }
 
   try {
-    if (confirm("Change owner of selected documents ?")) {
-      closePopupDialog();
-      var deep = booleanToNumber(mode.checked);
-      changeOwnerList(currentResourceList, newOwner, deep);
+  	var callback = function(result) {
+		  closeModalDialog('folderPickerDialog');
+  		if (result) {
+			  var deep = booleanToNumber(checkboxDeep.checked);
+  			var duplicateAction = duplicateAction;
+  			currentOperation(currentResourceList,targetFolder,deep,duplicateAction);
+      }
     }
+    BootstrapDialog.confirm("Apply to selected documents ?",callback)
+  }
+  catch (e) {
+    handleException("FolderBrowser.updateTargetFolder",e,null);
+  }   
+
+}
+
+function doDeepOperation(checkboxDeep) {
+
+  try {
+  	var callback = function(result) {
+		  closeModalDialog('deepOperationDialog');
+  		if (result) {
+  			var deep = booleanToNumber(checkboxDeep.checked);
+  			currentOperation(currentResourceList,deep);
+      }
+    }
+    BootstrapDialog.confirm("Apply to selected documents ?",callback)
+  }
+  catch (e) {
+    handleException("FolderBrowser.doPublishOperation",e,null);
+  }   
+}
+
+function doPublishOperation(checkboxDeep,checkboxPublic) {
+
+  try {
+  	var callback = function(result) {
+			closeModalDialog('publishDialog');
+  		if (result) {
+				var deep = booleanToNumber(checkboxDeep.checked);
+  			var makePublic = booleanToNumber(checkboxPublic.checked);
+  			publishResourceList(currentResourceList,deep,makePublic);
+      }
+    }
+    BootstrapDialog.confirm("Publish selected documents ?",callback)
+  }
+  catch (e) {
+    handleException("FolderBrowser.doPublishOperation",e,null);
+  }   
+
+}
+
+function updatePrinciple(newOwner,checkboxDeep) {
+
+  try {
+  	var callback = function(result) {
+		  closeModalDialog('setPrincipleDialog');
+  		if (result) {
+        var deep = booleanToNumber(checkboxDeep.checked);
+        changeOwnerList(currentResourceList, newOwner, deep);
+      }
+    }
+    BootstrapDialog.confirm("Change owner of selected documents ?",callback)
   }
   catch (e) {
     handleException("FolderBrowser.updatePrinciple",e,null);
@@ -803,14 +852,17 @@ function updatePrinciple(newOwner,mode) {
 
 }
 
-function updateACL(newACL,mode) {
+function updateACL(newACL,checkboxDeep) {
 
   try {
-    if (confirm("Apply ACL to selected documents ?")) {
-      closePopupDialog();
-    	var deep = booleanToNumber(mode.checked);
-  	  setAclList(currentResourceList, newACL, deep);
-    }
+  	var callback = function(result) {
+   		closeModalDialog("setACLDialog");
+  		if (result) {
+    	  var deep = booleanToNumber(checkboxDeep.checked);
+  	    setAclList(currentResourceList, newACL, deep);
+  	  }
+  	}
+    BootstrapDialog.confirm("Apply ACL to selected documents ?",callback)
   }
   catch (e) {
     handleException("FolderBrowser.updateACL",e,null);
@@ -818,13 +870,21 @@ function updateACL(newACL,mode) {
 
 }
 
-function updateViewer(newViewer) {
+function updateViewer(newViewer,checkboxMetadata) {
 
   try {
-    if (confirm("Apply Viewer to selected documents ?")) {
-      closePopupDialog();
-  	  setViewerList(currentResourceList, newViewer);
-    }
+  	var callback = function(result){
+      closeModalDialog("setViewerDialog");
+  		if (result) {
+  			var viewerArguments = "";
+    	  var metadata = booleanToNumber(checkboxMetadata.checked);
+    	  if (metadata) {
+    	  	var renderingMethod = 'getFolderWithMetadata'
+    	  }
+  	    setViewerList(currentResourceList, newViewer, renderingMethod);
+  	  }
+		}  		
+    BootstrapDialog.confirm("Apply Viewer to selected documents ?",callback);
   }
   catch (e) {
     handleException("FolderBrowser.updateViewer",e,null);
@@ -832,14 +892,17 @@ function updateViewer(newViewer) {
 
 }
 
-function checkInResources(comment,mode) {
+function checkInResources(comment,checkboxDeep) {
 
   try {
-    if (confirm("Check In selected documents ?")) {
-      closePopupDialog();  
-      var deep = booleanToNumber(mode.checked);
-      checkInResourceList(currentResourceList, comment, deep)
-    }
+  	var callback = function(result) {
+      closeModalDialog("checkInDialog");
+      if (result) {
+        var deep = booleanToNumber(checkboxDeep.checked);
+        checkInResourceList(currentResourceList, comment, deep)
+      }
+		}
+    BootstrapDialog.confirm("Check In selected documents ?",callback)
   }
   catch (e) {
     handleException("FolderBrowser.checkInResources",e,null);
@@ -847,7 +910,7 @@ function checkInResources(comment,mode) {
   
 }
 
-function doUnzipOperations(mode) {
+function doUnzipOperations(radioDuplicate) {
 
   var targetFolder = targetFolderTree.getOpenFolder()
   if (!targetFolder) {
@@ -859,14 +922,14 @@ function doUnzipOperations(mode) {
 // the array to detemine if the mode should be RAISE, OVERWRITE, VERSION, SKIP
 
   var duplicateAction
-  for (var i=0;i<mode.length;i++) {
-    if (mode[i].checked) {
-      duplicateAction = mode[i].value 
+  for (var i=0;i<radioDuplicate.length;i++) {
+    if (radioDuplicate[i].checked) {
+      duplicateAction = radioDuplicate[i].value 
       break;
     }
   }
 
-  closePopupDialog();  
+  closeModalDialog("folderPickerDialog");
   var targetFolder = targetFolderTree.getOpenFolder()
   unzipResourceList(currentResourceList,targetFolder,duplicateAction);
 
@@ -902,7 +965,7 @@ function doLocalSort(sortKey,sortOrder) {
 
 function openDeepOperationDialog(evt,action,resourceList,operation) {
 
-  titleBar = document.getElementById("deepOperationTitle");
+  titleBar = document.getElementById("deepOperationDialogTitle");
   
   if (action == "VERSION") {
   	titleBar.innerHTML = "Make Versioned options";
@@ -922,8 +985,7 @@ function openDeepOperationDialog(evt,action,resourceList,operation) {
 
   currentOperation = operation;
   currentResourceList = resourceList;
-  var dialog = document.getElementById("deepOperationDialog");  
-  openPopupDialog(evt, dialog);  
+  openModalDialog("deepOperationDialog");  
 
 }
 
@@ -931,8 +993,7 @@ function openPublishDialog(evt,action,resourceList,operation) {
 
   currentOperation = operation;
   currentResourceList = resourceList;
-  var dialog = document.getElementById("publishDialog");  
-  openPopupDialog(evt, dialog);  
+  openModalDialog("publishDialog");  
 
 }
 
@@ -1088,9 +1149,12 @@ function processAction(evt,action) {
        openDeepOperationDialog(evt,action,currentResourceList,lockResourceList)
     }
     else {
-      if (confirm("Lock selected documents ?")) {
-        lockResourceList(currentResourceList,false);
-      }
+    	var callback = function(result) {
+    		if (result) {
+    			lockResourceList(currentResourceList,false);
+    		}
+    	}
+      BootstrapDialog.confirm("Lock selected documents ?",callback)
     }
     return;
   }
@@ -1100,9 +1164,12 @@ function processAction(evt,action) {
        openDeepOperationDialog(evt,action,currentResourceList,unlockResourceList)
     }
     else {
-      if (confirm("Unlock selected documents ?")) {
-        unlockResourceList(currentResourceList,false);
-      }
+    	var callback = function(result) {
+    		if (result) {
+	        unlockResourceList(currentResourceList,false);
+    		}
+    	}
+      BootstrapDialog.confirm("Unlock selected documents ?",callback)
     }
     return;
   }
@@ -1132,9 +1199,12 @@ function processAction(evt,action) {
        openDeepOperationDialog(evt,action,currentResourceList,versionResourceList)
     }
     else {
-      if (confirm("Initiate versioning on selected documents ?")) {
-        versionResourceList(currentResourceList,false);
-      }
+    	var callback = function(result) {
+    		if (result) {
+          versionResourceList(currentResourceList,false);
+    		}
+    	}
+      BootstrapDialog.confirm("Initiate versioning on selected documents ?",callback)
     }
     return;
   }
@@ -1144,9 +1214,12 @@ function processAction(evt,action) {
        openDeepOperationDialog(evt,action,currentResourceList,checkOutResourceList)
     }
     else {
-      if (confirm("Check out selected documents ?")) {
-        checkOutResourceList(currentResourceList,false);
-      }
+    	var callback = function(result) {
+    		if (result) {
+	        checkOutResourceList(currentResourceList,false);
+    		}
+    	}
+      BootstrapDialog.confirm("Check out selected documents ?",callback)
     }
     return;
   }
@@ -1219,17 +1292,21 @@ function getResourceListXML(resourceList) {
 
 function openUploadFilesDialog(evt) {
 
-  var dialog = document.getElementById("uploadFilesDialog");
   var uploadFrame = document.getElementById('uploadFilesFrame');
   var targetFolder = uploadFrame.contentWindow.document.getElementById('targetFolder');
   targetFolder.value = resourceURL;
-  openPopupDialog(evt, dialog)
-
+  openModalDialog('uploadFilesDialog');
 }
+
+
+function closeUploadFilesDialog() {
+  closeModalDialog("uploadFilesDialog")
+}
+
 
 function doUploadComplete(status,errorCode,errorMessage,resourcePath) {
 
-  closePopupDialog();
+  closeModalDialog("uploadFilesDialog")
   var uploadFrame = document.getElementById('uploadFilesFrame');
   uploadFrame.src = '/XFILES/lite/Resource.html?target=/XFILES/lite/xsl/UploadFilesStatus.html&stylesheet=/XFILES/lite/xsl/UploadFiles.xsl';
 	// reloadUploadFrame();

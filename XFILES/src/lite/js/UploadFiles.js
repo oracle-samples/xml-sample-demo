@@ -15,8 +15,6 @@
 function onPageLoaded() {
 
   setDefaults();
-  document.getElementById('body').style.margin = "0px";
-  document.getElementById('Loading').style.display = "none";
 
 }
 
@@ -24,14 +22,17 @@ function setDefaults() {
   
   document.getElementById('UTF-8').selected = true;
   document.getElementById('en-US').selected = true;
+  document.getElementById('Loading').style.display = "none";
+
 }
 
 function doUploadFiles() {
+	
   var fileCollection = document.getElementsByName('FILE');
 
   for (i=0; i < fileCollection.length; i++) {
   	if (fileCollection[i].value != "") {
-		  document.getElementById('Loading').style.display = "block";
+  		document.getElementById('Loading').style.display = "block";
       document.getElementById('uploadFiles').submit();
       return;
     }

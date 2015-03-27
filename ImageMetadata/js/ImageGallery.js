@@ -204,21 +204,33 @@ jssor_slider1_starter = function (containerId) {
         }
     };
 
-    var jssor_slider1 = new $JssorSlider$(containerId, options);
-    //responsive code begin
-    //you can remove responsive code if you don't want the slider scales while window resizes
+    var showMetadata = function(slideIndex, progress, progressBegin, idleBegin, idleEnd, progressEnd) {
+	  	if (progress == progressBegin) {
+        document.getElementById('imageProperties.' + slideIndex).style.display="block";
+	    }
+			else if(progress == progressEnd) {
+       	document.getElementById('imageProperties.' + slideIndex).style.display="none";
+	    }
+		}
+
     function ScaleSlider() {
-        var parentWidth = jssor_slider1.$Elmt.parentNode.clientWidth;
-        if (parentWidth)
-            jssor_slider1.$ScaleWidth(Math.max(Math.min(parentWidth, 1200), 300));
-        else
-            $Jssor$.$Delay(ScaleSlider, 30);
+      var parentWidth = jssor_slider1.$Elmt.parentNode.clientWidth;
+      if (parentWidth)
+        jssor_slider1.$ScaleWidth(Math.max(Math.min(parentWidth, 1200), 300));
+      else
+        $Jssor$.$Delay(ScaleSlider, 30);
     }
 
-    ScaleSlider();
-    $Jssor$.$AddEvent(window, "load", ScaleSlider);
+    var jssor_slider1 = new $JssorSlider$(containerId, options);
+		jssor_slider1.$On($JssorSlider$.$EVT_STATE_CHANGE,showMetadata)
 
+    //responsive code begin
+    //you can remove responsive code if you don't want the slider scales while window resizes
+
+    ScaleSlider();
+    $Jssor$.$AddEvent(window, "load", ScaleSlider)
     $Jssor$.$AddEvent(window, "resize", $Jssor$.$WindowResizeFilter(window, ScaleSlider));
     $Jssor$.$AddEvent(window, "orientationchange", ScaleSlider);
     //responsive code end
 };
+

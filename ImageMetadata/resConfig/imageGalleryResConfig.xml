@@ -24,7 +24,7 @@
           <namespace>xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd"</namespace>
         </existsNode>
       </pre-condition>
-      <path>/home/XDBEXT/imageMetadata/xml/imageGalleryResConfig.xml</path>
+      <path>/home/XDBEXT/imageMetadata/resConfig/imageGalleryResConfig.xml</path>
     </configuration>
   </defaultChildConfig>
 </ResConfig>
