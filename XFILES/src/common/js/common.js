@@ -2230,6 +2230,18 @@ function xfilesException(module,id,target,exception) {
   
 }
 
+function openModalDialog(dialogName) {
+
+  $('#' + dialogName).modal('show');
+
+}
+
+function closeModalDialog(dialogName) {
+
+  $('#' + dialogName).modal('hide');
+
+}
+
 var xfilesHandleException = function(module, e, target) {
 	
   try {

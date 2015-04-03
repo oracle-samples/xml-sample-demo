@@ -74,11 +74,11 @@
 							<button id="btnCancelNewFolder" type="button" class="btn btn-default btn-med" data-dismiss="modal">
 								<span class="glyphicon glyphicon-ban-circle"></span>
 							</button>
-							<button id="btnDoNewFolder" type="button" class="btn btn-default btn-med"  onclick="createNewFolder(document.getElementById('newFolderName').value,document.getElementById('newFolderDescription').value);false;">
+						</div>
+					</div>							<button id="btnDoNewFolder" type="button" class="btn btn-default btn-med"  onclick="createNewFolder(document.getElementById('newFolderName').value,document.getElementById('newFolderDescription').value);false;">
 								<span class="glyphicon glyphicon-save"></span>
 							</button>
-						</div>
-					</div>
+
 				</div>
 			</div>
 		</div>
@@ -216,9 +216,12 @@
 					<div class="modal-body">
 						<div class="input-group checkbox">
 						  <span class="input-group-addon">
-								<label class="col-sm-2 control-label" for="deepOperation">
-									<input type="checkbox" id="deepOperation"/>Include Subfolders
-								</label>
+								<a href="#" class="toolTip">
+									<label class="col-sm-2 control-label" for="deepOperation">
+										<input type="checkbox" id="deepOperation"/>Include Subfolders
+										<span class="hint">Operations on a folder are applied to the folder and all files that are a direct descendant of the folder. Selecting the 'Include Subfolders' option extends the scope of the operation to include files and folders that are in-direct descendants of the target folder.</span>
+									</label>
+								</a>
 							</span>
 						</div>
 					</div>
@@ -235,12 +238,6 @@
 				</div>
 			</div>
 		</div>
-
-<!--
-	<a href="#" class="toolTip">
-		<span id="deepOperationHint" class="hint">Operations on a folder are applied to the folder and all files that are a direct descendant of the folder. Selecting the 'Include Subfolders' option extends the scope of the operation to include files and folders that are in-direct descendants of the target folder.</span>
-	</a>
--->
 	</xsl:template>
 	<xsl:template name="publishDialog">
 		<div class="modal fade" id="publishDialog" tabindex="-1" role="dialog" aria-labelledby="publishDialogTitle" aria-hidden="true">
@@ -254,17 +251,23 @@
 					</div>
 					<div class="modal-body">
 						<div class="input-group checkbox">
-						  <span class="input-group-addon">
-								<label class="col-sm-2 control-label" for="deepPublish">
-									<input type="checkbox" id="deepPublish"/>Include Subfolders
-								</label>
+							<span class="input-group-addon">
+								<a href="#" class="toolTip">
+									<label class="col-sm-2 control-label" for="deepPublish">
+										<input type="checkbox" id="deepPublish"/>Include Subfolders
+										<span class="hint">Checked  : Operations on a Folder and are applied to all descendants of the folder. Unchecked : Operations on a folder are restricted to files in the selected folder. Child folders are not processed.</span>
+									</label>
+								</a>
 							</span>
 						</div>
 						<div class="input-group checkbox">
-						  <span class="input-group-addon">
-								<label class="col-sm-2 control-label" for="deepPublish">
-									<input type="checkbox" id="publicPublish"/>Make Public
-								</label>
+							<span class="input-group-addon">
+								<a href="#" class="toolTip">
+									<label class="col-sm-2 control-label" for="publicPublish">
+										<input type="checkbox" id="publicPublish"/>Make Public
+										<span class="hint">Apply the bootstrap ACL to each resource making it readable by anyone including ANONYMOUS</span>
+									</label>
+								</a>
 							</span>
 						</div>
 					</div>
@@ -281,21 +284,6 @@
 				</div>
 			</div>
 		</div>
-<!--
-	<a href="#" class="toolTip">
-		<label for="deepPublish" id="deepPublishLabel">
-			<xsl:text>Include Subfolders</xsl:text>
-			<span id="deepPublishHint" class="hint">Checked  : Operations on a Folder and are applied to all descendants of the folder. Unchecked : Operations on a folder are restricted to files in the selected folder. Child folders are not processed.</span>
-		</label>
-	</a>
-
-	<a href="#" class="toolTip">
-		<label for="publicPublish" id="publicPublishLabel">
-			<xsl:text>Make Public</xsl:text>
-			<span id="publicPublishHint" class="hint">Apply the bootstrap ACL to each resource making it readable by anyone including ANONYMOUS</span>
-		</label>
-	</a>
--->
 	</xsl:template>
 	<xsl:template name="checkInDialog">
 		<div class="modal fade" id="checkInDialog" tabindex="-1" role="dialog" aria-labelledby="checkInDialogTitle" aria-hidden="true">

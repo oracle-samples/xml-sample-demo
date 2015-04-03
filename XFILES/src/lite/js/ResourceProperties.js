@@ -176,5 +176,5 @@ function saveChanges(closeFormWhenFinished) {
 }
 
 function doPreviewDocument(event) {
-	openPopupDialog(event,"documentPreviewDialog");
+	openModalDialog("documentPreviewDialog");
 }

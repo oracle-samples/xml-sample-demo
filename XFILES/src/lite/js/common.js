@@ -662,7 +662,7 @@ function getVersionHistory(resourceURL, outputWindow, stylesheetURL) {
 
 function showAboutXFiles(evt) {
 	
-	openPopupDialog(evt,"aboutXFilesDialog");
+	openModalDialog("aboutXFilesDialog");
 	
 }
 
@@ -762,7 +762,7 @@ var xfilesShowSourceCode = function (xml) {
 	var xmlOutputArea = document.getElementById('xmlWindow');
 	xmlOutputArea.innerHTML = "";
 	xmlPP.print(xml,xmlOutputArea);
-	openDialog('currentXML');
+	openModalDialog('currentXML');
     	
 }	
 

@@ -126,18 +126,6 @@ function createNewFolder(folderName, folderDescription) {
   
 }
 
-function openModalDialog(dialogName) {
-
-  $('#' + dialogName).modal('show');
-
-}
-
-function closeModalDialog(dialogName) {
-
-  $('#' + dialogName).modal('hide');
-
-}
-
 function openNewFolderDialog(evt) {
 
   document.getElementById("newFolderName").value = "";

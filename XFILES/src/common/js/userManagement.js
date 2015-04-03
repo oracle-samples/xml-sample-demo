@@ -518,7 +518,7 @@ function processsPasswordReset(mgr, message) {
 function openSetPasswordDialog(evt) {
   document.getElementById('newPassword1').value = "";
   document.getElementById('newPassword2').value = "";
-  openPopupDialog(evt, document.getElementById('setPasswordDialog'))
+  openModalDialog('setPasswordDialog')
 }
 
 function doSetPassword(evt) {
@@ -600,7 +600,7 @@ function processAdminPrivileges(mgr,evt) {
   document.getElementById('newUserPassword1').value = "";
   document.getElementById('newUserPassword2').value = "";
   document.getElementById('username').value = "";
-  openPopupDialog(evt,document.getElementById('manageUsersDialog'))
+  openModalDialog('manageUsersDialog')
 
   var div
  	div = document.getElementById('dbaOnly');

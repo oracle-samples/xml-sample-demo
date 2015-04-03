@@ -382,85 +382,29 @@
 		<option value="VIETNAMESE" id="VIETNAMESE">Vietnamese</option>
 	</xsl:template>
 	<xsl:template name="genericErrorDialog">
-		<!--
-		<div style="display: none; position:relative; top:0px" id="genericErrorDialog" onclick="stopBubble(event);">
-			<div class="popupOuterEdge" style="top: 10px; right: 15px; z-index: 10000;">
-				<div class="popupBackground">
-					<div class="popupInnerEdge">
-						<div id="errorDialogTitle" class="row popupTitle">
-							<xsl:text>XFILES Error encountered</xsl:text>
-						</div>
-						<div style="font-size:1px; border:0px; margin:0px; padding: 0px; height:3px"/>
-						<table style="border-width:0px;margin:0px;padding:2px">
-							<tbody>
-								<tr style="display:none" class="Row" id="errorModule">
-									<td>
-										<span class="labelCol">Module</span>
-									</td>
-									<td class="labelVal">
-										<span id="errorModuleText"/>
-									</td>
-								</tr>
-								<tr style="display:none" class="Row " id="errorType">
-									<td>
-										<span class="labelCol">Type</span>
-									</td>
-									<td class="labelVal">
-										<span id="errorTypeText"/>
-									</td>
-								</tr>
-								<tr style="display:none" class="Row" id="errorTarget">
-									<td>
-										<span class="labelCol">Target</span>
-									</td>
-									<td class="labelVal">
-										<span id="errorTargetText"/>
-									</td>
-								</tr>
-								<tr style="display:none" class="Row" id="errorTraceServer">
-									<td colspan="2" class="alignLeft">
-										<span>Server Trace</span>
-										<div style="font-size:1px; border:0px; margin:0px; padding: 0px; height:3px"/>
-										<div>
-											<pre id="errorTraceServerText" class="inputFormBorder"/>
-										</div>
-									</td>
-								</tr>
-								<tr style="display:none" class="Row" id="errorTraceClient">
-									<td colspan="2" class="alignLeft">
-										<span>Client Trace</span>
-										<div style="font-size:1px; border:0px; margin:0px; padding: 0px; height:3px"/>
-										<div>
-											<pre id="errorTraceClientText" class="inputFormBorder"/>
-										</div>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<div class="alignRight" style="vertical-align:middle">
-							<img id="btnCancelError" src="/XFILES/lib/icons/cancel.png" alt="Cancel" border="0" width="16" height="16" onclick="closeDialog('genericErrorDialog');false"/>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-  	-->
 	</xsl:template>
 	<xsl:template name="documentPreview">
-		<div style="display: none;position:relative; top:0px;" id="documentPreviewDialog" onclick="stopBubble(event)">
-			<div class="popupOuterEdge" style="top: -10px; right: 10px; z-index: 10000;">
-				<div class="popupBackground">
-					<div class="popupInnerEdge">
-						<div id="currentXMLTitle" class="row popupTitle">
-							<xsl:text>Document Preview</xsl:text>
+		<div class="modal fade" id="documentPreviewDialog" tabindex="-1" role="dialog" aria-labelledby="documentPreviewDialogTitle" aria-hidden="true">
+			<div class="modal-dialog:" style="width:775px;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<div>
+							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+							<h4 class="modal-title text-left" id="documentPreviewDialogTitle">Document Preview</h4>
 						</div>
+					</div>
+					<div class="modal-body">
 						<div style="text-align:left;white-space: pre;color: #000000; background-color: #FFFFFF; width: 100%; overflow:scroll;width:640px;height:480px">
 							<iframe id="documentPreview" frameborder="0" style="width:100%;height:100%">
 								<xsl:attribute name="src"><xsl:value-of select="concat('/sys/servlets/XFILES/Protected/XFILES.XFILES_REST_SERVICES.RENDERDOCUMENT?P_RESOURCE_PATH=',/r:Resource/xfiles:ResourceStatus/xfiles:CurrentPath/@xfiles:EncodedPath,'&amp;P_CONTENT_TYPE=text/html')"/></xsl:attribute>
 							</iframe>
 						</div>
-						<div class="alignRight" style="vertical-align:middle">
-							<img id="bntCancelPreview" src="/XFILES/lib/icons/cancel.png" alt="Cancel" border="0" width="16" height="16" onclick="closePopupDialog();return false;"/>
+					</div>
+					<div class="modal-footer">
+						<div>
+							<button id="bntCancelPreview" type="button" class="btn btn-default btn-med" data-dismiss="modal">
+								<span class="glyphicon glyphicon-ban-circle"></span>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -468,18 +412,25 @@
 		</div>
 	</xsl:template>
 	<xsl:template name="viewCurrentXML">
-		<div style="display: none;position:relative; top:0px;" id="currentXML" onclick="stopBubble(event)">
-			<div class="popupOuterEdge" style="top: 10px; right: 15px; z-index: 10000;">
-				<div class="popupBackground">
-					<div class="popupInnerEdge">
-						<div id="currentXMLTitle" class="row popupTitle">
-							<xsl:text>XML Viewer</xsl:text>
+		<div class="modal fade" id="currentXML" tabindex="-1" role="dialog" aria-labelledby="currentXMLTitle" aria-hidden="true">
+			<div class="modal-dialog:" style="width:775px;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<div>
+							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+							<h4 class="modal-title text-left" id="currentXMLTitle">XML Viewer</h4>
 						</div>
+					</div>
+					<div class="modal-body">
 						<div style="text-align:left;white-space: pre;color: #000000; background-color: #FFFFFF; width: 100%; overflow:scroll;width:750px;height:500px">
 							<pre id="xmlWindow"/>
 						</div>
-						<div class="alignRight" style="vertical-align:middle">
-							<img id="bntCancelXML" src="/XFILES/lib/icons/cancel.png" alt="Cancel" border="0" width="16" height="16" onclick="closeDialog('currentXML');return false;"/>
+					</div>
+					<div class="modal-footer">
+						<div>
+							<button id="bntCancelXML" type="button" class="btn btn-default btn-med" data-dismiss="modal">
+								<span class="glyphicon glyphicon-ban-circle"></span>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -487,18 +438,25 @@
 		</div>
 	</xsl:template>
 	<xsl:template name="viewCurrentSQL">
-		<div style="display: none; position:relative; top:0px;" id="currentSQL" onclick="stopBubble(event)">
-			<div class="popupOuterEdge" style="top: 10px; right: 15px; z-index: 10000;">
-				<div class="popupBackground">
-					<div class="popupInnerEdge">
-						<div id="currentSQLTitle" class="row popupTitle">
-							<xsl:text>Current SQL</xsl:text>
+		<div class="modal fade" id="currentSQL" tabindex="-1" role="dialog" aria-labelledby="currentSQLTitle" aria-hidden="true">
+			<div class="modal-dialog:" style="width:775px;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<div>
+							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+							<h4 class="modal-title text-left" id="currentSQLTitle">Current SQL</h4>
 						</div>
+					</div>
+					<div class="modal-body">
 						<div style="white-space: pre;color: #000000; background-color: #E0E0E0; width: 100%; overflow-X: auto; overflow-Y:auto;" width="100%">
 							<pre id="queryWindow"/>
 						</div>
-						<div class="alignRight" style="vertical-align:middle">
-							<img id="btnCancelSQL" src="/XFILES/lib/icons/cancel.png" alt="Cancel" border="0" width="16" height="16" onclick="closeDialog('currentSQL');return false;"/>
+					</div>
+					<div class="modal-footer">
+						<div>
+							<button id="btnCancelSQL" type="button" class="btn btn-default btn-med" data-dismiss="modal">
+								<span class="glyphicon glyphicon-ban-circle"></span>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -506,183 +464,139 @@
 		</div>
 	</xsl:template>
 	<xsl:template name="manageUsersDialog">
-		<div style="display: none;position:relative; top:0px" id="manageUsersDialog" onclick="stopBubble(event)">
-			<div class="popupOuterEdge" style="top: 10px; right: 15px;">
-				<div class="popupBackground">
-					<div class="popupInnerEdge">
-						<div id="errorDialogTitle" class="row popupTitle">
-							<xsl:text>XFiles System Administration</xsl:text>
+		<div class="modal fade" id="manageUsersDialog" tabindex="-1" role="dialog" aria-labelledby="manageUsersDialogTitle" aria-hidden="true">
+			<div class="modal-dialog:" style="width:775px;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<div>
+							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+							<h4 class="modal-title text-left" id="manageUsersDialogTitle">XFiles System Administration</h4>
 						</div>
-						<span id="dbaOnly" style="display: none; width: 100%;">
-							<table class="standardBackground" width="100%">
-								<tbody>
-									<tr>
-										<td class="x1w" colspan="5">
-											<xsl:text>Users and Passwords</xsl:text>
-										</td>
-									</tr>
-									<tr align="right" valign="middle">
-										<td align="left" nowrap="nowrap">
-											<span class="labelRight10">
-												<label>User name</label>
-											</span>
-										</td>
-										<td nowrap="nowrap">
-											<span style="width:5px; display: inline-block;"/>
-										</td>
-										<td nowrap="nowrap">
-											<input id="username" class="xg" name="username" size="30" maxlength="32" type="input"/>
-										</td>
-									</tr>
-									<tr align="right" valign="middle">
-										<td align="left" nowrap="nowrap">
-											<span class="labelRight10">
-												<label>Enter new Password</label>
-											</span>
-										</td>
-										<td nowrap="nowrap">
-											<span style="width:5px; display: inline-block;"/>
-										</td>
-										<td nowrap="nowrap">
-											<input id="newUserPassword1" class="xg" name="newUserPassword1" size="30" maxlength="32" type="password"/>
-										</td>
-									</tr>
-									<tr align="right" valign="middle">
-										<td align="left" nowrap="nowrap">
-											<span class="labelRight10">
-												<label>Re-enter New Password</label>
-											</span>
-										</td>
-										<td nowrap="nowrap">
-											<span style="width:5px; display: inline-block;"/>
-										</td>
-										<td nowrap="nowrap">
-											<input id="newUserPassword2" class="xg" name="newUserPassword2" size="30" maxlength="32" type="password"/>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-							<div class="alignRight" style="vertical-align:middle">
-								<img id="btnCancelUserDialog" src="/XFILES/lib/icons/cancel.png" alt="Cancel" border="0" width="16" height="16" onclick="closePopupDialog();false"/>
-								<span style="width:10px; display: inline-block;"/>
-								<img id="btnSubmitForm" src="/XFILES/lib/icons/accept.png" alt="Accept" border="0" width="16" height="16" onclick="manageUser(document.getElementById('username').value,document.getElementById('newUserPassword1').value,document.getElementById('newUserPassword2').value);false"/>
+					</div>
+					<div id="dbaOnly" style="display: none;">
+						<div class="modal-body">
+							<div class="form-horizontal" >
+								<div class="form-group">
+									<xsl:text>Users and Passwords</xsl:text>
+								`</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="username">User Name</label>
+									<div class="col-sm-10">
+										<input class="form-control" type="username" id="username" name="username" size="30" maxlength="32"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="newUserPassword1">Enter new Password</label>
+									<div class="col-sm-10">
+										<input class="form-control" type="newPassword1" id="newUserPassword1" name="newUserPassword1" size="30" maxlength="32"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="newUserPassword2">Re-Enter new Password</label>
+									<div class="col-sm-10">
+										<input class="form-control" type="newUserPassword2" id="newUserPassword2" name="newPassword2" size="30" maxlength="32"/>
+									</div>
+								</div>
 							</div>
-						</span>
-						<span id="xfilesAdmin" style="display: none; width: 100%;">
-							<table class="standardBackground" width="100%">
-								<tbody>
-									<tr>
-										<td class="x1w" colspan="6">
-											<xsl:text>User Roles</xsl:text>
-										</td>
-									</tr>
-									<tr align="right" valign="middle">
-										<td align="left" nowrap="nowrap">
-											<span class="labelRight10">
-												<label>Users</label>
-											</span>
-										</td>
-										<td nowrap="nowrap">
-											<span style="width:5px; display: inline-block;"/>
-										</td>
-										<td nowrap="nowrap">
-											<select id="userList" multiple="multiple"/>
-										</td>
-										<td align="left" nowrap="nowrap">
-											<span class="labelRight10">
-												<label>Role</label>
-											</span>
-										</td>
-										<td nowrap="nowrap">
-											<span style="width:5px; display: inline-block;"/>
-										</td>
-										<td align="left" nowrap="nowrap">
-											<input type="radio" id="disableOption" name="roleSelector" value="disabled"/>
-											<label for="disableOption">None</label>
-											<br/>
-											<input type="radio" id="userOption" name="roleSelector" value="user"/>
-											<label for="userOption">User</label>
-											<br/>
-											<span id="adminOptionButton">
-												<input type="radio" id="adminOption" name="roleSelector" value="administrator"/>
-												<label for="adminOption">Administrator</label>
-											</span>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-							<div class="alignRight" style="vertical-align:middle">
-								<img id="btnCancelAdminForm1" src="/XFILES/lib/icons/cancel.png" alt="Cancel" border="0" width="16" height="16" onclick="closePopupDialog();false"/>
-								<span style="width:10px; display: inline-block;"/>
-								<img id="btnSubmitForm" src="/XFILES/lib/icons/accept.png" alt="Accept" border="0" width="16" height="16" onclick="setUserRole();false"/>
+						</div>
+						<div class="modal-footer">
+							<div>
+								<button id="btnCancelUserDialog" type="button" class="btn btn-default btn-med" data-dismiss="modal">
+									<span class="glyphicon glyphicon-ban-circle"></span>
+								</button>
+								<button id="btnSubmitForm" type="button" class="btn btn-default btn-med"  onclick="manageUser(document.getElementById('username').value,document.getElementById('newUserPassword1').value,document.getElementById('newUserPassword2').value);false;">
+									<span class="glyphicon glyphicon-save"></span>
+								</button>
 							</div>
-						</span>
-						<span id="noAdminRights" style="display: block; width: 100%;">
-							<span class="labelRight10">You have no user management rights</span>
-							<div class="alignRight" style="vertical-align:middle">
-								<img id="btnCancelAdminForm2" src="/XFILES/lib/icons/cancel.png" alt="Cancel" border="0" width="16" height="16" onclick="closePopupDialog();false"/>
+						</div>
+					</div>
+					<div id="xfilesAdmin" style="display: none;">
+						<div class="modal-body">
+							<div class="form-horizontal">
+								<div class="form-group">
+									<xsl:text>Users Roles</xsl:text>
+							`	</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="userList">Select User(s)</label>
+									<div class="col-sm-10">
+										<select id="userList" multiple="multiple"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="Roles">Set Role(s)</label>
+									<input type="radio" id="disableOption" name="roleSelector" value="disabled"/>
+									<label for="disableOption">None</label>
+									<input type="radio" id="userOption" name="roleSelector" value="user"/>
+									<label for="userOption">User</label>
+									<span id="adminOptionButton">
+										<input type="radio" id="adminOption" name="roleSelector" value="administrator"/>
+										<label for="adminOption">Administrator</label>
+									</span>
+								</div>
 							</div>
-						</span>
+						</div>
+						<div class="modal-footer">
+							<div>
+								<button id="btnCancelUserDialog" type="button" class="btn btn-default btn-med" data-dismiss="modal">
+									<span class="glyphicon glyphicon-ban-circle"></span>
+								</button>
+								<button id="btnSubmitForm" type="button" class="btn btn-default btn-med"  onclick="setUserRole();false;">
+									<span class="glyphicon glyphicon-save"></span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div id="noAdminRights" style="display: block;">
+						<div class="modal-body">
+							<h4 class="danger">You have no user management rights</h4>
+						</div>
+						<div class="modal-footer"></div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</xsl:template>
 	<xsl:template name="setPasswordDialog">
-		<div style="display: none; position:relative; top: 0px;" id="setPasswordDialog" onclick="stopBubble(event)">
-			<div class="popupOuterEdge" style="top: 10px; right: 15px;">
-				<div class="popupBackground">
-					<div class="popupInnerEdge">
-						<div id="errorDialogTitle" class="row popupTitle">
-							<xsl:text>XFiles User Options</xsl:text>
-						</div>
-						<div class="alignLeft">
-							<xsl:text>Set Password</xsl:text>
-						</div>
-						<table>
-							<tbody>
-								<tr align="right" valign="middle">
-									<td align="left" nowrap="nowrap">
-										<span class="labelRight10">
-											<label>Enter new Password</label>
-										</span>
-										<span style="width:5px; display: inline-block;"/>
-									</td>
-									<td nowrap="nowrap">
-										<input id="newPassword1" name="newPassword1" size="30" maxlength="32" type="password"/>
-									</td>
-								</tr>
-								<tr align="right" valign="middle">
-									<td align="left" nowrap="nowrap">
-										<span class="labelRight10">
-											<label>Re-enter New Password</label>
-										</span>
-										<span style="width:5px; display: inline-block;"/>
-									</td>
-									<td nowrap="nowrap">
-										<input id="newPassword2" name="newPassword2" size="30" maxlength="32" type="password"/>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-						<div class="alignLeft">
-							<div style="white-space:nowrap">
-								<input type="checkbox" id="resetHomeFolder">Reset Home Folder</input>
-							</div>
-							<div style="white-space:nowrap">
-								<input type="checkbox" id="resetPublicFolder">Reset Public Folder</input>
-							</div>
-							<div style="white-space:nowrap">
-								<input type="checkbox" id="recreateHomePage">Recreate Home Page</input>
-							</div>
-							<div style="white-space:nowrap">
-								<input type="checkbox" id="recreatePublicPage">Recreate Public Page</input>
-							</div>
-						</div>
+		<div class="modal fade" id="setPasswordDialog" tabindex="-1" role="dialog" aria-labelledby="setPasswordDialogTitle" aria-hidden="true">
+			<div class="modal-dialog:" style="width:775px;">
+				<div class="modal-content">
+					<div class="modal-header">
 						<div>
-							<img id="btnCancelPasswordDialog" src="/XFILES/lib/icons/cancel.png" alt="Cancel" border="0" width="16" height="16" onclick="closePopupDialog();false"/>
-							<span style="width:10px; display: inline-block;"/>
-							<img id="btnSubmitPasswordDialog" src="/XFILES/lib/icons/accept.png" alt="Accept" border="0" width="16" height="16" onclick="setUserOptions();false"/>
+							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+							<h4 class="modal-title text-left" id="setPasswordDialogTitle">XFiles User Options</h4>
+						</div>
+					</div>
+					<div class="modal-body">
+						<div class="form-horizontal">
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="newPassword1">Enter new Password</label>
+								<div class="col-sm-10">
+									<input class="form-control" type="newPassword1" id="newPassword1" name="newPassword1" size="30" maxlength="32"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="newPassword2">Re-Enter new Password</label>
+								<div class="col-sm-10">
+									<input class="form-control" type="newPassword2" id="newPassword2" name="newPassword2" size="30" maxlength="32"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label">Actions</label>
+								<label><input type="checkbox" id="resetHomeFolder"></input>Reset Home Folder</label>
+								<label><input type="checkbox" id="resetPublicFolder"></input>Reset Public Folder</label>
+								<label><input type="checkbox" id="recreateHomePage"></input>Recreate Home Page</label>
+								<label><input type="checkbox" id="recreatePublicPage"></input>Reset Public Page</label>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<div>
+							<button id="btnCancelPasswordDialog" type="button" class="btn btn-default btn-med" data-dismiss="modal">
+								<span class="glyphicon glyphicon-ban-circle"></span>
+							</button>
+							<button id="btnSubmitPasswordDialog" type="button" class="btn btn-default btn-med"  onclick="setUserOptions();false;">
+								<span class="glyphicon glyphicon-save"></span>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -1090,7 +1004,7 @@
 		</table>
 	</xsl:template>
 	<xsl:template name="CopyRight">
-		<span style="float:left" class="copyright">Copyright © 2013 Oracle Corporation. All rights reserved.</span>
+		<span style="float:left" class="copyright">Copyright © 2015 Oracle Corporation. All rights reserved.</span>
 	</xsl:template>
 	<xsl:template name="XFilesFooter">
 		<div>
@@ -1336,18 +1250,25 @@
 		</span>
 	</xsl:template>
 	<xsl:template name="aboutXFilesDialog">
-		<div style="display: none;position:relative; top:0px;" id="aboutXFilesDialog" onclick="stopBubble(event)">
-			<div class="popupOuterEdge" style="top: -10px; right: 10px; z-index: 10000;">
-				<div class="popupBackground" style="width:600px;height:430px;">
-					<div class="popupInnerEdge">
-						<div id="currentXMLTitle" class="row popupTitle">
-							<xsl:text>About XFiles</xsl:text>
+		<div class="modal fade" id="aboutXFilesDialog" tabindex="-1" role="dialog" aria-labelledby="aboutXFilesDialogTitle" aria-hidden="true">
+			<div class="modal-dialog:" style="width:775px;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<div>
+							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+							<h4 class="modal-title text-left" id="aboutXFilesDialogTitle">About XFILES</h4>
 						</div>
+					</div>
+					<div class="modal-body">
 						<div style="text-align:left;white-space: pre;color: #000000; background-color: #FFFFFF; width: 100%; overflow:scroll;width:320;height:380px">
 							<iframe id="aboutXFiles" src="/XFILES/aboutXFiles.html" frameborder="0" style="width:100%;height:100%"/>
 						</div>
-						<div class="alignRight" style="vertical-align:middle">
-							<img id="bntCancelAbout" src="/XFILES/lib/icons/cancel.png" alt="Cancel" border="0" width="16" height="16" onclick="closePopupDialog();return false;"/>
+					</div>
+					<div class="modal-footer">
+						<div>
+							<button id="bntCancelAbout" type="button" class="btn btn-default btn-med" data-dismiss="modal">
+								<span class="glyphicon glyphicon-ban-circle"></span>
+							</button>
 						</div>
 					</div>
 				</div>

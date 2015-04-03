@@ -34,7 +34,7 @@
 			</span>
 			<span style="float:right;display:block;">
 				<span style="display:inline-block;width:21px;">
-					<a title="Show XQuery" href="#" onclick="openDialog('currentSQL');false">
+					<a title="Show XQuery" href="#" onclick="openModalDialog('currentSQL');false">
 						<img id="btnShowQuery" src="/XFILES/lib/icons/showQuery.png" alt="Show Query" border="0" width="16" height="16"/>
 					</a>
 				</span>
