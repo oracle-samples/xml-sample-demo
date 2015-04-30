@@ -1396,7 +1396,7 @@ function SqlProcessor() {
          }
        }
 
-       statement = statement + " " + nextLine;
+       statement = statement + nextLine + " ";
        statementStarted = true;
      }
      statement = "";
