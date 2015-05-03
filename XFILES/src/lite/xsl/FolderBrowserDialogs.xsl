@@ -74,11 +74,11 @@
 							<button id="btnCancelNewFolder" type="button" class="btn btn-default btn-med" data-dismiss="modal">
 								<span class="glyphicon glyphicon-ban-circle"></span>
 							</button>
-						</div>
-					</div>							<button id="btnDoNewFolder" type="button" class="btn btn-default btn-med"  onclick="createNewFolder(document.getElementById('newFolderName').value,document.getElementById('newFolderDescription').value);false;">
+							<button id="btnDoNewFolder" type="button" class="btn btn-default btn-med"  onclick="createNewFolder(document.getElementById('newFolderName').value,document.getElementById('newFolderDescription').value);false;">
 								<span class="glyphicon glyphicon-save"></span>
 							</button>
-
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

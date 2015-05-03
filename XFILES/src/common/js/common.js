@@ -98,8 +98,7 @@ function SoapManager(manager) {
   	}
   	else {
       this.loadLogEntry(logger.length);
-      // document.getElementById(logWindowID).modal('show');
-      $('#' + logWindowID).modal('show')    
+      openModalDialog(logWindowID);
     }
   }
   
@@ -2399,7 +2398,7 @@ var xfilesHandleException = function(module, e, target) {
    	 showPageContent();
    }
    
-   $('#genericErrorDialog').modal('show') 
+   openModalDialog('genericErrorDialog');
 
     if (e.id) {
   	  
