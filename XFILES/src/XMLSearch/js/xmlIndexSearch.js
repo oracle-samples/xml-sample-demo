@@ -136,12 +136,19 @@ function onPageLoaded() {
   viewXML = doViewXML;
 }
 
+
+function getUploadFolderPath() {
+	
+	return document.getElementById("uploadFolder").value;
+
+}
+
 function openUploadFilesDialog(evt) {
 
   var dialog = document.getElementById("uploadFilesDialog");
-  var uploadFrame =  document.getElementById("uploadFilesFrame");
-  uploadFrame.contentDocument.getElementById("targetFolder").value = document.getElementById("uploadFolder").value;
-  openPopupDialog(evt, dialog)
+  // var uploadFrame =  document.getElementById("uploadFilesFrame");
+  // uploadFrame.contentDocument.getElementById("targetFolder").value = document.getElementById("uploadFolder").value;
+  openModalDialog(dialog)
 
 }
 

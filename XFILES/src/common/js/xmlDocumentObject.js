@@ -586,11 +586,25 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
       var result;
       
       if (useMSXML) {
-        result = self.baseDocument.load(url);
+      	try {
+          result = self.baseDocument.load(url);
+        }
+        catch (e) {
+    	    error = new xfilesException(className + '.load',8, url, null);
+	        error.setDescription('[MSXML] : Error Loading Document via XMLDOM.load()');
+  	      throw error;
+  	    }
       }
       else {
         if (self.baseDocument.load) {
-          result = self.baseDocument.load(url);
+        	try {
+            result = self.baseDocument.load(url);
+          }
+          catch (e) {
+      	    error = new xfilesException(className + '.load',8, url, null);
+	          error.setDescription('[GECKO] : Error Loading Document via XMLDOM.load()');
+    	      throw error;
+    	    }
         }
         else {
         	// Implement XML.load function for Chrome / Safari ?

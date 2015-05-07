@@ -1278,11 +1278,19 @@ function getResourceListXML(resourceList) {
   return resourceListXML;
 }
 
+function getUploadFolderPath() {
+
+  return resourceURL
+
+}
+
 function openUploadFilesDialog(evt) {
 
-  var uploadFrame = document.getElementById('uploadFilesFrame');
-  var targetFolder = uploadFrame.contentWindow.document.getElementById('targetFolder');
-  targetFolder.value = resourceURL;
+  // var uploadFrame = document.getElementById('uploadFilesFrame');
+  // var targetFolder = uploadFrame.contentWindow.document.getElementById('targetFolder');
+  // targetFolder.value = resourceURL;
+  // showInfoMessage('Target Folder = ' + uploadFrame.contentWindow.document.getElementById('targetFolder').value);
+
   openModalDialog('uploadFilesDialog');
 }
 

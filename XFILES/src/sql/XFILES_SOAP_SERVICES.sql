@@ -62,6 +62,8 @@ as
   procedure getFolderListing(P_FOLDER_PATH IN VARCHAR2, P_INCLUDE_METADATA VARCHAR2 DEFAULT 'FALSE', P_TIMEZONE_OFFSET NUMBER DEFAULT 0, P_CACHE_RESULT NUMBER DEFAULT 0, P_FOLDER IN OUT XMLType);
   procedure getVersionHistory(P_RESOURCE_PATH IN VARCHAR2, P_TIMEZONE_OFFSET NUMBER DEFAULT 0, P_CACHE_RESULT NUMBER DEFAULT 0, P_RESOURCE IN OUT XMLType);
   procedure getACLList(P_ACL_LIST out XMLType);
+
+  function getPrivileges(P_RESOURCE_PATH VARCHAR2) return XMLTYPE;
   
   function GENERATEPREVIEW(P_RESOURCE_PATH VARCHAR2, P_LINES number) return XMLType;
   function renderAsXHTML(P_RESOURCE_PATH VARCHAR2) return XMLType;
@@ -1341,6 +1343,7 @@ begin
                  G_NODE_COUNT as "id",
                  'null' as "isSelected",
                  'closed' as "isOpen",
+                 'false' as "isWriteable",
                  '/XFILES/lib/icons/readOnlyFolderOpen.png' as "openIcon",
                  '/XFILES/lib/icons/readOnlyFolderClosed.png' as "closedIcon",
                  'hidden' as "children",
@@ -1361,6 +1364,7 @@ begin
                  G_NODE_COUNT as "id",
                  'null' as  "isSelected",
                  'closed' as "isOpen",
+                 'true' as "isWriteable",
                  '/XFILES/lib/icons/writeFolderOpen.png' as "openIcon",
                  '/XFILES/lib/icons/writeFolderClosed.png' as "closedIcon",
                  'hidden' as "children",
@@ -1385,6 +1389,7 @@ begin
        -- We are at the bottom of the path, Make sure folder is shown as writeable
        DBMS_XMLDOM.setAttribute(V_CHILD_FOLDER,'openIcon','/XFILES/lib/icons/writeFolderOpen.png');
        DBMS_XMLDOM.setAttribute(V_CHILD_FOLDER,'closedIcon','/XFILES/lib/icons/writeFolderClosed.png');
+       DBMS_XMLDOM.setAttribute(V_CHILD_FOLDER,'isWriteable','true');
      end if;
   end if;
   
@@ -1482,6 +1487,29 @@ exception
     raise;
 end;
 --
+function getPrivileges(P_RESOURCE_PATH VARCHAR2) 
+return XMLTYPE 
+as
+  V_PARAMETERS        XMLType;
+  V_INIT              TIMESTAMP WITH TIME ZONE := SYSTIMESTAMP;
+
+  V_PRIVILEGES XMLTYPE;
+begin
+  select xmlConcat(
+           xmlElement("ResourcePath",P_RESOURCE_PATH)
+         )
+    into V_PARAMETERS
+    from dual;
+    
+  XDB_REPOSITORY_SERVICES.getPrivileges(P_RESOURCE_PATH,V_PRIVILEGES);
+  writeLogRecord('GETPRIVILEGES',V_INIT,V_PARAMETERS);
+  return V_PRIVILEGES;
+exception
+  when others then
+    handleException('GETPRIVILEGES',V_INIT,V_PARAMETERS);
+    raise;
+end;
+--
 function GENERATEPREVIEW(P_RESOURCE_PATH VARCHAR2, P_LINES number) 
 return XMLType
 as
@@ -1498,11 +1526,11 @@ begin
     
    V_RESULT := XFILES_UTILITIES.generatePreview(P_RESOURCE_PATH,P_LINES);
    
-   writeLogRecord('PREVIEW',V_INIT,V_PARAMETERS);
+   writeLogRecord('GENERATEPREVIEW',V_INIT,V_PARAMETERS);
    return V_RESULT;
 exception
   when others then
-    handleException('PREVIEW',V_INIT,V_PARAMETERS);
+    handleException('GENERATEPREVIEW',V_INIT,V_PARAMETERS);
     raise;
 end;
 --

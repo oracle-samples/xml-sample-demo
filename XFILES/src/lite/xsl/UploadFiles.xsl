@@ -133,7 +133,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<div>
-						<button type="button" class="close" data-dismiss="modal" onclick="parent.closeUploadFilesDialog();false();"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+						<button type="button" class="close" data-dismiss="modal" onclick="parent.closeUploadFilesDialog();return false;"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
 						<h4 class="modal-title text-left" id="uploadFilesDialogTitle">UploadFiles</h4>
 					</div>
 				</div>
@@ -153,7 +153,7 @@
 				</div>
 				<div class="modal-footer">
 					<div>
-						<button id="btnCancelIUploadFiles" type="button" class="btn btn-default btn-med" data-dismiss="modal" onclick="parent.closeUploadFilesDialog();false();">
+						<button id="btnCancelIUploadFiles" type="button" class="btn btn-default btn-med" data-dismiss="modal" onclick="parent.closeUploadFilesDialog();return false;">
 							<span class="glyphicon glyphicon-ban-circle"></span>
 						</button>
 						<button id="btnDoUploadFiles" type="button" class="btn btn-default btn-med"  onclick="doUploadFiles();">

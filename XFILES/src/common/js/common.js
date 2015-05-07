@@ -511,6 +511,9 @@ var viewXSL
 var viewSOAPRequest
 var viewSOAPResponse
 
+var uploadSuccessCallback;
+var uploadFailedCallback;
+
 var orawsvNamespaces;
 
 var orawsvPrefixList = {
@@ -2244,6 +2247,11 @@ function closeModalDialog(dialogName) {
 var xfilesHandleException = function(module, e, target) {
 	
   try {
+  	
+  	if (!document.getElementById('genericErrorDialog')) {
+			createErrorDialog();
+    }
+
   	var xml = new xmlDocument();
   	var clientError = xml.createElement("XFilesClientException");
   	xml.appendChild(clientError);
@@ -2316,59 +2324,6 @@ var xfilesHandleException = function(module, e, target) {
     	}
     }
  
-    // Use Rest Service to Write Log Record. URL depends on whether or not we are current connected as an authenticated user.
- 
-  	setHttpUsername();
-
-  	if (isAuthenticatedUser()) {
-
-	  	var schema  = "XFILES";
-      var package = "XFILES_SOAP_SERVICES";
-      var method  = "WRITELOGRECORD";
-
-     	var mgr = soapManager.getRequestManager(schema,package,method);
-      var XHR = mgr.createPostRequest(false);
- 
-      var parameters  = new Object;
-	    var xparameters = new Object;
-      xparameters["P_LOG_RECORD-XMLTYPE-IN"]   = xml;
-      mgr.sendSoapRequest(parameters,xparameters);    
-      var soapResponse = mgr.getSoapResponse('common.xfilesHandleException()');
-    }
-    else {
-
-   	  var encodedLogRecord = encodeURIComponent(xml.serialize());
-  	
-   	  /* 
-  	  **
-  	  ** Do not submit URL larger than 2K via REST
-  	  **
-  	  */
-  	
-    	if (encodedLogRecord.length < 2048) {
-        var restURL = '/sys/servlets/XFILES/RestService/XFILES.XFILES_REST_SERVICES.WRITELOGRECORD?LOG_RECORD=' + encodedLogRecord;
-  
-        var XHR = soapManager.createGetRequest(restURL,false);
-        XHR.send(null);
-        if (XHR.status != 200) {
-          error = new xfilesException('common.xfilesHandleException',16, restURL, null);
-          error.setDescription(XHR.statusText);
-          error.setNumber(XHR.status);
-          throw error;
-        }
-      }
-      else {
-    	  // showWarningMessage("Cannot Write Log Entry via Rest (length = " + encodedLogRecord.length);
-    	  alert("Cannot Write Log Entry via Rest (length = " + encodedLogRecord.length);
-    	  
-    	  /*
-    	  **
-    	  ** Code to Chunk or Reduce the size of the LOG RECORD
-    	  **
-    	  */
-    	}
-		}
-  
     if (useMSXML) {
 
       if (e.number == -2147024891 ) { 
@@ -2381,11 +2336,7 @@ var xfilesHandleException = function(module, e, target) {
       }
 
     }
- 
-    if (!document.getElementById('genericErrorDialog')) {
-			createErrorDialog();
-    }
- 
+  
     document.getElementById('errorType').style.display = "none";
     document.getElementById('errorTarget').style.display = "none";
     document.getElementById('errorTraceClient').style.display = "none";
@@ -2394,11 +2345,11 @@ var xfilesHandleException = function(module, e, target) {
   	document.getElementById('errorModule').style.display = "block";
 	  document.getElementById('errorModuleText').innerHTML = module;
 	
-	 if (document.getElementById('pageContent')) {
-   	 showPageContent();
-   }
+  	if (document.getElementById('pageContent')) {
+   	  showPageContent();
+    }
    
-   openModalDialog('genericErrorDialog');
+    openModalDialog('genericErrorDialog');
 
     if (e.id) {
   	  
@@ -2435,6 +2386,67 @@ var xfilesHandleException = function(module, e, target) {
 	 		traceArea.innerHTML = "";
 			exceptionToHTML(e,traceArea);
     }
+
+    try {
+  
+      // Use Rest Service to Write Log Record. URL depends on whether or not we are current connected as an authenticated user.
+ 
+    	setHttpUsername();
+  
+    	if (isAuthenticatedUser()) {
+ 
+	    	var schema  = "XFILES";
+        var package = "XFILES_SOAP_SERVICES";
+        var method  = "WRITELOGRECORD";
+
+       	var mgr = soapManager.getRequestManager(schema,package,method);
+        var XHR = mgr.createPostRequest(false);
+ 
+        var parameters  = new Object;
+	      var xparameters = new Object;
+        xparameters["P_LOG_RECORD-XMLTYPE-IN"]   = xml;
+        mgr.sendSoapRequest(parameters,xparameters);    
+        var soapResponse = mgr.getSoapResponse('common.xfilesHandleException()');
+      }
+      else {
+  
+   	    var encodedLogRecord = encodeURIComponent(xml.serialize());
+    	
+   	    /* 
+    	  **
+    	  ** Do not submit URL larger than 2K via REST
+    	  **
+    	  */
+  	
+      	if (encodedLogRecord.length < 2048) {
+          var restURL = '/sys/servlets/XFILES/RestService/XFILES.XFILES_REST_SERVICES.WRITELOGRECORD?LOG_RECORD=' + encodedLogRecord;
+    
+          var XHR = soapManager.createGetRequest(restURL,false);
+          XHR.send(null);
+          if (XHR.status != 200) {
+            error = new xfilesException('common.xfilesHandleException',16, restURL, null);
+            error.setDescription(XHR.statusText);
+            error.setNumber(XHR.status);
+            throw error;
+          }
+        }
+        else {
+      	  // showWarningMessage("Cannot Write Log Entry via Rest (length = " + encodedLogRecord.length);
+      	  alert("Cannot Write Log Entry via Rest (length = " + encodedLogRecord.length);
+    	   
+    	    /*
+      	  **
+    	    ** Code to Chunk or Reduce the size of the LOG RECORD
+    	    **
+    	    */
+      	}
+		  }
+		}
+    catch (le) {
+      var err = new xfilesException('common.xfilesHandleException',12,null,le);
+      err.setDescription('Fatal Error Logging Exception.');
+      throw err;
+    }  
   }
   catch (ie) {
   	div = document.getElementById("greyLoading");
@@ -2451,7 +2463,7 @@ var xfilesHandleException = function(module, e, target) {
 	  if (div != null) {
 		  div.style.display="none";
   	}
-    err = new xfilesException('common.xfilesHandleException',12,null,ie);
+    var err = new xfilesException('common.xfilesHandleException',12,null,ie);
     err.setDescription('Fatal Error in Exception Handler.');
     err.toHTML(document.getElementById('fatalError'));
     err = new xfilesException(module,12,null,e);
@@ -2963,3 +2975,150 @@ function RequestManager(manager,wsdl) {
 
 }
 
+function doReauthentication(currentUser,URL) {
+		
+	var authenticatedUser = null;
+	try {
+   	try {
+  		authenticatedUser = getHttpUsername();
+   		authenticatedUser = getHttpUsername();
+  	} 
+  	catch (e) { // Fail with 501 ?
+  		authenticatedUser = getHttpUsername();
+  	}; 
+   	if (authenticatedUser != currentUser) {
+      error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
+      error.setDescription('User Mismatch following ReAuthentication : Expected "' + schema + '", found "' + authenticatedUser + '".');
+   	  throw error;
+	  }  		
+  }
+  catch (e) {
+    error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
+    error.setDescription('Exeception raised while performing ReAuthentication process for "' + schema + '".');
+  	throw error;
+  }	  	
+}
+
+function validateUploadFile(XHR, repositoryPath, callback) {
+
+	try {
+		if (XHR.status == 201) {
+   	  callback(XHR,repositoryPath);
+    }
+    else {
+			error = new xfilesException("kml.validateUploadFile",14,repositoryPath);
+    	error.setDescription("File Upload Operation Failed : " + XHR.statusText);
+   		error.setNumber(XHR.status);
+   		throw error;
+    }
+  } 
+  catch (e) {
+    handleException("kml.validateUploadFile",e,null);
+  }
+
+}
+
+function uploadFile(repositoryPath, fileControlname, callback) {
+   
+   // This version seems to result in trunctated content at 32K (At least with Firefox)
+
+   var fileControl = document.getElementById(fileControlname)
+   var XHR = soapManager.createPutRequest(repositoryPath,true);
+   XHR.onreadystatechange = function() { 
+   	                          if( XHR.readyState==4 ) { 
+   	                          	validateUploadFile(XHR,repositoryPath,callback);
+   	                          } 
+   	                        };
+   	                        
+   XHR.send(fileControl.files[0]);
+
+}
+
+function validateUploadToFolder(XHR, repositoryPath, callback) {
+
+	try {
+		if (XHR.status == 200) {
+			var uploadStatus = JSON.parse(XHR.responseText);
+			if (uploadStatus.status == 1) {
+			  callback(XHR, repositoryPath);
+			}
+			else {
+	    	showUserErrorMessage("File Upload Failed. Status: " + uploadStatus.status + ", SQL Error Code: " + uploadError.SQLError + ", SQL Error Message: " + uploadError.SQLErrorMessage);
+	    }
+	  }
+	  else {
+      showUserErrorMessage("File Upload Failed. HTTP Status: " + XHR.status + "[" + XHR.statusText + "]");
+  	}
+	}
+  catch (e) {
+    handleException("kml.validateUploadToFolder",e,null);
+  }
+}
+
+
+function uploadToFolder(targetFolder, fileControlName, callback) {
+
+/*
+    <form id="uploadImageForm" name="upload" action="/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.SINGLE_DOC_UPLOAD" method="post" enctype="multipart/form-data">
+			<input type="hidden"  id="targetFolder"            name="TARGET_FOLDER"/>
+			<input type="hidden"  id="duplicatePolicy"         name="DUPLICATE_POLICY" value="RAISE"/>
+			<input type="hidden"  id="resourceName"            name="RESOURCE_NAME"/>
+			<input type="hidden"  id="description"             name="DESCRIPTION"/>
+			<input type="hidden"  id="language"                name="LANGUAGE"/>
+			<input type="hidden"  id="characterSet"            name="CHARACTER_SET"/>
+ 			<div class="form-group" style="margin-left:20px">
+	  		<input id="FILE" name="FILE" title="FILE"  type="file">
+		  </div>
+		</form>	
+*/
+
+  var fileControl = document.getElementById(fileControlName)
+  var formData = new FormData();
+
+  formData.append('TARGET_FOLDER',targetFolder);
+  formData.append(fileControl.name,fileControl.files[0]);
+  formData.append('RESOURCE_NAME','');
+  formData.append('DUPLICATE_POLICY','RAISE');
+  formData.append('DESCRIPTION','');
+  formData.append('LANGUAGE','');
+  formData.append('CHARACTER_SET','');
+  
+  var repositoryPath = targetFolder + "/" + fileControl.value;
+
+  var XHR = soapManager.createPostRequest('/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.XMLHTTPREQUEST_DOC_UPLOAD',true);
+  XHR.onreadystatechange = function() { 
+   	                          if( XHR.readyState==4 ) { 
+   	                          	validateUploadToFolder(XHR,repositoryPath,callback);
+   	                          } 
+   	                        };
+  XHR.send(formData);
+
+}	
+
+// Enable stacked Bootstrap Modals.
+
+$(document)  
+  .on('show.bs.modal', '.modal', function(event) {
+    $(this).appendTo($('body'));
+  })
+  .on('shown.bs.modal', '.modal.in', function(event) {
+    setModalsAndBackdropsOrder();
+  })
+  .on('hidden.bs.modal', '.modal', function(event) {
+    setModalsAndBackdropsOrder();
+  });
+
+function setModalsAndBackdropsOrder() {  
+	try {
+    var modalZIndex = 1040;
+    $('.modal.in').each(function(index) {
+      var $modal = $(this);
+      modalZIndex++;
+      $modal.css('zIndex', modalZIndex);
+      $modal.next('.modal-backdrop.in').addClass('hidden').css('zIndex', modalZIndex - 1);
+    });
+    $('.modal.in:visible:last').focus().next('.modal-backdrop.in').removeClass('hidden');
+  } catch (e) {
+  	console.log(e);
+  }
+}

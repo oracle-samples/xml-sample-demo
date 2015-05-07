@@ -23,12 +23,17 @@ function setDefaults() {
   document.getElementById('UTF-8').selected = true;
   document.getElementById('en-US').selected = true;
   document.getElementById('Loading').style.display = "none";
+  
+  var targetFolder = document.getElementById('targetFolder');
+ 	targetFolder.value = parent.getUploadFolderPath();
+ 	
+  // console.log('UploadFiles.setDefaults() : Target Folder = ' + targetFolder.value);
 
 }
 
 function doUploadFiles() {
-	
-  var fileCollection = document.getElementsByName('FILE');
+
+	var fileCollection = document.getElementsByName('FILE');
 
   for (i=0; i < fileCollection.length; i++) {
   	if (fileCollection[i].value != "") {

@@ -29,6 +29,7 @@ var xfilesPrefixList = orawsvPrefixList;
     xfilesPrefixList['img']    = "http://xmlns.oracle.com/xdb/metadata/ImageMetadata";
     xfilesPrefixList['exif']   = "http://xmlns.oracle.com/ord/meta/exif";
     xfilesPrefixList['xhtml']  = "http://www.w3.org/1999/xhtml";
+    xfilesPrefixList['acl']    = "http://xmlns.oracle.com/xdb/acl.xsd";
 
 function loadXFilesNamespaces() {
   xfilesNamespaces = new namespaceManager(xfilesPrefixList);
@@ -108,6 +109,34 @@ function xfilesforceLogon(event) {
       handleException('common.xfilesforceLogon',e,resourceURL);
     }
   }
+}
+
+function hasCreateResource(resourcePath) {
+	
+	var hasPermission = false;
+	
+	var targetFolder = resourcePath.substring(0,resourcePath.lastIndexOf('/')-1);
+	
+  var schema  = "XFILES";
+  var package = "XFILES_SOAP_SERVICES";
+  var method  = "GETPRIVILEGES";
+	
+	var mgr = soapManager.getRequestManager(schema,package,method);
+  	
+	var namespaces = xfilesNamespaces
+	namespaces.redefinePrefix("lite",mgr.getServiceNamespace());
+	
+	var XHR = mgr.createPostRequest(false);
+
+	var parameters = new Object;
+	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = targetPath;
+  mgr.sendSoapRequest(parameters);    
+  
+  var permissions = logRequestManager.getSoapResponse(logRequestManager);
+     
+  var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:P_PRIVILEGES/acl:privilege/acl:link",xfilesNamespaces);
+	return nodeList.length == 1;
+
 }
 
 function xfilesDoLogon(event) {
@@ -198,6 +227,16 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
      node.value = 'hidden';
      xmlToHTML(self.targetWindow,self.treeState,self.treeStateXSL);
      raiseEvent(target,"click");
+   }
+
+   this.isWritableFolder = function() {
+     node = self.treeState.selectNodes('//*[@isOpen="open"]',self.treeNamespaces).item(0);
+     if (!node) {
+     	 return false;
+     }
+     else {
+     	 return node.getAttribute('isWriteable') == "true";
+     }
    }
    
    this.getOpenFolder = function() {
