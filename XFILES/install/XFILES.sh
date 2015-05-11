@@ -326,26 +326,26 @@ then
     exit 6
 	 fi
 fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/apex/xsl/ShowTree.xsl" | head -1)
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/apex/xsl/showTree.xsl" | head -1)
 if [ $HttpStatus != "404" ] 
 then
   if [ $HttpStatus == "200" ] 
   then
-    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/apex/xsl/ShowTree.xsl" | head -1)
+    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/apex/xsl/showTree.xsl" | head -1)
     if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
     then
-      echo "DELETE(PUT) "$SERVER/home/$USER/src/apex/xsl/ShowTree.xsl":$HttpStatus - Operation Failed" >> $logfilename
+      echo "DELETE(PUT) "$SERVER/home/$USER/src/apex/xsl/showTree.xsl":$HttpStatus - Operation Failed" >> $logfilename
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   else
-    echo "HEAD(PUT) "$SERVER/home/$USER/src/apex/xsl/ShowTree.xsl":$HttpStatus - Operation Failed" >> $logfilename
+    echo "HEAD(PUT) "$SERVER/home/$USER/src/apex/xsl/showTree.xsl":$HttpStatus - Operation Failed" >> $logfilename
     echo "Installation Failed: See $logfilename for details."
     exit 5
   fi
 fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/apex/xsl/ShowTree.xsl" "$SERVER/home/$USER/src/apex/xsl/ShowTree.xsl" | head -1)
-echo "PUT:"$demohome/src/apex/xsl/ShowTree.xsl" --> "$SERVER/home/$USER/src/apex/xsl/ShowTree.xsl":$HttpStatus" >> $logfilename
+HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/apex/xsl/showTree.xsl" "$SERVER/home/$USER/src/apex/xsl/showTree.xsl" | head -1)
+echo "PUT:"$demohome/src/apex/xsl/showTree.xsl" --> "$SERVER/home/$USER/src/apex/xsl/showTree.xsl":$HttpStatus" >> $logfilename
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename

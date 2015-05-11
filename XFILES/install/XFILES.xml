@@ -89,8 +89,8 @@
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\src\apex\xsl\ShowTree.xsl</local>
-  			<remote>%BASEFOLDER%/src/apex/xsl/ShowTree.xsl</remote>
+  			<local>%DEMODIRECTORY%\src\apex\xsl\showTree.xsl</local>
+  			<remote>%BASEFOLDER%/src/apex/xsl/showTree.xsl</remote>
   		</action>
 
       <!-- Common -->
