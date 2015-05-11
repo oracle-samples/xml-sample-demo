@@ -36,7 +36,7 @@
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\%USER%\sql\setup.sql</action>
 	 	<action type="SQLLDR"/>
 
- 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\Install\sql\executeAndQuit.sql %DEMODIRECTORY%\%USER%\sql\resetDemo.sql</action>
+ 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\executeAndQuit.sql %DEMODIRECTORY%\%USER%\sql\resetDemo.sql</action>
 
 	  <action type="UPLOAD">
   		<!-- Delete existing Source Code -->
@@ -168,7 +168,7 @@
 				<username>%USER%</username>
 				<password>%PASSWORD%</password>
 				<tnsAlias>%TNSALIAS%</tnsAlias>
-				<icon>%DEMODIRECTORY%\Install\sqlplus.ico</icon>
+				<icon>%DEMODIRECTORY%\install\sqlplus.ico</icon>
 			</defaults>
 			<shortCut>
 				<name>1.0 Reset Demo</name>

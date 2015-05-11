@@ -65,7 +65,7 @@ sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/createHomeFolder.sql
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/$USER/sql/setup.sql
 sed -e "s|\\\\|\/|g"  -i $demohome/$USER/sampleData/sampleData.ctl
 sqlldr -Userid=$USER/$USERPWD@$ORACLE_SID control=$demohome/$USER/sampleData/sampleData.ctl
-sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/Install/sql/executeAndQuit.sql $demohome/$USER/sql/resetDemo.sql
+sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/executeAndQuit.sql $demohome/$USER/sql/resetDemo.sql
 HttpStatus=$(curl --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XQuery" | head -1)
 echo "DELETE "$SERVER/publishedContent/demonstrations/XQuery":$HttpStatus" >> $logfilename
 if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ] && [ $HttpStatus != "404" ] 
