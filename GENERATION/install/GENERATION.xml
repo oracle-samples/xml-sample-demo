@@ -205,7 +205,7 @@
 	<clone>
 		<folders>
 			<folder>
-				<source>%DEMODIRECTORY%\Setup\cloneSource\sql</source>
+				<source>%DEMODIRECTORY%\setup\cloneSource\sql</source>
 				<target>%DEMODIRECTORY%\%USER%\sql</target>
 			</folder>
 		</folders>
