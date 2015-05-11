@@ -3055,18 +3055,7 @@ function validateUploadToFolder(XHR, repositoryPath, callback) {
   }
 }
 
-function stripPathInformation(filename) {
 
-	  // Deal with Directory Names in path 
-  	if (filename.lastIndexOf('/') > 0 ) {
-  	  filename = filename.substr(filename.lastIndexOf('/') + 1);
-  	}
-  	if (filename.lastIndexOf('\\') > 0 ) {
-  	  filename = filename.substr(filename.lastIndexOf('\\') + 1);
-  	}
-    return filename;
-}
- 
 function uploadToFolder(targetFolder, fileControlName, callback) {
 
 /*
