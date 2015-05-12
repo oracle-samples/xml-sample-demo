@@ -49,7 +49,7 @@ mkdir -p $demohome/$USER/sqlldr
 mkdir -p $demohome/$USER/sampleData
 mkdir -p $demohome/$USER/sampleData/xml
 echo "Unzipping \"$demohome/setup/sampleData.zip\" into \"$demohome/$USER/sampleData/xml\""
-unzip -qq "$demohome/setup/sampleData.zip" -d "$demohome/$USER/sampleData/xml"
+unzip -o -qq "$demohome/setup/sampleData.zip" -d "$demohome/$USER/sampleData/xml"
 echo "Unzip Completed"
 echo "Cloning \"$demohome/setup/sql\" into \"$demohome/$USER/sql\""
 cp -r "$demohome/setup/sql"/* "$demohome/$USER/sql"
