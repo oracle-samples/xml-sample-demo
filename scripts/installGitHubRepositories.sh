@@ -1,3 +1,4 @@
+doInstall {
 DBA=$1
 DBAPWD=$2
 XFILES=$3
@@ -8,7 +9,7 @@ DEMOUSER=$7
 DEMOPWD=$8
 HOSTNAME=$9
 HTTPPORT=${10}
-ORDSHOME=$(11}
+ORDSHOME=${11}
 SERVERURL="$HOSTNAME:$HTTPPORT"
 INSTALLROOT=`pwd`
 rm -rf oracle-xml-sample-demo-*
@@ -28,3 +29,5 @@ then
   scripts/installDBJSON.sh $DBA $DBAPWD $ORDSHOME
 fi
 sh /installJSONRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $XDBEXT $XDBEXTPWD $DEMOUSER $DEMOPWD $SERVERURL
+}
+doInstall 2>&1 | tee -a install.log
