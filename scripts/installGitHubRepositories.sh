@@ -1,17 +1,4 @@
 doInstall() {
-   DBA=$1
-   DBAPWD=$2
-   XFILES=$3
-   XFILESPWD=$4
-   XDBEXT=$5
-   XDBEXTPWD=$6
-   DEMOUSER=$7
-   DEMOPWD=$8
-   HOSTNAME=$9
-   HTTPPORT=${10}
-   ORDSHOME=${11}
-   SERVERURL="$HOSTNAME:$HTTPPORT"
-   INSTALLROOT=`pwd`
    rm -rf oracle-xml-sample-demo-*
    curl -Lk https://github.com/oracle/xml-sample-demo/zipball/master -o xml-sample-demo.zip
    unzip -o xml-sample-demo.zip
@@ -30,5 +17,18 @@ doInstall() {
    fi
    sh scripts/installJSONRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $XDBEXT $XDBEXTPWD $DEMOUSER $DEMOPWD $SERVERURL
 }
+DBA=$1
+DBAPWD=$2
+XFILES=$3
+XFILESPWD=$4
+XDBEXT=$5
+XDBEXTPWD=$6
+DEMOUSER=$7
+DEMOPWD=$8
+HOSTNAME=$9
+HTTPPORT=${10}
+ORDSHOME=${11}
+SERVERURL="$HOSTNAME:$HTTPPORT"
+INSTALLROOT=`pwd`
 rm install.log
 doInstall 2>&1 | tee -a install.log
