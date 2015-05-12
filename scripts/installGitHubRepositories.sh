@@ -8,6 +8,7 @@ DEMOUSER=$7
 DEMOPWD=$8
 HOSTNAME=$9
 HTTPPORT=${10}
+ORDSHOME=$(11}
 SERVERURL="$HOSTNAME:$HTTPPORT"
 INSTALLROOT=`pwd`
 rm -rf oracle-xml-sample-demo-*
@@ -22,4 +23,8 @@ cd $INSTALLROOT
 curl -Lk https://github.com/oracle/json-in-db/zipball/master -o json-in-db.zip
 unzip -o json-in-db.zip
 cd oracle-json-in-db*
-sh scripts/installJSONRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $XDBEXT $XDBEXTPWD $DEMOUSER $DEMOPWD $SERVERURL
+if [ $ORDSROOT != "" ]
+then
+  scripts/installDBJSON.sh $DBA $DBAPWD $ORDSHOME
+fi
+sh /installJSONRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $XDBEXT $XDBEXTPWD $DEMOUSER $DEMOPWD $SERVERURL
