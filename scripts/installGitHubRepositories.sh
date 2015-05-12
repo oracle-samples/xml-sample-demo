@@ -19,15 +19,16 @@ cd oracle-xml-sample-demo*
 sqlplus $DBA/$DBAPWD @scripts/installXFiles $XFILES $XFILESPWD $HTTPPORT
 sqlplus $DBA/$DBAPWD @scripts/installMetadata $XDBEXT $XDBEXTPWD
 sh scripts/installXMLRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $XDBEXT $XDBEXTPWD $DEMOUSER $DEMOPWD $SERVERURL
-rm -rf oracle-json-in-db-*
 cd $INSTALLROOT
+rm -rf oracle-json-in-db-*
 curl -Lk https://github.com/oracle/json-in-db/zipball/master -o json-in-db.zip
 unzip -o json-in-db.zip
 cd oracle-json-in-db*
-if [ $ORDSROOT != "" ]
+if [ -z "$ORDSROOT" ]
 then
-  scripts/installDBJSON.sh $DBA $DBAPWD $ORDSHOME
+  sh scripts/installDBJSON.sh $DBA $DBAPWD $ORDSHOME
 fi
-sh /installJSONRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $XDBEXT $XDBEXTPWD $DEMOUSER $DEMOPWD $SERVERURL
+sh scripts/installJSONRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $XDBEXT $XDBEXTPWD $DEMOUSER $DEMOPWD $SERVERURL
 }
+rm install.log
 doInstall 2>&1 | tee -a install.log
