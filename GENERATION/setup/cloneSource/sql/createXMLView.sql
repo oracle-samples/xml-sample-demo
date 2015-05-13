@@ -75,7 +75,7 @@ pause
 select *
   from XMLTABLE
        (
-         'for $d in fn:collection("oradb:/SCOTT/DEPARTMENT_XML")/Department[Name=$DEPARTMENT] 
+         'for $d in fn:collection("oradb:/%USER%/DEPARTMENT_XML")/Department[Name=$DEPARTMENT] 
             return $d' passing 'Executive' as DEPARTMENT
        )
 /
@@ -87,7 +87,7 @@ select *
        (
         '<Result>
          {
-           for $d in fn:collection("oradb:/SCOTT/DEPARTMENT_XML")/Department[EmployeeList/Employee/LastName=$LASTNAME]
+           for $d in fn:collection("oradb:/%USER%/DEPARTMENT_XML")/Department[EmployeeList/Employee/LastName=$LASTNAME]
            return <DepartmentName>
                   {
                      $d/Name/text()

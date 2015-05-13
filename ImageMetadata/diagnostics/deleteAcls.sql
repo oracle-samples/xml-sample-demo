@@ -14,15 +14,17 @@
 
 connect &DBA/&DBAPASSWORD@&TNSALIAS
 --
+def USERNAME = &1
+--
 var ACL_PATH varchar2(700)
 --
-call dbms_xdb.setACL('/home/SCOTT','/sys/acls/all_owner_acl.xml')
+call dbms_xdb.setACL('/home/&USERNAME','/sys/acls/all_owner_acl.xml')
 /
 call dbms_xdb.setACL('/publishedContent','/sys/acls/bootstrap_acl.xml')
 /
 call dbms_xdb.deleteResource('/publishedContent/allImages',4)
 /
-call dbms_xdb.deleteResource('/home/SCOTT/ImageLibrary',4)
+call dbms_xdb.deleteResource('/home/&USERNAME/ImageLibrary',4)
 /
 begin
   :ACL_PATH := '/sys/acls/all_owner_metadata_enabled_acl.xml';

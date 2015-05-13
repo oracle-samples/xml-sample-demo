@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Connection>
+  <Driver>Thin</Driver>
+  <Hostname>localhost</Hostname>
+  <Port>1521</Port>
+  <ServiceName>PDB12102</ServiceName>
+  <ServerMode>DEDICATED</ServerMode>
+  <Schema>SCOTT</Schema>
+  <Password>tiger</Password>
+  <logServerStats>true</logServerStats>
+  <clientSideEncoding>true</clientSideEncoding>
+  <FileList>
+    <File>c:\temp\sample.xml</File>
+  </FileList>
+  <Tables>
+    <Table name="TABLE_TABLE" path="/root/repeatingElement"/>
+  </Tables>
+  <CommitCharge>100</CommitCharge>
+  <ThreadCount>10</ThreadCount>
+  <LogFileName>c:\temp\XMLLoader.log</LogFileName>
+  <ErrorTable>ERROR_TABLE</ErrorTable>
+  <schemaInstancePrefix>xsi</schemaInstancePrefix>
+  <schemaLocation/>
+  <noNamespaceSchemaLocation/>
+</Connection>

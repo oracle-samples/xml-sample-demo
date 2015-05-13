@@ -235,23 +235,15 @@
    <hash n="oracle.jdevimpl.config.JProjectLibraries">
       <list n="exportedReferences">
          <hash>
-            <value n="id" v="Classes"/>
+            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDMBS XDK.library"/>
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
-            <value n="id" v="Classes1"/>
+            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDMBS XDB 6.library"/>
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
-            <url n="id" path="../../../../Users/Mark D Drake/AppData/Roaming/JDeveloper/system11.1.1.7.40.64.93/o.jdeveloper/XDB.jar.library"/>
-            <value n="isJDK" v="false"/>
-         </hash>
-         <hash>
-            <url n="id" path="../../../../Users/Mark D Drake/AppData/Roaming/JDeveloper/system11.1.1.7.40.64.93/o.jdeveloper/Ojdbc6.jar.library"/>
-            <value n="isJDK" v="false"/>
-         </hash>
-         <hash>
-            <url n="id" path="../../../../Users/Mark D Drake/AppData/Roaming/JDeveloper/system11.1.1.7.40.64.93/o.jdeveloper/XDK.library"/>
+            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDMBS JDBC 6.library"/>
             <value n="isJDK" v="false"/>
          </hash>
       </list>
@@ -299,46 +291,19 @@
                <value n="version" v="1.5.0_30"/>
             </hash>
          </list>
-         <list n="libraryDefinitions">
-            <hash>
-               <list n="classPath">
-                  <url protocol="file" path="/JDeveloper/Classes/"/>
-               </list>
-               <value n="deployedByDefault" v="true"/>
-               <value n="description" v="Classes"/>
-               <value n="id" v="Classes"/>
-               <value n="locked" v="true"/>
-            </hash>
-            <hash>
-               <list n="classPath">
-                  <url path="classes/"/>
-               </list>
-               <value n="deployedByDefault" v="true"/>
-               <value n="description" v="Classes1"/>
-               <value n="id" v="Classes1"/>
-               <value n="locked" v="true"/>
-            </hash>
-         </list>
+         <list n="libraryDefinitions"/>
       </hash>
       <list n="libraryReferences">
          <hash>
-            <value n="id" v="Classes"/>
+            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDMBS XDK.library"/>
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
-            <value n="id" v="Classes1"/>
+            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDMBS XDB 6.library"/>
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
-            <url n="id" path="../../../../Users/Mark D Drake/AppData/Roaming/JDeveloper/system11.1.1.7.40.64.93/o.jdeveloper/XDB.jar.library"/>
-            <value n="isJDK" v="false"/>
-         </hash>
-         <hash>
-            <url n="id" path="../../../../Users/Mark D Drake/AppData/Roaming/JDeveloper/system11.1.1.7.40.64.93/o.jdeveloper/Ojdbc6.jar.library"/>
-            <value n="isJDK" v="false"/>
-         </hash>
-         <hash>
-            <url n="id" path="../../../../Users/Mark D Drake/AppData/Roaming/JDeveloper/system11.1.1.7.40.64.93/o.jdeveloper/XDK.library"/>
+            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDMBS JDBC 6.library"/>
             <value n="isJDK" v="false"/>
          </hash>
       </list>

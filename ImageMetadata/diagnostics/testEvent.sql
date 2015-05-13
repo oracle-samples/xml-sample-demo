@@ -13,16 +13,20 @@
  */
 
 set echo on
-connect scott/tiger
-set define off
+--
+def USERNAME = &1
+--
+def PASSWORD = &2
+--
+connect &USERNAME/&PASSWORD
+--
 set serveroutput on
-
 -- 
  call image_processor.handle_event(xmltype(
 '<ResourceEvent xmlns="http://xmlns.oracle.com/xdb/resourceEvent">
-   <CurrentUser>SCOTT</CurrentUser>
+   <CurrentUser>&USERNAME</CurrentUser>
    <EventType>3</EventType>
-   <resourcePath>/home/SCOTT/ImageLibrary/Concorde.jpg</resourcePath>
+   <resourcePath>/home/&USERNAME/ImageLibrary/Concorde.jpg</resourcePath>
    <new>
      <ACL></ACL>
      <Author/>
@@ -30,12 +34,12 @@ set serveroutput on
      <Comment/>
      <ContentType>image/jpeg</ContentType>
      <CreationDate>22-SEP-07 04.35.22.984000 AM</CreationDate>
-     <Creator>SCOTT</Creator>
+     <Creator>&USERNAME</Creator>
      <DisplayName>Florence.jpg</DisplayName>
      <Language>en-us</Language>
      <ModificationDate>22-SEP-07 04.35.22.984000 AM</ModificationDate>
-     <LastModifier>SCOTT</LastModifier>
-     <Owner>SCOTT</Owner>
+     <LastModifier>&USERNAME</LastModifier>
+     <Owner>&USERNAME</Owner>
      <RefCount>1</RefCount>
    </new>
  </ResourceEvent>'))

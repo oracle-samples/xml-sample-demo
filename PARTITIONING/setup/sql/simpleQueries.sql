@@ -15,7 +15,7 @@
 select * 
   from XMLTABLE
        (
-          'for $i in fn:collection("oradb:/SCOTT/PURCHASEORDER")/PurchaseOrder[Reference/text()=$REFERENCE]
+          'for $i in fn:collection("oradb:/%USER%/%TABLE1%")/PurchaseOrder[Reference/text()=$REFERENCE]
            return $i'
            passing 'AFRIPP-2010060818343243PDT' as "REFERENCE"
        )
@@ -23,7 +23,7 @@ select *
 select COLUMN_VALUE XML
   from XMLTABLE
        (
-          'for $i in fn:collection("oradb:/SCOTT/PURCHASEORDER")/PurchaseOrder[Requestor=$REQUESTOR and count(LineItems/LineItem) > $QUANTITY]/Reference
+          'for $i in fn:collection("oradb:/%USER%/%TABLE1%")/PurchaseOrder[Requestor=$REQUESTOR and count(LineItems/LineItem) > $QUANTITY]/Reference
            return $i'
            passing 'Diana Lorentz' as "REQUESTOR", 5 as "QUANTITY"
        )
@@ -31,7 +31,7 @@ select COLUMN_VALUE XML
 select COLUMN_VALUE XML
   from XMLTABLE
        (
-          'for $i in fn:collection("oradb:/SCOTT/PURCHASEORDER")/PurchaseOrder[Requestor=$REQUESTOR and count(LineItems/LineItem) > $QUANTITY and CostCenter=$CC]/Reference
+          'for $i in fn:collection("oradb:/%USER%/%TABLE1%")/PurchaseOrder[Requestor=$REQUESTOR and count(LineItems/LineItem) > $QUANTITY and CostCenter=$CC]/Reference
            return $i'
            passing 'Diana Lorentz' as "REQUESTOR", 5 as "QUANTITY", 'A60' as "CC"
        )
@@ -39,7 +39,7 @@ select COLUMN_VALUE XML
 select * 
   from XMLTABLE
        (
-          'for $i in fn:collection("oradb:/SCOTT/PURCHASEORDER")/PurchaseOrder[LineItems/LineItem[Part/text()=$UPC and Quantity > $Quantity]]/Reference
+          'for $i in fn:collection("oradb:/%USER%/%TABLE1%")/PurchaseOrder[LineItems/LineItem[Part/text()=$UPC and Quantity > $Quantity]]/Reference
            return $i'
            passing '707729113751' as UPC, 3 as "Quantity"
        )
@@ -47,7 +47,7 @@ select *
 select * 
   from XMLTABLE
        (
-          'for $i in fn:collection("oradb:/SCOTT/PURCHASEORDER")/PurchaseOrder[LineItems/LineItem[Part/text()=$UPC and Quantity > $Quantity] and CostCenter=$CC]/Reference
+          'for $i in fn:collection("oradb:/%USER%/%TABLE1%")/PurchaseOrder[LineItems/LineItem[Part/text()=$UPC and Quantity > $Quantity] and CostCenter=$CC]/Reference
            return $i'
            passing '707729113751' as UPC, 3 as "Quantity", 'A50' as "CC"
        )
@@ -57,7 +57,7 @@ select *
        (
          '<Summary UPC="{$UPC}">
           {
-           for $p in fn:collection("oradb:/SCOTT/%TABLE1%")/PurchaseOrder
+           for $p in fn:collection("oradb:/%USER%/%TABLE1%")/PurchaseOrder
             for $l in $p/LineItems/LineItem[Quantity > $Quantity and Part/text() = $UPC]
            	return 
            	  <PurchaseOrder reference="{$p/Reference/text()}" lineItem="{fn:data($l/@ItemNumber)}" Quantity="{$l/Quantity}"/>
@@ -69,7 +69,7 @@ select *
 select * 
   from xmlTable 
        ( 
-          'for $p in fn:collection("oradb:/SCOTT/%TABLE1%")/PurchaseOrder 
+          'for $p in fn:collection("oradb:/%USER%/%TABLE1%")/PurchaseOrder 
             for $l in $p/LineItems/LineItem[Quantity > $Quantity and Part/text() = $UPC] 
               return 
               <Result ItemNumber="{fn:data($l/@ItemNumber)}"> 

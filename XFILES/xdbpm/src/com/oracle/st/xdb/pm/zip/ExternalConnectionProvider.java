@@ -176,7 +176,7 @@ public class ExternalConnectionProvider extends Object
     public void loadConnectionSettings()
     throws IOException, SAXException
     {
-      String filename = System.getProperty( "com.oracle.st.xmldb.pm.ConnectionParameters", this.DEFAULT_CONNECTION_DEFINITION ) ;
+      String filename = System.getProperty( "com.oracle.st.xmldb.pm.ConnectionParameters", DEFAULT_CONNECTION_DEFINITION ) ;
       loadConnectionSettings(filename);
     }
     

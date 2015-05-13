@@ -179,7 +179,7 @@ public class RepositoryImport extends ArchiveManager
       XMLElement e = (XMLElement) nl.item(0);
       this.temporaryAclFolder =  this.targetFolder + "/" + e.getFirstChild().getNodeValue();
       
-      OraclePreparedStatement statement = (OraclePreparedStatement)  this.databaseConnection.prepareStatement(this.RESET_ACL_FOLDER);
+      OraclePreparedStatement statement = (OraclePreparedStatement)  this.databaseConnection.prepareStatement(RESET_ACL_FOLDER);
       statement.setString(1,this.temporaryAclFolder);
       statement.execute();
       statement.close();
@@ -590,13 +590,13 @@ public class RepositoryImport extends ArchiveManager
     throws SQLException, IOException, XMLParseException, SAXException
     {
 
-       this.importFolder = (OracleCallableStatement) this.databaseConnection.prepareCall(this.IMPORT_FOLDER);
-       this.importLink = (OracleCallableStatement) this.databaseConnection.prepareCall(this.IMPORT_LINK);
-       this.importResource = (OracleCallableStatement) this.databaseConnection.prepareCall(this.IMPORT_RESOURCE);
-       this.getLOBLocator = (OracleCallableStatement) this.databaseConnection.prepareCall(this.GET_LOB_LOCATOR);
-       this.matchPath = (OracleCallableStatement) this.databaseConnection.prepareCall(this.MATCH_PATH);
-       this.linkExistingResource = (OracleCallableStatement) this.databaseConnection.prepareCall(this.LINK_EXISTING_RESOURCE);
-       this.patchXMLReference = (OracleCallableStatement) this.databaseConnection.prepareCall(this.PATCH_XML_REFERENCE);
+       this.importFolder = (OracleCallableStatement) this.databaseConnection.prepareCall(IMPORT_FOLDER);
+       this.importLink = (OracleCallableStatement) this.databaseConnection.prepareCall(IMPORT_LINK);
+       this.importResource = (OracleCallableStatement) this.databaseConnection.prepareCall(IMPORT_RESOURCE);
+       this.getLOBLocator = (OracleCallableStatement) this.databaseConnection.prepareCall(GET_LOB_LOCATOR);
+       this.matchPath = (OracleCallableStatement) this.databaseConnection.prepareCall(MATCH_PATH);
+       this.linkExistingResource = (OracleCallableStatement) this.databaseConnection.prepareCall(LINK_EXISTING_RESOURCE);
+       this.patchXMLReference = (OracleCallableStatement) this.databaseConnection.prepareCall(PATCH_XML_REFERENCE);
              
        this.clob = CLOB.createTemporary(this.databaseConnection,true,CLOB.DURATION_SESSION);
 
@@ -755,7 +755,7 @@ public class RepositoryImport extends ArchiveManager
 
       String duplicatePolicy  = getParameterValue(ArchiveManager.DUPLICATE_POLICY,parameters,null);
 
-      OracleCallableStatement startImport = (OracleCallableStatement) this.databaseConnection.prepareCall(this.START_IMPORT);
+      OracleCallableStatement startImport = (OracleCallableStatement) this.databaseConnection.prepareCall(START_IMPORT);
       startImport.setString(1,duplicatePolicy);
       
       if (targetFolder.equals("/")) {
@@ -771,7 +771,7 @@ public class RepositoryImport extends ArchiveManager
       importArchive();
       this.zis.close();
       
-      OraclePreparedStatement statement = (OraclePreparedStatement)  this.databaseConnection.prepareStatement(this.REMOVE_ACL_FOLDER);
+      OraclePreparedStatement statement = (OraclePreparedStatement)  this.databaseConnection.prepareStatement(REMOVE_ACL_FOLDER);
       statement.setString(1,this.temporaryAclFolder);
       statement.execute();
       statement.close();

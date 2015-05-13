@@ -519,7 +519,7 @@ public class RepositoryExport extends ArchiveManager {
                                    
   private void processDatabaseSummary() 
   throws SQLException, IOException {
-    OraclePreparedStatement statement = (OraclePreparedStatement) this.databaseConnection.prepareStatement(this.GET_DATABASE_SUMMARY);
+    OraclePreparedStatement statement = (OraclePreparedStatement) this.databaseConnection.prepareStatement(GET_DATABASE_SUMMARY);
     statement.execute();
     OracleResultSet rs = (OracleResultSet) statement.getResultSet();
      while (rs.next()) {
@@ -541,7 +541,7 @@ public class RepositoryExport extends ArchiveManager {
       clearPrintMode(SUPPRESS_CONTENT);
       String aclOidPath =  this.temporaryACLFolder + targetACLOID.stringValue()  + ".xml";
 
-      OraclePreparedStatement lookupACL = (OraclePreparedStatement)this.databaseConnection.prepareStatement(this.LOOKUP_ACL);
+      OraclePreparedStatement lookupACL = (OraclePreparedStatement)this.databaseConnection.prepareStatement(LOOKUP_ACL);
       lookupACL.setRAW(1,targetACLOID);
       OracleResultSet resultSet = (OracleResultSet) lookupACL.executeQuery();
 
@@ -652,7 +652,7 @@ public class RepositoryExport extends ArchiveManager {
     
     private String getContentSchemaHint(XMLDocument resource) {
       // NodeList nl = resource.getElementsByTagNameNS(this.SCHEMA_ELEMENT_ELEMENT,this.RESOURCE_NAMESPACE);
-      NodeList nl = resource.getElementsByTagName(this.SCHEMA_ELEMENT_ELEMENT);
+      NodeList nl = resource.getElementsByTagName(SCHEMA_ELEMENT_ELEMENT);
       if (nl.getLength() == 0) {
         return null;
       }
@@ -678,38 +678,38 @@ public class RepositoryExport extends ArchiveManager {
 
    // Special Handling for XMLDB XML Schema based documents such as XDBConfig, ACL, XMLSchema and Resource Configurations goes here.
 
-    if (contentSchema.equals(this.ACL_SCHEMA_URL)) {
+    if (contentSchema.equals(ACL_SCHEMA_URL)) {
       // Special Processing For ACL documents
       processACL(contentID);
       addLinkEntry(entryName, path, this.temporaryACLFolder + contentID.stringValue() + ".xml", HARD_LINK);
       return;
     }
 
-    if (contentSchema.indexOf(this.SCHEMA_SCHEMA_URL) == 0) {
+    if (contentSchema.indexOf(SCHEMA_SCHEMA_URL) == 0) {
        // Special Processing for Registered XML Schemas
        writeLogRecord("[" + entryName + "] : \"" + path + "\". Skipping XML Schema document.");                          
        return;
     }
 
-    if (contentSchema.indexOf(this.XDBCONFIG_SCHEMA_URL) == 0) {
+    if (contentSchema.indexOf(XDBCONFIG_SCHEMA_URL) == 0) {
       // Specicial processing for XDB Configuration Documents
       writeLogRecord("[" + entryName + "] : \"" + path + "\". Skipping XMLDB Configuration document.");                          
       return;
     }
 
-    if (contentSchema.indexOf(this.RESCONFIG_SCHEMA_URL) == 0) {
+    if (contentSchema.indexOf(RESCONFIG_SCHEMA_URL) == 0) {
       // Special Processing for Repository Configuration Documents
       writeLogRecord("[" + entryName + "] : \"" + path + "\". Skipping XMLDB Repository Configuration document.");                                                        
       return;
     }
 
-    if (contentSchema.indexOf(this.XSPRINCIPLE_SCHEMA_URL) == 0) {
+    if (contentSchema.indexOf(XSPRINCIPLE_SCHEMA_URL) == 0) {
       // Special Processing for Repository Configuration Documents
       writeLogRecord("[" + entryName + "] : \"" + path + "\". Skipping Fusion Security Principle document.");                                                        
       return;
     }
 
-    if (contentSchema.indexOf(this.XSSECCLASS_SCHEMA_URL) == 0) {
+    if (contentSchema.indexOf(XSSECCLASS_SCHEMA_URL) == 0) {
       // Special Processing for Repository Configuration Documents
       writeLogRecord("[" + entryName + "] : \"" + path + "\". Skipping Fusion Security Security Class Definition document.");                                                        
       return;
@@ -772,10 +772,10 @@ public class RepositoryExport extends ArchiveManager {
     
     XMLDocument resource = makeResource(resourceID, aclOID, clob);
     XMLElement root = (XMLElement)resource.getDocumentElement();
-    boolean isFolder = root.getAttribute(this.CONTAINER_ATTRIBUTE).equalsIgnoreCase("true");
+    boolean isFolder = root.getAttribute(CONTAINER_ATTRIBUTE).equalsIgnoreCase("true");
     
     // NodeList nl = root.getElementsByTagNameNS(this.VERSION_ID_ELEMENT,this.RESOURCE_NAMESPACE);
-    NodeList nl = root.getElementsByTagName(this.VERSION_ID_ELEMENT);
+    NodeList nl = root.getElementsByTagName(VERSION_ID_ELEMENT);
     boolean isVersioned = nl.getLength() > 0;
 
     if (isFolder) {
@@ -907,15 +907,15 @@ public class RepositoryExport extends ArchiveManager {
       this.archiveStartTime = logTimestamp.getTimeInMillis();
       this.writeLogRecord("Export started for path : " + path);
       
-      this.listFolderContents = (OraclePreparedStatement)this.databaseConnection.prepareStatement(this.LIST_FOLDER_CONTENTS);
-      this.checkACLLocation = (OraclePreparedStatement)this.databaseConnection.prepareStatement(this.CHECK_ACL_LOCATION);
-      this.getACLPaths = (OraclePreparedStatement)this.databaseConnection.prepareStatement(this.GET_ACL_PATHS);
-      this.lookupVersions = (OraclePreparedStatement)this.databaseConnection.prepareStatement(this.GET_VERSION_HISTORY_SQL);
-      this.getExternalReferences = (OraclePreparedStatement)this.databaseConnection.prepareStatement(this.GET_EXTERNAL_REFERENCES);
+      this.listFolderContents = (OraclePreparedStatement)this.databaseConnection.prepareStatement(LIST_FOLDER_CONTENTS);
+      this.checkACLLocation = (OraclePreparedStatement)this.databaseConnection.prepareStatement(CHECK_ACL_LOCATION);
+      this.getACLPaths = (OraclePreparedStatement)this.databaseConnection.prepareStatement(GET_ACL_PATHS);
+      this.lookupVersions = (OraclePreparedStatement)this.databaseConnection.prepareStatement(GET_VERSION_HISTORY_SQL);
+      this.getExternalReferences = (OraclePreparedStatement)this.databaseConnection.prepareStatement(GET_EXTERNAL_REFERENCES);
       if (path.equals("/")) {
-          this.lookupTarget = (OraclePreparedStatement)this.databaseConnection.prepareStatement(this.LOOKUP_TARGET_UNRESTRICTED);
+          this.lookupTarget = (OraclePreparedStatement)this.databaseConnection.prepareStatement(LOOKUP_TARGET_UNRESTRICTED);
       } else {
-          this.lookupTarget = (OraclePreparedStatement)this.databaseConnection.prepareStatement(this.LOOKUP_TARGET_RESTRICTED);
+          this.lookupTarget = (OraclePreparedStatement)this.databaseConnection.prepareStatement(LOOKUP_TARGET_RESTRICTED);
           this.lookupTarget.setString(2, path);
       }
 
