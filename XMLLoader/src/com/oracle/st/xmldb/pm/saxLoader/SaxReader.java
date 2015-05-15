@@ -354,20 +354,16 @@ public class SaxReader extends Thread implements ContentHandler
 
     private XMLElement createNewElement(String namespaceURI, String localName, String elementName, Attributes attrs) {
         XMLElement newElement = null;
-        if (namespaceURI != null) {
-            if (this.namespaceToPrefix.containsKey(namespaceURI)) {
-                /* Namespace in already in Scope - create Element from Qualified Name */
-                newElement = (XMLElement)this.currentDocument.createElement(elementName);
-            } else {
-                /* Namespace is not already in Scope - create Element with namespace */
-                newElement = (XMLElement)this.currentDocument.createElementNS(namespaceURI, elementName);
+        if ((namespaceURI != null) && (namespaceURI != "")) {
+            newElement = (XMLElement)this.currentDocument.createElementNS(namespaceURI,elementName);
+            if (!this.namespaceToPrefix.containsKey(namespaceURI)) {
                 newElement.setPrefix((String)this.namespaceToPrefix.get(namespaceURI));
             }
         } else {
-            newElement = (XMLElement)this.currentDocument.createElement(localName);
+            newElement = (XMLElement)this.currentDocument.createElementNS("",localName);
         }
         addAttributes(newElement, attrs);
-        if (this.currentNode.equals(this.currentDocument)) {
+        if (this.currentNode.isSameNode(this.currentDocument)) {
             addNamespaceDeclarations(newElement);
             patchSchemaLocation(newElement);
         }

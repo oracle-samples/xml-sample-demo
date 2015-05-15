@@ -47,7 +47,7 @@ public class ApplicationSettings {
     public static final String OCI_DRIVER = "oci8";
     public static final String INTERNAL_DRIVER = "KPRB";
 
-    public static final String DEFAULT_CONNECTION_DEFINITION = "c:\\temp\\connection.xml";
+    public static final String DEFAULT_CONNECTION_DEFINITION = "connectionProperties.xml";
     public static final String DEFAULT_DRIVER = OCI_DRIVER;
     public static final String DEFAULT_HOSTNAME = "localhost";
     public static final String DEFAULT_PORT = "1521";

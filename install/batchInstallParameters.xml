@@ -1,0 +1,11 @@
+<InstallList tnsalias="PDB12102" host="localhost" http="80" ftp="21" driveLetter="O:" dba="MYDBA" dbaPassword="oracle" demoFolder="c:\xdb\demo">
+	<Demo name="XFILES"         user="XFILES" password="XFILES"/>
+ 	<Demo name="ImageMetadata"  user="XDBEXT" password="XDBEXT"/>
+	<Demo name="EVOLUTION"      user="SCOTT" password="tiger"/>
+	<Demo name="FULLTEXT-LITE"  user="SCOTT" password="tiger"/>
+	<Demo name="GENERATION"     user="SCOTT" password="tiger"/>
+	<Demo name="INTRODUCTION"   user="SCOTT" password="tiger"/>
+	<Demo name="NVPAIR"         user="SCOTT" password="tiger"/> 
+	<Demo name="PARTITIONING"   user="SCOTT" password="tiger"/>
+	<Demo name="XQUERY"         user="SCOTT" password="tiger"/>
+</InstallList>		
