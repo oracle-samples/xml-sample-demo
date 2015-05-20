@@ -94,7 +94,7 @@ function SqlScript(id) {
   }
 
   this.getStatement = function() {
-    return statementList[self.getCommandId()].sql;
+    return statementList[self.getCommandId()].sql.trim();
   }
 
   function loadStatement() {
@@ -1554,8 +1554,6 @@ function SqlProcessor() {
 		** Run the current statement in the current Step.
 		**
 		*/
-
-    sqlScript = sqlScript.trim();
 
 	  if ((sqlScript.getStatementType() == "SQL") || (sqlScript.getStatementType() == "XQUERY")) {
     	invokeORAWSV(sqlScript);
