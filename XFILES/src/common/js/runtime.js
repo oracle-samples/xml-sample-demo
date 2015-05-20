@@ -16,6 +16,29 @@
 var steps = new Array();
 var demoPlayer = null;
 
+var soapFaultXSLSource = 
+'  <xsl:stylesheet version="1.0" xmlns:orawsv="http://xmlns.oracle.com/orawsv" xmlns:oraerr="http://xmlns.oracle.com/orawsv/faults" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xdbpm="http://xmlns.oracle.com/orawsv/XFILES/XFILES_WEBDEMO_HELPER">' + '\n' +
+'  	<xsl:output indent="yes" method="html"/>' + '\n' +
+'  	<xsl:template match="/">' + '\n' +
+'  		<xsl:for-each select="//oraerr:OracleErrors[oraerr:OracleError]">' + '\n' +
+'  			<xsl:for-each select="oraerr:OracleError">' + '\n' +
+'  				<xsl:if test="((position() > 1) or (ErrorNumber !=&quot;ORA-19202&quot;))">' + '\n' +
+'	  				<B>' + '\n' +
+' 	 					<xsl:value-of select="oraerr:ErrorNumber"/>' + '\n' +
+'  						<xsl:text>:</xsl:text>' + '\n' +
+'  						<xsl:value-of select="oraerr:Message"/>' + '\n' +
+'  					</B>' + '\n' +
+'     	  	<xsl:if test="position() != last()">' + '\n' +
+'   	  			<BR/>' + '\n' +
+'   				</xsl:if>' + '\n' +
+'         </xsl:if>' + '\n' +
+'  			</xsl:for-each>' + '\n' +
+'  		</xsl:for-each>' + '\n' +
+'  	</xsl:template>' + '\n' +
+'  </xsl:stylesheet>';
+
+var soapFaultXSL;
+
 function SqlScript(id) {
 
   // Declare private member "self". Set it to "this". This makes the object available to it's private methods.
@@ -797,16 +820,10 @@ function DemonstrationPlayer() {
   	  return;
   	}
 
-  	if ((contentType == "text/plain") || (contentType == "text/html")) {
-    	if (loc.pathname.substring(0,1) == "/") {
-    		iFrame.src = loc.pathname
-    	}
-      else {
-  		  iFrame.src = "/" + loc.pathname
-  		}
-  	  return;
+  	if ((contentType == "text/plain") || (contentType == "text/html")) { if 
+  	(loc.pathname.substring(0,1) == "/") { iFrame.src = loc.pathname + "?" + 
+  	loc.search } else { iFrame.src = "/" + loc.pathname + loc.search } return; } 
   	}
-  }
 
   this.setAutoTrace = function (state,scriptId) {
 
@@ -1164,6 +1181,9 @@ function SqlProcessor() {
   var FormatXPlanXSL;
 
   function initialize() {
+  	
+  	soapFaultXSL   = new xmlDocument().parse(soapFaultXSLSource);
+
 		loadFormatDescribeXSL();
   	loadFormatXPlanXSL();
   	loadFormatResponseXSL();
@@ -1416,17 +1436,31 @@ function SqlProcessor() {
   	var token;
   	var statementType;
 
-    token = statement.split(" ",1)[0].toLowerCase();
-    // alert('"' + this.token  + '"');
-
-    if ((token.substring(0,4) == "desc") || (token.substring(0,8) == "describe")) {
-      sqlScript.setDDLTarget(statement.split(" ",2)[1].toLowerCase());
-      statementType =  "CREATE";statementType = "DESCRIBE";
+    token = statement.split(" ",1)[0].toLowerCase().trim();
+    
+    if (token.substring(0,6) == "select") {
+      statementType =  "SQL";
       return statementType;
     }
 
-    if (token.substring(0,6) == "select") {
-      statementType =  "SQL";
+    if (token.substring(0,6) == "update") {
+      statementType =  "UPDATE";
+      return statementType;
+    }
+
+    if (token.substring(0,6) == "delete") {
+      statementType =  "DELETE";
+      return statementType;
+    }
+
+    if (token.substring(0,6) == "insert") {
+      statementType =  "INSERT";
+      return statementType;
+    }
+
+    if ((token.substring(0,6) == "commit") || (token.substring(0,8) == "rollback")) {
+      // Stateless Web Services cannot support Commit or Rollback. Treat as a NO-OP
+      statementType =  "COMMIT";
       return statementType;
     }
 
@@ -1454,27 +1488,6 @@ function SqlProcessor() {
     if (token.substring(0,4) == "exec") {
       statement = "begin " + statement.substring(5) + ";" + " end;"
       statementType =  "PLSQL";
-      return statementType;
-    }
-
-    if (token.substring(0,6) == "update") {
-      statementType =  "UPDATE";
-      return statementType;
-    }
-
-    if (token.substring(0,6) == "delete") {
-      statementType =  "DELETE";
-      return statementType;
-    }
-
-    if (token.substring(0,6) == "insert") {
-      statementType =  "INSERT";
-      return statementType;
-    }
-
-    if ((token.substring(0,6) == "commit") || (token.substring(0,7) == "rollback")) {
-      // Stateless Web Services cannot support Commit or Rollback. Treat as a NO-OP
-      statementType =  "COMMIT";
       return statementType;
     }
 
@@ -1513,6 +1526,13 @@ function SqlProcessor() {
       statementType =  "GRANT";
       return statementType;
     }
+
+    if ((token.substring(0,4) == "desc") || (token.substring(0,8) == "describe")) {
+      sqlScript.setDDLTarget(statement.split(" ",2)[1].toLowerCase());
+      statementType = "DESCRIBE";
+      return statementType;
+    }
+
   }
 
   function loadFormatDescribeXSL() {
@@ -1534,6 +1554,8 @@ function SqlProcessor() {
 		** Run the current statement in the current Step.
 		**
 		*/
+
+    sqlScript = sqlScript.trim();
 
 	  if ((sqlScript.getStatementType() == "SQL") || (sqlScript.getStatementType() == "XQUERY")) {
     	invokeORAWSV(sqlScript);
@@ -1691,7 +1713,7 @@ function SqlProcessor() {
     	if (e.getErrorCode() == 6) {
 				outputTarget = demoPlayer.getResultsPanel(sqlScript.getStatementId(),soapResponse);
 				demoPlayer.enableExecuteButton(sqlScript.getStatementId())
-        xmlToHTML(outputTarget,e.xml,errStackXSL)
+        xmlToHTML(outputTarget,e.xml,soapFaultXSL)
 	      demoPlayer.resetResultsPanel(sqlScript.getStatementId(),outputTarget,false);
   	    sqlScript.pauseExecution();
         return false;

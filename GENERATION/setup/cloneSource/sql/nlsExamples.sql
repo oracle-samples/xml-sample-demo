@@ -12,38 +12,31 @@
  * ================================================
  */
 
-﻿select xmlElement
-       (
+﻿select xmlElement(
          "部門",
          xmlAttributes( d.DEPARTMENT_ID as "部門ID"),
          xmlElement("部門名", d.DEPARTMENT_NAME),
-         xmlElement
-         (
+         xmlElement(
            "住所",
-           xmlForest
-           (
+           xmlForest(
               STREET_ADDRESS as "番地", CITY as "市町村", STATE_PROVINCE as "都道府県",
               POSTAL_CODE as "郵便番号",COUNTRY_NAME as "国名"
            )
          ),
-         xmlElement
-         (
+         xmlElement(
            "社員リスト",
            (
-             select xmlAgg
-                    (
-                      xmlElement
-                      (
+             select xmlAgg(
+                      xmlElement(
                         "社員",
-                        xmlAttributes ( e.EMPLOYEE_ID as "社員番号" ),
-                        xmlForest
-                        (
+                        xmlAttributes(e.EMPLOYEE_ID as "社員番号" ),
+                        xmlForest(
                           e.FIRST_NAME as "名", e.LAST_NAME as "姓", e.EMAIL as "Emailアドレス",
                           e.PHONE_NUMBER as "電話番号", e.HIRE_DATE as "入社年月日", j.JOB_TITLE as "役職",
                           e.SALARY as "給料"
                         ),
-                        xmlElement ( "COMMISSION", e.COMMISSION_PCT ),
-                        xmlElement (  "上司", m.FIRST_NAME, ' ', m.LAST_NAME)
+                        xmlElement("COMMISSION", e.COMMISSION_PCT ),
+                        xmlElement("上司", m.FIRST_NAME, ' ', m.LAST_NAME)
                       )
                     )
                from HR.EMPLOYEES e, HR.EMPLOYEES m, HR.JOBS j

@@ -18,37 +18,30 @@ with object id
   xmlcast(XMLQuery('$X/Department/Name' passing OBJECT_VALUE as "X" returning content) as varchar2(30))
 ) 
 as
-select xmlElement
-       (
+select xmlElement(
          "Department",
          xmlAttributes( d.DEPARTMENT_ID as "DepartmentId"),
          xmlElement("Name", d.DEPARTMENT_NAME),
-         xmlElement
-         (
+         xmlElement(
            "Location",
-           xmlForest
-           (
+           xmlForest(
               STREET_ADDRESS as "Address", CITY as "City", STATE_PROVINCE as "State",
               POSTAL_CODE as "Zip",COUNTRY_NAME as "Country"
            )
          ),
-         xmlElement
-         (
+         xmlElement(
            "EmployeeList",
            (
-             select xmlAgg
-                    (
-                      xmlElement
-                      (
+             select xmlAgg(
+                      xmlElement(
                         "Employee",
-                        xmlAttributes ( e.EMPLOYEE_ID as "employeeNumber" ),
-                        xmlForest
-                        (
+                        xmlAttributes(e.EMPLOYEE_ID as "employeeNumber" ),
+                        xmlForest(
                           e.FIRST_NAME as "FirstName", e.LAST_NAME as "LastName", e.EMAIL as "EmailAddress",
                           e.PHONE_NUMBER as "Telephone", e.HIRE_DATE as "StartDate", j.JOB_TITLE as "JobTitle",
                           e.SALARY as "Salary", m.FIRST_NAME || ' ' || m.LAST_NAME as "Manager"                
                         ),
-                        xmlElement ( "Commission", e.COMMISSION_PCT )
+                        xmlElement("Commission", e.COMMISSION_PCT )
                       )
                     )
                from HR.EMPLOYEES e, HR.EMPLOYEES m, HR.JOBS j
