@@ -25,9 +25,9 @@ doInstall() {
      mv oracle-xml-sample-demo-* xml-sample-demo
    fi
    cd xml-sample-demo
-   sqlplus $DBA/$DBAPWD @scripts/installXFiles $XFILES $XFILESPWD $HTTPPORT
-   sqlplus $DBA/$DBAPWD @scripts/installMetadata $XDBEXT $XDBEXTPWD
-   sh scripts/installXMLRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $XDBEXT $XDBEXTPWD $DEMOUSER $DEMOPWD $SERVERURL
+   sqlplus $DBA/$DBAPWD @install/installXFiles $XFILES $XFILESPWD $HTTPPORT
+   sqlplus $DBA/$DBAPWD @install/installMetadata $XDBEXT $XDBEXTPWD
+   sh install/installXMLRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $XDBEXT $XDBEXTPWD $DEMOUSER $DEMOPWD $SERVERURL
    cd $INSTALLROOT
    rm -rf json-in-db
    if [ -f "json-in-db-master.zip" ] 
@@ -44,9 +44,9 @@ doInstall() {
    cd json-in-db
    if [ -z "$ORDSROOT" ]
    then
-     sh scripts/installDBJSON.sh $DBA $DBAPWD $ORDSHOME
+     sh install/installDBJSON.sh $DBA $DBAPWD $ORDSHOME
    fi
-   sh scripts/installJSONRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $DEMOUSER $DEMOPWD $SERVERURL
+   sh install/installJSONRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $DEMOUSER $DEMOPWD $SERVERURL
 }
 DBA=$1
 DBAPWD=$2
