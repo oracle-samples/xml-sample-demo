@@ -21,12 +21,12 @@ select xmlElement("Department",
          (
            select xmlAgg(
                     xmlElement("Employee",
-                    xmlAttributes(e.EMPLOYEE_ID as "employeeId"),
-                    xmlElement("Name",e.FIRST_NAME,' ',e.LAST_NAME)
+                      xmlAttributes(e.EMPLOYEE_ID as "employeeId"),
+                      xmlElement("Name",e.FIRST_NAME,' ',e.LAST_NAME)
+                    )
                   )
-               )
-               from HR.EMPLOYEES e
-              where e.DEPARTMENT_ID = d.DEPARTMENT_ID 
+             from HR.EMPLOYEES e
+            where e.DEPARTMENT_ID = d.DEPARTMENT_ID 
            )
          )
        ) as XML

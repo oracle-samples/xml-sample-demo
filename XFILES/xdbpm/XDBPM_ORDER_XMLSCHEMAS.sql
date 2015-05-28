@@ -29,6 +29,7 @@ as
 
   procedure schemaOrderingScript(P_OUTPUT_FOLDER VARCHAR2, P_XMLSCHEMA_FOLDER VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2, P_XMLSCHEMA_PATH VARCHAR2 DEFAULT NULL);
   function orderSchemas(P_XMLSCHEMA_FOLDER VARCHAR2, P_XMLSCHEMA_PATH VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2) return XMLType;
+  function listGlobalElements(P_XMLSCHEMA_PATHS XMLTYPE) return XMLTYPE;
 
 end XDBPM_ORDER_XMLSCHEMAS;
 /
@@ -675,6 +676,98 @@ begin
 
   XDB_OPTIMIZE_XMLSCHEMA.printSchemaRegistrationScript(V_SCRIPT_FILE, V_COMMENT, V_SCHEMA_ORDERING, P_XMLSCHEMA_FOLDER);	
 
+end;
+--
+function listGlobalElements(P_XMLSCHEMA_PATHS XMLTYPE) 
+return XMLTYPE
+as
+  C_XQUERY CONSTANT VARCHAR2(32000)  :=
+ 'declare namespace xdbpm = "http://xmlns.oracle.com/xdb/xdbpm"; 
+  declare namespace xdb = "http://xmlns.oracle.com/xdb";
+  declare namespace rc   = "http://xmlns.oracle.com/xdb/pm/registrationConfiguration";
+
+	declare function xdb:index-of-node( $nodes as node()* , $nodeToFind as node()) as xs:integer* {
+  	for $seq in (1 to count($nodes))
+  	return $seq[$nodes[$seq] is $nodeToFind]
+ 	} ;
+             
+  declare function xdbpm:qname-to-string ( $qname as xs:string, $context as node()) as xs:string* { 
+    let $qn := fn:resolve-QName( $qname, $context)
+    return concat(fn:local-name-from-QName($qn),":",fn:namespace-uri-from-QName($qn))
+  }; 
+  
+  declare function xdbpm:global-elements ( $schemaList as  node() *,  $complexTypeList as  xs:string*) as xs:string* {           
+     let $elementList := for $schema in $schemaList/xs:schema
+                           for $element in $schema/xs:element[not(@substitutionGroup) and not(@abstract="true") and not(xs:simpleType)]
+                             where (($element/@type and (xdbpm:qname-to-string($element/@type,$element) = $complexTypeList)) or $element/xs:complexType)
+                     	     return if ($schema/@targetNamespace) then
+  		                         concat($element/@name,":",$schema/@targetNamespace)
+  		                       else
+  		                         concat($element/@name,":")
+     let $elementList := fn:distinct-values($elementList)
+     return $elementList
+  }; 
+                      
+  declare function xdbpm:ref-elements ( $schemaList as  node()*) as xs:string* {           
+    let $refElementList := for $e in $schemaList//xs:element[@ref]
+                               return xdbpm:qname-to-string($e/@ref,$e)
+    let $refElementList := fn:distinct-values($refElementList)
+    return $refElementList
+  }; 
+  
+  declare function xdbpm:getSchemaElement( $schemaList as node()*, $schemaInfo as node()*, $e as xs:string) as node() {
+    let $schemas := if (fn:substring-after($e,":") = "") then 
+                      $schemaList/xs:schema[not(@targetNamespace) and xs:element[@name=fn:substring-before($e,":")]]
+                   else
+                      $schemaList/xs:schema[@targetNamespace=fn:substring-after($e,":") and xs:element[@name=fn:substring-before($e,":")]]
+    for $sch in $schemas
+        let $schemaIndex        := xdb:index-of-node($schemaList/xs:schema,$sch)
+        let $schema             := $schemaInfo/rc:RegistrationList/rc:Schema[$schemaIndex]
+        let $schemaLocationHint := $schema/rc:SchemaLocationHint/text()
+        let $repositoryPath     := $schema/rc:RepositoryPath/text()
+        let $targetNamespace    := fn:data($sch/@targetNamespace)
+        order by $targetNamespace, $repositoryPath
+        return element table {
+                 element repositoryPath {$repositoryPath},
+                 element schemaLocationHint {$schemaLocationHint},
+                 element namespace {$targetNamespace},
+                 element globalElement{ fn:substring-before($e,":")}
+               }
+  };
+  
+  let $schemaList := for $path in $schemaInfo/rc:RegistrationList/rc:Schema/rc:RepositoryPath
+                       return fn:doc($path/text())
+
+  (: return $schemaList :)
+  
+  let $complexTypeList := for $schema in $schemaList/xs:schema
+                            for $ct in $schema/xs:complexType                          
+                              return if ($schema/@targetNamespace) then
+  		                                 concat($ct/@name,":",$schema/@targetNamespace)
+  		                               else
+  		                                concat($ct/@name,":")
+
+  (: return $complexTypeList :)
+  
+  let $globalElements := xdbpm:global-elements($schemaList,$complexTypeList)
+
+  (: return $globalElements :)
+                              
+  let $refs := xdbpm:ref-elements($schemaList)
+  for $e in $globalElements
+    where not ($e = $refs) 
+    return xdbpm:getSchemaElement($schemaList, $schemaInfo, $e)';  
+    
+  V_GLOBAL_ELEMENT_LIST XMLTYPE;
+begin
+	select XMLQUERY(
+	         C_XQUERY 
+	         passing P_XMLSCHEMA_PATHS as "schemaInfo" 
+	         returning content
+	       )
+	  into V_GLOBAL_ELEMENT_LIST
+    from dual;
+  return V_GLOBAL_ELEMENT_LIST;
 end;
 --
 end XDBPM_ORDER_XMLSCHEMAS;

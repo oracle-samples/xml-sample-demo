@@ -16,7 +16,6 @@
  */
 
 -->
-
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="http://www.w3.org/2001/XMLSchema" xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd" xmlns:xfiles="http://xmlns.oracle.com/xdb/xfiles" xmlns:xr="http://xmlns.oracle.com/xdb/xfiles" xmlns:img="http://xmlns.oracle.com/xdb/metadata/ImageMetadata" xmlns:exif="http://xmlns.oracle.com/ord/meta/exif">
 	<xsl:output version="1.0" encoding="utf-8" omit-xml-declaration="no" indent="no" media-type="text/html" method="html"/>
 	<xsl:include href="/XFILES/lite/xsl/common.xsl"/>
@@ -42,9 +41,9 @@
 							<input size="30" id="DisplayName" name="DisplayName" type="text" maxLength="128">
 								<xsl:attribute name="value"><xsl:value-of select="r:DisplayName"/></xsl:attribute>
 							</input>
-							<span style="display:inline-block;width:10px;height:1px;"></span>
+							<span style="display:inline-block;width:10px;height:1px;"/>
 							<label for="RenameLink">Rename Link</label>
-							<span style="display:inline-block;width:10px;height:1px;"></span>
+							<span style="display:inline-block;width:10px;height:1px;"/>
 							<input id="RenameLink" name="RenameLink" type="checkbox"/>
 						</td>
 						<td class="tdLabel">
@@ -327,29 +326,21 @@
 			</xsl:call-template>
 			<span style="float:right;">
 				<span id="openDocument" style="display:inline-block;width:21px;">
-					<a class="toolTip" target="XFilesViewContent">
+					<a target="XFilesViewContent" data-toggle="tooltip" data-placement="top" title="Open document in new browser window.">
 						<xsl:attribute name="href"><xsl:text>/sys/oid/</xsl:text><xsl:value-of select="/r:Resource/xfiles:ResourceStatus/xfiles:Resid"/></xsl:attribute>
 						<xsl:call-template name="IconFromFileExtension">
 							<xsl:with-param name="FileExtension" select="/r:Resource/r:DisplayName"/>
 						</xsl:call-template>
-						<span class="hint">
-							<xsl:text>Open document in new browser window.</xsl:text>
-						</span>
 					</a>
 				</span>
 			</span>
 			<xsl:if test="/*/xfiles:xfilesParameters/xfiles:user!='ANONYMOUS'">
-  			<span style="float:right;">
-				<span id="previewDocument" style="display:inline-block;width:21px;">
-					<a class="toolTip" href="#" onclick="javascript:doPreviewDocument(event);return false;">
-						<img id="btnPreviewDocument" src="/XFILES/lib/icons/preview.png" alt="Preview" border="0" height="16" width="16"/>
-						<span class="hint">
-							<xsl:text>Preview document.</xsl:text>
-						</span>
-					</a>
+				<span style="float:right;">
+					<span id="previewDocument" style="display:inline-block;width:21px;">
+						<img id="btnPreviewDocument" src="/XFILES/lib/icons/preview.png" alt="Preview" border="0" height="16" width="16" data-toggle="tooltip" data-placement="top" title="Preview document." onclick="javascript:doPreviewDocument(event);return false;"/>
+					</span>
 				</span>
-			</span>
-			<xsl:call-template name="documentPreview"/>
+				<xsl:call-template name="documentPreview"/>
 			</xsl:if>
 		</div>
 		<div class="formAreaBackground">

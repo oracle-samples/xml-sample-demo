@@ -16,7 +16,6 @@
  */
 
 -->
-
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd" xmlns:xfiles="http://xmlns.oracle.com/xdb/xfiles">
 	<xsl:variable name="XFilesMappings" select="document('/XFILES/lite/xsl/XFilesMappings.xml')"/>
 	<xsl:variable name="XFilesIconMappings" select="document('/XFILES/lite/xsl/XFilesIconMappings.xml')"/>
@@ -390,7 +389,10 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<div>
-							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+							<button type="button" class="close" data-dismiss="modal">
+								<span aria-hidden="true">&#215;</span>
+								<span class="sr-only">Close</span>
+							</button>
 							<h4 class="modal-title text-left" id="documentPreviewDialogTitle">Document Preview</h4>
 						</div>
 					</div>
@@ -404,7 +406,7 @@
 					<div class="modal-footer">
 						<div>
 							<button id="bntCancelPreview" type="button" class="btn btn-default btn-med" data-dismiss="modal">
-								<span class="glyphicon glyphicon-ban-circle"></span>
+								<span class="glyphicon glyphicon-ban-circle"/>
 							</button>
 						</div>
 					</div>
@@ -418,7 +420,10 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<div>
-							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+							<button type="button" class="close" data-dismiss="modal">
+								<span aria-hidden="true">&#215;</span>
+								<span class="sr-only">Close</span>
+							</button>
 							<h4 class="modal-title text-left" id="currentXMLTitle">XML Viewer</h4>
 						</div>
 					</div>
@@ -430,7 +435,7 @@
 					<div class="modal-footer">
 						<div>
 							<button id="bntCancelXML" type="button" class="btn btn-default btn-med" data-dismiss="modal">
-								<span class="glyphicon glyphicon-ban-circle"></span>
+								<span class="glyphicon glyphicon-ban-circle"/>
 							</button>
 						</div>
 					</div>
@@ -444,7 +449,10 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<div>
-							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+							<button type="button" class="close" data-dismiss="modal">
+								<span aria-hidden="true">&#215;</span>
+								<span class="sr-only">Close</span>
+							</button>
 							<h4 class="modal-title text-left" id="currentSQLTitle">Current SQL</h4>
 						</div>
 					</div>
@@ -456,7 +464,7 @@
 					<div class="modal-footer">
 						<div>
 							<button id="btnCancelSQL" type="button" class="btn btn-default btn-med" data-dismiss="modal">
-								<span class="glyphicon glyphicon-ban-circle"></span>
+								<span class="glyphicon glyphicon-ban-circle"/>
 							</button>
 						</div>
 					</div>
@@ -470,13 +478,16 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<div>
-							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+							<button type="button" class="close" data-dismiss="modal">
+								<span aria-hidden="true">&#215;</span>
+								<span class="sr-only">Close</span>
+							</button>
 							<h4 class="modal-title text-left" id="manageUsersDialogTitle">XFiles System Administration</h4>
 						</div>
 					</div>
 					<div id="dbaOnly" style="display: none;">
 						<div class="modal-body">
-							<div class="form-horizontal" >
+							<div class="form-horizontal">
 								<div class="form-group">
 									<xsl:text>Users and Passwords</xsl:text>
 								`</div>
@@ -503,10 +514,10 @@
 						<div class="modal-footer">
 							<div>
 								<button id="btnCancelUserDialog" type="button" class="btn btn-default btn-med" data-dismiss="modal">
-									<span class="glyphicon glyphicon-ban-circle"></span>
+									<span class="glyphicon glyphicon-ban-circle"/>
 								</button>
-								<button id="btnSubmitForm" type="button" class="btn btn-default btn-med"  onclick="manageUser(document.getElementById('username').value,document.getElementById('newUserPassword1').value,document.getElementById('newUserPassword2').value);false;">
-									<span class="glyphicon glyphicon-save"></span>
+								<button id="btnSubmitForm" type="button" class="btn btn-default btn-med" onclick="manageUser(document.getElementById('username').value,document.getElementById('newUserPassword1').value,document.getElementById('newUserPassword2').value);false;">
+									<span class="glyphicon glyphicon-save"/>
 								</button>
 							</div>
 						</div>
@@ -539,10 +550,10 @@
 						<div class="modal-footer">
 							<div>
 								<button id="btnCancelUserDialog" type="button" class="btn btn-default btn-med" data-dismiss="modal">
-									<span class="glyphicon glyphicon-ban-circle"></span>
+									<span class="glyphicon glyphicon-ban-circle"/>
 								</button>
-								<button id="btnSubmitForm" type="button" class="btn btn-default btn-med"  onclick="setUserRole();false;">
-									<span class="glyphicon glyphicon-save"></span>
+								<button id="btnSubmitForm" type="button" class="btn btn-default btn-med" onclick="setUserRole();false;">
+									<span class="glyphicon glyphicon-save"/>
 								</button>
 							</div>
 						</div>
@@ -551,7 +562,7 @@
 						<div class="modal-body">
 							<h4 class="danger">You have no user management rights</h4>
 						</div>
-						<div class="modal-footer"></div>
+						<div class="modal-footer"/>
 					</div>
 				</div>
 			</div>
@@ -563,7 +574,10 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<div>
-							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+							<button type="button" class="close" data-dismiss="modal">
+								<span aria-hidden="true">&#215;</span>
+								<span class="sr-only">Close</span>
+							</button>
 							<h4 class="modal-title text-left" id="setPasswordDialogTitle">XFiles User Options</h4>
 						</div>
 					</div>
@@ -583,20 +597,24 @@
 							</div>
 							<div class="form-group">
 								<label class="col-sm-2 control-label">Actions</label>
-								<label><input type="checkbox" id="resetHomeFolder"></input>Reset Home Folder</label>
-								<label><input type="checkbox" id="resetPublicFolder"></input>Reset Public Folder</label>
-								<label><input type="checkbox" id="recreateHomePage"></input>Recreate Home Page</label>
-								<label><input type="checkbox" id="recreatePublicPage"></input>Reset Public Page</label>
+								<label>
+									<input type="checkbox" id="resetHomeFolder"/>Reset Home Folder</label>
+								<label>
+									<input type="checkbox" id="resetPublicFolder"/>Reset Public Folder</label>
+								<label>
+									<input type="checkbox" id="recreateHomePage"/>Recreate Home Page</label>
+								<label>
+									<input type="checkbox" id="recreatePublicPage"/>Reset Public Page</label>
 							</div>
 						</div>
 					</div>
 					<div class="modal-footer">
 						<div>
 							<button id="btnCancelPasswordDialog" type="button" class="btn btn-default btn-med" data-dismiss="modal">
-								<span class="glyphicon glyphicon-ban-circle"></span>
+								<span class="glyphicon glyphicon-ban-circle"/>
 							</button>
-							<button id="btnSubmitPasswordDialog" type="button" class="btn btn-default btn-med"  onclick="setUserOptions();false;">
-								<span class="glyphicon glyphicon-save"></span>
+							<button id="btnSubmitPasswordDialog" type="button" class="btn btn-default btn-med" onclick="setUserOptions();false;">
+								<span class="glyphicon glyphicon-save"/>
 							</button>
 						</div>
 					</div>
@@ -608,14 +626,9 @@
 		<span style="vertical-align:middle;">
 			<span style="display:block">
 				<span id="closeForm">
-					<a href="#" class="toolTip" style="">
-						<img id="btnCancelCurrentForm" src="/XFILES/lib/icons/cancel.png" alt="Close" border="0" width="16" height="16">
-							<xsl:attribute name="onclick"><xsl:value-of select="concat('closeCurrentWindow(&quot;',//xfiles:ResourceStatus/xfiles:CurrentPath,'&quot;)')"/></xsl:attribute>
-						</img>
-						<span class="hint">
-							<xsl:text>Close form and return to folder Browser.</xsl:text>
-						</span>
-					</a>
+					<img id="btnCancelCurrentForm" src="/XFILES/lib/icons/cancel.png" alt="Close" border="0" width="16" height="16" data-toggle="tooltip" data-placement="top" title="Close form and return to folder Browser.">
+						<xsl:attribute name="onclick"><xsl:value-of select="concat('closeCurrentWindow(&quot;',//xfiles:ResourceStatus/xfiles:CurrentPath,'&quot;)')"/></xsl:attribute>
+					</img>
 				</span>
 			</span>
 			<span style="display:block;height:16px;">
@@ -623,37 +636,25 @@
 			<span style="display:block">
 				<xsl:choose>
 					<xsl:when test="/*/xfiles:xfilesParameters/xfiles:user='ANONYMOUS'">
-						<a title="login" href="#" onclick="xfilesDoLogon(event);false">
-							<img id="btnLogin" src="/XFILES/lib/icons/login.png" alt="logon" border="0" width="16" height="16"/>
-						</a>
+						<img id="btnLogin" src="/XFILES/lib/icons/login.png" alt="logon" border="0" width="16" height="16" onclick="xfilesDoLogon(event);false" data-toggle="tooltip" data-placement="top" title="Login"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<a title="logout" href="#" onclick="xfilesDoLogoff(event);false">
-							<img id="btnLogout" src="/XFILES/lib/icons/logout.png" alt="logout" border="0" width="16" height="16"/>
-						</a>
+						<img id="btnLogout" src="/XFILES/lib/icons/logout.png" alt="logout" border="0" width="16" height="16" onclick="xfilesDoLogoff(event);false" data-toggle="tooltip" data-placement="top" title="Logout"/>
 					</xsl:otherwise>
 				</xsl:choose>
 				<span style="width:10px; display: inline-block; "/>
 				<xsl:choose>
 					<xsl:when test="/*/xfiles:xfilesParameters/xfiles:user!='ANONYMOUS'">
-						<a title="Home" href="#">
-							<xsl:attribute name="onclick"><xsl:value-of select="concat('doShowHomeFolder(event,&quot;',/*/xfiles:xfilesParameters/xfiles:user,'&quot;);false;')"/></xsl:attribute>
-							<img id="btnHomeFolder" src="/XFILES/lib/icons/homeFolder.png" alt="homeFolder" border="0" width="16" height="16"/>
-						</a>
+						<xsl:attribute name="onclick"><xsl:value-of select="concat('doShowHomeFolder(event,&quot;',/*/xfiles:xfilesParameters/xfiles:user,'&quot;);false;')"/></xsl:attribute>
+						<img id="btnHomeFolder" src="/XFILES/lib/icons/homeFolder.png" alt="homeFolder" border="0" width="16" height="16" data-toggle="tooltip" data-placement="top" title="Open Home Folder"/>
 						<span style="width:10px; display: inline-block;"/>
-						<a title="User Options" href="#" onclick="doSetPassword(event);false">
-							<img id="btnSetPassword" src="/XFILES/lib/icons/setPassword.png" alt="set password" border="0" width="16" height="16"/>
-						</a>
+						<img id="btnSetPassword" src="/XFILES/lib/icons/setPassword.png" alt="set password" border="0" width="16" height="16" onclick="doSetPassword(event);false" data-toggle="tooltip" data-placement="top" title="User Options"/>
 						<span style="width:10px; display: inline-block;"/>
-						<a title="Administrator Options" href="#" onclick="doManageUsers(event);false">
-							<img id="btnAddUser" src="/XFILES/lib/icons/addUser.png" alt="add user" border="0" width="16" height="16"/>
-						</a>
+						<img id="btnAddUser" src="/XFILES/lib/icons/addUser.png" alt="add user" border="0" width="16" height="16" onclick="doManageUsers(event);false" data-toggle="tooltip" data-placement="top" title="Administrator Options"/>
 						<span style="width:10px; display: inline-block;"/>
 					</xsl:when>
 				</xsl:choose>
-				<a title="Help" href="#" onclick="xfilesHelpMenu(event)">
-					<img id="btnHelp" src="/XFILES/lib/icons/help.png" alt="help" border="0" width="16" height="16"/>
-				</a>
+				<img id="btnHelp" src="/XFILES/lib/icons/help.png" alt="help" border="0" width="16" height="16" onclick="xfilesHelpMenu(event)" data-toggle="tooltip" data-placement="top" title="Help"/>
 			</span>
 			<xsl:call-template name="setPasswordDialog"/>
 			<xsl:call-template name="manageUsersDialog"/>
@@ -690,92 +691,109 @@
 	</xsl:template>
 	<xsl:template name="loggingDialog">
 		<div class="modal fade" id="logWindow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	    <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title" id="myModalLabel">SOAP Call Log</h4>
-          </div>
-          <div class="modal-body">
-      			<div>
-  						<ul class="nav nav-tabs" role="tablist" id="sd.options">
-    						<li><a href="#lw_OverviewTab" role="tab" data-toggle="tab">Overview</a></li>
-    						<li><a href="#lw_RequestTab" role="tab" data-toggle="tab">Request</a></li>
-    						<li><a href="#lw_ResponseTab" role="tab" data-toggle="tab">Response</a></li>
-    						<li><a href="#lw_JavascriptTab" role="tab" data-toggle="tab">JavaScript</a></li>
-  		  			</ul>
-  		  		</div> 
-  		  		<br/>
-  		  		<!-- Tab panes -->
-  					<div class="tab-content">
-  				 	  <div class="tab-pane active" id="lw_OverviewTab">
-  				 	  	<div class="form-horizontal">
-    	  	  		  <div>
-    	 			      	<label class="control-label" for="lw.StartTime">Time&#160;</label>
-       		  			  <span id="lw.StartTime" class="uneditable-input"></span>
-    	 			      	<label class="control-label" for="lw.RecordNumber">&#160;Log&#160;Record&#160;</label>
-       		  			  <span id="lw.RecordNumber" class="uneditable-input"></span>
-    	 			      	<label class="control-label" for="lw.RecordCount">&#160;of&#160;</label>
-       		  			  <span id="lw.RecordCount" class="uneditable-input"></span>
-       	  			  </div>
-    	  	  		  <div>
-    	 			      	<label class="control-label" for="lw.Method">Method&#160;</label>
-       		  			  <span id="lw.Method" class="uneditable-input"></span>
-       	  			  </div>
-    	  	  		  <div>
-    	 			      	<label class="control-label" for="lw.URL">URL&#160;</label>
-       		  			  <span id="lw.URL" class="uneditable-input"></span>
-       	  			  </div>
-    	  	  		  <div>
-    	 			      	<label class="control-label" for="lw.HttpStatus">Status&#160;</label>
-       		  			  <span id="lw.HttpStatus" class="uneditable-input"></span>
-       	  			  </div>
-  	  	  		  	<div>
-  	 			      		<label class="control-label" for="lw.ElapsedTime">Timing&#160;</label>
-     		  			  	<span id="lw.ElapsedTime" class="uneditable-input"></span>
-     	  			  	</div>
-  	  	  		  	<div>
-  	   	  			  	<br/>
-  									<button id="lw.FirstRecord" type="button" class="btn btn-default btn-med" onclick="restAPI.loadLogEntry(1);return false;">
-    									<span class="glyphicon glyphicon glyphicon glyphicon-fast-backward"></span>
-  									</button>
-  									<button id="lw.PrevRecord" type="button" class="btn btn-default btn-med">
-    									<span class="glyphicon glyphicon glyphicon-step-backward"></span>
-  									</button>
-  									<button id="lw.NextRecord" type="button" class="btn btn-default btn-med">
-    									<span class="glyphicon glyphicon glyphicon-step-forward"></span>
-  									</button>
-  									<button id="lw.LastRecord" type="button" class="btn btn-default btn-med" onclick="restAPI.loadLogEntry(restAPI.getLogRecordCount());return false;">
-    									<span class="glyphicon glyphicon glyphicon glyphicon-fast-forward"></span>
-  									</button>
-     	  			  	</div>
-     	  			  </div>
-     	  		  </div>
-  				 	  <div class="tab-pane" id="lw_RequestTab">
-  	  	  		  <div>
-  	 			      	<label for="lw.RequestBody">Request</label>
-     		  			  <span><pre id="lw.RequestBody" class="pre-scrollable"></pre></span>
-     	  			  </div>
-     	  		  </div>
-  			 	  	<div class="tab-pane" id="lw_ResponseTab">
-  	 	  		  	<div>
-  	  		      	<label for="lw.ResponseText">Response</label>
-      	  			  <span><pre id="lw.ResponseText" class="pre-scrollable"></pre></span>
-     		  		  </div>
-     		  	  </div>
-  			 	  	<div class="tab-pane" id="lw_JavascriptTab">
-  	 	  		  	<div>
-  	  		      	<label for="lw.ResponseText">Javascript</label>
-      	  			  <span><pre id="lw.JavascriptCode" class="pre-scrollable"></pre></span>
-     		  		  </div>
-     		  	  </div>
-     	  		</div>
-          </div>
-          <div class="modal-footer">
-          </div>
-        </div>
-      </div>
-    </div>
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&#215;</span>
+							<span class="sr-only">Close</span>
+						</button>
+						<h4 class="modal-title" id="myModalLabel">SOAP Call Log</h4>
+					</div>
+					<div class="modal-body">
+						<div>
+							<ul class="nav nav-tabs" role="tablist" id="sd.options">
+								<li>
+									<a href="#lw_OverviewTab" role="tab" data-toggle="tab">Overview</a>
+								</li>
+								<li>
+									<a href="#lw_RequestTab" role="tab" data-toggle="tab">Request</a>
+								</li>
+								<li>
+									<a href="#lw_ResponseTab" role="tab" data-toggle="tab">Response</a>
+								</li>
+								<li>
+									<a href="#lw_JavascriptTab" role="tab" data-toggle="tab">JavaScript</a>
+								</li>
+							</ul>
+						</div>
+						<br/>
+						<!-- Tab panes -->
+						<div class="tab-content">
+							<div class="tab-pane active" id="lw_OverviewTab">
+								<div class="form-horizontal">
+									<div>
+										<label class="control-label" for="lw.StartTime">Time&#160;</label>
+										<span id="lw.StartTime" class="uneditable-input"/>
+										<label class="control-label" for="lw.RecordNumber">&#160;Log&#160;Record&#160;</label>
+										<span id="lw.RecordNumber" class="uneditable-input"/>
+										<label class="control-label" for="lw.RecordCount">&#160;of&#160;</label>
+										<span id="lw.RecordCount" class="uneditable-input"/>
+									</div>
+									<div>
+										<label class="control-label" for="lw.Method">Method&#160;</label>
+										<span id="lw.Method" class="uneditable-input"/>
+									</div>
+									<div>
+										<label class="control-label" for="lw.URL">URL&#160;</label>
+										<span id="lw.URL" class="uneditable-input"/>
+									</div>
+									<div>
+										<label class="control-label" for="lw.HttpStatus">Status&#160;</label>
+										<span id="lw.HttpStatus" class="uneditable-input"/>
+									</div>
+									<div>
+										<label class="control-label" for="lw.ElapsedTime">Timing&#160;</label>
+										<span id="lw.ElapsedTime" class="uneditable-input"/>
+									</div>
+									<div>
+										<br/>
+										<button id="lw.FirstRecord" type="button" class="btn btn-default btn-med" onclick="restAPI.loadLogEntry(1);return false;">
+											<span class="glyphicon glyphicon glyphicon glyphicon-fast-backward"/>
+										</button>
+										<button id="lw.PrevRecord" type="button" class="btn btn-default btn-med">
+											<span class="glyphicon glyphicon glyphicon-step-backward"/>
+										</button>
+										<button id="lw.NextRecord" type="button" class="btn btn-default btn-med">
+											<span class="glyphicon glyphicon glyphicon-step-forward"/>
+										</button>
+										<button id="lw.LastRecord" type="button" class="btn btn-default btn-med" onclick="restAPI.loadLogEntry(restAPI.getLogRecordCount());return false;">
+											<span class="glyphicon glyphicon glyphicon glyphicon-fast-forward"/>
+										</button>
+									</div>
+								</div>
+							</div>
+							<div class="tab-pane" id="lw_RequestTab">
+								<div>
+									<label for="lw.RequestBody">Request</label>
+									<span>
+										<pre id="lw.RequestBody" class="pre-scrollable"/>
+									</span>
+								</div>
+							</div>
+							<div class="tab-pane" id="lw_ResponseTab">
+								<div>
+									<label for="lw.ResponseText">Response</label>
+									<span>
+										<pre id="lw.ResponseText" class="pre-scrollable"/>
+									</span>
+								</div>
+							</div>
+							<div class="tab-pane" id="lw_JavascriptTab">
+								<div>
+									<label for="lw.ResponseText">Javascript</label>
+									<span>
+										<pre id="lw.JavascriptCode" class="pre-scrollable"/>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+					</div>
+				</div>
+			</div>
+		</div>
 	</xsl:template>
 	<xsl:template name="SearchDialog">
 		<span id="SearchDialog" style="display:block;">
@@ -795,9 +813,7 @@
 				<span style="width:5px; display: inline-block;"/>
 				<input id="searchTerms" class="xg" name="searchTerms" size="16" type="text" maxlength="128"/>
 				<span style="width:5px; display: inline-block;"/>
-				<a title="Open Search Dialog" href="javascript:doSearch(document.getElementById('searchType'),document.getElementById('searchTerms'));">
-					<img src="/XFILES/lib/icons/search.png" alt="Search" border="0" align="absmiddle" width="16" height="16"/>
-				</a>
+					<img src="/XFILES/lib/icons/search.png" alt="Search" border="0" align="absmiddle" width="16" height="16" onclick="doSearch(document.getElementById('searchType'),document.getElementById('searchTerms'));" data-toggle="tooltip" data-placement="top" title="Open Search Dialog"/>
 			</span>
 		</span>
 	</xsl:template>
@@ -823,23 +839,7 @@
 		<xsl:param name="method"/>
 		<xsl:attribute name="href"><xsl:choose><xsl:when test="$stylesheetURL != ''"><xsl:value-of select="concat('/XFILES/lite/Folder.html?target=',$folderURL,'&amp;stylesheet=',$stylesheetURL)"></xsl:value-of></xsl:when><xsl:otherwise><xsl:value-of select="concat('/XFILES/lite/Folder.html?target=',$folderURL)"></xsl:value-of></xsl:otherwise></xsl:choose></xsl:attribute>
 		<xsl:if test="$fastPath='true'">
-			<xsl:attribute name="onclick">
-				<xsl:choose>
-					<xsl:when test="$method != ''">
-						<xsl:value-of select="$method"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:text>doFolderJump</xsl:text>
-					</xsl:otherwise>
-				</xsl:choose>
-				<xsl:text>('</xsl:text>
-				<xsl:value-of select="$folderURL"/>
-				<xsl:if test="$stylesheetURL != ''">
-					<xsl:text>','</xsl:text>
-					<xsl:value-of select="$stylesheetURL"/>
-				</xsl:if>
-				<xsl:text>');return false;</xsl:text>
-			</xsl:attribute>
+			<xsl:attribute name="onclick"><xsl:choose><xsl:when test="$method != ''"><xsl:value-of select="$method"/></xsl:when><xsl:otherwise><xsl:text>doFolderJump</xsl:text></xsl:otherwise></xsl:choose><xsl:text>('</xsl:text><xsl:value-of select="$folderURL"/><xsl:if test="$stylesheetURL != ''"><xsl:text>','</xsl:text><xsl:value-of select="$stylesheetURL"/></xsl:if><xsl:text>');return false;</xsl:text></xsl:attribute>
 		</xsl:if>
 	</xsl:template>
 	<xsl:template name="printResourceLink">
@@ -939,7 +939,7 @@
 		<xsl:param name="fastPath"/>
 		<span class="standardBackground" style="white-space:nowrap">
 			<span>
-				<a title="Open Root folder">
+				<a>
 					<xsl:choose>
 						<xsl:when test="$fastPath='true'">
 							<xsl:attribute name="href"><xsl:text>#</xsl:text></xsl:attribute>
@@ -949,7 +949,7 @@
 							<xsl:attribute name="href"><xsl:text>/XFILES/lite/Folder.html?target=/</xsl:text></xsl:attribute>
 						</xsl:otherwise>
 					</xsl:choose>
-					<img alt="root" src="/XFILES/lib/icons/repositoryRoot.png" width="16" height="16" border="0"/>
+					<img alt="root" src="/XFILES/lib/icons/repositoryRoot.png" width="16" height="16" border="0" data-toggle="tooltip" data-placement="top" title="Open Root folder"/>
 				</a>
 			</span>
 		</span>
@@ -1020,22 +1020,12 @@
 			<span style="float:right;">
 				<xsl:if test="$saveButton='true'">
 					<span id="saveOption" style="display:inline-block;width:21px;">
-						<a href="#" class="toolTip">
-							<img id="btnAcceptForm" src="/XFILES/lib/icons/saveChanges.png" alt="Save" border="0" height="16" width="16" onclick="doSave();false"/>
-							<span class="hint">
-								<xsl:text>Save changes to current form.</xsl:text>
-							</span>
-						</a>
+						<img id="btnAcceptForm" src="/XFILES/lib/icons/saveChanges.png" alt="Save" border="0" height="16" width="16" onclick="doSave();false" data-toggle="tooltip" data-placement="top" title="Save changes to current form."/>
 					</span>
 				</xsl:if>
 				<xsl:if test="$saveAndCloseButton='true'">
 					<span id="saveAndCloseOption" style="display:inline-block;width:21px;">
-						<a href="#" class="toolTip">
-							<img id="btnSaveForm" src="/XFILES/lib/icons/saveChangesAndClose.png" alt="Save" border="0" height="16" width="16" onclick="doSaveAndClose();false"/>
-							<span class="hint">
-								<xsl:text>Save changes and close current form.</xsl:text>
-							</span>
-						</a>
+						<img id="btnSaveForm" src="/XFILES/lib/icons/saveChangesAndClose.png" alt="Save" border="0" height="16" width="16" onclick="doSaveAndClose();false" data-toggle="tooltip" data-placement="top" title="Save changes and close current form."/>
 					</span>
 				</xsl:if>
 				<span style="display:inline-block;width:5px"/>
@@ -1256,7 +1246,10 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<div>
-							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&#215;</span><span class="sr-only">Close</span></button>
+							<button type="button" class="close" data-dismiss="modal">
+								<span aria-hidden="true">&#215;</span>
+								<span class="sr-only">Close</span>
+							</button>
 							<h4 class="modal-title text-left" id="aboutXFilesDialogTitle">About XFILES</h4>
 						</div>
 					</div>
@@ -1268,7 +1261,7 @@
 					<div class="modal-footer">
 						<div>
 							<button id="bntCancelAbout" type="button" class="btn btn-default btn-med" data-dismiss="modal">
-								<span class="glyphicon glyphicon-ban-circle"></span>
+								<span class="glyphicon glyphicon-ban-circle"/>
 							</button>
 						</div>
 					</div>

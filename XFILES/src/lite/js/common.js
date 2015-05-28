@@ -262,7 +262,30 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
      return currentPath;
      
    }
+   
+   this.setOpenFolder = function(folderPath) {
 
+     var targetNode = new xmlElement( self.treeState.selectNodes('//*[@name="/"]',self.treeNamespaces).item(0));
+;
+     folderPath = folderPath.substring(1);
+     
+     while (folderPath.length > 0) {
+     	 seperator = folderPath.indexOf("/");
+     	 var folderName;
+     	 if (seperator < 0) {
+     	 	 folderName = folderPath;
+     	 	 folderPath = "";
+     	 }
+     	 else {
+     	 	 folderName = folderPath.substring(0,folderPath.indexOf("/"));
+     	 	 folderPath = folderPath.substring(folderPath.lastIndexOf("/") + 1);
+       }
+       targetNode =  new xmlElement( targetNode.selectNodes('*[@name="' + folderName + '"]',self.treeNamespaces).item(0));
+  	 }
+  	 id = targetNode.baseElement.getAttribute('id')
+  	 this.makeOpen(id);
+   }
+  		    
    this.selectBranch = function ( id ) { 
      unimplementedFunction('selectBranch ' + id);
    }
@@ -295,6 +318,230 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
      xmlToHTML(self.targetWindow,self.treeState,self.treeStateXSL);
      raiseEvent(target,"click");
    }
+}
+
+function validateUploadPath(fileControl,targetFolderTree) {
+
+  var repositoryFolder = targetFolderTree.getOpenFolder()
+  if (repositoryFolder == null) {
+    showUserErrorMessage("Please select target folder");
+    fileControl.focus();
+    return null;
+  }
+
+  if (!targetFolderTree.isWritableFolder()) {
+  	showUserErrorMessage("Cannot upload to folder \"" + repositoryFolder + "\" [READ-ONLY].");
+  	fileControl.focus();
+  	return null;
+  }
+
+  if (repositoryFolder != "/") {
+    repositoryFolder = repositoryFolder + "/";
+  }
+
+  var sourceFilePath = fileControl.value;
+  if (!sourceFilePath) {
+    showUserErrorMessage("Please select file to be uploaded");
+    fileControl.focus();
+    return null;
+  }  	
+
+  var filename = stripPathInformation(sourceFilePath);
+  
+	var repositoryPath = repositoryFolder + filename;
+
+  try {
+  	var XHR = soapManager.createHeadRequest(repositoryPath,false);
+    XHR.send();
+  
+    if (XHR.status != 404) {
+
+      if (XHR.status == 200) {
+      	showErrorMessage("Upload Failed: File \"" + filename + "\" already exists in Folder \"" + repositoryFolder + "\".");
+      	fileControl.focus();
+    	  return null;
+      }
+      else {
+	    error = new xfilesException("common.validateUploadPath",14,repositoryPath);
+				error.setDescription("HTTP HEAD Failed : " + XHR.statusText);
+				error.setNumber(XHR.status);
+				throw error;
+      }
+    }
+  } catch (e) {
+    error = new xfilesException("common.validateUploadPath",14,repositoryPath,e);
+		error.setDescription("HTTP HEAD Error : " + XHR.statusText);
+		error.setNumber(XHR.status);
+		throw error;
+  }
+  
+  return repositoryPath
+
+}
+
+function validateUploadFile(XHR, repositoryPath, callback) {
+
+	try {
+		if (XHR.status == 201) {
+   	  callback(XHR,repositoryPath);
+    }
+    else {
+			error = new xfilesException("common.validateUploadFile",14,repositoryPath);
+    	error.setDescription("File Upload Operation Failed : " + XHR.statusText);
+   		error.setNumber(XHR.status);
+   		throw error;
+    }
+  } 
+  catch (e) {
+    handleException("common.validateUploadFile",e,null);
+  }
+
+}
+
+function uploadFile(repositoryPath, fileControlname, callback) {
+   
+   // This version seems to result in trunctated content at 32K (At least with Firefox)
+
+   var fileControl = document.getElementById(fileControlname)
+   var XHR = soapManager.createPutRequest(repositoryPath,true);
+   XHR.onreadystatechange = function() { 
+   	                          if( XHR.readyState==4 ) { 
+   	                          	validateUploadFile(XHR,repositoryPath,callback);
+   	                          } 
+   	                        };
+   	                        
+   XHR.send(fileControl.files[0]);
+
+}
+
+function validateUploadToFolder(XHR, repositoryPath, callback) {
+
+	try {
+		if (XHR.status == 200) {
+			var uploadStatus = JSON.parse(XHR.responseText);
+			if (uploadStatus.status == 1) {
+			  callback(XHR, repositoryPath);
+			}
+			else {
+	    	showUserErrorMessage("File Upload Failed. Status: " + uploadStatus.status + ", SQL Error Code: " + uploadStatus.SQLError + ", SQL Error Message: " + uploadStatus.SQLErrorMessage);
+	    }
+	  }
+	  else {
+      showUserErrorMessage("File Upload Failed. HTTP Status: " + XHR.status + "[" + XHR.statusText + "]");
+  	}
+	}
+  catch (e) {
+    handleException("common.validateUploadToFolder",e,null);
+  }
+}
+
+function stripPathInformation(filename) {
+
+	  // Deal with Directory Names in path 
+  	if (filename.lastIndexOf('/') > 0 ) {
+  	  filename = filename.substr(filename.lastIndexOf('/') + 1);
+  	}
+  	if (filename.lastIndexOf('\\') > 0 ) {
+  	  filename = filename.substr(filename.lastIndexOf('\\') + 1);
+  	}
+    return filename;
+}
+ 
+function uploadToFolder(targetFolder, fileControlName, callback) {
+
+/*
+    <form id="uploadImageForm" name="upload" action="/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.SINGLE_DOC_UPLOAD" method="post" enctype="multipart/form-data">
+			<input type="hidden"  id="targetFolder"            name="TARGET_FOLDER"/>
+			<input type="hidden"  id="duplicatePolicy"         name="DUPLICATE_POLICY" value="RAISE"/>
+			<input type="hidden"  id="resourceName"            name="RESOURCE_NAME"/>
+			<input type="hidden"  id="description"             name="DESCRIPTION"/>
+			<input type="hidden"  id="language"                name="LANGUAGE"/>
+			<input type="hidden"  id="characterSet"            name="CHARACTER_SET"/>
+ 			<div class="form-group" style="margin-left:20px">
+	  		<input id="FILE" name="FILE" title="FILE"  type="file">
+		  </div>
+		</form>	
+*/
+
+  var fileControl = document.getElementById(fileControlName)
+  var formData = new FormData();
+
+  formData.append('TARGET_FOLDER',targetFolder);
+  formData.append(fileControl.name,fileControl.files[0]);
+  formData.append('RESOURCE_NAME','');
+  formData.append('DUPLICATE_POLICY','RAISE');
+  formData.append('DESCRIPTION','');
+  formData.append('LANGUAGE','');
+  formData.append('CHARACTER_SET','');
+  
+  var repositoryPath = targetFolder + "/" + stripPathInformation(fileControl.value);
+
+  var XHR = soapManager.createPostRequest('/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.XMLHTTPREQUEST_DOC_UPLOAD',true);
+  XHR.onreadystatechange = function() { 
+   	                          if( XHR.readyState==4 ) { 
+   	                          	validateUploadToFolder(XHR,repositoryPath,callback);
+   	                          } 
+   	                        };
+  XHR.send(formData);
+
+}	
+
+function displayFolderTree(namespaces,loading,tree,folderList,openFolder,focusTarget) {
+
+  loading.style.display="none";
+  tree.style.display="block";
+  targetFolderTree = new xmlTreeControl("treeControl",folderList,namespaces,TargetTreeXSL,tree)
+
+  if (openFolder) {
+  	targetFolderTree.setOpenFolder(openFolder);
+  }
+  
+  if (focusTarget) {
+    focusTarget.focus();
+  }
+
+}
+
+function processFolderTreeList(mgr,namespaces,loading,tree,openFolder,focusTarget) {
+
+  try {
+    var soapResponse = mgr.getSoapResponse("common.processFolderList");
+	  namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
+
+    var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:P_TREE/tns:root",namespaces);
+    if (nodeList.length == 1) {
+      var folderList = new xmlDocument();
+      var node = folderList.appendChild(folderList.importNode(nodeList.item(0),true));
+      displayFolderTree(namespaces,loading,tree,folderList,openFolder,focusTarget);
+      return;
+    }
+    
+    error = new xfilesException("kmlShared.processFolderList",12,null, null);
+    error.setDescription("Invalid Folder Tree Document");
+    error.setXML(soapResponse);
+    throw error;
+  }    
+  catch (e) {
+    handleException("common.processFolderList",e,null)
+ }
+
+}
+
+function loadFolderTree(namespaces,loading,tree,openFolder, focusTarget) {
+
+  var schema  = "XFILES";
+  var package = "XFILES_SOAP_SERVICES";
+  var method =  "GETTARGETFOLDERTREE";
+
+	var mgr = soapManager.getRequestManager(schema,package,method);
+	var XHR = mgr.createPostRequest();
+  XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processFolderTreeList(mgr, namespaces, loading, tree, openFolder, focusTarget) } };
+
+	var parameters = new Object;
+	var xparameters = new Object;
+			
+  mgr.sendSoapRequest(parameters,xparameters); 
+
 }
 
 function doSearch(searchType,searchTerms) {

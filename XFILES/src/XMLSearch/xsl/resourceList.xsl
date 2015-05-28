@@ -48,10 +48,9 @@
 		</td>
 		<td class="withBorder">
 		<!--
-			<a href="#">
-				<xsl:attribute name="onclick"><xsl:text>fetchDocument(</xsl:text><xsl:value-of select="$NodeMapName"/><xsl:text>,'RESPATH','</xsl:text><xsl:value-of select="orawsv:resourcePath"/><xsl:text>');return false;</xsl:text></xsl:attribute>
-				<img src="/XFILES/lib/icons/xmlDocument.png" alt="Resource XML" border="0" align="top"/>
-			</a>
+				<img src="/XFILES/lib/icons/xmlDocument.png" alt="Resource XML" border="0" align="top">
+					<xsl:attribute name="onclick"><xsl:text>fetchDocument(</xsl:text><xsl:value-of select="$NodeMapName"/><xsl:text>,'RESPATH','</xsl:text><xsl:value-of select="orawsv:resourcePath"/><xsl:text>');return false;</xsl:text></xsl:attribute>
+				</img>
         -->
         <a>
 			<xsl:choose>

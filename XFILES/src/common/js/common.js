@@ -552,6 +552,12 @@ var contentToHTMLSource  =
 '		</xsl:for-each>' + '\n' +
 '</xsl:template></xsl:stylesheet>';
 
+var TargetTreeXSL;
+
+function loadTargetTreeXSL() {
+  TargetTreeXSL = loadXSLDocument("/XFILES/lite/xsl/folderTree.xsl");
+}
+
 var contentToHTML;
 
 function loadOracleWebServiceNamespaces() {
@@ -687,6 +693,8 @@ function initCommon() {
   contentToHTML = new xsltProcessor(new xmlDocument().parse(contentToHTMLSource),document);
   
   // Check if the current session is authenticated to allow for REST/SOAP descisions when loading pages
+
+	loadTargetTreeXSL();
    
 }
    
@@ -1429,7 +1437,7 @@ function remoteXML2XML(xml,xslPath) {
     try {
  
     	var mgr = soapManager.getRequestManager(schema,package,method);
-     	var ajaxControl = mgr.createPostRequest(false);
+     	var XHR = mgr.createPostRequest(false);
   
   	  var parameters = new Object
     	parameters["P_XSL_PATH-VARCHAR2-IN"]   = xslPath;
@@ -1468,7 +1476,7 @@ function remoteXML2CDATA(xml,xslPath) {
     try {
  
     	var mgr = soapManager.getRequestManager(schema,package,method);
-     	var ajaxControl = mgr.createPostRequest(false);
+     	var XHR = mgr.createPostRequest(false);
   
   	  var parameters = new Object
     	parameters["P_XSL_PATH-VARCHAR2-IN"]   = xslPath;
@@ -2241,8 +2249,12 @@ function openModalDialog(dialogName) {
 
 function closeModalDialog(dialogName) {
 
-  $('#' + dialogName).modal('hide');
+  // Loop to force closure ?
 
+  while (($('#' + dialogName).data('bs.modal') || {}).isShown) {
+    $('#' + dialogName).modal('hide');
+  }
+  
 }
 
 var xfilesHandleException = function(module, e, target) {
@@ -2975,138 +2987,7 @@ function RequestManager(manager,wsdl) {
   }
 
 }
-
-function doReauthentication(currentUser,URL) {
-		
-	var authenticatedUser = null;
-	try {
-   	try {
-  		authenticatedUser = getHttpUsername();
-   		authenticatedUser = getHttpUsername();
-  	} 
-  	catch (e) { // Fail with 501 ?
-  		authenticatedUser = getHttpUsername();
-  	}; 
-   	if (authenticatedUser != currentUser) {
-      error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
-      error.setDescription('User Mismatch following ReAuthentication : Expected "' + schema + '", found "' + authenticatedUser + '".');
-   	  throw error;
-	  }  		
-  }
-  catch (e) {
-    error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
-    error.setDescription('Exeception raised while performing ReAuthentication process for "' + schema + '".');
-  	throw error;
-  }	  	
-}
-
-function validateUploadFile(XHR, repositoryPath, callback) {
-
-	try {
-		if (XHR.status == 201) {
-   	  callback(XHR,repositoryPath);
-    }
-    else {
-			error = new xfilesException("kml.validateUploadFile",14,repositoryPath);
-    	error.setDescription("File Upload Operation Failed : " + XHR.statusText);
-   		error.setNumber(XHR.status);
-   		throw error;
-    }
-  } 
-  catch (e) {
-    handleException("kml.validateUploadFile",e,null);
-  }
-
-}
-
-function uploadFile(repositoryPath, fileControlname, callback) {
-   
-   // This version seems to result in trunctated content at 32K (At least with Firefox)
-
-   var fileControl = document.getElementById(fileControlname)
-   var XHR = soapManager.createPutRequest(repositoryPath,true);
-   XHR.onreadystatechange = function() { 
-   	                          if( XHR.readyState==4 ) { 
-   	                          	validateUploadFile(XHR,repositoryPath,callback);
-   	                          } 
-   	                        };
-   	                        
-   XHR.send(fileControl.files[0]);
-
-}
-
-function validateUploadToFolder(XHR, repositoryPath, callback) {
-
-	try {
-		if (XHR.status == 200) {
-			var uploadStatus = JSON.parse(XHR.responseText);
-			if (uploadStatus.status == 1) {
-			  callback(XHR, repositoryPath);
-			}
-			else {
-	    	showUserErrorMessage("File Upload Failed. Status: " + uploadStatus.status + ", SQL Error Code: " + uploadError.SQLError + ", SQL Error Message: " + uploadError.SQLErrorMessage);
-	    }
-	  }
-	  else {
-      showUserErrorMessage("File Upload Failed. HTTP Status: " + XHR.status + "[" + XHR.statusText + "]");
-  	}
-	}
-  catch (e) {
-    handleException("kml.validateUploadToFolder",e,null);
-  }
-}
-
-function stripPathInformation(filename) {
-
-	  // Deal with Directory Names in path 
-  	if (filename.lastIndexOf('/') > 0 ) {
-  	  filename = filename.substr(filename.lastIndexOf('/') + 1);
-  	}
-  	if (filename.lastIndexOf('\\') > 0 ) {
-  	  filename = filename.substr(filename.lastIndexOf('\\') + 1);
-  	}
-    return filename;
-}
- 
-function uploadToFolder(targetFolder, fileControlName, callback) {
-
-/*
-    <form id="uploadImageForm" name="upload" action="/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.SINGLE_DOC_UPLOAD" method="post" enctype="multipart/form-data">
-			<input type="hidden"  id="targetFolder"            name="TARGET_FOLDER"/>
-			<input type="hidden"  id="duplicatePolicy"         name="DUPLICATE_POLICY" value="RAISE"/>
-			<input type="hidden"  id="resourceName"            name="RESOURCE_NAME"/>
-			<input type="hidden"  id="description"             name="DESCRIPTION"/>
-			<input type="hidden"  id="language"                name="LANGUAGE"/>
-			<input type="hidden"  id="characterSet"            name="CHARACTER_SET"/>
- 			<div class="form-group" style="margin-left:20px">
-	  		<input id="FILE" name="FILE" title="FILE"  type="file">
-		  </div>
-		</form>	
-*/
-
-  var fileControl = document.getElementById(fileControlName)
-  var formData = new FormData();
-
-  formData.append('TARGET_FOLDER',targetFolder);
-  formData.append(fileControl.name,fileControl.files[0]);
-  formData.append('RESOURCE_NAME','');
-  formData.append('DUPLICATE_POLICY','RAISE');
-  formData.append('DESCRIPTION','');
-  formData.append('LANGUAGE','');
-  formData.append('CHARACTER_SET','');
   
-  var repositoryPath = targetFolder + "/" + stripPathInformation(fileControl.value);
-
-  var XHR = soapManager.createPostRequest('/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.XMLHTTPREQUEST_DOC_UPLOAD',true);
-  XHR.onreadystatechange = function() { 
-   	                          if( XHR.readyState==4 ) { 
-   	                          	validateUploadToFolder(XHR,repositoryPath,callback);
-   	                          } 
-   	                        };
-  XHR.send(formData);
-
-}	
-
 // Enable stacked Bootstrap Modals.
 
 $(document)  

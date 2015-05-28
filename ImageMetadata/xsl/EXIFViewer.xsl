@@ -92,22 +92,12 @@
 			</xsl:call-template>
 			<span style="float:right;display:block;">
 				<span style="display:inline-block;width:21px;">
-					<a class="toolTip" href="#" onclick="javascript:doOpenEditDescription(event);return false;">
-						<img id="btnEditDesc" src="/XFILES/lib/icons/editMultiLineText.png" alt="Edit Title" height="16" width="16" border="0"/>
-						<span class="hint">
-							<xsl:text>Edit Image Description</xsl:text>
-						</span>
-					</a>
+						<img id="btnEditDesc" src="/XFILES/lib/icons/editMultiLineText.png" alt="Edit Title" height="16" width="16" border="0" onclick="javascript:doOpenEditDescription(event);return false;" data-toggle="tooltip" data-placement="top" title="Edit Image Description."/>
 				</span>
 			</span>
 			<span style="float:right;display:block;">
 				<span style="display:inline-block;width:21px;">
-					<a class="toolTip" href="#" onclick="javascript:doOpenEditTitle(event);return false;">
-						<img id="btnEditTitle" src="/XFILES/lib/icons/editSimpleText.png" alt="Edit Title" height="16" width="16" border="0"/>
-						<span class="hint">
-							<xsl:text>Edit Image Title</xsl:text>
-						</span>
-					</a>
+						<img id="btnEditTitle" src="/XFILES/lib/icons/editSimpleText.png" alt="Edit Title" height="16" width="16" border="0" onclick="javascript:doOpenEditTitle(event);return false;" data-toggle="tooltip" data-placement="top" title="Edit Image Title."/>
 				</span>
 			</span>
 		</div>

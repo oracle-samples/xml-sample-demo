@@ -16,42 +16,31 @@
  */
 
 -->
-
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd" xmlns:xfiles="http://xmlns.oracle.com/xdb/xfiles" xmlns:xr="http://xmlns.oracle.com/xdb/XDBResource.xsd">
-	<xsl:include href="/XFILES/lite/xsl/common.xsl"/> 
+	<xsl:include href="/XFILES/lite/xsl/common.xsl"/>
 	<xsl:template name="searchActions">
 		<div id="searchControls" class="blueGradient barWithIcons">
-			<span style="float:right;display:block;" id="xmlIndexOptions" >
+			<span style="float:right;display:block;" id="xmlIndexOptions">
 				<span style="display:inline-block;width:21px;">
-					<a title="Upload Content" href="#" onclick="openUploadFilesDialog(event);return false;">
-					<img id="btnUploadFiles" src="/XFILES/lib/icons/uploadFile.png" alt="Upload Files" border="0" width="16" height="16"/>
-					</a>
+					<img id="btnUploadFiles" src="/XFILES/lib/icons/uploadFile.png" alt="Upload Files" border="0" width="16" height="16" data-toggle="tooltip" data-placement="top" title="Upload Content" onclick="openUploadFilesDialog(event);return false;"/>
 				</span>
 				<span style="display:inline-block;width:21px;">
-					<a title="Reload Tree" href="#" onclick="refreshPage();return false;">		
-						<img id="btnRefreshPage" src="/XFILES/lib/icons/reloadTree.png" alt="Refresh Tree" border="0" width="16" height="16"/>		
-					</a>
+					<img id="btnRefreshPage" src="/XFILES/lib/icons/reloadTree.png" alt="Refresh Tree" border="0" width="16" height="16" onclick="refreshPage();return false;" data-toggle="tooltip" data-placement="top" title="Reload Tree"/>
 				</span>
 			</span>
 			<span style="float:right;display:block;">
 				<span style="display:inline-block;width:21px;">
-					<a title="Show XQuery" href="#" onclick="openModalDialog('currentSQL');false">
-						<img id="btnShowQuery" src="/XFILES/lib/icons/showQuery.png" alt="Show Query" border="0" width="16" height="16"/>
-					</a>
+					<img id="btnShowQuery" src="/XFILES/lib/icons/showQuery.png" alt="Show Query" border="0" width="16" height="16" onclick="openModalDialog('currentSQL');false" data-toggle="tooltip" data-placement="top" title="Show XQuery"/>
 				</span>
 			</span>
-			<span style="float:right;display:block;"  id="btnShowNodeMap" >
+			<span style="float:right;display:block;" id="btnShowNodeMap">
 				<span style="display:inline-block;width:21px;">
-					<a title="Show Node Map" href="#" onclick="showSourceCode(documentNodeMap.nodeMap);return false;">
-						<img id="btnShowNodeMap" src="/XFILES/lib/icons/showNodeList.png" alt="Show Node Map" border="0" width="16" height="16"/>
-					</a>
+					<img id="btnShowNodeMap" src="/XFILES/lib/icons/showNodeList.png" alt="Show Node Map" border="0" width="16" height="16" onclick="showSourceCode(documentNodeMap.nodeMap);return false;" data-toggle="tooltip" data-placement="top" title="Show Node Map"/>
 				</span>
 			</span>
 			<span style="float:right;display:none;" id="executeQuery">
 				<span style="display:inline-block;width:21px;">
-					<a title="Execute Query" href="#" onclick="executeQuery(documentNodeMap);return false;">	
-						<img id="btnExecuteQuery" src="/XFILES/lib/icons/executeSQL.png" alt="Execute Query" border="0" width="16" height="16"/>				
-					</a>
+					<img id="btnExecuteQuery" src="/XFILES/lib/icons/executeSQL.png" alt="Execute Query" border="0" width="16" height="16" onclick="executeQuery(documentNodeMap);return false;" data-toggle="tooltip" data-placement="top" title="Execute Query"/>
 				</span>
 			</span>
 		</div>

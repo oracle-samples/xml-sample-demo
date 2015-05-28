@@ -48,6 +48,8 @@ as
   procedure disableTableSubgroupMembers(P_XML_SCHEMA IN OUT XMLTYPE);
   procedure disableTableNonRootElements(P_XML_SCHEMA IN OUT XMLTYPE);
 
+  function UNPACK_ARCHIVE(P_ARCHIVE_PATH VARCHAR2) return NUMBER;
+
 end XDBPM_XMLSCHEMA_UTILITIES;
 /
 show errors
@@ -785,6 +787,102 @@ begin
 	for t in getOrphanTypes loop
 	  execute immediate 'drop type "' || t.OBJECT_NAME || '" force';
 	end loop;
+end;
+--
+function UNPACK_ARCHIVE(P_ARCHIVE_PATH VARCHAR2)
+return NUMBER
+--
+--  Unzip the XML Schema Archive, remove redundant folders and return number of documents.
+--
+as 
+  V_FOLDER_PATH        VARCHAR2(700) := substr(P_ARCHIVE_PATH,1,instr(P_ARCHIVE_PATH,'/',-1)-1);
+  V_ARCHIVE_FILE       VARCHAR2(700) := substr(P_ARCHIVE_PATH,instr(P_ARCHIVE_PATH,'/',-1)+1);
+  V_ARCHIVE_NAME       VARCHAR2(700) := substr(V_ARCHIVE_FILE,1,instr(V_ARCHIVE_FILE,'.',-1)-1);
+  V_SCHEMA_FOLDER      VARCHAR2(700) := V_FOLDER_PATH || '/' || V_ARCHIVE_NAME;
+  V_UNZIP_LOGFILE      VARCHAR2(700) := V_SCHEMA_FOLDER || '.log';
+  V_RESULT             BOOLEAN;
+  
+  V_UNZIPPED_COUNT     NUMBER;
+  V_RESOURCE_COUNT     NUMBER;
+  V_REDUNDANT_FOLDER   VARCHAR2(700);
+  V_SUBFOLDER_NAME     VARCHAR2(700);
+
+  cursor getArchiveContents(C_TARGET_PATH VARCHAR2) 
+  is
+  select ANY_PATH,
+         XMLCAST(
+           XMLQUERY(
+             'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
+              /Resource/DisplayName'
+             passing RES 
+             returning Content
+           )
+           as VARCHAR2(4000)
+         ) DISPLAY_NAME
+    from RESOURCE_VIEW
+   where under_path(RES,1,C_TARGET_PATH) = 1;
+
+
+begin
+	if (DBMS_XDB.existsResource(V_SCHEMA_FOLDER)) then
+	  DBMS_XDB.deleteResource(V_SCHEMA_FOLDER,DBMS_XDB.DELETE_RECURSIVE);
+	end if;
+	
+	if (DBMS_XDB.existsResource(V_UNZIP_LOGFILE)) then
+	  DBMS_XDB.deleteResource(V_UNZIP_LOGFILE);
+	end if;
+	
+	V_RESULT := DBMS_XDB.createFolder(V_SCHEMA_FOLDER);
+  commit;
+  
+	XDB_IMPORT_UTILITIES.unZip(P_ARCHIVE_PATH,V_SCHEMA_FOLDER,V_UNZIP_LOGFILE,XDB_CONSTANTS.RAISE_ERROR);
+  commit;
+  
+  -- Deal with scenario where the Arhcive Name is the root folder in the Archive.
+  
+  select count(*)
+    into V_RESOURCE_COUNT
+    from RESOURCE_VIEW
+   where under_path(RES,1,V_SCHEMA_FOLDER) = 1;
+
+  select count(*)
+    into V_UNZIPPED_COUNT
+    from RESOURCE_VIEW
+   where under_path(RES,V_SCHEMA_FOLDER) = 1;
+
+   
+  if (V_RESOURCE_COUNT = 1) then  
+  
+    select XMLCAST(
+             XMLQUERY(
+               'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
+                /Resource/DisplayName'
+               passing RES 
+               returning content
+             )
+             as VARCHAR2(4000)
+           )
+      into V_SUBFOLDER_NAME
+      from RESOURCE_VIEW
+     where under_path(RES,1,V_SCHEMA_FOLDER) = 1;
+     
+     
+    if (V_SUBFOLDER_NAME = V_ARCHIVE_NAME) then
+
+      V_REDUNDANT_FOLDER := V_SCHEMA_FOLDER || '/' || V_SUBFOLDER_NAME;
+      for r in getArchiveContents(V_REDUNDANT_FOLDER) loop
+        DBMS_XDB.renameResource(r.ANY_PATH,V_SCHEMA_FOLDER,r.DISPLAY_NAME);
+      end loop;
+      commit;
+
+      DBMS_XDB.deleteResource(V_REDUNDANT_FOLDER);
+      commit;
+
+    end if;
+      
+  end if;
+  
+  return V_UNZIPPED_COUNT;
 end;
 --
 end XDBPM_XMLSCHEMA_UTILITIES;

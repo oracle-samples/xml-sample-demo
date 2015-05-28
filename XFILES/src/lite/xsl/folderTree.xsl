@@ -16,7 +16,6 @@
  */
 
 -->
-
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:x="http://xmlns.oracle.com/xdb/pm/demo/search" xmlns:lite="http://xmlns.oracle.com/orawsv/XFILES/XFILES_SOAP_SERVICES/GETTARGETFOLDERTREE">
 	<xsl:variable name="controlName" select="/lite:root/@controlName"/>
 	<xsl:template match="/">
@@ -24,58 +23,48 @@
 	</xsl:template>
 	<xsl:template name="expandTreeIcon">
 		<span style="">
-			<a href="#" title="Show Children">
+			<img alt="Expand Item" width="16" height="16" border="0" data-toggle="tooltip" data-placement="top" title="Show Children">
 				<xsl:attribute name="onclick"><xsl:text>javascript:</xsl:text><xsl:value-of select="$controlName"></xsl:value-of><xsl:text>.showChildren(</xsl:text><xsl:value-of select="@id"></xsl:value-of><xsl:text>);return false;</xsl:text></xsl:attribute>
-				<img alt="Expand Item" width="16" height="16" border="0">
-					<xsl:attribute name="src"><xsl:value-of select="@showChildren"/></xsl:attribute>
-				</img>
-			</a>
+				<xsl:attribute name="src"><xsl:value-of select="@showChildren"/></xsl:attribute>
+			</img>
 		</span>
 	</xsl:template>
 	<xsl:template name="collapseTreeIcon">
 		<span style="">
-			<a href="#" title="Hide Children">
+			<img alt="Unselected Item" width="16" height="16" border="0" data-toggle="tooltip" data-placement="top" title="Hide Children">
+				<xsl:attribute name="src"><xsl:value-of select="@hideChildren"/></xsl:attribute>
 				<xsl:attribute name="onclick"><xsl:text>javascript:</xsl:text><xsl:value-of select="$controlName"></xsl:value-of><xsl:text>.hideChildren(</xsl:text><xsl:value-of select="@id"></xsl:value-of><xsl:text>);return false;</xsl:text></xsl:attribute>
-				<img alt="Unselected Item" width="16" height="16" border="0">
-					<xsl:attribute name="src"><xsl:value-of select="@hideChildren"/></xsl:attribute>
-				</img>
-			</a>
+			</img>
 		</span>
 	</xsl:template>
 	<xsl:template name="selectedFolderIcon">
 		<span style="">
-			<a href="#" title="Selected Folder">
+			<img alt="Selected Item" src="/XFILES/icons/isSelected.png" width="16" height="16" border="0" data-toggle="tooltip" data-placement="top" title="Selected Folder">
 				<xsl:attribute name="onclick"><xsl:text>javascript:</xsl:text><xsl:value-of select="$controlName"></xsl:value-of><xsl:text>.unselectBranch(</xsl:text><xsl:value-of select="@id"></xsl:value-of><xsl:text>);return false;</xsl:text></xsl:attribute>
-				<img alt="Selected Item" src="/XFILES/icons/isSelected.png" width="16" height="16" border="0"/>
-			</a>
+			</img>
 		</span>
 	</xsl:template>
 	<xsl:template name="unselectedFolderIcon">
 		<span style="">
-			<a href="#" title="Folder">
+			<img alt="Unselected Item" src="/XFILES/icons/isNotSelected.png" width="16" height="16" border="0" data-toggle="tooltip" data-placement="top" title="Folder">
 				<xsl:attribute name="onclick"><xsl:text>javascript:</xsl:text><xsl:value-of select="$controlName"></xsl:value-of><xsl:text>.selectBranch(</xsl:text><xsl:value-of select="@id"></xsl:value-of><xsl:text>);return false;</xsl:text></xsl:attribute>
-				<img alt="Unselected Item" src="/XFILES/icons/isNotSelected.png" width="16" height="16" border="0"/>
-			</a>
+			</img>
 		</span>
 	</xsl:template>
 	<xsl:template name="openFolderIcon">
 		<span style="">
-			<a href="#" title="Close Folder">
+			<img alt="Close Folder" width="16" height="16" border="0" title="Close Folder">
+				<xsl:attribute name="src"><xsl:value-of select="@openIcon"/></xsl:attribute>
 				<xsl:attribute name="onclick"><xsl:text>javascript:</xsl:text><xsl:value-of select="$controlName"></xsl:value-of><xsl:text>.makeClosed(</xsl:text><xsl:value-of select="@id"></xsl:value-of><xsl:text>);</xsl:text></xsl:attribute>
-				<img alt="Close Folder" width="16" height="16" border="0">
-					<xsl:attribute name="src"><xsl:value-of select="@openIcon"/></xsl:attribute>
-				</img>
-			</a>
+			</img>
 		</span>
 	</xsl:template>
 	<xsl:template name="closedFolderIcon">
 		<span style="">
-			<a href="#" title="Open Folder">
+			<img alt="Open Folder" width="16" height="16" border="0" title="Open Folder">
 				<xsl:attribute name="onclick"><xsl:text>javascript:</xsl:text><xsl:value-of select="$controlName"></xsl:value-of><xsl:text>.makeOpen(</xsl:text><xsl:value-of select="@id"></xsl:value-of><xsl:text>);</xsl:text></xsl:attribute>
-				<img alt="Open Folder" width="16" height="16" border="0">
-					<xsl:attribute name="src"><xsl:value-of select="@closedIcon"/></xsl:attribute>
-				</img>
-			</a>
+				<xsl:attribute name="src"><xsl:value-of select="@closedIcon"/></xsl:attribute>
+			</img>
 		</span>
 	</xsl:template>
 	<xsl:template match="*">
@@ -119,7 +108,7 @@
 			</span>
 			<xsl:if test="@children='visible'">
 				<span style="display:block;padding-left:16px;">
-				<xsl:apply-templates/>
+					<xsl:apply-templates/>
 				</span>
 			</xsl:if>
 		</span>

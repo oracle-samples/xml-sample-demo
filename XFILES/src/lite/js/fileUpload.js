@@ -11,39 +11,30 @@
  *
  * ================================================ */
 
-set echo on
---
-spool publishAppFolder.log
---
-def FOLDER = &1
---
-def ACL = &2
---
--- Create index.html in the user's folder pointing to WebDemo application
---
-declare
-  V_SOURCE_PATH varchar2(700) := XFILES_CONSTANTS.FOLDER_APPLICATIONS_PRIVATE || '/&FOLDER';
-  V_TARGET_PATH varchar2(700) := XFILES_CONSTANTS.FOLDER_APPLICATIONS_PUBLIC || '/&FOLDER';
 
-  cursor publishResources is
-  select path 
-    from path_view
-   where under_path(res,V_SOURCE_PATH) = 1;
+function init() {
+  
+  try {
+    var status = document.getElementById("status").value;
+    if (status != "%STATUS%") {
+    	// Page had been rendered by the Server following an upload operation.
+   	  var repositoryPath = document.getElementById("repositoryPath").value;
+    	if (status == 201) {
+	  		self.parent.uploadSuccessCallback(status, repositoryPath);
+    	}
+    	else {
+     	  var errorCode = document.getElementById("errorCode").value
+      	var errorMessage = document.getElementById("errorMessage").value
+    		self.parent.uploadFailedCallback('fileupload.init',repositoryPath,errorCode,errorMessage);
+      }
+    }
+    else {
+      document.getElementById('onSuccessRedirect').value = window.location.pathname;
+      document.getElementById('onFailureRedirect').value = window.location.pathname;
+    }
+  } catch (e) {
+    self.parent.handleException('fileUpload.init',e,null);
+  }
 
-begin
-  dbms_xdb.setAcl(V_SOURCE_PATH,&ACL);
-  for res in publishResources loop
-    dbms_xdb.setACL(res.path,&ACL);
-  end loop;
-  if dbms_xdb.existsResource(V_TARGET_PATH) then
-    dbms_xdb.deleteResource(V_TARGET_PATH);
-  end if;
-  dbms_xdb.link(V_SOURCE_PATH,XFILES_CONSTANTS.FOLDER_APPLICATIONS_PUBLIC,'&FOLDER',DBMS_XDB.LINK_TYPE_WEAK);
-end;
-/
-commit
-/
---
-@@postInstallationSteps
---
-quit
+}
+	

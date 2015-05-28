@@ -16,7 +16,6 @@
  */
 
 -->
-
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="http://www.w3.org/2001/XMLSchema" xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd" xmlns:xfiles="http://xmlns.oracle.com/xdb/xfiles" xmlns:xr="http://xmlns.oracle.com/xdb/xfiles" xmlns:img="http://xmlns.oracle.com/xdb/metadata/ImageMetadata" xmlns:exif="http://xmlns.oracle.com/ord/meta/exif">
 	<xsl:output version="1.0" encoding="utf-8" omit-xml-declaration="no" indent="no" media-type="text/html" method="html"/>
 	<xsl:include href="/XFILES/lite/xsl/common.xsl"/>
@@ -24,19 +23,14 @@
 		<div id="editTitleControls" class="blueGradient barWithIcons">
 			<span style="float:right;display:none;" id="executeQuery">
 				<span style="display:inline-block;width:21px;">
-					<a class="toolTip">
-						<xsl:attribute name="href"><xsl:value-of select="concat('/XFILES/WebDemo/runtime.html?target=',/r:Resource/xfiles:ResourceStatus/xfiles:CurrentPath/@xfiles:EncodedPath,'&amp;stylesheet=/XFILES/WebDemo/xsl/runtime.xsl&amp;includeContent=true')"/></xsl:attribute>
-						<img id="btnExecuteQuery" src="/XFILES/lib/icons/executeSQL.png" alt="Execute Query" border="0" width="16" height="16"/>
-						<span class="hint">
-							<xsl:text>Execute Script</xsl:text>
-						</span>
-					</a>
+					<xsl:attribute name="href"><xsl:value-of select="concat('/XFILES/WebDemo/runtime.html?target=',/r:Resource/xfiles:ResourceStatus/xfiles:CurrentPath/@xfiles:EncodedPath,'&amp;stylesheet=/XFILES/WebDemo/xsl/runtime.xsl&amp;includeContent=true')"/></xsl:attribute>
+					<img id="btnExecuteQuery" src="/XFILES/lib/icons/executeSQL.png" alt="Execute Query" border="0" width="16" height="16" data-toggle="tooltip" data-placement="top" title="Execute Script."/>
 				</span>
 			</span>
 		</div>
 	</xsl:template>
 	<xsl:template name="RenderTable">
- 		<input type="hidden" name="contentType" id="targetContentType" value="text/XML"/>
+		<input type="hidden" name="contentType" id="targetContentType" value="text/XML"/>
 		<div id="sourcearea" style="width:100%; height:40em overflow:auto;"/>
 	</xsl:template>
 	<xsl:template match="/">

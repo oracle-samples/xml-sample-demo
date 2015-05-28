@@ -16,7 +16,6 @@
  */
 
 -->
-
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="http://www.w3.org/2001/XMLSchema" xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd" xmlns:xfiles="http://xmlns.oracle.com/xdb/xfiles" xmlns:xr="http://xmlns.oracle.com/xdb/xfiles">
 	<xsl:output version="1.0" encoding="utf-8" omit-xml-declaration="no" indent="no" media-type="text/html" method="html"/>
 	<xsl:include href="/XFILES/lite/xsl/common.xsl"/>
@@ -179,9 +178,7 @@
 		<div class="blueGradient barWithIcons">
 			<div style="float:right;">
 				<span style="display:inline-block;width:5px"/>
-				<a href="#" title="Create Indexed Table">
-				<img id="btnDoNewTable" src="/XFILES/lib/icons/addTable.png" alt="New Table Dialog" border="0" width="16" height="16" onclick="openPopupDialog(event, document.getElementById('newTableDialog'));return false"/>
-				</a>
+				<img id="btnDoNewTable" src="/XFILES/lib/icons/addTable.png" alt="New Table Dialog" border="0" width="16" height="16" onclick="openPopupDialog(event, document.getElementById('newTableDialog'));return false" data-toggle="tooltip" data-placement="top" title="Create Indexed Table"/>
 				<span style="display:inline-block;width:5px"/>
 			</div>
 			<div style="height:0px;clear:both;"/>

@@ -16,7 +16,6 @@
  */
 
 -->
-
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:x="http://xmlns.oracle.com/xdb/pm/demo/search">
 	<xsl:variable name="NodeMapName" select="/x:NodeMap/@nodeMapName"/>
 	<xsl:variable name="searchIconsEnabled" select="not(/x:NodeMap[@isChildNodeMap='true'])"/>
@@ -35,45 +34,37 @@
 	</xsl:template>
 	<xsl:template name="toggleChildrenControl">
 		<span style="padding-right:3px">
-			<a href="#">
+			<img alt="" border="0" data-toggle="tooltip" data-placement="top">
+				<xsl:attribute name="src"><xsl:choose><xsl:when test="@childrenVisible='block'"><xsl:text>/XFILES/lib/icons/elementHideChildren.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib/icons/elementShowChildren.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
 				<xsl:attribute name="onclick"><xsl:value-of select="concat('toggleChildren(',$NodeMapName,',&quot;',@ID,'&quot;);return false;')"></xsl:value-of></xsl:attribute>
-  			    <xsl:attribute name="title"><xsl:choose><xsl:when test="@childrenVisible='block'"><xsl:text>Hide Children</xsl:text></xsl:when><xsl:otherwise><xsl:text>Show Childen</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
-				<img alt="" border="0">
-					<xsl:attribute name="src"><xsl:choose><xsl:when test="@childrenVisible='block'"><xsl:text>/XFILES/lib/icons/elementHideChildren.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib/icons/elementShowChildren.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
-				</img>
-			</a>
+				<xsl:attribute name="title"><xsl:choose><xsl:when test="@childrenVisible='block'"><xsl:text>Hide Children</xsl:text></xsl:when><xsl:otherwise><xsl:text>Show Childen</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
+			</img>
 		</span>
 	</xsl:template>
 	<xsl:template name="toggleAttributesControl">
 		<span style="padding-right:3px">
-			<a href="#">
+			<img alt="" border="0" data-toggle="tooltip" data-placement="top">
+				<xsl:attribute name="src"><xsl:choose><xsl:when test="@attributesVisible='block'"><xsl:text>/XFILES/lib/icons/elementHideAttrs.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib//icons/elementShowAttrs.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
 				<xsl:attribute name="title"><xsl:choose><xsl:when test="@attributesVisible='block'"><xsl:text>Hide Attributes</xsl:text></xsl:when><xsl:otherwise><xsl:text>Show Attributes</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
 				<xsl:attribute name="onclick"><xsl:value-of select="concat('toggleAttrs(',$NodeMapName,',&quot;',@ID,'&quot;);return false;')"></xsl:value-of></xsl:attribute>
-				<img alt="" border="0">
-					<xsl:attribute name="src"><xsl:choose><xsl:when test="@attributesVisible='block'"><xsl:text>/XFILES/lib/icons/elementHideAttrs.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib//icons/elementShowAttrs.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
-				</img>
-			</a>
+			</img>
 		</span>
 	</xsl:template>
 	<xsl:template name="toggleSubstitutionGroupControl">
 		<span style="padding-right:3px">
 			<xsl:choose>
 				<xsl:when test="x:SubGroup">
-					<a href="#">
+					<img alt="" border="0" data-toggle="tooltip" data-placement="top">
 						<xsl:attribute name="title"><xsl:choose><xsl:when test="@subGroupVisible='block'"><xsl:text>Show Substitution Group</xsl:text></xsl:when><xsl:otherwise><xsl:text>Hide Substitution Group</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
 						<xsl:attribute name="onclick"><xsl:value-of select="concat('toggleSubGroup(',$NodeMapName,',&quot;',@ID,'&quot;);return false;')"></xsl:value-of></xsl:attribute>
-						<img alt="" border="0">
-							<xsl:attribute name="src"><xsl:choose><xsl:when test="@subGroupVisible='block'"><xsl:text>/XFILES/lib/icons/hideSubGroup.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib/icons/showSubGroup.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
-						</img>
-					</a>
+						<xsl:attribute name="src"><xsl:choose><xsl:when test="@subGroupVisible='block'"><xsl:text>/XFILES/lib/icons/hideSubGroup.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib/icons/showSubGroup.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
+					</img>
 				</xsl:when>
 				<xsl:otherwise>
-					<a href="#" title="Show Substitution Group">
+					<img alt="" border="0" data-toggle="tooltip" data-placement="top" title="Show Substitution Group">
 						<xsl:attribute name="onclick"><xsl:value-of select="concat('expandSubstitutionGroup(',$NodeMapName,',&quot;',@subGroupHead,'&quot;,&quot;',@ID,'&quot;);return false;')"></xsl:value-of></xsl:attribute>
-						<img alt="" border="0">
-							<xsl:attribute name="src"><xsl:text>/XFILES/lib/icons/showSubGroup.png</xsl:text></xsl:attribute>
-						</img>
-					</a>
+						<xsl:attribute name="src"><xsl:text>/XFILES/lib/icons/showSubGroup.png</xsl:text></xsl:attribute>
+					</img>
 				</xsl:otherwise>
 			</xsl:choose>
 		</span>
@@ -81,28 +72,24 @@
 	<xsl:template name="toggleNodeValueControl">
 		<xsl:param name="toggleValueImplementation"/>
 		<xsl:param name="iconName"/>
-		<span style="padding-right:3px;">
-			<a href="#">
+		<span style="padding-right:3px;" data-toggle="tooltip" data-placement="top">
+			<img border="0">
 				<xsl:attribute name="onclick"><xsl:value-of select="concat($toggleValueImplementation,'(',$NodeMapName,',&quot;',@ID,'&quot;);return false;')"></xsl:value-of></xsl:attribute>
 				<xsl:attribute name="title"><xsl:choose><xsl:when test="@valueVisible='hidden'"><xsl:text>Enable Input</xsl:text></xsl:when><xsl:otherwise><xsl:text>Disable Input</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
-				<img border="0">
-					<xsl:attribute name="src"><xsl:value-of select="concat('/XFILES/lib/icons/',$iconName)"/></xsl:attribute>
-					<xsl:attribute name="alt"><xsl:choose><xsl:when test="@valueVisible='hidden'"><xsl:text>Enable Input</xsl:text></xsl:when><xsl:otherwise><xsl:text>Disable Input</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
-				</img>
-			</a>
+				<xsl:attribute name="src"><xsl:value-of select="concat('/XFILES/lib/icons/',$iconName)"/></xsl:attribute>
+				<xsl:attribute name="alt"><xsl:choose><xsl:when test="@valueVisible='hidden'"><xsl:text>Enable Input</xsl:text></xsl:when><xsl:otherwise><xsl:text>Disable Input</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
+			</img>
 		</span>
 	</xsl:template>
 	<xsl:template name="isUniqueKeyIcon">
 		<xsl:param name="setUniqueKeyImplementation"/>
 		<xsl:if test="$searchIconsEnabled">
 			<span style="padding-right:3px">
-				<a href="#">
+				<img alt="" border="0" data-toggle="tooltip" data-placement="top">
 					<xsl:attribute name="title"><xsl:choose><xsl:when test="@uniqueKey='true'"><xsl:text>Define Unique Key</xsl:text></xsl:when><xsl:otherwise><xsl:text>Undefine Unique Key</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
 					<xsl:attribute name="onclick"><xsl:value-of select="concat($setUniqueKeyImplementation,'(',$NodeMapName,',&quot;',@ID,'&quot;);return false;')"></xsl:value-of></xsl:attribute>
-					<img alt="" border="0">
-						<xsl:attribute name="src"><xsl:choose><xsl:when test="@uniqueKey='true'"><xsl:text>/XFILES/lib/icons/notUniqueKey.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib/icons/uniqueKey.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
-					</img>
-				</a>
+					<xsl:attribute name="src"><xsl:choose><xsl:when test="@uniqueKey='true'"><xsl:text>/XFILES/lib/icons/notUniqueKey.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib/icons/uniqueKey.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
+				</img>
 			</span>
 		</xsl:if>
 	</xsl:template>
@@ -116,22 +103,18 @@
 	<xsl:template name="doPathSearchIcon">
 		<xsl:if test="$searchIconsEnabled and parent::x:NodeMap/@schemaType">
 			<span style="padding-right:3px">
-				<a href="#">
+				<img alt="" border="0">
 					<xsl:attribute name="onclick"><xsl:value-of select="concat('setPathSearch(',$NodeMapName,',&quot;',@ID,'&quot;);return false;')"></xsl:value-of></xsl:attribute>
-					<img alt="" border="0">
-						<xsl:attribute name="src"><xsl:choose><xsl:when test="@pathSearch='true'"><xsl:text>/XFILES/lib/icons/notPathSearch.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib/icons/pathSearch.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
-					</img>
-				</a>
+					<xsl:attribute name="src"><xsl:choose><xsl:when test="@pathSearch='true'"><xsl:text>/XFILES/lib/icons/notPathSearch.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib/icons/pathSearch.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
+				</img>
 			</span>
 		</xsl:if>
 	</xsl:template>
 	<xsl:template name="toggleNodeValue">
-		<a href="#">
+		<img alt="" border="0">
 			<xsl:attribute name="onclick"><xsl:value-of select="concat('toggleValue(',$NodeMapName,',&quot;',@ID,'&quot;);return false;')"></xsl:value-of></xsl:attribute>
-			<img alt="" border="0">
-				<xsl:attribute name="src"><xsl:choose><xsl:when test="@valueVisible='hidden'"><xsl:text>/XFILES/lib/icons/showNodeValue.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib/icons/hideNodeValue.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
-			</img>
-		</a>
+			<xsl:attribute name="src"><xsl:choose><xsl:when test="@valueVisible='hidden'"><xsl:text>/XFILES/lib/icons/showNodeValue.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib/icons/hideNodeValue.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
+		</img>
 	</xsl:template>
 	<xsl:template name="addNodeValueDialog">
 		<xsl:param name="toggleValueImplementation"/>
@@ -139,13 +122,11 @@
 		<xsl:param name="setUniqueKeyImplementation"/>
 		<span>
 			<span style="padding-right:3px">
-				<a href="#">
+				<img border="0">
 					<xsl:attribute name="onclick"><xsl:value-of select="concat($toggleValueImplementation,'(',$NodeMapName,',&quot;',@ID,'&quot;);')"></xsl:value-of></xsl:attribute>
-					<img border="0">
-						<xsl:attribute name="src"><xsl:choose><xsl:when test="@valueVisible='hidden'"><xsl:text>/XFILES/lib/icons/showNodeValue.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib/icons/hideNodeValue.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
-						<xsl:attribute name="alt"><xsl:choose><xsl:when test="@valueVisible='hidden'"><xsl:text>Enable Input</xsl:text></xsl:when><xsl:otherwise><xsl:text>Display Input</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
-					</img>
-				</a>
+					<xsl:attribute name="src"><xsl:choose><xsl:when test="@valueVisible='hidden'"><xsl:text>/XFILES/lib/icons/showNodeValue.png</xsl:text></xsl:when><xsl:otherwise><xsl:text>/XFILES/lib/icons/hideNodeValue.png</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
+					<xsl:attribute name="alt"><xsl:choose><xsl:when test="@valueVisible='hidden'"><xsl:text>Enable Input</xsl:text></xsl:when><xsl:otherwise><xsl:text>Display Input</xsl:text></xsl:otherwise></xsl:choose></xsl:attribute>
+				</img>
 			</span>
 			<xsl:if test="@valueVisible='visible'">
 				<span style="padding-right:3px">
@@ -287,10 +268,8 @@
 	</xsl:template>
 	<xsl:template name="unknownContentModel">
 		<span style="padding-right:3px;">
-			<a href="#">
-				<xsl:attribute name="onclick"><xsl:text>findContentModel(</xsl:text><xsl:value-of select="$NodeMapName"/><xsl:text>,'</xsl:text><xsl:choose><xsl:when test="parent::x:Elements or parent::x:NodeMap"><xsl:value-of select="@ID"/></xsl:when><xsl:otherwise><xsl:value-of select="parent::x:SubGroup/@SelectedMember"/></xsl:otherwise></xsl:choose><xsl:text>');return false;</xsl:text></xsl:attribute>
-				<img alt="Expand" src="/XFILES/lib/icons/elementExpand.png" border="0"/>
-			</a>
+			<img alt="Expand" src="/XFILES/lib/icons/elementExpand.png" border="0"/>
+			<xsl:attribute name="onclick"><xsl:text>findContentModel(</xsl:text><xsl:value-of select="$NodeMapName"/><xsl:text>,'</xsl:text><xsl:choose><xsl:when test="parent::x:Elements or parent::x:NodeMap"><xsl:value-of select="@ID"/></xsl:when><xsl:otherwise><xsl:value-of select="parent::x:SubGroup/@SelectedMember"/></xsl:otherwise></xsl:choose><xsl:text>');return false;</xsl:text></xsl:attribute>
 		</span>
 		<xsl:call-template name="printElementName"/>
 	</xsl:template>

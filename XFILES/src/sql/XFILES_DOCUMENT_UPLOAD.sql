@@ -396,7 +396,7 @@ begin
    
   exception
     when others then
-      V_RESPONSE_HTML := '{ "path" : "' || V_RESOURCE_PATH || '", "status" : -1, "SQLError" : ' || SQLCODE || ', "SQLErrorMessage" : "' || SQLERRM  || '}';
+      V_RESPONSE_HTML := '{ "path" : "' || V_RESOURCE_PATH || '", "status" : -1, "SQLError" : ' || SQLCODE || ', "SQLErrorMessage" : "' || SQLERRM  || '"}';
       handleException('SINGLE_DOC_UPLOAD',V_INIT,V_PARAMETERS);
   end;
 

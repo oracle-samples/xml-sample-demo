@@ -16,7 +16,6 @@
  */
 
 -->
-
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="http://www.w3.org/2001/XMLSchema" xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd" xmlns:xfiles="http://xmlns.oracle.com/xdb/xfiles" xmlns:xr="http://xmlns.oracle.com/xdb/xfiles" xmlns:img="http://xmlns.oracle.com/xdb/metadata/ImageMetadata" xmlns:exif="http://xmlns.oracle.com/ord/meta/exif" xmlns:wiki="http://xmlns.oracle.com/xdb/xfiles/wiki" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 	<xsl:output version="1.0" encoding="utf-8" omit-xml-declaration="no" indent="no" media-type="text/html" method="html"/>
 	<xsl:include href="/XFILES/lite/xsl/common.xsl"/>
@@ -45,7 +44,7 @@
 		</xsl:call-template>
 		<div class="blueGradient barWithIcons">
 			<span style="float:left;">
-				<xsl:value-of select="/r:Resource/r:Comment"></xsl:value-of>
+				<xsl:value-of select="/r:Resource/r:Comment"/>
 			</span>
 			<xsl:call-template name="XFilesSaveAndCloseOptions">
 				<xsl:with-param name="saveButton" select="'true'"/>
@@ -53,44 +52,24 @@
 			</xsl:call-template>
 			<span style="float:right;display:none;" id="wikiViewerControls">
 				<span style="display:inline-block;width:21px;">
-			</span>
+				</span>
 				<span style="display:inline-block;width:21px;">
-			</span>
+				</span>
 			</span>
 			<span style="float:right;display:block;" id="wikiEditingControls">
 				<span style="display:inline-block;width:21px;" id="undoEditingOption">
-					<a class="toolTip" href="#" onclick="javascript:doRevertToSaved();return false;">
-						<img id="btnResetWiki" src="/XFILES/lib/icons/undoMultiLineText.png" alt="Reset Wiki" height="16" width="16"  border="0" />
-						<span class="hint">
-							<xsl:text>Revert to saved state</xsl:text>
-						</span>
-					</a>
+					<img id="btnResetWiki" src="/XFILES/lib/icons/undoMultiLineText.png" alt="Reset Wiki" height="16" width="16" border="0" onclick="javascript:doRevertToSaved();return false;" data-toggle="tooltip" data-placement="top" title="Revert to saved state."/>
 				</span>
 				<span style="display:inline-block;width:21px;">
-					<a class="toolTip" href="#" onclick="javascript:doCancelEdits();return false;">
-						<img id="btnDiscardWikiEdits" src="/XFILES/lib/icons/cancel.png" alt="Cancel" height="16" width="16"  border="0" />
-						<span class="hint">
-							<xsl:text>Undo current edits</xsl:text>
-						</span>
-					</a>
+					<img id="btnDiscardWikiEdits" src="/XFILES/lib/icons/cancel.png" alt="Cancel" height="16" width="16" border="0" onclick="javascript:doCancelEdits();return false;" data-toggle="tooltip" data-placement="top" title="Undo current edits."/>
 				</span>
 				<span style="display:inline-block;width:21px;">
-					<a class="toolTip" href="#" onclick="javascript:doSaveEdits();return false;">
-					<img id="btnSaveWikiEdits" src="/XFILES/lib/icons/saveAndClose.png" alt="Save" height="16" width="16"  border="0"/>
-						<span class="hint">
-							<xsl:text>Save edits</xsl:text>
-						</span>
-					</a>
+					<img id="btnSaveWikiEdits" src="/XFILES/lib/icons/saveAndClose.png" alt="Save" height="16" width="16" border="0" onclick="javascript:doSaveEdits();return false;" data-toggle="tooltip" data-placement="top" title="Save edits."/>
 				</span>
 			</span>
 			<span style="float:right;display:block;" id="wikiViewingControls">
 				<span style="display:inline-block;width:21px;">
-					<a class="toolTip" href="#" onclick="javascript:setEditingMode(contentUpdatedFlag);return false;">
-						<img id="btnEditWiki" src="/XFILES/lib/icons/editMultiLineText.png" alt="Edit Description" height="16" width="16" border="0"/>
-						<span class="hint">
-							<xsl:text>Edit Wikie Page</xsl:text>
-						</span>
-					</a>
+					<img id="btnEditWiki" src="/XFILES/lib/icons/editMultiLineText.png" alt="Edit Description" height="16" width="16" border="0" onclick="javascript:setEditingMode(contentUpdatedFlag);return false;" data-toggle="tooltip" data-placement="top" title="Edit Wiki Page."/>
 				</span>
 			</span>
 		</div>

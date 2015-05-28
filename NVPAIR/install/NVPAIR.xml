@@ -1,8 +1,8 @@
 <!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by Mark D. Drake and Geoff Lee (Oracle XML Dev) -->
 <installerConfiguration>
 	<parameters>
-		<parameter name="%DEMONAME%" value="Name Value Pair Optimization : Oracle Database 12c (12.1.0.2.0)"/>
-		<parameter name="%LAUNCHPAD%" value="Hands on Lab (12.1.0.2.0)"/>
+		<parameter name="%DEMONAME%" value="Name Value Pair Optimization"/>
+		<parameter name="%LAUNCHPAD%" value="Name Value Pair Optimization"/>
 		<parameter name="%LAUNCHPADFOLDER%" value="%STARTMENU%\NV Pair Optimization"/>
 		<parameter name="%SHORTCUTFOLDER%" value="%DEMODIRECTORY%\%USER%"/>
 

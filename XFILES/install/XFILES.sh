@@ -278,6 +278,32 @@ then
   echo "Installation Failed: See $logfilename for details."
   exit 5
 fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/jssor.zip" | head -1)
+if [ $HttpStatus != "404" ] 
+then
+  if [ $HttpStatus == "200" ] 
+  then
+    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/jssor.zip" | head -1)
+    if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+    then
+      echo "DELETE(PUT) "$SERVER/home/$USER/src/jssor.zip":$HttpStatus - Operation Failed" >> $logfilename
+      echo "Installation Failed: See $logfilename for details."
+      exit 5
+    fi
+  else
+    echo "HEAD(PUT) "$SERVER/home/$USER/src/jssor.zip":$HttpStatus - Operation Failed" >> $logfilename
+    echo "Installation Failed: See $logfilename for details."
+    exit 5
+  fi
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/jssor.zip" "$SERVER/home/$USER/src/jssor.zip" | head -1)
+echo "PUT:"$demohome/src/jssor.zip" --> "$SERVER/home/$USER/src/jssor.zip":$HttpStatus" >> $logfilename
+if [ $HttpStatus != "201" ] 
+then
+  echo "Operation Failed: Installation Aborted." >> $logfilename
+  echo "Installation Failed: See $logfilename for details."
+  exit 5
+fi
 HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
 if [ $HttpStatus == "404" ] 
 then
@@ -4388,11 +4414,60 @@ then
     exit 6
 	 fi
 fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
+if [ $HttpStatus == "404" ] 
+then
+  HttpStatus=$(curl --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
+  echo "MKCOL "$SERVER/home":$HttpStatus" >> $logfilename
+  if [ $HttpStatus != "201" ]
+  then
+    echo "Operation Failed - Installation Aborted." >> $logfilename
+    echo "Installation Failed: See $logfilename for details."
+    exit 6
+	 fi
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
+if [ $HttpStatus == "404" ] 
+then
+  HttpStatus=$(curl --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
+  echo "MKCOL "$SERVER/home/$USER":$HttpStatus" >> $logfilename
+  if [ $HttpStatus != "201" ]
+  then
+    echo "Operation Failed - Installation Aborted." >> $logfilename
+    echo "Installation Failed: See $logfilename for details."
+    exit 6
+	 fi
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Frameworks" | head -1)
+if [ $HttpStatus == "404" ] 
+then
+  HttpStatus=$(curl --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Frameworks" | head -1)
+  echo "MKCOL "$SERVER/home/$USER/Frameworks":$HttpStatus" >> $logfilename
+  if [ $HttpStatus != "201" ]
+  then
+    echo "Operation Failed - Installation Aborted." >> $logfilename
+    echo "Installation Failed: See $logfilename for details."
+    exit 6
+	 fi
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Frameworks/jssor" | head -1)
+if [ $HttpStatus == "404" ] 
+then
+  HttpStatus=$(curl --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Frameworks/jssor" | head -1)
+  echo "MKCOL "$SERVER/home/$USER/Frameworks/jssor":$HttpStatus" >> $logfilename
+  if [ $HttpStatus != "201" ]
+  then
+    echo "Operation Failed - Installation Aborted." >> $logfilename
+    echo "Installation Failed: See $logfilename for details."
+    exit 6
+	 fi
+fi
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/famfamfam_silk_icons_v013.zip /home/$USER/icons/famfamfam          /home/$USER/icons/famfamfam_silk_icons_v013.log
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/Xinha-0.96.1.zip              /home/$USER/Frameworks               /home/$USER/Frameworks/Xinha-0.96.1.log
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/bootstrap3-dialog-master.zip  /home/$USER/Frameworks               /home/$USER/Frameworks/bootstrap3-dialog-master.log
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/bootstrap-3.2.0-dist.zip      /home/$USER/Frameworks               /home/$USER/Frameworks/bootstrap-3.2.0-dist.log
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/jquery-2.1.1.min.zip          /home/$USER/Frameworks/jquery-2.1.1  /home/$USER/Frameworks/jquery-2.1.1.min.log
+sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/jssor.zip                     /home/$USER/Frameworks/jssor         /home/$USER/Frameworks/jssor.log
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/WebDemo/sql/XFILES_WEBDEMO_SERVICES.sql $USER
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/PUBLISH_XFILES.sql OracleTransparent3d.png
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_STATUS_PAGE.sql $USER

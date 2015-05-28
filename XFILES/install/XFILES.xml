@@ -79,6 +79,11 @@
   		  <local>%DEMODIRECTORY%\src\jquery-2.1.1.min.zip</local>
   			<remote>%BASEFOLDER%/src/jquery-2.1.1.min.zip</remote>
   		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  		  <local>%DEMODIRECTORY%\src\jssor.zip</local>
+  			<remote>%BASEFOLDER%/src/jssor.zip</remote>
+  		</action>
 
 
 
@@ -307,6 +312,11 @@
   			<local>%DEMODIRECTORY%\src\lite\js\xfilesStatus.js</local>
   			<remote>%BASEFOLDER%/src/lite/js/xfilesStatus.js</remote>
   		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\js\fileUpload.js</local>
+  			<remote>%BASEFOLDER%/src/lite/js/fileUpload.js</remote>
+  		</action>
 
       <!-- XFILES Lite XSL Files-->
 
@@ -373,6 +383,11 @@
   			<mode>FORCE</mode>
   			<local>%DEMODIRECTORY%\src\lite\xsl\UploadFilesStatus.html</local>
   			<remote>%BASEFOLDER%/src/lite/xsl/UploadFilesStatus.html</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\src\lite\xsl\fileUpload.html</local>
+  			<remote>%BASEFOLDER%/src/lite/xsl/fileUpload.html</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
@@ -751,6 +766,10 @@
   			<mode>FORCE</mode>
   			<remote>%BASEFOLDER%/Frameworks/jquery-2.1.1</remote>
   		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%BASEFOLDER%/Frameworks/jssor</remote>
+  		</action>
 
   	</action>
   	<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/famfamfam_silk_icons_v013.zip %BASEFOLDER%/icons/famfamfam          %BASEFOLDER%/icons/famfamfam_silk_icons_v013.log</action>
@@ -758,6 +777,7 @@
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/bootstrap3-dialog-master.zip  %BASEFOLDER%/Frameworks               %BASEFOLDER%/Frameworks/bootstrap3-dialog-master.log</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/bootstrap-3.2.0-dist.zip      %BASEFOLDER%/Frameworks               %BASEFOLDER%/Frameworks/bootstrap-3.2.0-dist.log</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/jquery-2.1.1.min.zip          %BASEFOLDER%/Frameworks/jquery-2.1.1  %BASEFOLDER%/Frameworks/jquery-2.1.1.min.log</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/jssor.zip                     %BASEFOLDER%/Frameworks/jssor         %BASEFOLDER%/Frameworks/jssor.log</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\WebDemo\sql\XFILES_WEBDEMO_SERVICES.sql %USER%</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\PUBLISH_XFILES.sql %LOGO%</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_STATUS_PAGE.sql %USER%</action>

@@ -13,7 +13,6 @@
  * ================================================
  */
 
-var TargetTreeXSL
 var uploadDialogURL
 
 var outstandingRequestCount = 0;
@@ -23,12 +22,10 @@ var targetFolderTree
 
 function onPageLoaded() {	
 	reloadForm = refreshCurrentFolder;
-  loadTargetTreeXSL();
   document.getElementById("closeForm").style.display="none";
-}
-
-function loadTargetTreeXSL() {
-  TargetTreeXSL = loadXSLDocument("/XFILES/lite/xsl/folderTree.xsl");
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
 }
 
 function reportStatus(response, namespaces, operation, status, targetURL) {
@@ -213,45 +210,9 @@ function openDeleteDialog(evt, resourceList) {
 
   // Open the Delete Dialog. Delete Processing will be performed by deleteResources()
 
+  document.getElementById('deepDelete').checked = false;
+	document.getElementById('forceDelete').checked = false;
   openModalDialog("deleteDialog");
-
-}
-
-function displayFolderList(folderList,namespaces,operation,resourceList) {
-
-  document.getElementById("treeLoading").style.display="none";
-  targetTree = document.getElementById("treeControl");
-  targetTree.style.display="block";
-  targetFolderTree = new xmlTreeControl("treeControl",folderList,namespaces,TargetTreeXSL,targetTree)
-  currentOperation = operation;
-  currentResourceList = resourceList;
-
-}
-
-function processFolderList(mgr,action,resourceList,operation) {
-
-  try {
-    var soapResponse = mgr.getSoapResponse("FolderBrowser.processFolderList");
-  
-    var namespaces = xfilesNamespaces;
-    namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
-    
-    var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:P_TREE/tns:root",namespaces);
-    if (nodeList.length == 1) {
-      var folderList = new xmlDocument();
-      var node = folderList.appendChild(folderList.importNode(nodeList.item(0),true));
-      displayFolderList(folderList,namespaces,operation,resourceList);
-      return;
-    }
-    
-    error = new xfilesException("FolderBrowser.processFolderList",12,null, null);
-    error.setDescription("Invalid Folder List Document Receieved");
-    error.setXML(soapResponse);
-    throw error;
-  }    
-  catch (e) {
-    handleException("FolderBrowser.processFolderList",e,null)
- }
 
 }
 
@@ -294,7 +255,15 @@ function openFolderPicker(evt, action, resourceList, operation) {
 
 	var mgr = soapManager.getRequestManager(schema,package,method);
  	var XHR = mgr.createPostRequest();
-  XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processFolderList(mgr, action, resourceList, operation) } };
+  XHR.onreadystatechange = function() { 
+  	                         if ( XHR.readyState == 4 ) {
+  	                       	   currentOperation = operation;
+														   currentResourceList = resourceList;
+  	                       	   var loading =  document.getElementById("treeLoading");
+  													   var targetTree = document.getElementById("treeControl");
+  	                       	   processFolderTreeList(mgr, xfilesNamespaces, loading, targetTree) 
+  	                         } 
+  	                       };
   
 	var parameters = new Object;
   mgr.sendSoapRequest(parameters);
@@ -548,7 +517,7 @@ function deleteResourceList(resourceListXML, deep, force) {
   	doListOperation(resourceListXML, parameters, module, actionName, null);
   }
   catch (e) {
-    handleException("FolderBrowser.deleteResources",e,null);
+    handleException("FolderBrowser.deleteResourceList",e,null);
   }
    
 }  
@@ -734,16 +703,13 @@ function addHitCounter(resourceListXML, deepOption) {
    
 }
 
-function deleteResources(deepOption, forceOption) {
-
+function deleteResources() {
 
   try {
   	var callback = function(result) {
 		  closeModalDialog('deleteDialog');
   		if (result) {
-			  var deep = booleanToNumber(deepOption.checked);
-  			var force = booleanToNumber(forceOption.checked);
-  			deleteResourceList(currentResourceList, deep, force);
+  			deleteResourceList(currentResourceList, booleanToNumber(document.getElementById('deepDelete').checked), booleanToNumber(document.getElementById('forceDelete').checked));
       }
     }
     BootstrapDialog.confirm("Delete selected documents ?",callback)
@@ -754,15 +720,17 @@ function deleteResources(deepOption, forceOption) {
 
 }
 
-function updateTargetFolder(checkboxDeep,radioDuplicate) {
+function updateTargetFolder() {
 
   var targetFolder = targetFolderTree.getOpenFolder()
   if (!targetFolder) {
     showUserErrorMessage("Please select target folder");
     return;
   }
-  
+  var radioDuplicate = document.getElementsByName('onDuplicateAction');
+
   var duplicateAction
+
   for (var i=0;i<radioDuplicate.length;i++) {
     if (radioDuplicate[i].checked) {
       duplicateAction = radioDuplicate[i].value 
@@ -774,8 +742,7 @@ function updateTargetFolder(checkboxDeep,radioDuplicate) {
   	var callback = function(result) {
 		  closeModalDialog('folderPickerDialog');
   		if (result) {
-			  var deep = booleanToNumber(checkboxDeep.checked);
-  			var duplicateAction = duplicateAction;
+			  var deep = booleanToNumber(document.getElementById('deepFolder').checked);
   			currentOperation(currentResourceList,targetFolder,deep,duplicateAction);
       }
     }
@@ -787,14 +754,16 @@ function updateTargetFolder(checkboxDeep,radioDuplicate) {
 
 }
 
-function doDeepOperation(checkboxDeep) {
+function doDeepOperation() {
+
+	var deepCheckbox = document.getElementById('deepOperation');
+	var deepOption = booleanToNumber(deepOption.checked);
 
   try {
   	var callback = function(result) {
 		  closeModalDialog('deepOperationDialog');
   		if (result) {
-  			var deep = booleanToNumber(checkboxDeep.checked);
-  			currentOperation(currentResourceList,deep);
+  			currentOperation(currentResourceList,deepOption);
       }
     }
     BootstrapDialog.confirm("Apply to selected documents ?",callback)
@@ -804,14 +773,14 @@ function doDeepOperation(checkboxDeep) {
   }   
 }
 
-function doPublishOperation(checkboxDeep,checkboxPublic) {
+function doPublishOperation() {
 
   try {
   	var callback = function(result) {
 			closeModalDialog('publishDialog');
   		if (result) {
-				var deep = booleanToNumber(checkboxDeep.checked);
-  			var makePublic = booleanToNumber(checkboxPublic.checked);
+				var deep = booleanToNumber(document.getElementById('deepPublish').checked);
+  			var makePublic = booleanToNumber(document.getElementById('publicPublish').checked);
   			publishResourceList(currentResourceList,deep,makePublic);
       }
     }
@@ -823,13 +792,14 @@ function doPublishOperation(checkboxDeep,checkboxPublic) {
 
 }
 
-function updatePrinciple(newOwner,checkboxDeep) {
+function updatePrinciple() {
 
   try {
   	var callback = function(result) {
 		  closeModalDialog('setPrincipleDialog');
   		if (result) {
-        var deep = booleanToNumber(checkboxDeep.checked);
+        var deep = booleanToNumber(document.getElementById('deepChown').checked);
+        var newOwner = document.getElementById('principleList').value;
         changeOwnerList(currentResourceList, newOwner, deep);
       }
     }
@@ -841,13 +811,14 @@ function updatePrinciple(newOwner,checkboxDeep) {
 
 }
 
-function updateACL(newACL,checkboxDeep) {
+function updateACL() {
 
   try {
   	var callback = function(result) {
    		closeModalDialog("setACLDialog");
   		if (result) {
-    	  var deep = booleanToNumber(checkboxDeep.checked);
+  			var newACL = document.getElementById('aclList').value;
+    	  var deep = booleanToNumber(document.getElementById('deepACL').checked);
   	    setAclList(currentResourceList, newACL, deep);
   	  }
   	}
@@ -859,14 +830,15 @@ function updateACL(newACL,checkboxDeep) {
 
 }
 
-function updateViewer(newViewer,checkboxMetadata) {
+function updateViewer() {
 
   try {
   	var callback = function(result){
       closeModalDialog("setViewerDialog");
   		if (result) {
   			var viewerArguments = "";
-    	  var metadata = booleanToNumber(checkboxMetadata.checked);
+        var newViewer = document.getElementById('xslList').value;
+    	  var metadata = booleanToNumber(document.getElementById('viewerMetadata').checked);
     	  if (metadata) {
     	  	var renderingMethod = 'getFolderWithMetadata'
     	  }
@@ -881,13 +853,14 @@ function updateViewer(newViewer,checkboxMetadata) {
 
 }
 
-function checkInResources(comment,checkboxDeep) {
+function checkInResources() {
 
   try {
   	var callback = function(result) {
       closeModalDialog("checkInDialog");
       if (result) {
-        var deep = booleanToNumber(checkboxDeep.checked);
+        var comment = document.getElementById('checkInComment').value;
+        var deep = booleanToNumber(document.getElementById('deepCheckIn').checked);
         checkInResourceList(currentResourceList, comment, deep)
       }
 		}

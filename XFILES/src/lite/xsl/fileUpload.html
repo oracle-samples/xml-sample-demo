@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="/XFILES/Frameworks/bootstrap/css/bootstrap.min.css"/>
+		<link rel="stylesheet" href="/XFILES/Frameworks/bootstrap-dialog/css/bootstrap-dialog.min.css"/>
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="/XFILES/Frameworks/bootstrap/css/bootstrap-theme.min.css"/>
+		<!-- Custom styles for this template -->
+	  <script type="text/javascript" language="javascript" src="/XFILES/lite/js/fileUpload.js"></script>
+	</head>
+	<body onload="init()">
+		<input type="hidden" id="status"                     value="%STATUS%" name="STATUS"/>
+	  <input type="hidden" id="errorCode"                  value="%ERROR_CODE%" name="ERROR_CODE"/>
+		<input type="hidden" id="errorMessage"               value="%ERROR_MESSAGE%" name="ERROR_MESSAGE"/>
+		<input type="hidden" id="repositoryPath"             value="%REPOSITORY_PATH%" name="REPOSITORY_PATH"/>
+		<div style="height:10px"/>
+    <form id="uploadFileForm" name="upload" action="/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.SINGLE_DOC_UPLOAD" method="post" enctype="multipart/form-data">
+			<input type="hidden"  id="onSuccessRedirect"       name="ON_SUCCESS_REDIRECT" value="%URL_SUCCESS%"/>
+			<input type="hidden"  id="onFailureRedirect"       name="ON_FAILURE_REDIRECT"  value="%URL_FAILURE%"/>
+			<input type="hidden"  id="targetFolder"            name="TARGET_FOLDER"/>
+			<input type="hidden"  id="duplicatePolicy"         name="DUPLICATE_POLICY" value="RAISE"/>
+			<input type="hidden"  id="resourceName"            name="RESOURCE_NAME"/>
+			<input type="hidden"  id="description"             name="DESCRIPTION"/>
+			<input type="hidden"  id="language"                name="LANGUAGE"/>
+			<input type="hidden"  id="characterSet"            name="CHARACTER_SET"/>
+ 			<div class="form-group" style="margin-left:20px">
+	  		<input id="FILE" name="FILE" title="FILE"  type="file">
+		  </div>
+		</form>	
+	</body>
+</html>

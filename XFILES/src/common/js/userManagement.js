@@ -757,3 +757,26 @@ function setUserRole() {
   }
 }
 
+function doReauthentication(currentUser,URL) {
+		
+	var authenticatedUser = null;
+	try {
+   	try {
+  		authenticatedUser = getHttpUsername();
+   		authenticatedUser = getHttpUsername();
+  	} 
+  	catch (e) { // Fail with 501 ?
+  		authenticatedUser = getHttpUsername();
+  	}; 
+   	if (authenticatedUser != currentUser) {
+      error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
+      error.setDescription('User Mismatch following ReAuthentication : Expected "' + schema + '", found "' + authenticatedUser + '".');
+   	  throw error;
+	  }  		
+  }
+  catch (e) {
+    error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
+    error.setDescription('Exeception raised while performing ReAuthentication process for "' + schema + '".');
+  	throw error;
+  }	  	
+}

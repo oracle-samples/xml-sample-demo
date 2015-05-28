@@ -55,18 +55,19 @@ as
   procedure setSchemaDataType(P_XML_SCHEMA in out XMLType,P_XML_DATATYPE VARCHAR2,P_SQL_DATATYPE VARCHAR2);
   procedure setMaintainDOM(P_XML_SCHEMA in out XMLType, P_PATH_EXPRESSION VARCHAR2, P_VALUE VARCHAR2);
 
-  procedure getGroupDefinitions(P_PATH varchar2);
+  procedure loadGroupDefinitions(P_SCHEMA_FOLDER varchar2);
   procedure expandAllGroups(P_XML_SCHEMA in out XMLType);
+  procedure expandAllGroups(P_SCHEMA_FOLDER VARCHAR2);
   procedure expandRepeatingGroups(P_XML_SCHEMA in out XMLType);
 
-  function showGroupDefinitions return XMLTYPE;
+  function  getGroupDefinitions return XMLTYPE;
+  function  getGroupDefinitions(P_SCHEMA_FOLDER VARCHAR2) return XMLTYPE;
 
   procedure saveAnnotatedSchema(P_XML_SCHEMA_PATH VARCHAR2,P_XML_SCHEMA XMLTYPE,P_COMMENT VARCHAR2 DEFAULT NULL);
   
-  function DIFF_XML_SCHEMAS(P_OLD_SCHEMA XMLTYPE, P_NEW_SCHEMA XMLTYPE) return XMLTYPE;
-  function generateAnnotationScript(P_SCHEMA_URL VARCHAR2, P_OWNER VARCHAR2) return CLOB;
-  function generateAnnotationScript(P_XML_SCHEMA XMLTYPE) return CLOB;
-  
+  function  DIFF_XML_SCHEMAS(P_OLD_SCHEMA XMLTYPE, P_NEW_SCHEMA XMLTYPE) return XMLTYPE;
+  function  generateAnnotationScript(P_SCHEMA_URL VARCHAR2, P_OWNER VARCHAR2) return CLOB;
+  function  generateAnnotationScript(P_XML_SCHEMA XMLTYPE) return CLOB;
 end;
 /
 show errors
@@ -1416,7 +1417,7 @@ begin
 
 end;
 --
-procedure getGroupDefinitions(P_PATH VARCHAR2) 
+procedure loadGroupDefinitions(P_SCHEMA_FOLDER VARCHAR2) 
 as
 begin
 
@@ -1441,7 +1442,7 @@ begin
            let $schemaList := fn:collection($XSD_FOLDER_PATH)/xs:schema
            let $groupList := xdbpm:group-defs($schemaList)
            return $groupList'
-           passing P_PATH as "XSD_FOLDER_PATH"
+           passing P_SCHEMA_FOLDER as "XSD_FOLDER_PATH"
          );
  
  	if (G_GROUP_DEFINITIONS is not NULL) then
@@ -1453,7 +1454,7 @@ begin
   end if;  
 end;
 --
-function showGroupDefinitions 
+function getGroupDefinitions 
 return XMLTYPE
 as
 begin
@@ -1627,6 +1628,40 @@ begin
      and OWNER = P_OWNER;
      
 	return generateAnnotationScript(V_XMLSCHEMA);
+end;
+--
+procedure expandAllGroups(P_SCHEMA_FOLDER VARCHAR2) 
+as
+  cursor getSchemas(C_TARGET_FOLDER VARCHAR2) is
+  select ANY_PATH, xdburitype(ANY_PATH).getXML() XML_SCHEMA
+    from RESOURCE_VIEW
+ where under_path(RES,C_TARGET_FOLDER) = 1
+   and XMLExists
+       (
+          'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
+           $RES/Resource[ends-with(DisplayName,".xsd")]'
+           passing RES as "RES"
+       );
+  V_XML_SCHEMA XMLTYPE;
+begin
+  loadGroupDefinitions(P_SCHEMA_FOLDER);
+  for xsd in getSchemas(P_SCHEMA_FOLDER) loop
+     --     
+     -- Expand any groups in the XML Schema and save the result as the '.xsd' file.
+     --
+     V_XML_SCHEMA := xsd.XML_SCHEMA;
+     XDB_EDIT_XMLSCHEMA.expandAllGroups(V_XML_SCHEMA);
+     XDB_EDIT_XMLSCHEMA.saveAnnotatedSchema(xsd.ANY_PATH,V_XML_SCHEMA,'Expanded Groups');
+	   commit;
+  end loop;
+end;
+--
+function getGroupDefinitions(P_SCHEMA_FOLDER VARCHAR2) 
+return XMLTYPE
+as
+begin
+	loadGroupDefinitions(P_SCHEMA_FOLDER);
+	return getGroupDefinitions();
 end;
 --
 end;
