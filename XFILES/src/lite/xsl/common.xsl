@@ -645,8 +645,9 @@
 				<span style="width:10px; display: inline-block; "/>
 				<xsl:choose>
 					<xsl:when test="/*/xfiles:xfilesParameters/xfiles:user!='ANONYMOUS'">
-						<xsl:attribute name="onclick"><xsl:value-of select="concat('doShowHomeFolder(event,&quot;',/*/xfiles:xfilesParameters/xfiles:user,'&quot;);false;')"/></xsl:attribute>
-						<img id="btnHomeFolder" src="/XFILES/lib/icons/homeFolder.png" alt="homeFolder" border="0" width="16" height="16" data-toggle="tooltip" data-placement="top" title="Open Home Folder"/>
+						<img id="btnHomeFolder" src="/XFILES/lib/icons/homeFolder.png" alt="homeFolder" border="0" width="16" height="16" data-toggle="tooltip" data-placement="top" title="Open Home Folder">
+							<xsl:attribute name="onclick"><xsl:value-of select="concat('doShowHomeFolder(event,&quot;',/*/xfiles:xfilesParameters/xfiles:user,'&quot;);false;')"/></xsl:attribute>
+						</img>
 						<span style="width:10px; display: inline-block;"/>
 						<img id="btnSetPassword" src="/XFILES/lib/icons/setPassword.png" alt="set password" border="0" width="16" height="16" onclick="doSetPassword(event);false" data-toggle="tooltip" data-placement="top" title="User Options"/>
 						<span style="width:10px; display: inline-block;"/>

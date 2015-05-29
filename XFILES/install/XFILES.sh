@@ -1628,6 +1628,32 @@ then
   echo "Installation Failed: See $logfilename for details."
   exit 5
 fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/lite/js/fileUpload.js" | head -1)
+if [ $HttpStatus != "404" ] 
+then
+  if [ $HttpStatus == "200" ] 
+  then
+    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/lite/js/fileUpload.js" | head -1)
+    if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+    then
+      echo "DELETE(PUT) "$SERVER/home/$USER/src/lite/js/fileUpload.js":$HttpStatus - Operation Failed" >> $logfilename
+      echo "Installation Failed: See $logfilename for details."
+      exit 5
+    fi
+  else
+    echo "HEAD(PUT) "$SERVER/home/$USER/src/lite/js/fileUpload.js":$HttpStatus - Operation Failed" >> $logfilename
+    echo "Installation Failed: See $logfilename for details."
+    exit 5
+  fi
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/lite/js/fileUpload.js" "$SERVER/home/$USER/src/lite/js/fileUpload.js" | head -1)
+echo "PUT:"$demohome/src/lite/js/fileUpload.js" --> "$SERVER/home/$USER/src/lite/js/fileUpload.js":$HttpStatus" >> $logfilename
+if [ $HttpStatus != "201" ] 
+then
+  echo "Operation Failed: Installation Aborted." >> $logfilename
+  echo "Installation Failed: See $logfilename for details."
+  exit 5
+fi
 HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
 if [ $HttpStatus == "404" ] 
 then
@@ -1994,6 +2020,32 @@ then
 fi
 HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/lite/xsl/UploadFilesStatus.html" "$SERVER/home/$USER/src/lite/xsl/UploadFilesStatus.html" | head -1)
 echo "PUT:"$demohome/src/lite/xsl/UploadFilesStatus.html" --> "$SERVER/home/$USER/src/lite/xsl/UploadFilesStatus.html":$HttpStatus" >> $logfilename
+if [ $HttpStatus != "201" ] 
+then
+  echo "Operation Failed: Installation Aborted." >> $logfilename
+  echo "Installation Failed: See $logfilename for details."
+  exit 5
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/lite/xsl/fileUpload.html" | head -1)
+if [ $HttpStatus != "404" ] 
+then
+  if [ $HttpStatus == "200" ] 
+  then
+    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/lite/xsl/fileUpload.html" | head -1)
+    if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+    then
+      echo "DELETE(PUT) "$SERVER/home/$USER/src/lite/xsl/fileUpload.html":$HttpStatus - Operation Failed" >> $logfilename
+      echo "Installation Failed: See $logfilename for details."
+      exit 5
+    fi
+  else
+    echo "HEAD(PUT) "$SERVER/home/$USER/src/lite/xsl/fileUpload.html":$HttpStatus - Operation Failed" >> $logfilename
+    echo "Installation Failed: See $logfilename for details."
+    exit 5
+  fi
+fi
+HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/lite/xsl/fileUpload.html" "$SERVER/home/$USER/src/lite/xsl/fileUpload.html" | head -1)
+echo "PUT:"$demohome/src/lite/xsl/fileUpload.html" --> "$SERVER/home/$USER/src/lite/xsl/fileUpload.html":$HttpStatus" >> $logfilename
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename
