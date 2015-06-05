@@ -1191,6 +1191,7 @@ as
   function getTraceFileContents return CLOB;
   function getTraceFileContents(P_SESSION_ID NUMBER) return CLOB;
     
+  procedure resetLobLocator(P_RESID RAW);
   procedure setBinaryContent(P_RESID RAW, P_SCHEMA_OID RAW, P_BINARY_ELEMENT_ID NUMBER);
   procedure setTextContent(P_RESID RAW, P_SCHEMA_OID RAW, P_TEXT_ELEMENT_ID NUMBER);
   procedure setXMLContent(P_RESID RAW);
@@ -1564,6 +1565,15 @@ return CLOB
 as
 begin
 	return getTraceFileContents(getSessionId());
+end;
+--
+procedure resetLobLocator(P_RESID RAW)
+is
+begin
+  update XDB.XDB$RESOURCE r
+     set r.XMLDATA.XMLLOB = empty_blob()
+   where OBJECT_ID = P_RESID
+     and r.XMLDATA.XMLLOB is null;
 end;
 --
 procedure setBinaryContent(P_RESID RAW, P_SCHEMA_OID RAW, P_BINARY_ELEMENT_ID NUMBER)

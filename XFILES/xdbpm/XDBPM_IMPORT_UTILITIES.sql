@@ -130,36 +130,6 @@ as
   G_TARGET_SCHEMA_OID   RAW(16);
   G_GLOBAL_ELEMENT_ID   NUMBER(16);
 --
-  G_RESOURCE_SCHEMA_OID RAW(16);
-  G_TEXT_ELEMENT_ID     NUMBER(16);
-  G_BINARY_ELEMENT_ID   NUMBER(16);
---
-procedure getResourceSchemaInfo
-as
-begin
-  select object_id,
-       extractValue
-       (
-         object_value,
-         '/xs:schema/xs:element[@name="binary"]/@xdb:propNumber',
-         'xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xdb="http://xmlns.oracle.com/xdb"'
-       ),
-       extractValue
-       (
-         object_value,
-         '/xs:schema/xs:element[@name="text"]/@xdb:propNumber',
-         'xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xdb="http://xmlns.oracle.com/xdb"'
-       )
-    into G_RESOURCE_SCHEMA_OID, G_BINARY_ELEMENT_ID, G_TEXT_ELEMENT_ID
-    from xdb.xdb$schema
-   where extractValue
-       (
-         object_value,
-         '/xs:schema/@xdb:schemaURL',
-         'xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xdb="http://xmlns.oracle.com/xdb"'
-       )  = 'http://xmlns.oracle.com/xdb/XDBSchema.xsd';
-end;
---
 procedure setDuplicatePolicy(P_DUPLICATE_POLICY VARCHAR2)
 as
 begin
@@ -381,22 +351,19 @@ end;
 procedure setBinaryContent(P_RESID RAW)
 is
 begin
-  -- dbms_output.put_line('Creating Binary Content');
-  xdb_helper.setBinaryContent(P_RESID, G_RESOURCE_SCHEMA_OID, G_BINARY_ELEMENT_ID);
+  XDBPM_INTERNAL.setBinaryContent(P_RESID);
 end;
 --
 procedure setTextContent(P_RESID RAW)
 is
 begin
-  -- dbms_output.put_line('Creating Text Content');
-  xdb_helper.setTextContent(P_RESID, G_RESOURCE_SCHEMA_OID, G_TEXT_ELEMENT_ID);
+  XDBPM_INTERNAL.setTextContent(P_RESID);
 end;
 --
 procedure setXMLContent(P_RESID RAW)
 is
 begin
-  -- dbms_output.put_line('Creating NSB XML Content');
-  xdb_helper.setXMLContent(P_RESID);
+  XDBPM_INTERNAL.setXMLContent(P_RESID);
 end;
 --
 procedure createPrinciples(P_XML_RESOURCE XMLType )
@@ -1494,8 +1461,6 @@ begin
 	return;
 end;
 --
-begin
-  getResourceSchemaInfo;
 end;
 /
 show errors

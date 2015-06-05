@@ -21,6 +21,8 @@ create index DATA_ITEM_PROPNAME_IDX
 create index DATA_ITEM_INTVALUE_IDX
     on DATA_ITEM_TABLE(NESTED_TABLE_ID, SYS_NC_TYPEID$, "name", TREAT(SYS_NC_ROWINFO$ AS "INTEGER_T")."value")
 /
+set autotrace on explain lines 256 pages 50
+--
 select * 
   from DEPARTMENT_VIEW 
  where DEPARTMENT_ID = 40

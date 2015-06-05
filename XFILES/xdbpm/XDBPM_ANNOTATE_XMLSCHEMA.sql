@@ -326,7 +326,7 @@ end;
 procedure expandGroup(P_XML_SCHEMA in out XMLType, P_GROUP_NAME VARCHAR2, P_XSD_DIRECTORY VARCHAR2)
 as
 begin
-	XDB_EDIT_XMLSCHEMA.getGroupDefinitions(P_XSD_DIRECTORY);
+	XDB_EDIT_XMLSCHEMA.loadGroupDefinitions(P_XSD_DIRECTORY);
 	XDB_EDIT_XMLSCHEMA.expandRepeatingGroups(P_XML_SCHEMA);
 end;
 --

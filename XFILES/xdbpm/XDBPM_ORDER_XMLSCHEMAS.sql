@@ -14,7 +14,7 @@
  */
 
 --
--- XDPBM_XMLSCHEMA_WIZARD should be created under XDBPM
+-- XDPBM_XML_SCHEMA_WIZARD should be created under XDBPM
 --
 alter session set current_schema = XDBPM
 /
@@ -27,15 +27,14 @@ create or replace package XDBPM_ORDER_XMLSCHEMAS
 authid CURRENT_USER
 as
 
-  procedure schemaOrderingScript(P_OUTPUT_FOLDER VARCHAR2, P_XMLSCHEMA_FOLDER VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2, P_XMLSCHEMA_PATH VARCHAR2 DEFAULT NULL);
-  function orderSchemas(P_XMLSCHEMA_FOLDER VARCHAR2, P_XMLSCHEMA_PATH VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2) return XMLType;
-  function listGlobalElements(P_XMLSCHEMA_PATHS XMLTYPE) return XMLTYPE;
-
+  function createSchemaOrderingDocument(P_OUTPUT_FOLDER VARCHAR2, P_XML_SCHEMA_FOLDER VARCHAR2, P_LOCAL_PATH VARCHAR2, P_LOCATION_PREFIX VARCHAR2 DEFAULT '') return XMLType;
+  function getGlobalElementList(P_XML_SCHEMA_CONFIGURATION XMLTYPE) return XMLType;
+  
 end XDBPM_ORDER_XMLSCHEMAS;
 /
 show errors
 --
-create or replace synonym XDB_ORDER_XMLSCHEMAS for XDBPM_ORDER_XMLSCHEMAS
+create or replace synonym XDB_ORDER_XML_SCHEMAS for XDBPM_ORDER_XMLSCHEMAS
 /
 create or replace synonym XDB_ORDER_SCHEMAS for XDBPM_ORDER_XMLSCHEMAS
 /
@@ -52,6 +51,7 @@ as
   IS RECORD 
   ( 
      SCHEMA_PATH              VARCHAR2(700),
+     TARGET_NAMESPACE         VARCHAR2(700),
      DEPENDENCY_LIST          SCHEMA_LOCATION_LIST_T,
      EXTENDED_DEPENDENCY_LIST SCHEMA_LOCATION_LIST_T,
      RECURSIVE_PATH_COUNT     NUMBER
@@ -63,9 +63,9 @@ as
 function normalizePath(P_TARGET_PATH VARCHAR2, P_RELATIVE_PATH VARCHAR2, P_LOCATION_PREFIX VARCHAR2)
 return VARCHAR2
 as
-  V_BASE_FOLDER   VARCHAR2(700);
+  V_BASE_FOLDER    VARCHAR2(700);
   V_TARGET_FOLDER  VARCHAR2(700);
-  V_RELATIVE_PATH VARCHAR2(700);
+  V_RELATIVE_PATH  VARCHAR2(700);
 begin
 
   V_BASE_FOLDER := NULL;
@@ -106,7 +106,7 @@ begin
 
   end if;     
   
-  if (P_LOCATION_PREFIX is not null) THEN
+  if ((P_LOCATION_PREFIX is not null) and (P_LOCATION_PREFIX <> '')) THEN
     if (INSTR(P_RELATIVE_PATH,P_LOCATION_PREFIX)=1) THEN
       V_RELATIVE_PATH := V_TARGET_FOLDER || SUBSTR(V_RELATIVE_PATH,LENGTH(P_LOCATION_PREFIX)+1);
     end if;
@@ -116,21 +116,18 @@ begin
 
 end;
 --
-function getDependentList(P_TARGET_SCHEMA VARCHAR2, P_LOCATION_PREFIX VARCHAR2)
+function getDependentList(P_XML_SCHEMA XMLTYPE, P_XML_SCHEMA_PATH VARCHAR2, P_LOCATION_PREFIX VARCHAR2)
 return SCHEMA_LOCATION_LIST_T
 as
-  V_XML_SCHEMA           XMLType;
-  V_SCHEMA_LOCATION_LIST SCHEMA_LOCATION_LIST_T;
+  V_SCHEMA_LOCATION_LIST SCHEMA_LOCATION_LIST_T := SCHEMA_LOCATION_LIST_T();
   
   cursor getSchemaLocationList(C_XML_SCHEMA XMLType)
   is
   select distinct SCHEMA_LOCATION
     from (
            select SCHEMA_LOCATION
-             from XMLTable
-                  (
-                    xmlNamespaces
-                    (
+             from XMLTable(
+                    xmlNamespaces(
                       'http://xmlns.oracle.com/xdb/XDBResource.xsd' as "res",
                       'http://www.w3.org/2001/XMLSchema' as "xsd"
                     ),
@@ -143,10 +140,8 @@ as
             where NAMESPACE <> 'http://www.w3.org/XML/1998/namespace'
            union all  
            select SCHEMA_LOCATION
-             from XMLTable
-                  (
-                    xmlNamespaces
-                    (
+             from XMLTable(
+                    xmlNamespaces(
                       'http://xmlns.oracle.com/xdb/XDBResource.xsd' as "res",
                       'http://www.w3.org/2001/XMLSchema' as "xsd"
                     ),
@@ -165,71 +160,86 @@ as
          );
 
 begin
-	DBMS_OUTPUT.PUT_LINE(P_TARGET_SCHEMA);
-	V_XML_SCHEMA := xdburitype(P_TARGET_SCHEMA).getXML();
-	V_SCHEMA_LOCATION_LIST := SCHEMA_LOCATION_LIST_T();
-	for i in getSchemaLocationList(V_XML_SCHEMA)loop
+	for i in getSchemaLocationList(P_XML_SCHEMA)loop
 	  V_SCHEMA_LOCATION_LIST.extend();
-	  V_SCHEMA_LOCATION_LIST(V_SCHEMA_LOCATION_LIST.LAST) := NORMALIZEPATH(P_TARGET_SCHEMA,i.SCHEMA_LOCATION,P_LOCATION_PREFIX);
+	  V_SCHEMA_LOCATION_LIST(V_SCHEMA_LOCATION_LIST.LAST) := NORMALIZEPATH(P_XML_SCHEMA_PATH,i.SCHEMA_LOCATION,P_LOCATION_PREFIX);
   end loop;
   return V_SCHEMA_LOCATION_LIST;
 end;
 --
-procedure buildDependencyGraph(P_TARGET_SCHEMA VARCHAR2, P_LOCATION_PREFIX VARCHAR2, P_SCHEMA_DEPENDENCY_LIST IN OUT SCHEMA_DEPENDENCY_LIST_T) 
+procedure buildDependencyGraph(P_XML_SCHEMA_PATH VARCHAR2, P_LOCATION_PREFIX VARCHAR2, P_SCHEMA_DEPENDENCY_LIST IN OUT SCHEMA_DEPENDENCY_LIST_T) 
 as
   V_SCHEMA_DEPENDENCY_REC  SCHEMA_DEPENDENCY_REC;
-  V_TARGET_SCHEMA          VARCHAR2(700);
-  
+  V_XML_SCHEMA_PATH        VARCHAR2(700);
+  V_XML_SCHEMA             XMLType;
+
   cursor schemaRegistered
   is
   select 1 
     from ALL_XML_SCHEMAS
-   where SCHEMA_URL = P_TARGET_SCHEMA;
-   
+   where SCHEMA_URL = P_XML_SCHEMA_PATH;
+
+  cursor getTargetNamespace(C_XML_SCHEMA XMLType)
+  is
+  select TARGET_NAMESPACE
+    from XMLTable(
+           xmlNamespaces(
+             'http://xmlns.oracle.com/xdb/XDBResource.xsd' as "res",
+             'http://www.w3.org/2001/XMLSchema' as "xsd"
+           ),
+           '/xsd:schema'
+           passing C_XML_SCHEMA
+           columns
+             TARGET_NAMESPACE       VARCHAR2(700) path '@targetNamespace'
+         );   
 begin
-$IF $$DEBUG $THEN
-   XDB_OUTPUT.writeTraceFileEntry('  Processing XML Schema : "' || P_TARGET_SCHEMA|| '".');
-$END
+  $IF $$DEBUG $THEN
+  XDB_OUTPUT.writeTraceFileEntry('  Processing XML Schema : "' || P_XML_SCHEMA_PATH|| '".');
+  $END
 
   -- Check if this schema has already been processed.. 
   
   for s in schemaRegistered loop
-$IF $$DEBUG $THEN
+    $IF $$DEBUG $THEN
     XDB_OUTPUT.writeTraceFileEntry('Schema already Registered.');
-$END
+    $END
     return;
   end loop;
   
-
   for i in 1..P_SCHEMA_DEPENDENCY_LIST.count() loop
-    if (P_SCHEMA_DEPENDENCY_LIST(i).SCHEMA_PATH = P_TARGET_SCHEMA) then
-$IF $$DEBUG $THEN
+    if (P_SCHEMA_DEPENDENCY_LIST(i).SCHEMA_PATH = P_XML_SCHEMA_PATH) then
+      $IF $$DEBUG $THEN
       XDB_OUTPUT.writeTraceFileEntry('Schema already Processed.');
-$END      
+      $END      
       return;
     end if;
   end loop;
   
-  V_SCHEMA_DEPENDENCY_REC.SCHEMA_PATH := P_TARGET_SCHEMA;
-  V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST := getDependentList(P_TARGET_SCHEMA,P_LOCATION_PREFIX);
+	V_XML_SCHEMA := xdburitype(P_XML_SCHEMA_PATH).getXML();
 
-$IF $$DEBUG $THEN
-   XDB_OUTPUT.writeTraceFileEntry('Checking Dependencies.');
-$END
+  V_SCHEMA_DEPENDENCY_REC.SCHEMA_PATH := P_XML_SCHEMA_PATH;
+  for n in getTargetNamespace(V_XML_SCHEMA) loop
+    V_SCHEMA_DEPENDENCY_REC.TARGET_NAMESPACE := n.TARGET_NAMESPACE;
+  end loop;
+  V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST := getDependentList(V_XML_SCHEMA,P_XML_SCHEMA_PATH,P_LOCATION_PREFIX);
+
+  $IF $$DEBUG $THEN
+  XDB_OUTPUT.writeTraceFileEntry('Checking Dependencies.');
+  $END
   
   P_SCHEMA_DEPENDENCY_LIST.extend();
   P_SCHEMA_DEPENDENCY_LIST(P_SCHEMA_DEPENDENCY_LIST.LAST) := V_SCHEMA_DEPENDENCY_REC;
   
-$IF $$DEBUG $THEN
+  $IF $$DEBUG $THEN
   XDB_OUTPUT.writeTraceFileEntry('Dependency count  = ' || V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST.count());
-$END 
+  $END 
   if (V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST.count() > 0) then
     for i in V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST.FIRST..V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST.LAST loop
-$IF $$DEBUG $THEN
+      $IF $$DEBUG $THEN
       XDB_OUTPUT.writeTraceFileEntry('Dependency [' || i || '] : = "' || V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST(i) || '".');
-$END     
-      V_TARGET_SCHEMA := V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST(i);
-      buildDependencyGraph(V_TARGET_SCHEMA, P_LOCATION_PREFIX, P_SCHEMA_DEPENDENCY_LIST);
+      $END     
+      V_XML_SCHEMA_PATH:= V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST(i);
+      buildDependencyGraph(V_XML_SCHEMA_PATH, P_LOCATION_PREFIX, P_SCHEMA_DEPENDENCY_LIST);
     end loop;
   end if;
   
@@ -350,16 +360,15 @@ begin
   end loop;
 end;
 --
-function processSchema(P_CURRENT_SCHEMA VARCHAR2, P_SCHEMA_FOLDER VARCHAR2, P_LOCATION_HINT_PREFIX VARCHAR2, P_SCHEMA_DEPENDENCY_LIST IN OUT SCHEMA_DEPENDENCY_LIST_T, P_FORCE BOOLEAN)
+function processSchema(P_CURRENT_SCHEMA SCHEMA_DEPENDENCY_REC, P_SCHEMA_FOLDER VARCHAR2, P_LOCATION_PREFIX VARCHAR2, P_SCHEMA_DEPENDENCY_LIST IN OUT SCHEMA_DEPENDENCY_LIST_T, P_FORCE BOOLEAN)
 return XMLType
 as
   V_BUFFER               VARCHAR2(32000);
   V_SCHEMA_LOCATION_HINT VARCHAR2(700);
   V_NEXT_SCHEMA          XMLType;
-  V_FORCE_OPTION         VARCHAR2(5) := XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_FORCE);
 begin
 	
-	V_SCHEMA_LOCATION_HINT := P_LOCATION_HINT_PREFIX || SUBSTR(P_CURRENT_SCHEMA,LENGTH(P_SCHEMA_FOLDER)+1);
+	V_SCHEMA_LOCATION_HINT := P_LOCATION_PREFIX || SUBSTR(P_CURRENT_SCHEMA.SCHEMA_PATH,LENGTH(P_SCHEMA_FOLDER)+1);
 	
 	-- Remove leading '/' if the only '/' is the leading '/'
 	
@@ -367,27 +376,28 @@ begin
 	  V_SCHEMA_LOCATION_HINT := SUBSTR(V_SCHEMA_LOCATION_HINT,2);
 	end if;
 
-  select xmlElement
-         (
-           "Schema",
+  select xmlElement(
+           "SchemaInformation",
  					 xmlAttributes('http://xmlns.oracle.com/xdb/pm/registrationConfiguration' as "xmlns"),
-           xmlElement
-           (
-             "SchemaLocationHint",
+           xmlElement(
+             "schemaLocationHint",
              xmlAttributes('http://xmlns.oracle.com/xdb/pm/registrationConfiguration' as "xmlns"),
              V_SCHEMA_LOCATION_HINT
            ),           
-           xmlElement
-           (
-             "RepositoryPath",
+           xmlElement(
+             "targetNamespace",
              xmlAttributes('http://xmlns.oracle.com/xdb/pm/registrationConfiguration' as "xmlns"),
-             P_CURRENT_SCHEMA
+             P_CURRENT_SCHEMA.TARGET_NAMESPACE
            ),
-           xmlElement
-           (
-             "Force",
+           xmlElement(
+             "repositoryPath",
              xmlAttributes('http://xmlns.oracle.com/xdb/pm/registrationConfiguration' as "xmlns"),
-             V_FORCE_OPTION
+             P_CURRENT_SCHEMA.SCHEMA_PATH
+           ),
+           xmlElement(
+             "force",
+             xmlAttributes('http://xmlns.oracle.com/xdb/pm/registrationConfiguration' as "xmlns"),
+             XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_FORCE)
            )
          )
     into V_NEXT_SCHEMA
@@ -398,7 +408,7 @@ begin
       if (P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST.count() > 0) then
         for j in P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST.FIRST..P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST.LAST loop
           if (P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST.exists(j)) THEN
-	          if (P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST(j) = P_CURRENT_SCHEMA) THEN
+	          if (P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST(j) = P_CURRENT_SCHEMA.SCHEMA_PATH) THEN
 	             P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST.delete(j);
 	             EXIT;
 	          end if;
@@ -411,7 +421,7 @@ begin
   return V_NEXT_SCHEMA;
 end;
 --
-function processExtendedDependencyList(P_SCHEMA_ORDERING IN OUT XMLType, P_LOCATION_HINT_PREFIX VARCHAR2, P_SCHEMA_FOLDER VARCHAR2, P_SCHEMA_LOCATION_LIST SCHEMA_LOCATION_LIST_T,P_SCHEMA_DEPENDENCY_LIST IN OUT SCHEMA_DEPENDENCY_LIST_T)
+function processExtendedDependencyList(P_XML_SCHEMA_CONFIGURATION IN OUT XMLType, P_LOCATION_PREFIX VARCHAR2, P_SCHEMA_FOLDER VARCHAR2, P_SCHEMA_LOCATION_LIST SCHEMA_LOCATION_LIST_T,P_SCHEMA_DEPENDENCY_LIST IN OUT SCHEMA_DEPENDENCY_LIST_T)
 return XMLType
 as
   V_NEXT_SCHEMA       XMLType;
@@ -421,26 +431,26 @@ begin
       if (P_SCHEMA_DEPENDENCY_LIST.exists(j)) THEN
         if (P_SCHEMA_LOCATION_LIST(i) = P_SCHEMA_DEPENDENCY_LIST(j).SCHEMA_PATH) THEN
           if j < P_SCHEMA_DEPENDENCY_LIST.LAST then
-            V_NEXT_SCHEMA := processSchema(P_SCHEMA_DEPENDENCY_LIST(j).SCHEMA_PATH,P_SCHEMA_FOLDER,P_LOCATION_HINT_PREFIX,P_SCHEMA_DEPENDENCY_LIST,TRUE);
+            V_NEXT_SCHEMA := processSchema(P_SCHEMA_DEPENDENCY_LIST(j),P_SCHEMA_FOLDER,P_LOCATION_PREFIX,P_SCHEMA_DEPENDENCY_LIST,TRUE);
             select appendChildXML
                    (
-                     P_SCHEMA_ORDERING,
-                     '/RegistrationList',
+                     P_XML_SCHEMA_CONFIGURATION,
+                     '/SchemaRegistrationConfiguration',
 										 V_NEXT_SCHEMA,
 										 'xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration"'                     
                    )
-              into P_SCHEMA_ORDERING
+              into P_XML_SCHEMA_CONFIGURATION
               from DUAL;
           else
-            V_NEXT_SCHEMA := processSchema(P_SCHEMA_DEPENDENCY_LIST(j).SCHEMA_PATH,P_SCHEMA_FOLDER,P_LOCATION_HINT_PREFIX,P_SCHEMA_DEPENDENCY_LIST,FALSE);
+            V_NEXT_SCHEMA := processSchema(P_SCHEMA_DEPENDENCY_LIST(j),P_SCHEMA_FOLDER,P_LOCATION_PREFIX,P_SCHEMA_DEPENDENCY_LIST,FALSE);
             select appendChildXML
                    (
-                     P_SCHEMA_ORDERING,
-                     '/RegistrationList',
+                     P_XML_SCHEMA_CONFIGURATION,
+                     '/SchemaRegistrationConfiguration',
 										 V_NEXT_SCHEMA,
 										 'xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration"'                                         
                    )
-              into P_SCHEMA_ORDERING
+              into P_XML_SCHEMA_CONFIGURATION
               from DUAL;
           end if;
           P_SCHEMA_DEPENDENCY_LIST.delete(j);
@@ -448,21 +458,17 @@ begin
       end if;
     end loop;
   end loop;
-  return P_SCHEMA_ORDERING;
+  return P_XML_SCHEMA_CONFIGURATION;
 end;
 --
-function  processDependencyGraph(P_SCHEMA_DEPENDENCY_LIST IN OUT SCHEMA_DEPENDENCY_LIST_T,P_SCHEMA_FOLDER VARCHAR2, P_LOCATION_HINT_PREFIX VARCHAR2)
+function  processDependencyGraph(P_SCHEMA_DEPENDENCY_LIST IN OUT SCHEMA_DEPENDENCY_LIST_T,P_XML_SCHEMA_CONFIGURATION IN OUT XMLTYPE,P_SCHEMA_FOLDER VARCHAR2, P_LOCATION_PREFIX VARCHAR2)
 return XMLType
 as
   V_SCHEMA_PROCESSED  BOOLEAN := TRUE;
   V_INDEX             BINARY_INTEGER;
-  V_SCHEMA_ORDERING   XMLType;
   V_NEXT_SCHEMA       XMLType;
 begin
 
-	select XMLElement("RegistrationList", xmlAttributes('http://xmlns.oracle.com/xdb/pm/registrationConfiguration' as "xmlns")) 
-	  into V_SCHEMA_ORDERING
-	  from DUAL;
 	
 	WHILE (P_SCHEMA_DEPENDENCY_LIST.count() > 0) loop
   	WHILE (V_SCHEMA_PROCESSED) LOOP
@@ -471,15 +477,15 @@ begin
   	    for i in P_SCHEMA_DEPENDENCY_LIST.FIRST..P_SCHEMA_DEPENDENCY_LIST.LAST  LOOP
           if (P_SCHEMA_DEPENDENCY_LIST.exists(i)) THEN
             if (P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST.count() = 0) THEN
-              V_NEXT_SCHEMA := processSchema(P_SCHEMA_DEPENDENCY_LIST(i).SCHEMA_PATH,P_SCHEMA_FOLDER,P_LOCATION_HINT_PREFIX,P_SCHEMA_DEPENDENCY_LIST,FALSE);
+              V_NEXT_SCHEMA := processSchema(P_SCHEMA_DEPENDENCY_LIST(i),P_SCHEMA_FOLDER,P_LOCATION_PREFIX,P_SCHEMA_DEPENDENCY_LIST,FALSE);
               select appendChildXML
                      (
-                       V_SCHEMA_ORDERING,
-                       '/RegistrationList',
+                       P_XML_SCHEMA_CONFIGURATION,
+                       '/SchemaRegistrationConfiguration',
                        V_NEXT_SCHEMA,
 										   'xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration"'                     
                      )
-                into V_SCHEMA_ORDERING
+                into P_XML_SCHEMA_CONFIGURATION
                 from DUAL;
   	          P_SCHEMA_DEPENDENCY_LIST.delete(i);
 	            V_SCHEMA_PROCESSED := TRUE;
@@ -500,185 +506,57 @@ begin
   	  -- Register the last dependent schema with FORCE = FALSE, since all cycles should be resolvable.
   	  --
   	  V_INDEX := P_SCHEMA_DEPENDENCY_LIST.FIRST;
-  	  V_NEXT_SCHEMA := processSchema(P_SCHEMA_DEPENDENCY_LIST(V_INDEX).SCHEMA_PATH,P_SCHEMA_FOLDER,P_LOCATION_HINT_PREFIX,P_SCHEMA_DEPENDENCY_LIST,TRUE);
+  	  V_NEXT_SCHEMA := processSchema(P_SCHEMA_DEPENDENCY_LIST(V_INDEX),P_SCHEMA_FOLDER,P_LOCATION_PREFIX,P_SCHEMA_DEPENDENCY_LIST,TRUE);
       select appendChildXML
              (
-               V_SCHEMA_ORDERING,
-               '/RegistrationList',
+               P_XML_SCHEMA_CONFIGURATION,
+               '/SchemaRegistrationConfiguration',
                V_NEXT_SCHEMA,
 						   'xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration"'                     
              )
-        into V_SCHEMA_ORDERING
+        into P_XML_SCHEMA_CONFIGURATION
         from DUAL;
-  	  V_SCHEMA_ORDERING := processExtendedDependencyList(V_SCHEMA_ORDERING, P_LOCATION_HINT_PREFIX, P_SCHEMA_FOLDER, P_SCHEMA_DEPENDENCY_LIST(V_INDEX).EXTENDED_DEPENDENCY_LIST,P_SCHEMA_DEPENDENCY_LIST);
+  	  P_XML_SCHEMA_CONFIGURATION := processExtendedDependencyList(P_XML_SCHEMA_CONFIGURATION, P_LOCATION_PREFIX, P_SCHEMA_FOLDER, P_SCHEMA_DEPENDENCY_LIST(V_INDEX).EXTENDED_DEPENDENCY_LIST,P_SCHEMA_DEPENDENCY_LIST);
       P_SCHEMA_DEPENDENCY_LIST.delete(V_INDEX);
       V_SCHEMA_PROCESSED := TRUE;
     end if; 	  
   end loop;
-  return V_SCHEMA_ORDERING;
+  return P_XML_SCHEMA_CONFIGURATION;
 end;
 --
-function orderSchemas(P_XMLSCHEMA_FOLDER VARCHAR2, P_XMLSCHEMA_PATH VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2) 
-return XMLType
+function getFileName(P_PATH VARCHAR2)
+return VARCHAR2
 as
-  V_SCHEMA_DEPENDENCY_LIST SCHEMA_DEPENDENCY_LIST_T   := SCHEMA_DEPENDENCY_LIST_T();
-  V_SCHEMA_ORDERING        XMLTYPE;
-begin  	
-
-$IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('Processing XML Schema "' || P_XMLSCHEMA_FOLDER || '/' || P_XMLSCHEMA_PATH || '".');
-$END
-  buildDependencyGraph(P_XMLSCHEMA_FOLDER || '/' || P_XMLSCHEMA_PATH, P_SCHEMA_LOCATION_PREFIX, V_SCHEMA_DEPENDENCY_LIST);  
-
-$IF $$DEBUG $THEN
-  dumpDependencyGraph(V_SCHEMA_DEPENDENCY_LIST);
-  XDB_OUTPUT.flushTraceFile();
-$END
-  V_SCHEMA_ORDERING := processDependencyGraph(V_SCHEMA_DEPENDENCY_LIST, P_XMLSCHEMA_FOLDER, P_SCHEMA_LOCATION_PREFIX);
-  return V_SCHEMA_ORDERING;
-end;
---
-function orderSchemas(P_XMLSCHEMA_FOLDER VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2) 
-return XMLType
-as
-  V_SCHEMA_DEPENDENCY_LIST SCHEMA_DEPENDENCY_LIST_T   := SCHEMA_DEPENDENCY_LIST_T();
-  V_SCHEMA_ORDERING        XMLTYPE;
-  
-  cursor getXMLSchemas
-  is
-  select ANY_PATH
-	  from RESOURCE_VIEW
-	 where under_path(res,P_XMLSCHEMA_FOLDER) = 1
-	   and XMLExists('declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :) $R/Resource[ends-with(DisplayName,".xsd")]' passing RES as "R");
-
+  V_FILENAME VARCHAR2(4000);
 begin
-$IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('Processing XML Schemas for folder "' || P_XMLSCHEMA_FOLDER || '".');
-$END  
-  
-	for x in getXMLSchemas() loop
-	  buildDependencyGraph(x.ANY_PATH, P_SCHEMA_LOCATION_PREFIX, V_SCHEMA_DEPENDENCY_LIST);  
-	end loop;
-
-$IF $$DEBUG $THEN
-  dumpDependencyGraph(V_SCHEMA_DEPENDENCY_LIST);
-  XDB_OUTPUT.flushTraceFile();
-$END
-  
-  V_SCHEMA_ORDERING := processDependencyGraph(V_SCHEMA_DEPENDENCY_LIST, P_XMLSCHEMA_FOLDER, P_SCHEMA_LOCATION_PREFIX);
-  return V_SCHEMA_ORDERING;
-end;
---
-procedure declareExceptions(P_SCRIPT IN OUT CLOB)
-as
-  V_BUFFER     VARCHAR2(32000);
-begin
-    V_BUFFER := '  GENERIC_ERROR exception;' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(P_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := '  PRAGMA EXCEPTION_INIT( GENERIC_ERROR , -31061 ); ' || C_BLANK_LINE;
-    DBMS_LOB.WRITEAPPEND(P_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := '  NO_MATCHING_NODES exception;' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(P_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := '  PRAGMA EXCEPTION_INIT( NO_MATCHING_NODES , -64405 ); ' || C_BLANK_LINE;
-    DBMS_LOB.WRITEAPPEND(P_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-end;
---
-procedure addExceptionBlock(P_SCRIPT IN OUT CLOB,P_STATEMENT VARCHAR2)
-as
-  V_BUFFER     VARCHAR2(32000);
-begin
-
-  V_BUFFER := '  begin ' || C_NEW_LINE;
-  DBMS_LOB.WRITEAPPEND(P_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-  DBMS_LOB.WRITEAPPEND(P_SCRIPT,LENGTH(P_STATEMENT),P_STATEMENT);
-     
-  V_BUFFER := '  exception ' || C_NEW_LINE;
-  DBMS_LOB.WRITEAPPEND(P_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-  V_BUFFER := '    when GENERIC_ERROR or NO_MATCHING_NODES then' || C_NEW_LINE;
-  DBMS_LOB.WRITEAPPEND(P_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-  V_BUFFER := '      NULL;' || C_NEW_LINE;
-  DBMS_LOB.WRITEAPPEND(P_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-  V_BUFFER := '    when OTHERS then ' || C_NEW_LINE;
-  DBMS_LOB.WRITEAPPEND(P_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-  V_BUFFER := '      RAISE;' || C_NEW_LINE;
-  DBMS_LOB.WRITEAPPEND(P_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-  V_BUFFER := '  end;' || C_BLANK_LINE;
-  DBMS_LOB.WRITEAPPEND(P_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-end;
---
-procedure schemaOrderingScript(P_OUTPUT_FOLDER VARCHAR2, P_XMLSCHEMA_FOLDER VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2, P_XMLSCHEMA_PATH VARCHAR2 DEFAULT NULL) 
---
--- Generate the Schema Ordering Script for a particular XML Schema. 
--- 
--- P_OUTPUT_FOLDER          : The target folder for all scripts and log files.
---                       
--- P_XMLSCHEMA_FOLDER       : The folder containing all the XML Schemas required to successfully register the specified XML Schema.
---
--- P_XMLSCHEMA_PATH         : The relative path (from P_XMLSCHEMA_FOLDER) to the xsd file to be registered.
---
--- P_SCHEMA_LOCATION_PREFIX : The prefix for the schema location hint to be used when registering the XML Schema. The prefix will be concatenated 
---                            with the value of P_XMLSCHEMA_PATH to create the schema location hint. 
---                            
-as
-  V_SCHEMA_ORDERING        XMLTYPE;
-  V_SCHEMA_FILE            VARCHAR2(700);
-  V_SCHEMA_NAME            VARCHAR2(700);
-  V_SCRIPT_FILE            VARCHAR2(700);
-  V_TRACE_FILE             VARCHAR2(700);
-  V_CONFIGURATION_FILE     VARCHAR2(700);
-  V_COMMENT                VARCHAR2(4000);
-  V_RESULT                 BOOLEAN;
-begin
-
-	if (P_XMLSCHEMA_PATH is NULL) then
-	  V_SCHEMA_NAME := P_XMLSCHEMA_FOLDER;
-  else
-    --
-    -- Assume Schema Path ends in ".xsd"
-    --
-    V_SCHEMA_NAME := P_XMLSCHEMA_PATH;
-    V_SCHEMA_NAME := substr(V_SCHEMA_NAME,1,instr(V_SCHEMA_NAME,'.',-1)-1);
-  end if;
-
-  if instr(V_SCHEMA_NAME,'/',-1) > 1 then
-	  V_SCHEMA_NAME := substr(V_SCHEMA_NAME,instr(V_SCHEMA_NAME,'/',-1)+1);
+  V_FILENAME := P_PATH;
+  V_FILENAME := substr(V_FILENAME,1,instr(V_FILENAME,'.',-1)-1);
+	
+  if instr(V_FILENAME,'/',-1) > 1 then
+	  V_FILENAME := substr(V_FILENAME,instr(V_FILENAME,'/',-1)+1);
 	end if;
-
-  V_TRACE_FILE         := P_OUTPUT_FOLDER || '/' || V_SCHEMA_NAME || '.log';
-  V_SCRIPT_FILE        := P_OUTPUT_FOLDER || '/' || V_SCHEMA_NAME || '.sql';
-  V_CONFIGURATION_FILE := P_OUTPUT_FOLDER || '/' || V_SCHEMA_NAME || '.xml';
-  
-	XDB_OUTPUT.createOutputFile(V_TRACE_FILE,true);
-
-  if (P_XMLSCHEMA_PATH is not null) then
-    V_SCHEMA_ORDERING := orderSchemas(P_XMLSCHEMA_FOLDER, P_XMLSCHEMA_PATH, P_SCHEMA_LOCATION_PREFIX);
-  else
-    V_SCHEMA_ORDERING := orderSchemas(P_XMLSCHEMA_FOLDER, P_SCHEMA_LOCATION_PREFIX);
-  end if;
-
-  if DBMS_XDB.existsResource(V_CONFIGURATION_FILE) then
-    DBMS_XDB.deleteResource(V_CONFIGURATION_FILE);
-  end if;
-  
-  V_RESULT := DBMS_XDB.createResource(V_CONFIGURATION_FILE,V_SCHEMA_ORDERING); 
-  commit;
-  
-  if (P_XMLSCHEMA_PATH is NULL) then
-    V_COMMENT :=  '--' ||  C_NEW_LINE || '-- Schema Registration Script for folder "' || P_XMLSCHEMA_FOLDER || C_NEW_LINE || '--' || C_NEW_LINE;
-  else
-    V_COMMENT :=  '--' ||  C_NEW_LINE || '-- Schema Registration Script for XMLSchema "' || P_XMLSCHEMA_FOLDER || '/' || P_XMLSCHEMA_PATH || C_NEW_LINE || '--' || C_NEW_LINE;
-  end if;
-
-  XDB_OPTIMIZE_XMLSCHEMA.printSchemaRegistrationScript(V_SCRIPT_FILE, V_COMMENT, V_SCHEMA_ORDERING, P_XMLSCHEMA_FOLDER);	
-
+	
+	return V_FILENAME;
 end;
 --
-function listGlobalElements(P_XMLSCHEMA_PATHS XMLTYPE) 
+function generateOutputFilename(P_XML_SCHEMA_FOLDER VARCHAR2, P_LOCAL_PATH VARCHAR2,P_FILENAME_PREFIX VARCHAR2,P_FILENAME_SUFFIX VARCHAR2) 
+return VARCHAR2
+as
+  V_FILENAME VARCHAR2(4000);
+begin
+  if (P_LOCAL_PATH is not null) then
+    V_FILENAME := getFileName(P_LOCAL_PATH);
+  else
+    V_FILENAME := getFileName(P_XML_SCHEMA_FOLDER);
+  end if;
+  V_FILENAME := P_FILENAME_PREFIX || '.' || V_FILENAME || '.' || P_FILENAME_SUFFIX;
+  if (SUBSTR(V_FILENAME,1,1) != '/') then
+    V_FILENAME := '/' || V_FILENAME;
+  end if;
+  return V_FILENAME;
+end;
+--
+function getGlobalElementList(P_XML_SCHEMA_CONFIGURATION XMLTYPE) 
 return XMLTYPE
 as
   C_XQUERY CONSTANT VARCHAR2(32000)  :=
@@ -722,20 +600,20 @@ as
                       $schemaList/xs:schema[@targetNamespace=fn:substring-after($e,":") and xs:element[@name=fn:substring-before($e,":")]]
     for $sch in $schemas
         let $schemaIndex        := xdb:index-of-node($schemaList/xs:schema,$sch)
-        let $schema             := $schemaInfo/rc:RegistrationList/rc:Schema[$schemaIndex]
-        let $schemaLocationHint := $schema/rc:SchemaLocationHint/text()
-        let $repositoryPath     := $schema/rc:RepositoryPath/text()
+        let $schema             := $schemaInfo/rc:SchemaRegistrationConfiguration/rc:SchemaInformation[$schemaIndex]
+        let $schemaLocationHint := $schema/rc:schemaLocationHint/text()
+        let $repositoryPath     := $schema/rc:repositoryPath/text()
         let $targetNamespace    := fn:data($sch/@targetNamespace)
         order by $targetNamespace, $repositoryPath
-        return element table {
-                 element repositoryPath {$repositoryPath},
-                 element schemaLocationHint {$schemaLocationHint},
-                 element namespace {$targetNamespace},
-                 element globalElement{ fn:substring-before($e,":")}
+        return element rc:Table {
+                 element rc:repositoryPath {$repositoryPath},
+                 element rc:schemaLocationHint {$schemaLocationHint},
+                 element rc:namespace {$targetNamespace},
+                 element rc:globalElement{ fn:substring-before($e,":")}
                }
   };
   
-  let $schemaList := for $path in $schemaInfo/rc:RegistrationList/rc:Schema/rc:RepositoryPath
+  let $schemaList := for $path in $schemaInfo/rc:SchemaRegistrationConfiguration/rc:SchemaInformation/rc:repositoryPath
                        return fn:doc($path/text())
 
   (: return $schemaList :)
@@ -762,7 +640,7 @@ as
 begin
 	select XMLQUERY(
 	         C_XQUERY 
-	         passing P_XMLSCHEMA_PATHS as "schemaInfo" 
+	         passing P_XML_SCHEMA_CONFIGURATION as "schemaInfo" 
 	         returning content
 	       )
 	  into V_GLOBAL_ELEMENT_LIST
@@ -770,6 +648,128 @@ begin
   return V_GLOBAL_ELEMENT_LIST;
 end;
 --
+function orderSchemas(P_OUTPUT_FOLDER VARCHAR2, P_XML_SCHEMA_FOLDER VARCHAR2, P_LOCAL_PATH VARCHAR2, P_LOCATION_PREFIX VARCHAR2) 
+return XMLType
+as
+  V_SCHEMA_DEPENDENCY_LIST          SCHEMA_DEPENDENCY_LIST_T   := SCHEMA_DEPENDENCY_LIST_T();
+  V_XML_SCHEMA_CONFIGURATION        XMLTYPE;
+  V_GLOBAL_ELEMENT_LIST             XMLTYPE;
+  V_TARGET_PATH                     VARCHAR2(4000);
+  
+  cursor getXMLSchemas
+  is
+  select ANY_PATH
+	  from RESOURCE_VIEW
+	 where under_path(res,P_XML_SCHEMA_FOLDER) = 1
+	   and XMLExists('declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :) $R/Resource[ends-with(DisplayName,".xsd")]' passing RES as "R");
+
+  V_TRACE_FILENAME             VARCHAR2(700);
+  V_CONFIGURATION_FILENAME     VARCHAR2(700);
+  V_DELETE_SCRIPT_FILENAME     VARCHAR2(700);
+  V_TYPE_OPTIMIZATION_FILENAME VARCHAR2(700);
+  V_REGISTER_SCRIPT_FILENAME   VARCHAR2(700);
+  V_DOCUMENT_UPLOAD_FILENAME   VARCHAR2(700);
+begin  	
+ 
+  V_TRACE_FILENAME             := P_OUTPUT_FOLDER || generateOutputFileName(P_XML_SCHEMA_FOLDER,P_LOCAL_PATH,'SchemaRegistrationOrdering','log');
+  V_CONFIGURATION_FILENAME     := P_OUTPUT_FOLDER || generateOutputFileName(P_XML_SCHEMA_FOLDER,P_LOCAL_PATH,'SchemaRegistrationConfiguration','xml');
+  V_DELETE_SCRIPT_FILENAME     := P_OUTPUT_FOLDER || generateOutputFileName(P_XML_SCHEMA_FOLDER,P_LOCAL_PATH,'DeleteSchemas','sql');
+	V_TYPE_OPTIMIZATION_FILENAME := P_OUTPUT_FOLDER || generateOutputFileName(P_XML_SCHEMA_FOLDER,P_LOCAL_PATH,'TypeOptimization','log');
+  V_REGISTER_SCRIPT_FILENAME   := P_OUTPUT_FOLDER || generateOutputFileName(P_XML_SCHEMA_FOLDER,P_LOCAL_PATH,'RegisterSchema','sql');
+  V_DOCUMENT_UPLOAD_FILENAME   := P_OUTPUT_FOLDER || generateOutputFileName(P_XML_SCHEMA_FOLDER,P_LOCAL_PATH,'InstanceUpload','log');
+
+ 	XDB_OUTPUT.createOutputFile(V_TRACE_FILENAME,true);
+ 
+  if (P_LOCAL_PATH is NULL) then
+    V_TARGET_PATH := P_XML_SCHEMA_FOLDER;
+    $IF $$DEBUG $THEN
+       XDB_OUTPUT.writeTraceFileEntry('Processing XML Schemas for folder "' || V_TARGET_PATH || '".');
+    $END  
+
+  	for x in getXMLSchemas() loop
+	    buildDependencyGraph(x.ANY_PATH, P_LOCATION_PREFIX, V_SCHEMA_DEPENDENCY_LIST);  
+	  end loop;
+  else
+    V_TARGET_PATH := P_XML_SCHEMA_FOLDER || '/' || P_LOCAL_PATH;
+    $IF $$DEBUG $THEN
+       XDB_OUTPUT.writeTraceFileEntry('Processing XML Schema "' || V_TARGET_PATH || '".');
+    $END
+    
+    buildDependencyGraph(P_XML_SCHEMA_FOLDER || '/' || P_LOCAL_PATH, P_LOCATION_PREFIX, V_SCHEMA_DEPENDENCY_LIST);  
+  end if;
+   
+  $IF $$DEBUG $THEN
+    dumpDependencyGraph(V_SCHEMA_DEPENDENCY_LIST);
+    XDB_OUTPUT.flushTraceFile();
+  $END
+  
+	select XMLElement("SchemaRegistrationConfiguration", 
+	         xmlAttributes(
+	            'http://xmlns.oracle.com/xdb/pm/registrationConfiguration' as "xmlns",
+	            P_LOCATION_PREFIX as "schemaLocationPrefix",
+	            V_TARGET_PATH as "target"
+	         ),
+	         xmlElement("FileNames",
+	           xmlElement("registrationConfigurationFile",V_CONFIGURATION_FILENAME),
+	           xmlElement("registrationScriptFile",V_REGISTER_SCRIPT_FILENAME),
+	           xmlElement("deleteScriptFile",V_DELETE_SCRIPT_FILENAME),
+             xmlElement("schemaOrderingTraceFile",V_TRACE_FILENAME),
+	           xmlElement("typeOptimizationTraceFile",V_TYPE_OPTIMIZATION_FILENAME),
+	           xmlElement("instanceUploadLog",V_DOCUMENT_UPLOAD_FILENAME)
+           )
+	       )
+	  into V_XML_SCHEMA_CONFIGURATION
+	  from DUAL;
+	
+  V_XML_SCHEMA_CONFIGURATION := processDependencyGraph(V_SCHEMA_DEPENDENCY_LIST, V_XML_SCHEMA_CONFIGURATION, P_XML_SCHEMA_FOLDER, P_LOCATION_PREFIX);
+  V_GLOBAL_ELEMENT_LIST := getGlobalElementList(V_XML_SCHEMA_CONFIGURATION) ;
+
+  select XMLQUERY(
+          'declare default element namespace "http://xmlns.oracle.com/xdb/pm/registrationConfiguration"; (: :)
+           copy $NEWXML := $CONFIG modify (
+                                     for $TARGET in $NEWXML/SchemaRegistrationConfiguration
+                                         return insert nodes $TABLES as last into $TARGET
+                                   )
+                 return $NEWXML'
+           passing V_XML_SCHEMA_CONFIGURATION as "CONFIG",
+                   V_GLOBAL_ELEMENT_LIST as "TABLES"
+           returning content
+         )
+    into V_XML_SCHEMA_CONFIGURATION
+    from dual;
+    
+  XDB_UTILITIES.uploadResource(V_CONFIGURATION_FILENAME,V_XML_SCHEMA_CONFIGURATION,XDB_CONSTANTS.VERSION);
+  XDB_OUTPUT.flushOutputFile();
+  
+  return V_XML_SCHEMA_CONFIGURATION;
+end;
+--
+function createSchemaOrderingDocument(P_OUTPUT_FOLDER VARCHAR2, P_XML_SCHEMA_FOLDER VARCHAR2, P_LOCAL_PATH VARCHAR2, P_LOCATION_PREFIX VARCHAR2 DEFAULT '')
+return XMLType
+--
+-- Generate the Schema Ordering Document for a particular XML Schema or all the schemas in a particular folder.
+-- 
+-- P_OUTPUT_FOLDER          : The target folder for the Ordering document and log file. 
+--                       
+-- P_XML_SCHEMA_FOLDER       : The folder containing all the XML Schemas required to successfully register the specified XML Schema.
+--
+-- P_LOCAL_PATH             : The relative path (from P_XML_SCHEMA_FOLDER) to the primary XML Schema.
+--
+-- P_LOCATION_PREFIX        : The prefix for the schema location hint to be used when registering the XML Schema. The prefix will be concatenated 
+--                            with the value of P_LOCAL_PATH to create the schema location hint. 
+--                            
+as
+  V_XML_SCHEMA_CONFIGURATION        XMLTYPE;
+begin
+  V_XML_SCHEMA_CONFIGURATION := orderSchemas(P_OUTPUT_FOLDER, P_XML_SCHEMA_FOLDER, P_LOCAL_PATH, P_LOCATION_PREFIX); 
+  return V_XML_SCHEMA_CONFIGURATION;
+end;
+--
+begin
+	NULL;
+	$IF $$DEBUG $THEN
+    XDB_OUTPUT.createTraceFile('/public/XDBPM_ORDER_XMLSCHEMAS.log');
+  $END
 end XDBPM_ORDER_XMLSCHEMAS;
 /
 show errors

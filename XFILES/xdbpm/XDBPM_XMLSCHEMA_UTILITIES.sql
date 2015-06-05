@@ -27,6 +27,21 @@ create or replace package XDBPM_XMLSCHEMA_UTILITIES
 authid CURRENT_USER
 as
 
+  TYPE DOCUMENT_INFO_T
+    is RECORD (
+         PATH                 VARCHAR2(1024),
+         ELEMENT              VARCHAR2(256), 
+         NAMESPACE            VARCHAR2(4000), 
+         SCHEMA_LOCATION_HINT VARCHAR2(4000),
+         TARGET               VARCHAR2(4000),
+         OWNER                VARCHAR2(128),
+         TABLE_NAME           VARCHAR2(128),
+         MATCH_TYPE           VARCHAR2(16)
+       );
+  
+  TYPE DOCUMENT_TABLE_T
+    is TABLE of DOCUMENT_INFO_T;
+    
   procedure scopeXMLReferences;
   procedure indexXMLReferences(INDEX_NAME VARCHAR2);
   procedure prepareBulkLoad(P_TABLE_NAME VARCHAR2, P_OWNER VARCHAR2 DEFAULT USER);
@@ -35,14 +50,19 @@ as
  
   function printNestedTables(XML_TABLE VARCHAR2) return XMLType;
   function getDefaultTableName(P_RESOURCE_PATH VARCHAR2) return VARCHAR2;
+
+  procedure cleanupSchema(P_OWNER VARCHAR2);
+  procedure cleanXMLSchemaArtifacts(P_XML_SCHEMA XMLTYPE);
+  procedure deleteOrphanTypes(P_REGISTRATION_DATE TIMESTAMP);
   
   function generateSchemaFromTable(P_TABLE_NAME VARCHAR2, P_OWNER VARCHAR2 default USER) return XMLTYPE;  
   function generateCreateTableStatement(XML_TABLE_NAME VARCHAR2, NEW_TABLE_NAME VARCHAR2) return CLOB;
 
-  procedure cleanupSchema(P_OWNER VARCHAR2);
-
+  function  matchRelativeURL(P_RELATIVE_URL VARCHAR2) return VARCHAR2;
+  function  getInstanceDocuments(P_FOLDER_PATH VARCHAR2) return DOCUMENT_TABLE_T pipelined; 
+  procedure loadInstanceDocuments(P_FOLDER_PATH VARCHAR2,P_LOGFILE_NAME VARCHAR2);
+  
   procedure generateCycleReport(P_RESOURCE_PATH VARCHAR2 DEFAULT '/public/cycleReport.log');            
-  procedure deleteOrphanTypes(P_REGISTRATION_DATE TIMESTAMP);
   
   procedure disableTableReferencedElements(P_XML_SCHEMA IN OUT XMLTYPE);
   procedure disableTableSubgroupMembers(P_XML_SCHEMA IN OUT XMLTYPE);
@@ -54,7 +74,7 @@ end XDBPM_XMLSCHEMA_UTILITIES;
 /
 show errors
 --
-create or replace synonym XDB_XMLSCHEMA_UTILITIES for XDBPM_XMLSCHEMA_UTILITIES
+create or replace synonym XDB_XML_SCHEMA_UTILITIES for XDBPM_XMLSCHEMA_UTILITIES
 /
 create or replace package body XDBPM_XMLSCHEMA_UTILITIES
 as
@@ -69,8 +89,7 @@ as
     is TABLE of TYPE_DEFINITION_T;
 --
   TYPE CYCLE_LIST_ENTRY_T 
-  is RECORD
-  (
+    is RECORD(
     TYPE            TYPE_DEFINITION_T,
     SUPER_TYPE_LIST TYPE_LIST_T
   );
@@ -78,6 +97,12 @@ as
   TYPE CYCLE_LIST_T
     is TABLE of CYCLE_LIST_ENTRY_T;
 --  
+  TYPE SCHEMA_URL_CACHE_T
+  IS TABLE of VARCHAR2(700)
+     INDEX BY VARCHAR2(700);
+     
+  G_SCHEMA_URL_CACHE SCHEMA_URL_CACHE_T;   
+     
   G_KNOWN_CYCLE_LIST TYPE_LIST_T;
 --
   G_PROCESSED_TYPE_LIST TYPE_LIST_T;
@@ -594,8 +619,8 @@ end;
 procedure disableTableNonRootElements(P_XML_SCHEMA IN OUT XMLTYPE)
 as
 begin
-	 XDB_XMLSCHEMA_UTILITIES.disableTableSubgroupMembers(P_XML_SCHEMA);
-	 XDB_XMLSCHEMA_UTILITIES.disableTableReferencedElements(P_XML_SCHEMA);
+	 XDB_XML_SCHEMA_UTILITIES.disableTableSubgroupMembers(P_XML_SCHEMA);
+	 XDB_XML_SCHEMA_UTILITIES.disableTableReferencedElements(P_XML_SCHEMA);
 end;
 --
 function initializeSchemaAnnotations(P_SCHEMA_LOCATION_HINT VARCHAR2)
@@ -883,6 +908,263 @@ begin
   end if;
   
   return V_UNZIPPED_COUNT;
+end;
+--
+procedure cleanXMLSchemaArtifacts(P_XML_SCHEMA XMLTYPE)
+as
+ 	cursor getTables
+ 	is
+ 	select TABLE_NAME
+ 	  from USER_XML_TABLES
+ 	 where TABLE_NAME in (
+ 	         select TABLE_NAME 
+ 	           from XMLTABLE(
+ 	                  '//xs:element[@defaultTable]'
+ 	                  passing P_XML_SCHEMA
+ 	                  columns
+ 	                    TABLE_NAME VARCHAR2(128) PATH '@defaultTable'
+ 	                ) 
+ 	       );
+ 	       
+ 	cursor getCollTypes
+ 	is
+ 	select TYPE_NAME
+ 	  from USER_COLL_TYPES
+ 	 where TYPE_NAME in (
+ 	         select TYPE_NAME
+ 	           from XMLTABLE(
+ 	                  '//xs:complexType[@SQLCollType]'
+ 	                  passing P_XML_SCHEMA
+ 	                  columns
+ 	                    TYPE_NAME VARCHAR2(128) PATH '@SQLCollType'
+ 	                ) 
+ 	       );
+ 	       
+ 	cursor getTypes
+ 	is
+ 	select TYPE_NAME
+ 	  from USER_TYPES
+ 	 where TYPE_NAME in (
+ 	         select TYPE_NAME
+ 	           from XMLTABLE( 
+ 	                  '//xs:complexType[@SQLType]' 
+ 	                  passing P_XML_SCHEMA
+ 	                  columns
+ 	                    TYPE_NAME VARCHAR2(128) PATH '@SQLType'  
+ 	                )
+ 	       );
+begin
+	for t in getTables loop
+	  execute immediate 'drop table "' || t.TABLE_NAME || '" force';
+	end loop;
+	for t in getCollTypes loop
+	  execute immediate 'drop type "' || t.TYPE_NAME || '" force';
+	end loop;
+	for t in getTypes loop
+	  execute immediate 'drop type "' || t.TYPE_NAME || '" force';
+	end loop;
+end;
+--
+function matchRelativeURL(P_RELATIVE_URL VARCHAR2) 
+return VARCHAR2
+as
+  V_MATCHING_URL VARCHAR2(700) := P_RELATIVE_URL;
+  V_URL_PATTERN  VARCHAR2(700);
+  V_MATCH_COUNT  BINARY_INTEGER;
+  
+  cursor findMatchingURLs
+  is 
+  select SCHEMA_URL
+    from USER_XML_SCHEMAS
+   where SCHEMA_URL like '%' || V_MATCHING_URL;
+
+begin
+	
+	if G_SCHEMA_URL_CACHE.exists(P_RELATIVE_URL) then
+	  V_MATCHING_URL := G_SCHEMA_URL_CACHE(P_RELATIVE_URL);
+	else	
+    if (((instr(V_MATCHING_URL,'://') = 0) and (instr(V_MATCHING_URL,'/') <> 1) )  or (instr(V_MATCHING_URL,'./') = 1)) then
+      if (instr(V_MATCHING_URL,'..')  = 1 ) then
+    	  while instr(V_MATCHING_URL,'..') = 1 loop
+          V_MATCHING_URL := substr(V_MATCHING_URL,4);
+        end loop;
+      else 
+        if (instr(V_MATCHING_URL,'./') = 1) then
+          V_MATCHING_URL := substr(V_MATCHING_URL,3);
+        end if;
+      end if;
+  
+      V_URL_PATTERN := '%' || V_MATCHING_URL;
+    
+      select count(*) 
+        into V_MATCH_COUNT
+        from USER_XML_SCHEMAS
+       where SCHEMA_URL like V_URL_PATTERN;
+   
+      case V_MATCH_COUNT
+        when 0 then begin
+          select count(*)   
+            into V_MATCH_COUNT
+            from ALL_XML_SCHEMAS
+           where SCHEMA_URL like V_URL_PATTERN;
+   
+          if (V_MATCH_COUNT = 1) then
+            select SCHEMA_URL
+              into V_MATCHING_URL
+              from ALL_XML_SCHEMAS
+             where SCHEMA_URL like V_URL_PATTERN;
+          else
+            V_MATCHING_URL := NULL;
+          end if;
+        end;
+        when 1 then
+          select SCHEMA_URL       
+            into V_MATCHING_URL
+            from USER_XML_SCHEMAS
+           where SCHEMA_URL like V_URL_PATTERN;
+        else
+          V_MATCHING_URL := null;
+      end case;   
+    end if;
+    G_SCHEMA_URL_CACHE(P_RELATIVE_URL) := V_MATCHING_URL;
+  end if;
+  return V_MATCHING_URL;
+end;
+--
+function  getInstanceDocuments(P_FOLDER_PATH VARCHAR2) 
+return DOCUMENT_TABLE_T pipelined
+as
+  cursor getDocumentInfo
+  is 
+  with DOCUMENT_INFO as (
+    select ANY_PATH, ELEMENT, NAMESPACE, SCHEMA_LOCATION_HINT
+      FROM RESOURCE_VIEW rv,
+           XMLTABLE(          
+              'for $DOC in $DOCUMENT/* (:[@xsi:noNamespaceSchemaLocation or @xsi:schemaLocation] :)
+                   let $SEQ := fn:tokenize($DOC/@xsi:schemaLocation," ")
+                   let $IND := fn:index-of($SEQ,fn:namespace-uri($DOC))+1
+                   return element documentInfo {
+                                    element schemaLocationHint {
+                                                if (fn:namespace-uri($DOC)) then
+                                   						    $SEQ[$IND] 
+                                                else 
+                                                  $DOC/@xsi:noNamespaceSchemaLocation
+                                            },
+                                    element elementName        {fn:local-name($DOC)},
+                                    element namespace          {fn:namespace-uri($DOC)}
+                                  }
+             '
+             passing xdburitype(ANY_PATH).getXML() as "DOCUMENT"
+             columns 
+               ELEMENT               VARCHAR2(256) PATH 'elementName',
+               NAMESPACE             VARCHAR2(256) PATH 'namespace',
+               SCHEMA_LOCATION_HINT  VARCHAR2(700) PATH 'schemaLocationHint'
+           )
+     where under_path(RES,P_FOLDER_PATH) = 1
+       and XMLExists(
+            'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
+             $RES/Resource[ends-with(DisplayName,".xml")]' 
+             passing RES as "RES"
+           )
+  )
+  select ANY_PATH, ELEMENT, NAMESPACE, SCHEMA_LOCATION_HINT, SCHEMA_LOCATION_HINT TARGET, axt.OWNER, axt.TABLE_NAME, 'Exact' MATCH_TYPE
+      -- Exact Match in USER_XML_TABLES based on ELEMENT and SCHEMA_LOCATION_HINT
+    from DOCUMENT_INFO, ALL_XML_TABLES axt
+   where SCHEMA_LOCATION_HINT is not NULL
+     and XMLSCHEMA = SCHEMA_LOCATION_HINT
+     and ELEMENT_NAME = ELEMENT
+   union all
+  select ANY_PATH, ELEMENT, NAMESPACE, SCHEMA_LOCATION_HINT, axt.XMLSCHEMA TARGET, axt.OWNER, axt.TABLE_NAME, 'Relative' MATCH_TYPE
+      -- Relative Match in USER_XML_TABLES based on ELEMENT and SCHEMA_LOCATION_HINT
+    from DOCUMENT_INFO, ALL_XML_TABLES axt
+   where SCHEMA_LOCATION_HINT is not NULL
+     and XMLSCHEMA = XDB_XMLSCHEMA_UTILITIES.matchRelativeURL(SCHEMA_LOCATION_HINT) 
+     and ELEMENT_NAME = ELEMENT
+   union all
+  select ANY_PATH, ELEMENT, NAMESPACE, SCHEMA_LOCATION_HINT, axt.XMLSCHEMA TARGET, axt.OWNER, axt.TABLE_NAME, 'Namespace' MATCH_TYPE
+      -- Match in USER_XML_TABLES based on ELEMENT and NAMESPACE
+    from DOCUMENT_INFO, ALL_XML_TABLES axt, ALL_XML_SCHEMAS axs
+   where ELEMENT = ELEMENT_NAME
+     and SCHEMA_URL = XMLSCHEMA
+     and axs.OWNER = axt.OWNER
+     and NAMESPACE = XMLCAST(
+                       XMLQUERY(
+                         '$SCHEMA/xs:schema/@targetNamespace'
+                         passing SCHEMA as "SCHEMA"
+                         returning content
+                       ) as VARCHAR2(700)
+                     )
+   union all
+  select ANY_PATH, ELEMENT, NAMESPACE, SCHEMA_LOCATION_HINT, axt.XMLSCHEMA TARGET, axt.OWNER, axt.TABLE_NAME, 'Namespace' MATCH_TYPE
+      -- Match in USER_XML_TABLES based on ELEMENT and NAMESPACE
+    from DOCUMENT_INFO, ALL_XML_TABLES axt, ALL_XML_SCHEMAS axs
+   where ELEMENT = ELEMENT_NAME
+     and SCHEMA_URL = XMLSCHEMA
+     and axs.OWNER = axt.OWNER
+     and NAMESPACE is NULL
+     and not XMLEXISTS(
+               '$SCHEMA/xs:schema/@targetNamespace'
+                passing SCHEMA as "SCHEMA"
+             );
+begin
+	for d in getDocumentInfo() loop	
+	  pipe row (d);
+  end loop;
+end;
+--
+procedure loadInstanceDocuments(P_FOLDER_PATH VARCHAR2,P_LOGFILE_NAME VARCHAR2) 
+as	
+  V_STATEMENT     VARCHAR2(4000);
+  
+  V_DOCUMENT_COUNT  NUMBER := 0;
+  V_SUCCESS_COUNT   NUMBER := 0;
+  V_FAILED_COUNT    NUMBER := 0;
+  
+  cursor getDocuments 
+  is
+  select * 
+    from TABLE(
+           XDB_XMLSCHEMA_UTILITIES.getInstanceDocuments(P_FOLDER_PATH)
+         ) d
+   where d.TABLE_NAME is not NULL;
+  
+begin
+   
+  XDB_OUTPUT.createLogFile(P_FOLDER_PATH || '/' || P_LOGFILE_NAME,TRUE);
+
+  for doc in getDocuments loop
+  
+    V_DOCUMENT_COUNT := V_DOCUMENT_COUNT + 1;
+
+    XDB_OUTPUT.writeLogFileEntry('Processing "' || doc.PATH || '.' );
+    XDB_OUTPUT.flushLogFile();
+
+   	V_STATEMENT := 'insert into "' || doc.OWNER || '"."' || doc.TABLE_NAME || '" values (:1)';
+   	
+    begin
+      execute immediate V_STATEMENT using  xdburitype(doc.PATH);
+      V_SUCCESS_COUNT := V_SUCCESS_COUNT + 1;
+    exception
+      when OTHERS then
+         XDB_OUTPUT.writeLogFileEntry('SQL: "' || V_STATEMENT || '".');
+         XDB_OUTPUT.writeLogFileEntry('Element: "' || doc.ELEMENT || '" in namespace: "' || doc.NAMESPACE || '" defined by XMLSchema: "' || doc.TARGET || '".');
+         XDB_OUTPUT.writeLogFileEntry('Match Basis: "' || doc.MATCH_TYPE || '".');
+         XDB_OUTPUT.writeLogFileEntry(SQLERRM);
+         XDB_OUTPUT.writeLogFileEntry('--');   
+         XDB_OUTPUT.flushLogFile();
+         V_FAILED_COUNT := V_FAILED_COUNT + 1;
+    end;     
+             
+    XDB_OUTPUT.flushLogFile();
+
+    commit;
+
+  end loop;
+
+  XDB_OUTPUT.writeLogFileEntry('Document Count = ' || V_DOCUMENT_COUNT);   
+  XDB_OUTPUT.writeLogFileEntry('Loaded         = ' || V_SUCCESS_COUNT);   
+  XDB_OUTPUT.writeLogFileEntry('Failed         = ' || V_FAILED_COUNT);   
+  XDB_OUTPUT.flushLogFile();
 end;
 --
 end XDBPM_XMLSCHEMA_UTILITIES;

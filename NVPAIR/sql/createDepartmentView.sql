@@ -24,6 +24,8 @@ select xt.*
          	DEPARTMENT_NAME	VARCHAR2(64) 	          path 'StringValue[@name="DEPARTMENT_NAME"]/@value'
       ) xt
 /
+set autotrace on explain lines 256 pages 50
+--
 select * 
   from DEPARTMENT_VIEW
 /

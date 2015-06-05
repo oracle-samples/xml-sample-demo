@@ -18,7 +18,7 @@
 --
 alter session set current_schema = XDBPM
 /
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:TRUE'
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
 --
 set define on
@@ -32,40 +32,32 @@ as
   function COLUMN_LIMIT return number deterministic;
   
   procedure generateTypeSummary; 
+  function doTypeAnalysis(P_XML_SCHEMA_CONFIGURATION IN OUT XMLTYPE, P_SCHEMA_LOCATION_HINT VARCHAR2 DEFAULT NULL, P_OWNER VARCHAR2 DEFAULT USER, P_LIMIT NUMBER DEFAULT 3) return BOOLEAN;
 
-  procedure schemaRegistrationScript(P_OUTPUT_FOLDER VARCHAR2, P_XMLSCHEMA_FOLDER VARCHAR2, P_CONFIGURATION XMLType, P_SCHEMA_LOCATION_HINT VARCHAR2 DEFAULT NULL, P_OWNER VARCHAR2 DEFAULT USER, P_LIMIT NUMBER DEFAULT 3);
-  procedure printSchemaRegistrationScript(P_SCRIPT_FILE VARCHAR2, P_COMMENT VARCHAR2, P_SCHEMA_ORDERING XMLTYPE, P_XMLSCHEMA_FOLDER VARCHAR2);
-  procedure describeAnnotations(P_RESOURCE_PATH VARCHAR2, P_SCHEMA_LOCATION_HINT VARCHAR2,P_OWNER VARCHAR2 DEFAULT USER);
-  function  doTypeAnalysis(P_OUTPUT_FILE VARCHAR2, P_TARGET_NAME VARCHAR2, P_CONFIGURATION IN OUT XMLTYPE, P_SCHEMA_LOCATION_HINT VARCHAR2 DEFAULT NULL, P_OWNER VARCHAR2 DEFAULT USER, P_LIMIT NUMBER DEFAULT 3) return VARCHAR2;
-  
-  procedure setEvent(P_EVENT VARCHAR2, P_LEVEL VARCHAR2);
-  procedure tableCreationScript(P_OUTPUT_FOLDER VARCHAR2, P_TARGET_NAMESPACE VARCHAR2);
+  function createDeleteSchemaScript(P_XML_SCHEMA_CONFIGURATION XMLTYPE) return VARCHAR2;
 
   procedure setSchemaRegistrationOptions(
-              P_LOCAL                BOOLEAN        DEFAULT TRUE,  
-              P_GENTYPES             BOOLEAN        DEFAULT TRUE,  
-              P_GENTABLES            BOOLEAN        DEFAULT TRUE, 
-              P_FORCE                BOOLEAN        DEFAULT FALSE, 
-              P_OWNER                VARCHAR2       DEFAULT NULL, 
-              P_ENABLE_HIERARCHY     BINARY_INTEGER DEFAULT DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE,
-              P_OPTIONS              BINARY_INTEGER DEFAULT NULL
+              P_LOCAL                BOOLEAN        DEFAULT TRUE  
+             ,P_GENTYPES             BOOLEAN        DEFAULT TRUE  
+             ,P_GENTABLES            BOOLEAN        DEFAULT TRUE 
+             ,P_OWNER                VARCHAR2       DEFAULT NULL 
+             ,P_ENABLE_HIERARCHY     BINARY_INTEGER DEFAULT DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE
+             ,P_OPTIONS              BINARY_INTEGER DEFAULT NULL
             );
            
   procedure setRegistrationScriptOptions(
-              P_ADD_XDB_NAMESPACE      BOOLEAN        DEFAULT TRUE,  
-              P_DISABLE_DOM_FIDELITY   BOOLEAN        DEFAULT FALSE, 
-              P_DISABLE_DEFAULT_TABLES BOOLEAN        DEFAULT FALSE,
-              P_REMOVE_APPINFO         BOOLEAN        DEFAULT FALSE,
-              P_CALL_ANNOTATION_SCRIPT BOOLEAN        DEFAULT FALSE
+              P_DISABLE_DOM_FIDELITY   BOOLEAN        DEFAULT FALSE
             );
-            
-  
-  procedure addXDBNamespace;
-  procedure disableDOMFidelity;
-  procedure disableDefaultTables;
-  procedure removeAppInfo;
-  procedure annotationScript;
+
+  function  createSchemaRegistrationScript(P_XML_SCHEMA_CONFIGURATION XMLTYPE) return VARCHAR2;
+  procedure appendTableCreationScript(P_XML_SCHEMA_CONFIGURATION XMLTYPE);
     
+  -- procedure schemaRegistrationScript(P_OUTPUT_FOLDER VARCHAR2, P_XMLSCHEMA_FOLDER VARCHAR2, P_XML_SCHEMA_CONFIGURATION XMLType, P_SCHEMA_LOCATION_HINT VARCHAR2 DEFAULT NULL, P_OWNER VARCHAR2 DEFAULT USER, P_LIMIT NUMBER DEFAULT 3);
+  -- procedure printSchemaRegistrationScript(P_SCRIPT_FILE VARCHAR2, P_COMMENT VARCHAR2, P_XML_SCHEMA_CONFIGURATION XMLTYPE, P_XMLSCHEMA_FOLDER VARCHAR2);
+  procedure describeAnnotations(P_RESOURCE_PATH VARCHAR2, P_SCHEMA_LOCATION_HINT VARCHAR2,P_OWNER VARCHAR2 DEFAULT USER);
+  
+  procedure setEvent(P_EVENT VARCHAR2, P_LEVEL VARCHAR2);
+               
 $IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
 --
 -- Depricated in 11.1.x : ALL_XML_SCHEMAS now contains column SCHEMA_ID which can be used to get this value.
@@ -134,18 +126,13 @@ as
   G_LOCAL                    BOOLEAN := TRUE;
   G_GENTYPES                 BOOLEAN := TRUE;
   G_GENTABLES                BOOLEAN := TRUE;
-  G_FORCE                    BOOLEAN := FALSE;
   G_OWNER                    VARCHAR2(32) := NULL;
   G_OPTIONS                  BINARY_INTEGER :=NULL;
   G_ENABLE_HIERARCHY         BINARY_INTEGER := NULL;
 --
   G_DISABLE_DOM_FIDELITY     BOOLEAN := FALSE;
   G_DISABLE_DEFAULT_TABLES   BOOLEAN := FALSE;
-  G_REMOVE_APPINFO           BOOLEAN := FALSE;
 --  
-  G_ADD_XDB_NAMESPACE        BOOLEAN := TRUE;
-  G_CALL_ANNOTATION_SCRIPT   BOOLEAN := TRUE;
---
 function COLUMN_LIMIT 
 return number deterministic
 as
@@ -815,7 +802,7 @@ begin
   while (not V_OPTIMIZATION_COMPLETE) loop
     V_OPTIMIZATION_COMPLETE := TRUE;
     for t in findLargeType loop
-      DBMS_LOB.createTemporary(V_CONTENT,TRUE); 
+      DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call); 
       V_BUFFER := '-- Type "' || t.OWNER || '"."' || t.TYPE_NAME || '" requires ' || t.COLUMN_COUNT || ' columns : Commencing Type Structure optimization -' || C_NEW_LINE;
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
       V_OPTIMIZATION_COMPLETE := FALSE;
@@ -831,15 +818,19 @@ begin
       else
         V_OPTIMIZATION_COMPLETE := TRUE;
         V_OPTIMIZATION_SUCCESSFUL := FALSE;
-        V_BUFFER := '  -- Unable to optimize type model.' || C_NEW_LINE;
+        V_BUFFER := '--' || C_NEW_LINE 
+                 || '-- Unable to optimize type model.' || C_NEW_LINE
+                 || '--' || C_NEW_LINE;
         DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
         XDB_OUTPUT.writeToFile(P_TYPE_ANALYSIS_PATH,V_CONTENT);
       end if;
     end loop;
   end loop;  
 
-  DBMS_LOB.createTemporary(V_CONTENT,TRUE); 
-  V_BUFFER := '  -- Optimization Complete. --' || C_BLANK_LINE;
+  DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call); 
+  V_BUFFER := '--' || C_NEW_LINE 
+           || '-- Optimization Complete. --' || C_NEW_LINE
+           || '--' || C_NEW_LINE;
   DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
   XDB_OUTPUT.writeToFile(P_TYPE_ANALYSIS_PATH,V_CONTENT);
           
@@ -848,9 +839,11 @@ begin
 exception
   when OTHERS then
     if (V_CONTENT is NULL) then
-      DBMS_LOB.createTemporary(V_CONTENT,TRUE); 
+      DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call); 
     end if;    
-    V_BUFFER := '  -- Error Detected During Optimization. --' || C_BLANK_LINE;
+    V_BUFFER := '--' || C_NEW_LINE 
+           	 || '-- Error Detected During Optimization. --' || C_NEW_LINE
+           	 || '--' || C_NEW_LINE;
     DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
     V_BUFFER := DBMS_UTILITY.FORMAT_ERROR_STACK() || C_BLANK_LINE;
     DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
@@ -861,7 +854,7 @@ exception
   
 end;
 --
-procedure getDependentSchemas(P_SCHEMA_LOCATION_HINT VARCHAR2, P_OWNER VARCHAR2 DEFAULT USER, P_SCHEMA_LOCATION_LIST IN OUT XDB.XDB$STRING_LIST_T)
+procedure addDependentSchemas(P_SCHEMA_LOCATION_HINT VARCHAR2, P_OWNER VARCHAR2 DEFAULT USER, P_SCHEMA_LOCATION_LIST IN OUT XDB.XDB$STRING_LIST_T)
 as
   V_SCHEMA_COUNT NUMBER;
   cursor getSchemaLocations
@@ -895,12 +888,12 @@ begin
 
   if (P_SCHEMA_LOCATION_LIST.last > V_SCHEMA_COUNT) then
     for i in V_SCHEMA_COUNT + 1 .. P_SCHEMA_LOCATION_LIST.last loop
-      getDependentSchemas(P_SCHEMA_LOCATION_LIST(i), P_OWNER, P_SCHEMA_LOCATION_LIST);
+      addDependentSchemas(P_SCHEMA_LOCATION_LIST(i), P_OWNER, P_SCHEMA_LOCATION_LIST);
     end loop;
   end if;
 end;
 --	
-function loadSchemaAnnotationCache(V_SCHEMA_LOCATION_LIST XDB.XDB$STRING_LIST_T)
+function loadSchemaAnnotationCache(P_SCHEMA_LOCATION_LIST XDB.XDB$STRING_LIST_T)
 return SCHEMA_ANNOTATION_LIST_T
 as
   V_SCHEMA_ANNOTATION_CACHE SCHEMA_ANNOTATION_LIST_T := SCHEMA_ANNOTATION_LIST_T();
@@ -915,7 +908,7 @@ $ELSE
          MAKE_REF(XDB.XDB$SCHEMA,SCHEMA_ID) SCHEMA_REFERENCE
 $END         
     from ALL_XML_SCHEMAS
-        ,TABLE(V_SCHEMA_LOCATION_LIST) sl
+        ,TABLE(P_SCHEMA_LOCATION_LIST) sl
    where SCHEMA_URL = sl.COLUMN_VALUE;
 begin
   G_SCHEMA_REFERENCE_LIST := XDB.XDB$XMLTYPE_REF_LIST_T();
@@ -924,7 +917,7 @@ begin
     G_SCHEMA_REFERENCE_LIST(G_SCHEMA_REFERENCE_LIST.last) := s.SCHEMA_REFERENCE;
 
     V_SCHEMA_ANNOTATION_CACHE.extend();
-    DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+    DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
 
     V_SCHEMA_ANNOTATION_CACHE(V_SCHEMA_ANNOTATION_CACHE.last).SCHEMA_LOCATION_HINT   := s.SCHEMA_URL;
     V_SCHEMA_ANNOTATION_CACHE(V_SCHEMA_ANNOTATION_CACHE.last).OWNER                  := s.OWNER;
@@ -986,21 +979,16 @@ as
   select  distinct SCHEMA_ID, NAME, XPATH, PREFIX
     from (  
            select MAKE_REF(XDB.XDB$SCHEMA,SCHEMA_ID) SCHEMA_ID, NAME, SUBSTR(XPATH,11) XPATH, PREFIX
-             from XMLTABLE
-                  (
-                     'declare namespace functx = "http://www.functx.com"; 
+             from XMLTABLE(
+                    'declare namespace functx = "http://www.functx.com"; 
          						 declare namespace xdbpm = "http://xmlns.oracle.com/xdb/xdbpm"; 
          						 
-                     declare function functx:index-of-node ( $nodes as node()* , $nodeToFind as node() )  
-                             as xs:integer* 
-                     {
+                     declare function functx:index-of-node ( $nodes as node()* , $nodeToFind as node() ) as xs:integer* {
                        for $seq in (1 to count($nodes))
                        return $seq[$nodes[$seq] is $nodeToFind]
                      };
                      
-                     declare function functx:path-to-node-with-pos ( $node as node()? ) 
-                             as xs:string 
-                     {     
+                     declare function functx:path-to-node-with-pos ( $node as node()? ) as xs:string {     
                        string-join
                        (
                          for $ancestor in $node/ancestor-or-self::*
@@ -1023,25 +1011,19 @@ as
                        )
                      };
                                           
-                     declare function xdbpm:substitutable-elements ( $schemaList as  node() * ) 
-                          as xs:string*
-                     {           
+                     declare function xdbpm:substitutable-elements ( $schemaList as  node() * ) as xs:string* {           
                        let $subGroupHeadList := for $e in $schemaList/SCHEMA/xs:schema/xs:element[@substitutionGroup]
                                                   return xdbpm:qname-to-string($e/@substitutionGroup,$e)
                        let $subGroupHeadList := fn:distinct-values($subGroupHeadList)
                        return $subGroupHeadList
                      }; 
                      
-                     declare function xdbpm:qname-to-string ( $qname as xs:string, $context as node() ) 
-                             as xs:string
-                     { 
+                     declare function xdbpm:qname-to-string ( $qname as xs:string, $context as node() ) as xs:string { 
                        let $qn := fn:resolve-QName( $qname, $context)
                        return concat(fn:namespace-uri-from-QName($qn),":",fn:local-name-from-QName($qn))
                      }; 
                                           
-         						 declare function xdbpm:getComplexType ( $schemaList as node()* , $targetNamespace as xs:string, $typename as xs:string ) 
-         						         as node()
-                     {  
+         						 declare function xdbpm:getComplexType ( $schemaList as node()* , $targetNamespace as xs:string, $typename as xs:string ) as node() {  
                        let $ct := if (fn:empty($targetNamespace)  or ($targetNamespace="")) then
                                     $schemaList/SCHEMA/xs:schema[not(@targetNamespace)]/xs:complexType[@name=$typename]
                                   else
@@ -1049,16 +1031,12 @@ as
                        return $ct
                      };                         
                                             
-                     declare function xdbpm:getParentType($schemaList as node()*, $extension as node()) 
-                             as node()
-                     {
+                     declare function xdbpm:getParentType($schemaList as node()*, $extension as node()) as node() {
                        let $qn := fn:resolve-QName( $extension/@base, $extension)
                        return xdbpm:getComplexType($schemaList,fn:namespace-uri-from-QName($qn),fn:local-name-from-QName($qn))
                      };
 
-                     declare function xdbpm:processComplexType($schemaList as node()*, $complexType as node()) 
-                             as node()
-                     {                               
+                     declare function xdbpm:processComplexType($schemaList as node()*, $complexType as node()) as node() {                               
                        if ($complexType[not(xs:complexContent/xs:extension[not(@base="xs:anyType")])]) then
                          if ($complexType/@name) then
                            <Result>
@@ -1113,7 +1091,7 @@ as
   V_BUFFER      VARCHAR2(4000);
   V_CONTENT     CLOB;   
 begin
-  DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+  DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
   V_BUFFER := '  -- DOM Fidelity enabled due to presence of mixed text, substitution group heads, or repeating choice structures in complex type defintion :-'  || C_BLANK_LINE;
   DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
 
@@ -1122,7 +1100,7 @@ begin
     if (V_PREV_SCHEMA is not NULL and V_PREV_SCHEMA <> p.SCHEMA_ID) then
        DBMS_LOB.writeAppend(V_CONTENT,LENGTH(C_NEW_LINE),C_NEW_LINE);
        appendSchemaAnnotations(V_PREV_SCHEMA,V_CONTENT);
-       DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+       DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
        V_BUFFER := '  -- DOM Fidelity enabled due to presence of mixed text, substitution group heads, or repeating choice structures in complex type defintion :-'  || C_BLANK_LINE;
        DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);	    
 	   end if;
@@ -1177,10 +1155,8 @@ $ELSE
          MAKE_REF(XDB.XDB$SCHEMA,SCHEMA_ID) PARENT_SCHEMA
 $END
     from ALL_XML_SCHEMAS sc
-        ,XMLTABLE
-         (
-           xmlNamespaces
-           (
+        ,XMLTABLE(
+           xmlNamespaces(
              'http://www.w3.org/2001/XMLSchema' as "xsd",
              'http://xmlns.oracle.com/xdb' as "xdb"
            ),
@@ -1190,10 +1166,8 @@ $END
            XSD_TYPE_NAME VARCHAR2(2000) path '@name',
            ELEMENT_LIST  XMLTYPE        path 'descendant::xsd:element[@xdb:defaultTable]'
          )
-        ,XMLTable
-         (
-           xmlNamespaces
-           (
+        ,XMLTable(
+           xmlNamespaces(
              'http://www.w3.org/2001/XMLSchema' as "xsd",
              'http://xmlns.oracle.com/xdb' as "xdb"
            ),
@@ -1227,10 +1201,8 @@ $ELSE
          MAKE_REF(XDB.XDB$SCHEMA,SCHEMA_ID) PARENT_SCHEMA
 $END
     from ALL_XML_SCHEMAS sc
-        ,XMLTABLE
-         (
-           xmlNamespaces
-           (
+        ,XMLTABLE(
+           xmlNamespaces(
              'http://www.w3.org/2001/XMLSchema' as "xsd",
              'http://xmlns.oracle.com/xdb' as "xdb"
            ),
@@ -1240,10 +1212,8 @@ $END
            XSD_GLOBAL_ELEMENT_NAME VARCHAR2(2000) path '@name',
            ELEMENT_LIST            XMLTYPE       path 'descendant::xsd:element[@xdb:defaultTable]'
          )
-        ,XMLTable
-         (
-           xmlNamespaces
-           (
+        ,XMLTable(
+           xmlNamespaces(
              'http://www.w3.org/2001/XMLSchema' as "xsd",
              'http://xmlns.oracle.com/xdb' as "xdb"
            ),
@@ -1277,10 +1247,8 @@ $ELSE
          MAKE_REF(XDB.XDB$SCHEMA,SCHEMA_ID) PARENT_SCHEMA
 $END
     from ALL_XML_SCHEMAS sc
-        ,XMLTABLE
-         (
-           xmlNamespaces
-           (
+        ,XMLTABLE(
+           xmlNamespaces(
              'http://www.w3.org/2001/XMLSchema' as "xsd",
              'http://xmlns.oracle.com/xdb' as "xdb"
            ),
@@ -1290,10 +1258,8 @@ $END
            XSD_GROUP_NAME VARCHAR2(2000) path '@name',
            ELEMENT_LIST   XMLTYPE       path 'descendant::xsd:element[@xdb:defaultTable]'
          )
-        ,XMLTable
-         (
-           xmlNamespaces
-           (
+        ,XMLTable(
+           xmlNamespaces(
              'http://www.w3.org/2001/XMLSchema' as "xsd",
              'http://xmlns.oracle.com/xdb' as "xdb"
            ),
@@ -1314,7 +1280,7 @@ $END
 
 begin
   
-  DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+  DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
   V_BUFFER := '  -- Out-of-Line mappings for global complex types :-'  || C_BLANK_LINE;
   DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
 
@@ -1323,7 +1289,7 @@ begin
 	  if (V_PREV_SCHEMA is not NULL and V_PREV_SCHEMA <> ct.PARENT_SCHEMA) then
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(C_NEW_LINE),C_NEW_LINE);
 	    appendSchemaAnnotations(V_PREV_SCHEMA,V_CONTENT);
-      DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+      DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
       V_BUFFER := '  -- Out-of-Line mappings for global complex types :-'  || C_BLANK_LINE;
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);	    
 	  end if;
@@ -1341,7 +1307,7 @@ begin
     appendSchemaAnnotations(V_PREV_SCHEMA,V_CONTENT);
   end if;
   
-  DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+  DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
   V_BUFFER := '  -- Out-of-Line mappings for global elements :-'  || C_BLANK_LINE;
   DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
 
@@ -1350,7 +1316,7 @@ begin
 	  if (V_PREV_SCHEMA is not NULL and V_PREV_SCHEMA <> ge.PARENT_SCHEMA) then
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(C_NEW_LINE),C_NEW_LINE);
 	    appendSchemaAnnotations(V_PREV_SCHEMA,V_CONTENT);
-      DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+      DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
       V_BUFFER := '  -- Out-of-Line mappings for global elements :-'  || C_BLANK_LINE;
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);	    
 	  end if;
@@ -1368,7 +1334,7 @@ begin
     appendSchemaAnnotations(V_PREV_SCHEMA,V_CONTENT);
   end if;
 
-  DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+  DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
   V_BUFFER := '  -- Out-of-Line mappings for global groups :-'  || C_BLANK_LINE;
   DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
 
@@ -1377,7 +1343,7 @@ begin
 	  if (V_PREV_SCHEMA is not NULL and V_PREV_SCHEMA <> g.PARENT_SCHEMA) then
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(C_NEW_LINE),C_NEW_LINE);
 	    appendSchemaAnnotations(V_PREV_SCHEMA,V_CONTENT);
-      DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+      DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
       V_BUFFER := '  -- Out-of-Line mappings for global groups :-'  || C_BLANK_LINE;
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);	    
 	  end if;
@@ -1462,7 +1428,7 @@ begin
     V_LIMIT := 1;
   end if;
   
-  DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+  DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
   V_BUFFER := '  -- SQLType names for global complex types :-'  || C_NEW_LINE;
   DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
   
@@ -1472,7 +1438,7 @@ begin
 	  if (V_PREV_SCHEMA is not NULL and V_PREV_SCHEMA <> ct.PARENT_SCHEMA) then
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(C_NEW_LINE),C_NEW_LINE);
 	    appendSchemaAnnotations(V_PREV_SCHEMA,V_CONTENT);
-      DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+      DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
       V_BUFFER := '  -- SQLType names for global complex types :-'  || C_NEW_LINE;
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);	    
       V_PREV_SYSTEM_GENERATED := -1;
@@ -1493,7 +1459,7 @@ begin
     appendSchemaAnnotations(V_PREV_SCHEMA,V_CONTENT);
   end if;
   
-  DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+  DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
   V_BUFFER := '  -- SQLType names for global elements based on local complex types :-'  || C_NEW_LINE;
   DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
 
@@ -1503,7 +1469,7 @@ begin
 	  if (V_PREV_SCHEMA is not NULL and V_PREV_SCHEMA <> ge.PARENT_SCHEMA) then
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(C_NEW_LINE),C_NEW_LINE);
 	    appendSchemaAnnotations(V_PREV_SCHEMA,V_CONTENT);
-      DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+      DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
       V_BUFFER := '      -- SQLType names for global elements based on local complex types :-'  || C_NEW_LINE;
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);	    
       V_PREV_SYSTEM_GENERATED := -1;
@@ -1530,121 +1496,74 @@ begin
     
 end;
 --
-procedure printSchemaList(P_RESOURCE_PATH VARCHAR2, P_SCHEMA_LOCATION_LIST XDB.XDB$STRING_LIST_T, P_TARGET_NAME VARCHAR2, P_SCHEMA_LOCATION_HINT VARCHAR2)
+procedure printSchemaList(P_RESOURCE_PATH VARCHAR2, P_SCHEMA_LOCATION_LIST XDB.XDB$STRING_LIST_T, P_TARGET_PATH VARCHAR2)
 as
-  V_BUFFER  VARCHAR2(4000);
+  V_BUFFER  VARCHAR2(32000);
   V_CONTENT CLOB;
 begin
-  DBMS_LOB.createTemporary(V_CONTENT,TRUE);
-  DBMS_LOB.writeAppend(V_CONTENT,LENGTH(C_NEW_LINE),C_NEW_LINE);
 
-  if (P_SCHEMA_LOCATION_HINT is NULL) then
-    V_BUFFER := '-- Initiating Object-Relational storage model optimization for XML Schemas in "' || P_TARGET_NAME || '"'  || C_BLANK_LINE;
-  else
-    V_BUFFER := '-- Initiating Object-Relational storage model optimization for XML Schema "' || P_TARGET_NAME || '"'  || C_BLANK_LINE;
-  end if;
-
-  DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
+  DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
 
   if ((P_SCHEMA_LOCATION_LIST is NULL) or (P_SCHEMA_LOCATION_LIST.count() = 0)) then
 
-    if (P_SCHEMA_LOCATION_HINT is NULL) then
-      V_BUFFER := '-- Unable to locate any XML Schemas in "' || P_TARGET_NAME || '" '  || C_BLANK_LINE;
+    if (instr(P_TARGET_PATH,'.xsd',-1) = (LENGTH(P_TARGET_PATH)-4)) then
+      V_BUFFER := '-- Unable to locate XML Schema "' || P_TARGET_PATH || '"'  || C_NEW_LINE;
     else
-      V_BUFFER := '-- Unable to locate XML Schema "' || P_TARGET_NAME || '"'  || C_BLANK_LINE;
+      V_BUFFER := '-- Unable to locate any XML Schemas in folder "' || P_TARGET_PATH || '" '  || C_NEW_LINE;
     end if;
 
     DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
     
   else
-    
-    if P_SCHEMA_LOCATION_LIST.count() > 1 then
-      V_BUFFER := '-- Processing Object Types derived from the following XML Schemas :- ' || C_NEW_LINE;
-      DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
-      for i in P_SCHEMA_LOCATION_LIST.first + 1 .. P_SCHEMA_LOCATION_LIST.last loop
-          V_BUFFER := '--    ' || P_SCHEMA_LOCATION_LIST(i)  || C_NEW_LINE;
-          DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
-      end loop;
-      DBMS_LOB.writeAppend(V_CONTENT,LENGTH(C_NEW_LINE),C_NEW_LINE);
+  
+    V_BUFFER := '-- Processing the following XML Schemas :- ' || C_NEW_LINE
+             || '-- ' || C_NEW_LINE;
+  
+    DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
 
-    end if;
+    for i in P_SCHEMA_LOCATION_LIST.first + 1 .. P_SCHEMA_LOCATION_LIST.last loop
+       V_BUFFER := '--    ' || P_SCHEMA_LOCATION_LIST(i)  || C_NEW_LINE;
+       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
+    end loop;
      	
   end if;
 
   XDB_OUTPUT.writeToFile(P_RESOURCE_PATH,V_CONTENT);
-   
+ 
 end;
 --
-function getSchemaLocationList(P_CONFIGURATION XMLTYPE)
+function getSchemaLocationList(P_SCHEMA_LOCATION_HINT VARCHAR2)
 return XDB.XDB$STRING_LIST_T
 as
   --
-  -- There may be corner cases where we need XML Schemas other than those in the configuration document...
-  -- These schemas were already registered (possibly as system defined schemas) 
+  -- Get the complete list of dependant schemas for the target XML Schema.
   -- 
   V_SCHEMA_EXISTS NUMBER;
   V_SCHEMA_LOCATION_LIST XDB.XDB$STRING_LIST_T := XDB.XDB$STRING_LIST_T();
   
-  cursor getSchemaLocationList 
-  is
-  select *
-    from XMLTABLE
-         (
-           xmlNamespaces
-           (
-              default 'http://xmlns.oracle.com/xdb/pm/registrationConfiguration'
-           ),
-           '/RegistrationList/Schema'
-           passing P_CONFIGURATION
-           columns
-           SCHEMA_LOCATION_HINT VARCHAR2(700) path 'SchemaLocationHint'
-         );
-   
-  V_UNKNOWN_SCHEMA BOOLEAN := FALSE;
-            
+  V_FIRST_SCHEMA binary_integer;
+  V_LAST_SCHEMA  binary_integer;
 begin
-  for x in getSchemaLocationList loop
-    V_UNKNOWN_SCHEMA := TRUE;
-    if V_SCHEMA_LOCATION_LIST.count() > 0 then
-      for i in V_SCHEMA_LOCATION_LIST.first .. V_SCHEMA_LOCATION_LIST.last loop
-        if (V_SCHEMA_LOCATION_LIST(i) = x.SCHEMA_LOCATION_HINT) then
-          V_UNKNOWN_SCHEMA := FALSE;
-          exit;
-        end if;
-      end loop;
-    end if;
-    if (V_UNKNOWN_SCHEMA) then
-      V_SCHEMA_LOCATION_LIST.extend();
-      V_SCHEMA_LOCATION_LIST(V_SCHEMA_LOCATION_LIST.last) := x.SCHEMA_LOCATION_HINT;
-      getDependentSchemas(x.SCHEMA_LOCATION_HINT, USER, V_SCHEMA_LOCATION_LIST);
-    end if;
+	
+  V_FIRST_SCHEMA := 1;
+  V_SCHEMA_LOCATION_LIST.extend();
+  V_SCHEMA_LOCATION_LIST(V_SCHEMA_LOCATION_LIST.last) := P_SCHEMA_LOCATION_HINT;
+    
+  loop
+    V_LAST_SCHEMA := V_SCHEMA_LOCATION_LIST.last;
+    for x in V_FIRST_SCHEMA .. V_LAST_SCHEMA loop
+      addDependentSchemas(V_SCHEMA_LOCATION_LIST(x), USER, V_SCHEMA_LOCATION_LIST);
+    end loop;  
+    
+    V_FIRST_SCHEMA := V_LAST_SCHEMA + 1;
+    exit when (V_FIRST_SCHEMA > V_SCHEMA_LOCATION_LIST.last);
   end loop;
-  
+    
   return V_SCHEMA_LOCATION_LIST;
+
 end;
 --
-function getSchemaLocationList(P_SCHEMA_LOCATION_HINT VARCHAR2,P_OWNER VARCHAR2 DEFAULT USER)
-return XDB.XDB$STRING_LIST_T
-as
-  V_SCHEMA_EXISTS NUMBER;
-  V_SCHEMA_LOCATION_LIST XDB.XDB$STRING_LIST_T := XDB.XDB$STRING_LIST_T();
-begin
-	select count(*) 
-	  into V_SCHEMA_EXISTS
-    from ALL_XML_SCHEMAS
-   where SCHEMA_URL = P_SCHEMA_LOCATION_HINT
-     and OWNER = P_OWNER;
-   
-	if (V_SCHEMA_EXISTS = 1) then
-    V_SCHEMA_LOCATION_LIST.extend();
-    V_SCHEMA_LOCATION_LIST(V_SCHEMA_LOCATION_LIST.last) := P_SCHEMA_LOCATION_HINT;
-    getDependentSchemas(P_SCHEMA_LOCATION_HINT, P_OWNER, V_SCHEMA_LOCATION_LIST);
-  end if;
- 
-  return V_SCHEMA_LOCATION_LIST;
-end;
---
-procedure addAnnotations(P_CONFIGURATION IN OUT XMLTYPE)
+procedure addAnnotations(P_XML_SCHEMA_CONFIGURATION IN OUT XMLTYPE)
 as
   V_ANNOTATIONS   XMLType;
   V_BUFFER        VARCHAR2(4000);
@@ -1652,15 +1571,15 @@ as
 begin
 
 $IF $$DEBUG $THEN
-   XDB_OUTPUT.writeTraceFileEntry('P_CONFIGURATION',TRUE);
-   XDB_OUTPUT.writeTraceFileEntry(P_CONFIGURATION,TRUE);
+   XDB_OUTPUT.writeTraceFileEntry('P_XML_SCHEMA_CONFIGURATION',TRUE);
+   XDB_OUTPUT.writeTraceFileEntry(P_XML_SCHEMA_CONFIGURATION,TRUE);
 $END
 
-	select XMLCast(XMLQuery('for $i in fn:namespace-uri($XML/*) return $i' passing P_CONFIGURATION as "XML" returning content) as VARCHAR2(1024))
+	select XMLCast(XMLQuery('for $i in fn:namespace-uri($XML/*) return $i' passing P_XML_SCHEMA_CONFIGURATION as "XML" returning content) as VARCHAR2(1024))
 	  into V_NAMESPACE_URI
 	  from DUAL;
 
-  -- V_NAMESPACE_URI := P_CONFIGURATION.getNamespace();
+  -- V_NAMESPACE_URI := P_XML_SCHEMA_CONFIGURATION.getNamespace();
     
 $IF $$DEBUG $THEN
   XDB_OUTPUT.writeTraceFileEntry('V_NAMESPACE_URI',TRUE);
@@ -1692,39 +1611,70 @@ $IF $$DEBUG $THEN
 $END              
       select insertChildXML
              (
-               P_CONFIGURATION,
+               P_XML_SCHEMA_CONFIGURATION,
                '/rc:RegistrationList/rc:Schema[rc:SchemaLocationHint="' || G_SCHEMA_ANNOTATION_CACHE(i).SCHEMA_LOCATION_HINT || '"]',
                'rc:Annotations',
                V_ANNOTATIONS,
                'xmlns:rc="' || V_NAMESPACE_URI || '"'
              )
-        into P_CONFIGURATION
+        into P_XML_SCHEMA_CONFIGURATION
         from DUAL;
     end if;
   end loop;  
 end;
 --
-function doTypeAnalysis(P_OUTPUT_FILE VARCHAR2, P_TARGET_NAME VARCHAR2, P_CONFIGURATION IN OUT XMLTYPE, P_SCHEMA_LOCATION_HINT VARCHAR2 DEFAULT NULL, P_OWNER VARCHAR2 DEFAULT USER, P_LIMIT NUMBER DEFAULT 3)
+function getFileName(P_PATH VARCHAR2)
 return VARCHAR2
 as
-  V_OPTIMIZATION_SUCCESSFUL BOOLEAN := FALSE;     
-  V_SCHEMA_LOCATION_LIST    XDB.XDB$STRING_LIST_T;
-  V_PARENT_XMLSCHEMA REF XMLTYPE := NULL;
+  V_FILENAME VARCHAR2(4000);
+begin
+  V_FILENAME := P_PATH;
+  V_FILENAME := substr(V_FILENAME,1,instr(V_FILENAME,'.',-1)-1);
+	
+  if instr(V_FILENAME,'/',-1) > 1 then
+	  V_FILENAME := substr(V_FILENAME,instr(V_FILENAME,'/',-1)+1);
+	end if;
+	
+	return V_FILENAME;
+end;
+--
+function doTypeAnalysis(P_XML_SCHEMA_CONFIGURATION IN OUT XMLTYPE, P_SCHEMA_LOCATION_HINT VARCHAR2 DEFAULT NULL, P_OWNER VARCHAR2 DEFAULT USER, P_LIMIT NUMBER DEFAULT 3)
+return BOOLEAN
+as
+  V_OPTIMIZATION_SUCCESSFUL        BOOLEAN := FALSE;     
+
+  V_PARENT_XMLSCHEMA REF           XMLTYPE := NULL;
+  V_SCHEMA_LOCATION_LIST           XDB.XDB$STRING_LIST_T;
+  
+  V_CONFIGURATION_FILENAME         VARCHAR2(700);
+  V_TYPE_OPTIMIZATION_FILENAME     VARCHAR2(700);
+  
+  V_TARGET                         VARCHAR2(700);
+  V_COMMENT                        VARCHAR2(32000);
 begin
 
+  V_TARGET 	                    := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/@target','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+	V_CONFIGURATION_FILENAME      := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/FileNames/registrationConfigurationFile/text()','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+	V_TYPE_OPTIMIZATION_FILENAME  := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/FileNames/typeOptimizationTraceFile/text()','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+		
+  createOutputFile(V_TYPE_OPTIMIZATION_FILENAME);  
+  		
+	V_COMMENT := '--' ||  C_NEW_LINE 
+	          || '-- Type analysis log for "' || V_TARGET || '"' || C_NEW_LINE 
+	          || '--' || C_NEW_LINE
+            || '-- Initiating Object-Relational type model optimization for "' || V_TARGET || '"' || C_NEW_LINE 
+	          || '--' || C_NEW_LINE;
+
+  XDB_OUTPUT.writeToFile(V_TYPE_OPTIMIZATION_FILENAME,V_COMMENT);
+   
+	          
 $IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
 	V_PARENT_XMLSCHEMA := XDBPM_ANALYZE_XMLSCHEMA.getXMLSchemaRef(P_SCHEMA_LOCATION_HINT,P_OWNER) PARENT_SCHEMA
 $END
+  
+ 	V_SCHEMA_LOCATION_LIST    := getSchemaLocationList(P_SCHEMA_LOCATION_HINT);
 
-  createOutputFile(P_OUTPUT_FILE);  
-
-  if (P_SCHEMA_LOCATION_HINT is NULL) then
-	  V_SCHEMA_LOCATION_LIST    := getSchemaLocationList(P_CONFIGURATION);
-	else
-  	V_SCHEMA_LOCATION_LIST    := getSchemaLocationList(P_SCHEMA_LOCATION_HINT,P_OWNER);
-  end if;
-
-	printSchemaList(P_OUTPUT_FILE, V_SCHEMA_LOCATION_LIST, P_TARGET_NAME, P_SCHEMA_LOCATION_HINT);  
+	printSchemaList(V_TYPE_OPTIMIZATION_FILENAME, V_SCHEMA_LOCATION_LIST, V_TARGET);  
 
   if (V_SCHEMA_LOCATION_LIST is not null) then
 	  G_TABLE_LIST              := getDefaultTableList();
@@ -1732,99 +1682,92 @@ $END
     enforceDomFidelity();
     addGlobalTypeNames(TRUE);
     addOutOfLineStorage(V_PARENT_XMLSCHEMA);
-    V_OPTIMIZATION_SUCCESSFUL := optimizeTypeModel(P_OUTPUT_FILE,P_LIMIT);
+    V_OPTIMIZATION_SUCCESSFUL := optimizeTypeModel(V_TYPE_OPTIMIZATION_FILENAME,P_LIMIT);
     if (V_OPTIMIZATION_SUCCESSFUL) then
-      addAnnotations(P_CONFIGURATION);
+      addAnnotations(P_XML_SCHEMA_CONFIGURATION);
+    end if;
+  end if;
+  
+  $IF $$DEBUG $THEN
+    XDB_OUTPUT.flushTraceFile();
+  $END
+
+  return V_OPTIMIZATION_SUCCESSFUL;
+end;	
+--
+function generateRegistrationScript(P_XML_SCHEMA_CONFIGURATION XMLTYPE) 
+return CLOB
+as
+  V_BUFFER     VARCHAR2(32000);
+  V_SCRIPT     CLOB;
+  V_RESULT     BOOLEAN;
+   
+  cursor getSchemas 
+  is
+  select * 
+    from XMLTable
+         (
+           xmlNamespaces
+           (
+              default 'http://xmlns.oracle.com/xdb/pm/registrationConfiguration'
+           ),
+           '/SchemaRegistrationConfiguration/SchemaInformation'
+           passing P_XML_SCHEMA_CONFIGURATION
+           columns
+           SCHEMA_LOCATION_HINT VARCHAR2(700) PATH 'schemaLocationHint',
+           REPOSITORY_PATH      VARCHAR2(700) PATH 'repositoryPath',
+           FORCE_OPTION         VARCHAR2(5)   PATH 'force',
+           ANNOTATIONS          CLOB          PATH 'annotations'
+         );
+
+  V_EVENTS                   VARCHAR2(32000);
+  V_OPTIONS                  VARCHAR2(64);
+  V_ENABLE_HIERARCHY_OPTION  VARCHAR2(64);
+  
+  V_LOCATION_PREFIX          VARCHAR2(700);
+  V_SCHEMA_LOCATION_HINT     VARCHAR2(700);
+begin
+	
+  V_OPTIONS := '0';
+
+  V_LOCATION_PREFIX := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/@schemaLocationPrefix','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration').getStringVal();
+
+  if (LENGTH(V_LOCATION_PREFIX) > 0) then
+    if (INSTR(V_LOCATION_PREFIX,'/',-1) <> LENGTH(V_LOCATION_PREFIX)) then
+      V_LOCATION_PREFIX := V_LOCATION_PREFIX || '/';
     end if;
   end if;
 
- 
-  return XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(V_OPTIMIZATION_SUCCESSFUL);
-end;	
---
-procedure createDeleteSchemaScript(P_SCRIPT_FILE VARCHAR2, P_COMMENT VARCHAR2, P_SCHEMA_ORDERING XMLTYPE) 
-as
-  pragma       autonomous_transaction;
-  V_BUFFER     VARCHAR2(32000);
-  V_SCRIPT     CLOB;
-  V_RESULT     BOOLEAN;
-   
-  cursor getSchemas 
-  is
-  select * 
-    from XMLTable
-         (
-           xmlNamespaces
-           (
-              default 'http://xmlns.oracle.com/xdb/pm/registrationConfiguration'
-           ),
-           '/RegistrationList/Schema'
-           passing P_SCHEMA_ORDERING
-           columns
-           SCHEMA_INDEX         FOR ORDINALITY,
-           SCHEMA_LOCATION_HINT VARCHAR2(700) PATH 'SchemaLocationHint',
-           REPOSITORY_PATH      VARCHAR2(700) PATH 'RepositoryPath',
-           FORCE_OPTION         VARCHAR2(5)   PATH 'Force',
-           ANNOTATIONS          CLOB          PATH 'Annotations'
-         )
-   ORDER BY SCHEMA_INDEX DESC;
-begin
-
- 	V_SCRIPT := P_COMMENT;
-	
-  for s in getSchemas() loop
-    V_BUFFER := 'declare' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-    V_BUFFER := '  V_SCHEMA_LOCATION_HINT VARCHAR2(700) := ''' || s.SCHEMA_LOCATION_HINT || '''; ' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-    V_BUFFER := 'begin' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-    V_BUFFER := '  DBMS_XMLSCHEMA.deleteSchema(V_SCHEMA_LOCATION_HINT,4);' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-    V_BUFFER := 'end;' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-    V_BUFFER := '/' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-  end loop;
-
-  if DBMS_XDB.existsResource(P_SCRIPT_FILE) then
-    DBMS_XDB.deleteResource(P_SCRIPT_FILE);
+  if (G_OPTIONS is not NULL) then
+    V_OPTIONS := G_OPTIONS;
+    if (G_OPTIONS = DBMS_XMLSCHEMA.REGISTER_NODOCID) then
+      V_OPTIONS := 'DBMS_XMLSCHEMA.REGISTER_NODOCID';
+    end if;
+			$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
+			$ELSE   
+    	if (G_OPTIONS = DBMS_XMLSCHEMA.REGISTER_BINARYXML) then
+        V_OPTIONS := 'DBMS_XMLSCHEMA.REGISTER_BINARYXML';
+      end if;
+      if (G_OPTIONS = DBMS_XMLSCHEMA.REGISTER_NT_AS_IOT) then
+        V_OPTIONS := 'DBMS_XMLSCHEMA.REGISTER_NT_AS_IOT';
+    end if;
+    $END
   end if;
-  V_RESULT := DBMS_XDB.createResource(P_SCRIPT_FILE, V_SCRIPT);
-  commit;
-  
-end;
---
-procedure printSchemaRegistrationScript(P_SCRIPT_FILE VARCHAR2, P_COMMENT VARCHAR2, P_SCHEMA_ORDERING XMLTYPE, P_XMLSCHEMA_FOLDER VARCHAR2) 
-as
-  pragma       autonomous_transaction;
-  V_BUFFER     VARCHAR2(32000);
-  V_SCRIPT     CLOB;
-  V_RESULT     BOOLEAN;
-   
-  cursor getSchemas 
-  is
-  select * 
-    from XMLTable
-         (
-           xmlNamespaces
-           (
-              default 'http://xmlns.oracle.com/xdb/pm/registrationConfiguration'
-           ),
-           '/RegistrationList/Schema'
-           passing P_SCHEMA_ORDERING
-           columns
-           SCHEMA_LOCATION_HINT VARCHAR2(700) PATH 'SchemaLocationHint',
-           REPOSITORY_PATH      VARCHAR2(700) PATH 'RepositoryPath',
-           FORCE_OPTION         VARCHAR2(5)   PATH 'Force',
-           ANNOTATIONS          CLOB          PATH 'Annotations'
-         );
 
-  V_EVENTS                 VARCHAR2(32000);
+  V_ENABLE_HIERARCHY_OPTION := 'DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE';
 
-begin
-	
- 	V_SCRIPT := P_COMMENT;
+		if (G_ENABLE_HIERARCHY is not NULL) then
+    V_ENABLE_HIERARCHY_OPTION := 'DBMS_XMLSCHEMA.ENABLE_HIERARCHY_INVALID';
+    if (G_ENABLE_HIERARCHY = DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE) then
+  	  V_ENABLE_HIERARCHY_OPTION := 'DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE';
+    end if;
+    if (G_ENABLE_HIERARCHY = DBMS_XMLSCHEMA.ENABLE_HIERARCHY_CONTENTS) then
+     V_ENABLE_HIERARCHY_OPTION := 'DBMS_XMLSCHEMA.ENABLE_HIERARCHY_CONTENTS';
+    end if;
+    if (G_ENABLE_HIERARCHY = DBMS_XMLSCHEMA.ENABLE_HIERARCHY_RESMETADATA) then
+	      V_ENABLE_HIERARCHY_OPTION := 'DBMS_XMLSCHEMA.ENABLE_HIERARCHY_RESMETADATA';
+    end if;
+  end if;
 
   V_EVENTS := '--'  || C_NEW_LINE;
   
@@ -1835,290 +1778,128 @@ begin
       V_EVENTS := V_EVENTS || '--' || C_NEW_LINE;
     end loop;
   end if;
+           
+  V_SCRIPT := V_EVENTS;
 
-  V_SCRIPT := V_SCRIPT || V_EVENTS;
-  
-  V_BUFFER := '-- begin' || C_NEW_LINE;
-  DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-	V_BUFFER := '  -- XDB_EDIT_XMLSCHEMA.getGroupDefinitions(''' || P_XMLSCHEMA_FOLDER || ''');' || C_NEW_LINE; 
-  DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-  V_BUFFER := '-- end;' || C_NEW_LINE;
-  DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-  V_BUFFER := '-- /' || C_NEW_LINE;
-  DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
+  -- V_BUFFER := 'begin' || C_NEW_LINE
+	--          || '  XDB_EDIT_XMLSCHEMA.getGroupDefinitions(''' || P_XMLSCHEMA_FOLDER || ''');' || C_NEW_LINE
+  --          || 'end;' || C_NEW_LINE
+  --          || '/' || C_BLANK_LINE;
+
+  -- DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
 
   for s in getSchemas() loop
  	
-    V_BUFFER := 'declare' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
+ 	  V_SCHEMA_LOCATION_HINT := V_LOCATION_PREFIX || s.SCHEMA_LOCATION_HINT;
+ 	
+    V_BUFFER := 'declare' || C_NEW_LINE
+             || '  V_XML_SCHEMA_PATH        VARCHAR2(700) := ''' || s.REPOSITORY_PATH || ''';' || C_NEW_LINE
+             || '  V_XML_SCHEMA             XMLType       := xdburitype(V_XML_SCHEMA_PATH).getXML(); ' || C_NEW_LINE
+             || '  V_SCHEMA_LOCATION_HINT   VARCHAR2(700) := ''' || V_SCHEMA_LOCATION_HINT || '''; ' || C_NEW_LINE
+             || 'begin' || C_NEW_LINE
+						 || '  DBMS_XMLSCHEMA_ANNOTATE.printWarnings(FALSE);' || C_BLANK_LINE
+ --          || '  -- XDB_EDIT_XMLSCHEMA.expandRepeatingGroups(V_XML_SCHEMA);' || C_BLANK_LINE
+             || '  -- XDB_EDIT_XMLSCHEMA.expandAllGroups(V_XML_SCHEMA);' || C_BLANK_LINE
+             || '  XDB_EDIT_XMLSCHEMA.removeAppInfo(V_XML_SCHEMA);' || C_NEW_LINE
+             || '  XDB_EDIT_XMLSCHEMA.fixRelativeURLs(V_XML_SCHEMA,V_SCHEMA_LOCATION_HINT);' || C_BLANK_LINE;
     
-    -- declareExceptions(V_SCRIPT);
-
-    V_BUFFER := '  V_XML_SCHEMA_PATH        VARCHAR2(700) := ''' || s.REPOSITORY_PATH || ''';' || C_NEW_LINE;
     DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := '  V_XML_SCHEMA             XMLType       := xdburitype(V_XML_SCHEMA_PATH).getXML(); ' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);	
-
-    V_BUFFER := '  V_SCHEMA_LOCATION_HINT   VARCHAR2(700) := ''' || s.SCHEMA_LOCATION_HINT || '''; ' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-    
-    V_BUFFER := 'begin' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    -- V_BUFFER := '  -- XDB_EDIT_XMLSCHEMA.expandRepeatingGroups(V_XML_SCHEMA);' || C_NEW_LINE;
-    V_BUFFER := '  -- XDB_EDIT_XMLSCHEMA.expandAllGroups(V_XML_SCHEMA);' || C_BLANK_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    -- V_BUFFER := '  DBMS_XMLSCHEMA_ANNOTATE.addXDBNamespace(V_XML_SCHEMA);' || C_NEW_LINE;
-    -- DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
 
     if (G_OPTIONS <> DBMS_XMLSCHEMA.REGISTER_BINARYXML) then
-      V_BUFFER := '  XDB_EDIT_XMLSCHEMA.mapAnyToClob(V_XML_SCHEMA);' || C_NEW_LINE;
-      DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-      V_BUFFER := '  XDB_EDIT_XMLSCHEMA.applySQLTypeMappings(V_XML_SCHEMA);' || C_NEW_LINE;
+      V_BUFFER := '  XDB_EDIT_XMLSCHEMA.mapAnyToClob(V_XML_SCHEMA);' || C_NEW_LINE
+               || '  XDB_EDIT_XMLSCHEMA.applySQLTypeMappings(V_XML_SCHEMA);' || C_BLANK_LINE;
       DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
     end if;
-
-    V_BUFFER := '  DBMS_XMLSCHEMA_ANNOTATE.printWarnings(FALSE);' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
     
     if (G_DISABLE_DEFAULT_TABLES) then
-      V_BUFFER := '  DBMS_XMLSCHEMA_ANNOTATE.disableDefaultTableCreation(V_XML_SCHEMA);' || C_NEW_LINE;
+      V_BUFFER := '  DBMS_XMLSCHEMA_ANNOTATE.disableDefaultTableCreation(V_XML_SCHEMA);' || C_BLANK_LINE;
       DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-     -- addExceptionBlock(V_SCRIPT,V_BUFFER);
     end if;
   
     if (G_DISABLE_DOM_FIDELITY) then
-      V_BUFFER := '  DBMS_XMLSCHEMA_ANNOTATE.disableMaintainDom(V_XML_SCHEMA,FALSE);' || C_NEW_LINE;
-      DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-      -- addExceptionBlock(V_SCRIPT,V_BUFFER);
-    end if;
-
-    V_BUFFER := C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-  
-    if (G_REMOVE_APPINFO) then
-      V_BUFFER := '  XDB_EDIT_XMLSCHEMA.removeAppInfo(V_XML_SCHEMA);' || C_NEW_LINE;
+      V_BUFFER := '  DBMS_XMLSCHEMA_ANNOTATE.disableMaintainDom(V_XML_SCHEMA,FALSE);' || C_BLANK_LINE;
       DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
     end if;
-
-    V_BUFFER := '  XDB_EDIT_XMLSCHEMA.fixRelativeURLs(V_XML_SCHEMA,V_SCHEMA_LOCATION_HINT);' || C_BLANK_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
 
     if (s.ANNOTATIONS is not NULL) then
       DBMS_LOB.APPEND(V_SCRIPT,s.ANNOTATIONS);
     end if;
-
-    V_BUFFER := '  XDB_EDIT_XMLSCHEMA.saveAnnotatedSchema(V_XML_SCHEMA_PATH, V_XML_SCHEMA);' || C_BLANK_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := '  commit;' || C_BLANK_LINE; 
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := 'end;' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-  
-    V_BUFFER := '/' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := 'declare' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := '  V_XML_SCHEMA_PATH        VARCHAR2(700) := ''' || s.REPOSITORY_PATH || ''';' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := '  V_XML_SCHEMA             XMLType       := xdburitype(V_XML_SCHEMA_PATH).getXML(); ' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);	
-
-    V_BUFFER := '  V_SCHEMA_LOCATION_HINT   VARCHAR2(700) := ''' || s.SCHEMA_LOCATION_HINT || '''; ' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
     
-    if (G_OPTIONS <> DBMS_XMLSCHEMA.REGISTER_BINARYXML) then
-      V_BUFFER := '  V_REGISTRATION_TIMESTAMP TIMESTAMP; ' || C_NEW_LINE;
-      DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-    end if;
-
-    V_BUFFER := 'begin' || C_NEW_LINE;
+    V_BUFFER := '  XDB_EDIT_XMLSCHEMA.saveAnnotatedSchema(V_XML_SCHEMA_PATH, V_XML_SCHEMA);' || C_BLANK_LINE
+             || '  commit;' || C_BLANK_LINE 
+             || 'end;' || C_NEW_LINE
+             || '/' || C_NEW_LINE
+             || 'declare' || C_NEW_LINE
+             || '  V_XML_SCHEMA_PATH        VARCHAR2(700) := ''' || s.REPOSITORY_PATH || ''';' || C_NEW_LINE
+             || '  V_XML_SCHEMA             XMLType       := xdburitype(V_XML_SCHEMA_PATH).getXML(); ' || C_NEW_LINE
+             || '  V_SCHEMA_LOCATION_HINT   VARCHAR2(700) := ''' || V_SCHEMA_LOCATION_HINT || '''; ' || C_NEW_LINE
+             || '  V_REGISTRATION_TIMESTAMP TIMESTAMP; ' || C_NEW_LINE
+             || 'begin' || C_NEW_LINE
+             || '  V_REGISTRATION_TIMESTAMP := SYSTIMESTAMP; ' || C_BLANK_LINE
+             || '  DBMS_XMLSCHEMA.registerSchema(' || C_NEW_LINE
+             || '    SCHEMAURL       => V_SCHEMA_LOCATION_HINT' || C_NEW_LINE
+             || '   ,SCHEMADOC       => V_XML_SCHEMA' || C_NEW_LINE
+             || '   ,LOCAL           => '   || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(G_LOCAL) || C_NEW_LINE
+             || '   ,GENTYPES        => '   || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(G_GENTYPES) || C_NEW_LINE
+             || '   ,GENTABLES       => '   || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(G_GENTABLES) || C_NEW_LINE
+             || '   ,FORCE           => '   || UPPER(s.FORCE_OPTION) || C_NEW_LINE
+             || '   ,OWNER           => ''' || G_OWNER || '''' || C_NEW_LINE
+             || '   ,ENABLEHIERARCHY => '   || V_ENABLE_HIERARCHY_OPTION || C_NEW_LINE
+             || '   ,OPTIONS         => '   || V_OPTIONS || C_NEW_LINE
+             ||'  );' || C_BLANK_LINE;
+             
     DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
 
     if (G_OPTIONS <> DBMS_XMLSCHEMA.REGISTER_BINARYXML) then
-      V_BUFFER := '  V_REGISTRATION_TIMESTAMP := SYSTIMESTAMP; ' || C_BLANK_LINE;
+      V_BUFFER :='  XDB_ANALYZE_SCHEMA.deleteOrphanTypes(V_REGISTRATION_TIMESTAMP);' || C_BLANK_LINE;
       DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
     end if;
     
-    V_BUFFER := '  DBMS_XMLSCHEMA.registerSchema' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
+   V_BUFFER := 'end;' || C_NEW_LINE
+            || '/' || C_NEW_LINE;
 
-    V_BUFFER := '  (' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := '    SCHEMAURL       => V_SCHEMA_LOCATION_HINT' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := '   ,SCHEMADOC       => V_XML_SCHEMA' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    if (G_LOCAL) then
-      V_BUFFER := '   ,LOCAL           => '|| XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(TRUE) || C_NEW_LINE;
-    else
-      V_BUFFER := '   ,LOCAL           => '|| XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(FALSE) || C_NEW_LINE;
-    end if;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := '   ,GENTYPES        => '|| XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(G_GENTYPES) || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    V_BUFFER := '   ,GENTABLES       => '|| XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(G_GENTABLES) || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    if (s.FORCE_OPTION = 'TRUE' or G_FORCE) then
-      V_BUFFER := '   ,FORCE           => '|| XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(TRUE) || C_NEW_LINE;
-      DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-    end if;
-  
-    if (G_OWNER is not null) then
-      V_BUFFER := '   ,OWNER           => ''' || G_OWNER || '''' || C_NEW_LINE;
-      DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-    end if;
-
-    if (G_ENABLE_HIERARCHY is not NULL) then
-      V_BUFFER := '    ,ENABLEHIERARCHY => DBMS_XMLSCHEMA.ENABLE_HIERARCHY_INVALID' || C_NEW_LINE;
-      if (G_ENABLE_HIERARCHY = DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE) then
-        V_BUFFER := '   ,ENABLEHIERARCHY => DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE' || C_NEW_LINE;
-      end if;
-      if (G_ENABLE_HIERARCHY = DBMS_XMLSCHEMA.ENABLE_HIERARCHY_CONTENTS) then
-        V_BUFFER := '   ,ENABLEHIERARCHY => DBMS_XMLSCHEMA.ENABLE_HIERARCHY_CONTENTS' || C_NEW_LINE;
-      end if;
-      if (G_ENABLE_HIERARCHY = DBMS_XMLSCHEMA.ENABLE_HIERARCHY_RESMETADATA) then
-        V_BUFFER := '   ,ENABLEHIERARCHY => DBMS_XMLSCHEMA.ENABLE_HIERARCHY_RESMETADATA' || C_NEW_LINE;
-      end if;
-      DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-    end if;
-
-    if (G_OPTIONS is not NULL) then
-      V_BUFFER := '  ,OPTIONS       => ' || G_OPTIONS ||  C_NEW_LINE;
-      if (G_OPTIONS = DBMS_XMLSCHEMA.REGISTER_NODOCID) then
-        V_BUFFER := '   ,OPTIONS         => DBMS_XMLSCHEMA.REGISTER_NODOCID' || C_NEW_LINE;
-      end if;
-$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
-$ELSE   
-      if (G_OPTIONS = DBMS_XMLSCHEMA.REGISTER_BINARYXML) then
-        V_BUFFER := '   ,OPTIONS         => DBMS_XMLSCHEMA.REGISTER_BINARYXML' || C_NEW_LINE;
-      end if;
-      if (G_OPTIONS = DBMS_XMLSCHEMA.REGISTER_NT_AS_IOT) then
-        V_BUFFER := '   ,OPTIONS         => DBMS_XMLSCHEMA.REGISTER_NT_AS_IOT' || C_NEW_LINE;
-      end if;
-$END
-      DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-    end if;
-
-    V_BUFFER := '  );' || C_BLANK_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-
-    if (G_OPTIONS <> DBMS_XMLSCHEMA.REGISTER_BINARYXML) then
-      V_BUFFER := '  XDB_ANALYZE_SCHEMA.deleteOrphanTypes(V_REGISTRATION_TIMESTAMP);' || C_NEW_LINE;
-      DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-    end if;
-    
-    V_BUFFER := 'end;' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-  
-    V_BUFFER := '/' || C_NEW_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
+  DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
 
   end loop;
   
-  if DBMS_XDB.existsResource(P_SCRIPT_FILE) then
-    DBMS_XDB.deleteResource(P_SCRIPT_FILE);
-  end if;
-  V_RESULT := DBMS_XDB.createResource(P_SCRIPT_FILE, V_SCRIPT);
-  commit;
+  return V_SCRIPT;
 end;
 --
-procedure schemaRegistrationScript(P_OUTPUT_FOLDER VARCHAR2, P_XMLSCHEMA_FOLDER VARCHAR2, P_CONFIGURATION XMLType, P_SCHEMA_LOCATION_HINT VARCHAR2 DEFAULT NULL, P_OWNER VARCHAR2 DEFAULT USER, P_LIMIT NUMBER DEFAULT 3)
+function createSchemaRegistrationScript(P_XML_SCHEMA_CONFIGURATION XMLTYPE) 
+return VARCHAR2
 as
-  V_SUCCESS                VARCHAR2(10);
-  V_TARGET_LOCATION        VARCHAR2(700);
-  V_SCHEMA_NAME            VARCHAR2(256);
-  V_SCHEMA_ORDERING        XMLTYPE;
-  V_DEL_COMMENT            VARCHAR2(4000);
-  V_REG_COMMENT            VARCHAR2(4000);
-  V_RESULT                 BOOLEAN;
-
-  V_TRACE_FILE             VARCHAR2(700);
-  V_SCRIPT_FILE            VARCHAR2(700);
-  V_CONFIGURATION_FILE     VARCHAR2(700);
-  V_DELETE_SCRIPT_FILE     VARCHAR2(700);
-  V_TYPE_ANALYSIS_FILE     VARCHAR2(700);
+  pragma                         autonomous_transaction;
+  V_SCRIPT                       CLOB;
+  V_TARGET                       VARCHAR2(700);
+  V_CONFIGURATION_FILENAME       VARCHAR2(700);
+  V_REGISTRATION_SCRIPT_FILENAME VARCHAR2(700);
+  V_COMMENT                      VARCHAR2(32000); 
+  V_SPOOL_FILENAME               VARCHAR2(700);
 begin
 
-$IF $$DEBUG $THEN
-  XDB_OUTPUT.createTraceFile('/public/analyzeSchema.log');
-  XDB_OUTPUT.writeTraceFileEntry('SchemaRegistrationScript : ' || SYSTIMESTAMP,TRUE);
-$END
-	
-	if (P_SCHEMA_LOCATION_HINT is NULL) then
-	  V_SCHEMA_NAME     := P_XMLSCHEMA_FOLDER;
-    V_TARGET_LOCATION := P_XMLSCHEMA_FOLDER;
-    V_DEL_COMMENT     :=  '--' ||  C_NEW_LINE || '-- Schema Deletion Script for XML Schemas in "' || V_TARGET_LOCATION || '" --' || C_NEW_LINE || '--' || C_NEW_LINE;
-    V_REG_COMMENT     :=  '--' ||  C_NEW_LINE || '-- Schema Registration Script for XML Schemas in "' || V_TARGET_LOCATION || '" --' || C_NEW_LINE || '--' || C_NEW_LINE;
-  else
-    --
-    -- Assume Schema Location Hint ends in ".xsd"
-    --
-    V_SCHEMA_NAME     := substr(P_SCHEMA_LOCATION_HINT,1,instr(P_SCHEMA_LOCATION_HINT,'.',-1)-1);
-    V_TARGET_LOCATION := P_SCHEMA_LOCATION_HINT;
-    V_DEL_COMMENT     :=  '--' ||  C_NEW_LINE || '-- Schema Deletion Script for XML Schema "' || V_TARGET_LOCATION || '" --' || C_NEW_LINE || '--' || C_NEW_LINE;
-    V_REG_COMMENT     :=  '--' ||  C_NEW_LINE || '-- Schmea Registration Script for XML Schema "' || V_TARGET_LOCATION || '" --' || C_NEW_LINE || '--' || C_NEW_LINE;
-  end if;
+  V_TARGET 	                      := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/@target','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+	V_CONFIGURATION_FILENAME        := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/FileNames/registrationConfigurationFile/text()','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+	V_REGISTRATION_SCRIPT_FILENAME  := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/FileNames/registrationScriptFile/text()','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+		
+	V_SPOOL_FILENAME := getFileName(V_REGISTRATION_SCRIPT_FILENAME);
+	V_SPOOL_FILENAME := substr(V_SPOOL_FILENAME,1,instr(V_SPOOL_FILENAME,'.',-1));
+		
+	V_COMMENT := 'set echo on' || C_NEW_LINE 
+	          || 'spool ' || V_SPOOL_FILENAME || '.log' || C_NEW_LINE 
+						|| '--' || C_NEW_LINE 
+	          || '-- Schema Registration Script for "' || V_TARGET || '"' || C_NEW_LINE 
+	          || '--' || C_NEW_LINE;
 
-  if instr(V_SCHEMA_NAME,'/',-1) > 1 then
-	  V_SCHEMA_NAME := substr(V_SCHEMA_NAME,instr(V_SCHEMA_NAME,'/',-1)+1);
-	end if;
-  
-  V_TRACE_FILE         := P_OUTPUT_FOLDER || '/' || V_SCHEMA_NAME || '.log';
-  V_SCRIPT_FILE        := P_OUTPUT_FOLDER || '/' || V_SCHEMA_NAME || '.sql';
-  V_CONFIGURATION_FILE := P_OUTPUT_FOLDER || '/' || V_SCHEMA_NAME || '.xml';
-  V_DELETE_SCRIPT_FILE := P_OUTPUT_FOLDER || '/deleteSchemas.sql';
-  V_TYPE_ANALYSIS_FILE := P_OUTPUT_FOLDER || '/typeAnalysis.log';
-
-	V_SCHEMA_ORDERING := P_CONFIGURATION;
-
-  if DBMS_XDB.existsResource(V_DELETE_SCRIPT_FILE) then
-    DBMS_XDB.deleteResource(V_DELETE_SCRIPT_FILE);
-    commit;
-  end if;
-
-  if DBMS_XDB.existsResource(V_TYPE_ANALYSIS_FILE) then
-    DBMS_XDB.deleteResource(V_TYPE_ANALYSIS_FILE);
-    commit;
-  end if;
-	
-  if DBMS_XDB.existsResource(V_CONFIGURATION_FILE) then
-    DBMS_XDB.deleteResource(V_CONFIGURATION_FILE);
-    commit;
-  end if;
-	
-	createDeleteSchemaScript( V_DELETE_SCRIPT_FILE , V_DEL_COMMENT, V_SCHEMA_ORDERING);
-  commit;
-
-  V_SUCCESS := doTypeAnalysis(V_TYPE_ANALYSIS_FILE, V_TARGET_LOCATION, V_SCHEMA_ORDERING, P_SCHEMA_LOCATION_HINT, P_OWNER, P_LIMIT);
-  commit;
-
-  V_RESULT  := DBMS_XDB.createResource(V_CONFIGURATION_FILE,V_SCHEMA_ORDERING); 
+ 	V_SCRIPT := V_COMMENT;
+ 	DBMS_LOB.APPEND(V_SCRIPT,generateRegistrationScript(P_XML_SCHEMA_CONFIGURATION));
+  XDB_UTILITIES.uploadResource(V_REGISTRATION_SCRIPT_FILENAME,V_SCRIPT,XDB_CONSTANTS.VERSION);
+  XDB_UTILITIES.uploadResource(V_CONFIGURATION_FILENAME,P_XML_SCHEMA_CONFIGURATION,XDB_CONSTANTS.VERSION);
   commit;
   
-  printSchemaRegistrationScript(V_SCRIPT_FILE, V_REG_COMMENT, V_SCHEMA_ORDERING, P_XMLSCHEMA_FOLDER);	
-  commit;
-
-$IF $$DEBUG $THEN
-  XDB_OUTPUT.flushTraceFile();
-$END
-
+  return V_REGISTRATION_SCRIPT_FILENAME;
 end;
 --
-procedure printScriptFile(P_RESOURCE_PATH VARCHAR2)
+procedure createSchemaRegistrationScript(P_RESOURCE_PATH VARCHAR2)
 as
   V_CONTENT CLOB;
   V_BUFFER  VARCHAR2(4000);
@@ -2127,15 +1908,16 @@ as
 begin
 	for i in G_SCHEMA_ANNOTATION_CACHE.first .. G_SCHEMA_ANNOTATION_CACHE.last loop
     if G_SCHEMA_ANNOTATION_CACHE(i).HAS_ANNOTATIONS then
-      DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+      DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
       V_SCHEMA_LOCATION_HINT := G_SCHEMA_ANNOTATION_CACHE(i).SCHEMA_LOCATION_HINT;
       
-      V_BUFFER := ' -- Annotations for "' || V_SCHEMA_LOCATION_HINT || '" --' ||  C_BLANK_LINE;
+      V_BUFFER := ' -- Annotations for "' || V_SCHEMA_LOCATION_HINT || '" --' ||  C_BLANK_LINE
+               || '  if (V_SCHEMA_LOCATION_HINT = ''' || V_SCHEMA_LOCATION_HINT || ''') THEN ' || C_BLANK_LINE;
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
-      V_BUFFER := '  if (V_SCHEMA_LOCATION_HINT = ''' || V_SCHEMA_LOCATION_HINT || ''') THEN ' || C_BLANK_LINE;
-      DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
+
       DBMS_LOB.append(V_CONTENT,G_SCHEMA_ANNOTATION_CACHE(i).SCHEMA_ANNOTATIONS);
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(C_NEW_LINE),C_NEW_LINE);
+
       V_BUFFER :=  '  end if;' || C_BLANK_LINE;
       DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
       
@@ -2143,17 +1925,16 @@ begin
     end if;
   end loop;
   
-  DBMS_LOB.createTemporary(V_CONTENT,TRUE);
+  DBMS_LOB.createTemporary(V_CONTENT,TRUE,DBMS_LOB.call);
   V_BUFFER :=  '-- End of Script --' || C_BLANK_LINE;
   DBMS_LOB.writeAppend(V_CONTENT,LENGTH(V_BUFFER),V_BUFFER);
   XDB_OUTPUT.writeToFile(P_RESOURCE_PATH,V_CONTENT);
-  
 end;
 --
-
 procedure describeAnnotations(P_RESOURCE_PATH VARCHAR2, P_SCHEMA_LOCATION_HINT VARCHAR2,P_OWNER VARCHAR2 DEFAULT USER)
 as
   V_REUSE_GENERATED_NAMES BOOLEAN := TRUE;
+  
   V_SCHEMA_LOCATION_LIST XDB.XDB$STRING_LIST_T;
   V_PARENT_XMLSCHEMA REF XMLTYPE := NULL;
 begin
@@ -2162,177 +1943,25 @@ $IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
 	V_PARENT_XMLSCHEMA := XDB_OPTIMIZE_XMLSCHEMA.getXMLSchemaRef(P_SCHEMA_LOCATION_HINT,P_OWNER) PARENT_SCHEMA
 $END
 
-	V_SCHEMA_LOCATION_LIST    := getSchemaLocationList(P_SCHEMA_LOCATION_HINT,P_OWNER);
+	V_SCHEMA_LOCATION_LIST    := getSchemaLocationList(P_SCHEMA_LOCATION_HINT);
 
   createOutputFile(P_RESOURCE_PATH);  
-	printSchemaList(P_RESOURCE_PATH, V_SCHEMA_LOCATION_LIST, P_SCHEMA_LOCATION_HINT, P_SCHEMA_LOCATION_HINT);
+	printSchemaList(P_RESOURCE_PATH, V_SCHEMA_LOCATION_LIST, P_SCHEMA_LOCATION_HINT);
 	    
   if (V_SCHEMA_LOCATION_LIST is not null) then G_TABLE_LIST              := 
     getDefaultTableList(); 
     G_SCHEMA_ANNOTATION_CACHE := loadSchemaAnnotationCache(V_SCHEMA_LOCATION_LIST); 
     addGlobalTypeNames(TRUE); 
     addOutOfLineStorage(V_PARENT_XMLSCHEMA); 
-    printScriptFile(P_RESOURCE_PATH); 
+    createSchemaRegistrationScript(P_RESOURCE_PATH); 
   end if;
 
 end;	
---
-procedure tableCreationScript(P_OUTPUT_FOLDER VARCHAR2, P_TARGET_NAMESPACE VARCHAR2)
-as
---
-  pragma       autonomous_transaction;
-
-  TYPE T_XML_TABLE_LIST 
-       IS TABLE OF VARCHAR2(32) 
-       INDEX BY VARCHAR2(32);
-       
-  V_XML_TABLE_LIST T_XML_TABLE_LIST;
-
-  V_NEW_TABLE_NAME VARCHAR2(32);
-  V_COUNTER        NUMBER(2);
-  
-  V_BUFFER     VARCHAR2(32000);
-  V_SCRIPT     CLOB;
-  V_RESULT     BOOLEAN;
-  
-  V_XQUERY     CLOB := 
-  
-' declare namespace xdbpm = "http://xmlns.oracle.com/xdb/xdbpm"; 
-  declare namespace xdb = "http://xmlns.oracle.com/xdb";
-             
-  declare function xdbpm:qname-to-string ( $qname as xs:string, $context as node() ) 
-          as xs:string
-  { 
-    let $qn := fn:resolve-QName( $qname, $context)
-    return concat(fn:local-name-from-QName($qn),":",fn:namespace-uri-from-QName($qn))
-  }; 
-  
-  declare function xdbpm:global-elements ( $schemaList as  node() *,  $complexTypeList as  xs:string*) 
-       as xs:string*
-  {           
-     let $elementList := for $schema in $schemaList/SCHEMA/xs:schema
-                           for $element in $schema/xs:element[not(@substitutionGroup) and not(@abstract="true") and not(xs:simpleType)]
-                             where (($element/@type and (xdbpm:qname-to-string($element/@type,$element) = $complexTypeList)) or $element/xs:complexType)
-                     	     return if ($schema/@targetNamespace) then
-  		                         concat($element/@name,":",$schema/@targetNamespace)
-  		                       else
-  		                         concat($element/@name,":")
-     let $elementList := fn:distinct-values($elementList)
-     return $elementList
-  }; 
-                      
-  declare function xdbpm:ref-elements ( $schemaList as  node() * ) 
-       as xs:string*
-  {           
-    let $refElementList := for $e in $schemaList/SCHEMA//xs:element[@ref]
-                               return xdbpm:qname-to-string($e/@ref,$e)
-    let $refElementList := fn:distinct-values($refElementList)
-    return $refElementList
-  }; 
-  
-  declare function xdbpm:getSchemaElement( $schemaList as node()*, $e as xs:string) as node()
-  {
-    if (fn:substring-after($e,":") = "") then 
-      for $sch in $schemaList/SCHEMA/xs:schema[not(@targetNamespace) and xs:element[@name=fn:substring-before($e,":")]]
-        return <Table>
-                 <SCHEMA_URL>{fn:data($sch/@xdb:schemaURL)}</SCHEMA_URL>,
-                 <ELEMENT>{fn:substring-before($e,":")}</ELEMENT>
-               </Table>
-    else
-      for $sch in $schemaList/SCHEMA/xs:schema[@targetNamespace=fn:substring-after($e,":") and xs:element[@name=fn:substring-before($e,":")]]
-        return <Table>
-                 <SCHEMA_URL>{fn:data($sch/@xdb:schemaURL)}</SCHEMA_URL>,
-                 <NAMESPACE>{fn:data($sch/@targetNamespace)}</NAMESPACE>
-                 <ELEMENT>{fn:substring-before($e,":")}</ELEMENT>
-               </Table>
-  };
-
-  let $schemaList := fn:collection("oradb:/PUBLIC/USER_XML_SCHEMAS")/ROW                  
-
-  let $complexTypeList := for $schema in $schemaList/SCHEMA/xs:schema
-                            for $ct in $schema/xs:complexType                          
-                              return if ($schema/@targetNamespace) then
-  		                                 concat($ct/@name,":",$schema/@targetNamespace)
-  		                               else
-  		                                concat($ct/@name,":")
-  		                                                              
-  let $globalElements := xdbpm:global-elements($schemaList,$complexTypeList)
-
-  let $refs := xdbpm:ref-elements($schemaList)
-  for $e in $globalElements
-    where not ($e = $refs) 
-    return xdbpm:getSchemaElement($schemaList, $e)';
-             
-  V_SCRIPT_FILE  VARCHAR2(700) := P_OUTPUT_FOLDER || '/doTableCreation.sql';
-
-  cursor getElements
-  is
-  select /*+ NO_XML_QUERY_REWRITE */
-         SCHEMA_URL, ELEMENT
-    from XMLTable
-         (
-           V_XQUERY
-           COLUMNS 
-           SCHEMA_URL   VARCHAR2(700),
-           ELEMENT      VARCHAR2(256),
-           NAMESPACE    VARCHAR2(700)
-         )
-   where (P_TARGET_NAMESPACE is not null and NAMESPACE like P_TARGET_NAMESPACE)
-       or
-         (P_TARGET_NAMESPACE is null and NAMESPACE is null)
-   order by NAMESPACE, SCHEMA_URL, ELEMENT;
-           
-  V_SQLCODE NUMBER;
-  V_SQLERRM VARCHAR2(4000);
-
-begin
-	
-	for c in 
-	(
-	  select TABLE_NAME 
-	    from USER_XML_TABLES
-	) loop 
-	  V_XML_TABLE_LIST(c.TABLE_NAME) := c.TABLE_NAME;
-  end loop;
-
-  if DBMS_XDB.existsResource(V_SCRIPT_FILE) then
-    DBMS_XDB.deleteResource(V_SCRIPT_FILE);
-    commit;
-  end if;
-
-  V_SCRIPT := '-- Table creation for namespace "' || P_TARGET_NAMESPACE || '"' || C_BLANK_LINE;
-    
-  for t in getElements loop
-    V_NEW_TABLE_NAME := UPPER(SUBSTR(t.ELEMENT,1,24)) || '_TABLE';
-
-    V_COUNTER := 0;    
-    while (V_XML_TABLE_LIST.exists(V_NEW_TABLE_NAME)) loop
-	    V_COUNTER := V_COUNTER + 1;
-	    V_NEW_TABLE_NAME := SUBSTR(UPPER(t.ELEMENT),1,21) || '_' || LPAD(V_COUNTER,2,'0') || '_TABLE';
-	  end loop;
-
-    V_XML_TABLE_LIST(V_NEW_TABLE_NAME) := V_NEW_TABLE_NAME;
-
-    V_BUFFER := 'CREATE TABLE "' || V_NEW_TABLE_NAME || '" of XMLTYPE'  || C_NEW_LINE;
-    if (G_OPTIONS = DBMS_XMLSCHEMA.REGISTER_BINARYXML) then
-      V_BUFFER := V_BUFFER || 'XMLTYPE STORE AS SECUREFILE BINARY XML' || C_NEW_LINE;
-    else
-      V_BUFFER := V_BUFFER || 'XMLTYPE STORE AS OBJECT RELATIONAL' || C_NEW_LINE;
-    end if;
-    V_BUFFER := V_BUFFER || 'XMLSCHEMA "' || t.SCHEMA_URL || '" ELEMENT "' || t.ELEMENT || '"' || C_NEW_LINE;
-    V_BUFFER := V_BUFFER || '/'||  C_BLANK_LINE;
-    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-  end loop;
-
-  V_RESULT  := DBMS_XDB.createResource(V_SCRIPT_FILE,V_SCRIPT); 
-  commit;
-end;          
 --
 procedure setSchemaRegistrationOptions(
            P_LOCAL                BOOLEAN        DEFAULT TRUE,  
            P_GENTYPES             BOOLEAN        DEFAULT TRUE,  
            P_GENTABLES            BOOLEAN        DEFAULT TRUE, 
-           P_FORCE                BOOLEAN        DEFAULT FALSE, 
            P_OWNER                VARCHAR2       DEFAULT NULL, 
            P_ENABLE_HIERARCHY     BINARY_INTEGER DEFAULT DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE,
            P_OPTIONS              BINARY_INTEGER DEFAULT NULL
@@ -2342,57 +1971,17 @@ begin
 	G_LOCAL            := P_LOCAL;
 	G_GENTYPES         := P_GENTYPES;
 	G_GENTABLES        := P_GENTABLES;
-	G_FORCE            := P_FORCE;
 	G_OWNER            := P_OWNER;
 	G_ENABLE_HIERARCHY := P_ENABLE_HIERARCHY;
 	G_OPTIONS          := P_OPTIONS;
 end;
 --
 procedure setRegistrationScriptOptions(
-           P_ADD_XDB_NAMESPACE      BOOLEAN        DEFAULT TRUE,  
-           P_DISABLE_DOM_FIDELITY   BOOLEAN        DEFAULT FALSE, 
-           P_DISABLE_DEFAULT_TABLES BOOLEAN        DEFAULT FALSE,
-           P_REMOVE_APPINFO         BOOLEAN        DEFAULT FALSE,
-           P_CALL_ANNOTATION_SCRIPT BOOLEAN        DEFAULT FALSE
+           P_DISABLE_DOM_FIDELITY   BOOLEAN        DEFAULT FALSE
         )
 as
 begin
-	G_ADD_XDB_NAMESPACE      := P_ADD_XDB_NAMESPACE;
 	G_DISABLE_DOM_FIDELITY   := P_DISABLE_DOM_FIDELITY;
-	G_DISABLE_DEFAULT_TABLES := P_DISABLE_DEFAULT_TABLES;
-	G_REMOVE_APPINFO         := P_REMOVE_APPINFO;
-	G_CALL_ANNOTATION_SCRIPT := P_CALL_ANNOTATION_SCRIPT; 
-end;
---
-procedure addXDBNamespace
-as
-begin
-	G_ADD_XDB_NAMESPACE      := TRUE;
-end;
---
-procedure disableDOMFidelity
-as
-begin
-	G_DISABLE_DOM_FIDELITY   := TRUE;
-end;
---
-procedure disableDefaultTables
-as
-begin
-	G_DISABLE_DEFAULT_TABLES := TRUE;
-end;
---
-procedure removeAppInfo
-as
-begin
-	G_REMOVE_APPINFO := TRUE;
-end;
---
-
-procedure annotationScript
-as
-begin
-	G_CALL_ANNOTATION_SCRIPT := TRUE; 
 end;
 --
 procedure setEvent(P_EVENT VARCHAR2, P_LEVEL VARCHAR2) 
@@ -2420,8 +2009,331 @@ end;
 --
 $END
 --
+function generateDeleteSchemaScript(P_XML_SCHEMA_CONFIGURATION XMLTYPE) 
+return CLOB
+as
+  V_BUFFER               VARCHAR2(32000);
+  V_SCRIPT               CLOB;
+  V_RESULT               BOOLEAN;
+  V_LOCATION_PREFIX      VARCHAR2(700);
+  V_SCHEMA_LOCATION_HINT VARCHAR2(700);
+  V_LOCAL_PATH           VARCHAR2(700);
+  
+  cursor getSchemas 
+  is
+  select * 
+    from XMLTable
+         (
+           xmlNamespaces
+           (
+              default 'http://xmlns.oracle.com/xdb/pm/registrationConfiguration'
+           ),
+           '/SchemaRegistrationConfiguration/SchemaInformation'
+           passing P_XML_SCHEMA_CONFIGURATION
+           columns
+           SCHEMA_INDEX         FOR ORDINALITY,
+           SCHEMA_LOCATION_HINT VARCHAR2(700) PATH 'schemaLocationHint'
+         )
+   ORDER BY SCHEMA_INDEX DESC;
+begin
+
+ 	DBMS_LOB.createTemporary(V_SCRIPT,FALSE,DBMS_LOB.CALL);
+ 
+  V_LOCATION_PREFIX := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/@schemaLocationPrefix','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration').getStringVal();
+
+  if (LENGTH(V_LOCATION_PREFIX) > 0) then
+    if (INSTR(V_LOCATION_PREFIX,'/',-1) <> LENGTH(V_LOCATION_PREFIX)) then
+      V_LOCATION_PREFIX := V_LOCATION_PREFIX || '/';
+    end if;
+  end if;
+	
+  for s in getSchemas() loop
+
+    V_LOCAL_PATH := s.SCHEMA_LOCATION_HINT;
+    if (INSTR(V_LOCAL_PATH,'/') = 1) THEN
+	    V_LOCAL_PATH := SUBSTR(V_LOCAL_PATH,2);
+    end if;
+ 
+	  V_SCHEMA_LOCATION_HINT := V_LOCATION_PREFIX || s.SCHEMA_LOCATION_HINT;
+
+ 		V_BUFFER := 'declare' || C_NEW_LINE
+ 		         || '  V_SCHEMA_LOCATION_HINT VARCHAR2(700) := ''' || V_LOCATION_PREFIX || V_LOCAL_PATH || '''; ' || C_NEW_LINE
+ 		         || '  V_XML_SCHEMA            XMLTYPE;' || C_NEW_LINE || C_NEW_LINE
+ 		         || 'begin' || C_NEW_LINE
+ 		         || '  select SCHEMA' || C_NEW_LINE
+ 		         || '    into V_XML_SCHEMA' || C_NEW_LINE
+             || '    from USER_XML_SCHEMAS' || C_NEW_LINE
+             || '   where SCHEMA_URL = V_SCHEMA_LOCATION_HINT;' || C_NEW_LINE  || C_NEW_LINE
+             || '  DBMS_XMLSCHEMA.deleteSchema(V_SCHEMA_LOCATION_HINT,4);' || C_NEW_LINE || C_NEW_LINE
+             || '  XDB_XMLSCHEMA_UTILITIES.cleanXMLSchemaArtifacts(V_XML_SCHEMA); ' || C_NEW_LINE || C_NEW_LINE
+             || 'end;' || C_NEW_LINE
+             || '/' || C_NEW_LINE;
+
+    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
+
+  end loop;
+  
+  return V_SCRIPT;
+
+end;
+--
+procedure appendScript(P_SCRIPT_PATH VARCHAR2,P_ADDITIONAL_CONTENT CLOB) 
+as
+  V_SCRIPT_CONTENT       CLOB;
+begin
+  select xdburitype(P_SCRIPT_PATH).getClob()
+	  into V_SCRIPT_CONTENT 
+	  from dual;
+
+  DBMS_LOB.append(V_SCRIPT_CONTENT, P_ADDITIONAL_CONTENT);
+  XDB_UTILITIES.uploadResource(P_SCRIPT_PATH,V_SCRIPT_CONTENT,XDB_CONSTANTS.version);  
+  commit;
+end;
+--
+procedure appendTableCreationScript(P_XML_SCHEMA_CONFIGURATION XMLTYPE)
+as
+--
+  pragma autonomous_transaction;
+
+  TYPE T_XML_TABLE_LIST 
+       IS TABLE OF VARCHAR2(32) 
+       INDEX BY VARCHAR2(32);
+       
+  V_XML_TABLE_LIST  T_XML_TABLE_LIST;
+
+  V_NEW_TABLE_NAME  VARCHAR2(32);
+  V_COUNTER         NUMBER(2);
+  
+  V_BUFFER               VARCHAR2(32000);
+  V_SCRIPT               CLOB;           
+  V_SCRIPT_FILE          VARCHAR2(700);
+  V_TARGET               VARCHAR2(700);
+  V_LOCATION_PREFIX      VARCHAR2(700);
+  V_SCHEMA_LOCATION_HINT VARCHAR2(700);
+  
+  V_SCOPE_XMLREFERENCES VARCHAR2(4000)
+     := '--' || C_NEW_LINE 
+     || 'begin' || C_NEW_LINE
+     || '  DBMS_XMLSTORAGE_MANAGE.SCOPEXMLREFERENCES();' || C_NEW_LINE
+     || 'end;' || C_NEW_LINE
+     || '/' || C_NEW_LINE
+     || '--' || C_NEW_LINE
+     || 'select IS_SCOPED, COUNT(*)' || C_NEW_LINE   
+     || '  from user_refs' || C_NEW_LINE   
+     || ' group by IS_SCOPED' || C_NEW_LINE   
+     || '/' || C_NEW_LINE
+     || 'select table_name, column_name' || C_NEW_LINE   
+     || '  from USER_REFS' || C_NEW_LINE   
+     || ' where IS_SCOPED = ''''NO''' || C_NEW_LINE   
+     || '/' || C_NEW_LINE ;
+  
+  cursor getGlobalElements
+  is
+  select SCHEMA_URL, ELEMENT
+    from XMLTable(
+           xmlNamespaces(
+              'http://xmlns.oracle.com/xdb/pm/registrationConfiguration' as "rc"
+           ),
+           '$CONFIG/rc:SchemaRegistrationConfiguration/rc:Table'
+            passing P_XML_SCHEMA_CONFIGURATION as "CONFIG"
+            COLUMNS 
+              SCHEMA_URL   VARCHAR2(700) path 'rc:schemaLocationHint',
+              ELEMENT      VARCHAR2(256) path 'rc:globalElement'
+         );
+  
+  cursor getXMLTables
+  is
+  select TABLE_NAME 
+	  from USER_XML_TABLES;
+           
+  V_STORAGE_CLAUSE VARCHAR2(128);
+
+begin
+
+  V_TARGET 	        := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/@target','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+	V_SCRIPT_FILE     := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/FileNames/registrationScriptFile/text()','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+  V_LOCATION_PREFIX := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/@schemaLocationPrefix','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration').getStringVal();
+
+  if (LENGTH(V_LOCATION_PREFIX) > 0) then
+    if (INSTR(V_LOCATION_PREFIX,'/',-1) <> LENGTH(V_LOCATION_PREFIX)) then
+      V_LOCATION_PREFIX := V_LOCATION_PREFIX || '/';
+    end if;
+  end if;
+	
+	V_SCRIPT := '--' ||  C_NEW_LINE 
+	         || '-- Table creation Script for "' || V_TARGET || '"' || C_NEW_LINE 
+	         || '--' || C_NEW_LINE;
+
+  V_BUFFER := 'select TABLE_NAME' || C_NEW_LINE
+           || '  from USER_XML_TABLES' || C_NEW_LINE
+           || ' order by TABLE_NAME'|| C_NEW_LINE
+           || '/' || C_NEW_LINE;
+
+  DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
+
+  if (G_OPTIONS = DBMS_XMLSCHEMA.REGISTER_BINARYXML) then
+    V_STORAGE_CLAUSE := 'SECUREFILE BINARY XML';
+  else
+    V_STORAGE_CLAUSE := 'OBJECT RELATIONAL';
+  end if;
+	
+	for t in getXMLTables loop
+	  V_XML_TABLE_LIST(t.TABLE_NAME) := t.TABLE_NAME;
+  end loop;
+      
+  for t in getGlobalElements loop
+    V_NEW_TABLE_NAME := UPPER(SUBSTR(t.ELEMENT,1,24)) || '_TABLE';
+
+	  V_SCHEMA_LOCATION_HINT := t.SCHEMA_URL;
+    if (INSTR(V_SCHEMA_LOCATION_HINT,'/') = 1) THEN
+	    V_SCHEMA_LOCATION_HINT := SUBSTR(V_SCHEMA_LOCATION_HINT,2);
+    end if;
+ 
+	  V_SCHEMA_LOCATION_HINT := V_LOCATION_PREFIX || V_SCHEMA_LOCATION_HINT;
+
+    V_COUNTER := 0;    
+    while (V_XML_TABLE_LIST.exists(V_NEW_TABLE_NAME)) loop
+	    V_COUNTER := V_COUNTER + 1;
+	    V_NEW_TABLE_NAME := SUBSTR(UPPER(t.ELEMENT),1,21) || '_' || LPAD(V_COUNTER,2,'0') || '_TABLE';
+	  end loop;
+
+    V_XML_TABLE_LIST(V_NEW_TABLE_NAME) := V_NEW_TABLE_NAME;
+    
+    V_BUFFER := 'CREATE TABLE "' || V_NEW_TABLE_NAME || '" of XMLTYPE'  || C_NEW_LINE
+             || 'XMLTYPE STORE AS ' || V_STORAGE_CLAUSE  || C_NEW_LINE
+             || 'XMLSCHEMA "' || V_SCHEMA_LOCATION_HINT || '" ELEMENT "' || t.ELEMENT || '"' || C_NEW_LINE
+             || '/'||  C_BLANK_LINE;
+             
+    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
+  end loop;
+  
+  V_BUFFER := 'select TABLE_NAME' || C_NEW_LINE
+           || '  from USER_XML_TABLES' || C_NEW_LINE
+           || ' order by TABLE_NAME'|| C_NEW_LINE
+           || '/' || C_NEW_LINE;
+
+  DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
+
+  if (G_OPTIONS != DBMS_XMLSCHEMA.REGISTER_BINARYXML) then
+    DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_SCOPE_XMLREFERENCES),V_SCOPE_XMLREFERENCES);
+  end if;
+  
+  appendScript(V_SCRIPT_FILE,V_SCRIPT);
+  
+end;          
+--
+procedure appendFileUploadScript(P_XML_SCHEMA_CONFIGURATION XMLTYPE)
+as
+--
+  pragma autonomous_transaction;
+
+  V_CREATE_IGNORE_LIST VARCHAR2(4000)
+    := 'declare' ||  C_NEW_LINE
+    || '  V_FILELIST_PATH VARCHAR2(700) := ''%IGNORE_FILES_PATH%'';' ||  C_NEW_LINE
+    || '  V_RESULT BOOLEAN;' ||  C_NEW_LINE 
+    || 'begin' ||  C_NEW_LINE 
+    || '  if not (DBMS_XDB.existsResource()) then'||  C_NEW_LINE 
+    || '    V_RESULT := DBMS_XDB.createResource(V_FILELIST_PATH,XMLType(''<Files/>''));' ||  C_NEW_LINE
+    || '    commit;' ||  C_NEW_LINE
+    || '  end if;' ||  C_NEW_LINE
+    || 'end;' ||  C_NEW_LINE
+    || '/' ||  C_NEW_LINE;
+
+  V_FIELD_SIZES             VARCHAR2(4000)
+    := 'column PATH                 FORMAT A64' || C_NEW_LINE 
+    || 'column OWNER                FORMAT A16' || C_NEW_LINE 
+    || 'column TABLE_NAME           FORMAT A32' || C_NEW_LINE 
+    || 'column ELEMENT              FORMAT A32' || C_NEW_LINE 
+    || 'column NAMESPACE            FORMAT A64' || C_NEW_LINE 
+    || 'column SCHEMA_LOCATION_HINT FORMAT A64' || C_NEW_LINE 
+    || 'column SCHEMA_URL           FORMAT A64' || C_NEW_LINE;
+
+  V_PROCESS_INSTANCE_DOCUMENTS VARCHAR2(4000) 
+    := 'select *' || C_NEW_LINE 
+    || '  from TABLE(' || C_NEW_LINE 
+    || '         XDB_XMLSCHEMA_UTILITIES.getInstanceDocuments(''%FOLDER_PATH%'')' || C_NEW_LINE 
+    || '        )' || C_NEW_LINE 
+    || '/' || C_NEW_LINE
+    || 'call XDB_XMLSCHEMA_UTILITIES.loadInstanceDocuments(''%FOLDER_PATH%'',''%LOGFILE_NAME%'')' || C_NEW_LINE
+    || '/' || C_NEW_LINE
+    || 'set long 1000000 pages 0 lines 256 trimspool on' || C_NEW_LINE
+	  || 'column log format A250' || C_NEW_LINE
+    || 'select xdburitype(''%FOLDER_PATH%/%LOGFILE_NAME%'').getClob() LOG' || C_NEW_LINE
+    || ' from DUAL' || C_NEW_LINE
+    || '/' || C_NEW_LINE;
+                       
+  V_TARGET                   VARCHAR2(700);
+  V_SCRIPT_FILE              VARCHAR2(700);
+                             
+  V_BUFFER                   VARCHAR2(32000);
+  V_SCRIPT                   CLOB;           
+                             
+  V_IGNORE_FILES_PATH        VARCHAR2(700);
+  V_FOLDER_PATH              VARCHAR2(700);
+  V_LOGFILE_NAME             VARCHAR2(700);
+  
+  V_STORAGE_CLAUSE           VARCHAR2(128);
+  V_INSTANCE_UPLOAD_FILENAME VARCHAR2(700);
+begin
+
+  V_TARGET 	                 := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/@target','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+	V_SCRIPT_FILE              := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/FileNames/registrationScriptFile/text()','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+  V_INSTANCE_UPLOAD_FILENAME := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/FileNames/instanceUploadLog/text()','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+
+	
+	V_FOLDER_PATH := substr(V_INSTANCE_UPLOAD_FILENAME,1,instr(V_INSTANCE_UPLOAD_FILENAME,'/',-1));
+	V_LOGFILE_NAME  := substr(V_INSTANCE_UPLOAD_FILENAME,instr(V_INSTANCE_UPLOAD_FILENAME,'/',+1));
+	
+	V_SCRIPT := '--' ||  C_NEW_LINE 
+	          || '-- File Upload Script for "' || V_TARGET || '"' || C_NEW_LINE 
+	          || '--' || C_NEW_LINE;
+	          
+	-- V_BUFFER := replace(V_CREATE_IGNORE_LIST,'%IGNORE_LIST_PATH%',V_IGNORE_FILES_PATH);
+  -- DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
+  
+	V_BUFFER := V_FIELD_SIZES;
+  DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
+
+	V_BUFFER := replace(V_PROCESS_INSTANCE_DOCUMENTS,'%FOLDER_PATH%',V_FOLDER_PATH);
+	V_BUFFER := replace(V_PROCESS_INSTANCE_DOCUMENTS,'%LOGFILE_NAME%',V_LOGFILE_NAME);
+  DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
+
+  appendScript(V_SCRIPT_FILE,V_SCRIPT);  
+ 
+end;          
+--
+function createDeleteSchemaScript(P_XML_SCHEMA_CONFIGURATION XMLTYPE) 
+return VARCHAR2
+as
+  pragma                       autonomous_transaction;
+  V_SCRIPT                     CLOB;
+  V_TARGET                     VARCHAR2(700);
+  V_CONFIGURATION_FILENAME     VARCHAR2(700);
+  V_DELETE_SCRIPT_FILENAME     VARCHAR2(700);
+  V_COMMENT                    VARCHAR2(32000); 
+begin
+
+  V_TARGET 	                := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/@target','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+	V_CONFIGURATION_FILENAME  := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/FileNames/registrationConfigurationFile/text()','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+	V_DELETE_SCRIPT_FILENAME  := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/FileNames/deleteScriptFile/text()','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
+		
+	V_COMMENT := '--' ||  C_NEW_LINE 
+	          || '-- Schema Deletion Script for "' || V_TARGET || '"' || C_NEW_LINE 
+	          || '--' || C_NEW_LINE;
+
+ 	V_SCRIPT := V_COMMENT;
+ 	DBMS_LOB.APPEND(V_SCRIPT,generateDeleteSchemaScript(P_XML_SCHEMA_CONFIGURATION));
+  XDB_UTILITIES.uploadResource(V_DELETE_SCRIPT_FILENAME,V_SCRIPT,XDB_CONSTANTS.VERSION);
+  commit;
+  
+  return V_DELETE_SCRIPT_FILENAME;
+end;
+--
 begin
 	G_EVENT_LIST := EVENT_LIST_T();
+  $IF $$DEBUG $THEN
+    XDB_OUTPUT.createTraceFile('/public/XDB_OPTIMIZE_XMLSCHEMA.log');
+  $END
 end XDBPM_OPTIMIZE_XMLSCHEMA;
 /
 show errors

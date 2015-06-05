@@ -25,7 +25,7 @@
 				<span style="display:inline-block;width:21px;">
 					<a>
 						<xsl:attribute name="href"><xsl:value-of select="concat('/XFILES/WebDemo/runtime.html?target=',/r:Resource/xfiles:ResourceStatus/xfiles:CurrentPath/@xfiles:EncodedPath,'&amp;stylesheet=/XFILES/WebDemo/xsl/runtime.xsl&amp;includeContent=true')"/></xsl:attribute>
-						<img id="btnExecuteQuery" src="/XFILES/lib/icons/executeSQL.png" alt="Execute Query" border="0" width="16" height="16" data-toggle="tooltip" data-placement="top" title="Execute Script."/>
+						<img id="btnExecuteQuery" src="/XFILES/lib/icons/executeSQL.png" alt="Execute Query" border="0" width="16" height="16" data-toggle="tooltip" data-placement="top" title="Execute SQL Script."/>
 					</a>
 				</span>
 			</span>

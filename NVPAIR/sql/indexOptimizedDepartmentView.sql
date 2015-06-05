@@ -19,6 +19,8 @@ select DEPARTMENT_ID,
        DEPARTMENT_NAME     
   from DEPARTMENT_SXI
 /
+set autotrace on explain lines 256 pages 50
+--
 select * 
   from DEPARTMENT_VIEW 
  where DEPARTMENT_ID = 40

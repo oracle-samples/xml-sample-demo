@@ -1417,7 +1417,7 @@ function SqlProcessor() {
          }
        }
 
-       statement = statement + nextLine + " ";
+       statement = statement + nextLine + "\r\n";
        statementStarted = true;
      }
      statement = "";

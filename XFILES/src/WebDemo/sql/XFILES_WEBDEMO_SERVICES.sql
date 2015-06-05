@@ -18,6 +18,8 @@ spool XFILES_WEBDEMO_SERVICES.log
 --
 def XFILES_SCHEMA = &1
 --
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:TRUE'
+/
 create or replace package XFILES_WEBDEMO_SERVICES
 authid current_user
 as
@@ -71,7 +73,12 @@ begin
 
   V_CDATA_SECTION := P_STATEMENT.extract('//text()').getCLOBVal();
   V_STATEMENT_TEXT := DBMS_XMLGEN.CONVERT(V_CDATA_SECTION,1);
-  
+	$IF $$DEBUG $THEN
+    XDB_OUTPUT.writeTraceFileEntry('EXECUTESQL: SQL Statement =');
+    XDB_OUTPUT.writeTraceFileEntry(V_STATEMENT_TEXT);
+    XDB_OUTPUT.flushTraceFile();
+  $END
+
   execute immediate V_STATEMENT_TEXT;
   V_ROWCOUNT := SQL%ROWCOUNT;
   
@@ -240,7 +247,12 @@ exception
     raise; 
 end;
 --
-end;
+begin
+	NULL;
+	$IF $$DEBUG $THEN
+    XDB_OUTPUT.createTraceFile('/public/XFILES_WEBDEMO_SERVICES.log');
+  $END
+end XFILES_WEBDEMO_SERVICES;
 /
 show errors
 --

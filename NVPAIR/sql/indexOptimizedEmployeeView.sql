@@ -11,7 +11,7 @@
  *
  * ================================================
  */
-
+ 
 create or replace VIEW EMPLOYEE_VIEW 
 as
 select EMPLOYEE_ID,    
@@ -29,6 +29,8 @@ select EMPLOYEE_ID,
 /
 create index EMPLOYEE_DEPT_IDX on EMPLOYEE_SXI (DEPARTMENT_ID)
 /
+set autotrace on explain lines 256 pages 50
+--
 select FIRST_NAME, LAST_NAME
   from EMPLOYEE_VIEW e, DEPARTMENT_VIEW d
  where e.DEPARTMENT_ID = d.DEPARTMENT_ID
