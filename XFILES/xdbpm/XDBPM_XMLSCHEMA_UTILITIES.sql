@@ -1128,6 +1128,7 @@ as
          ) d
    where d.TABLE_NAME is not NULL;
   
+   V_XML_INSTANCE XMLTYPE;
 begin
    
   XDB_OUTPUT.createLogFile(P_FOLDER_PATH || '/' || P_LOGFILE_NAME,TRUE);
@@ -1142,7 +1143,39 @@ begin
    	V_STATEMENT := 'insert into "' || doc.OWNER || '"."' || doc.TABLE_NAME || '" values (:1)';
    	
     begin
-      execute immediate V_STATEMENT using  xdburitype(doc.PATH);
+    	V_XML_INSTANCE := xdburitype(doc.PATH).getXML();
+    	
+    	if (doc.SCHEMA_LOCATION_HINT <> doc.TARGET) then
+  	    select case 
+         	       WHEN doc.NAMESPACE is NULL THEN
+          	        XMLQUERY(
+          	          '$NEWDOC := $DOC modify (
+          	                 	           let $ROOT = $NEWDOC/*
+          	                             delete nodes $ROOT/@xsi:noNamespaceSchemaLocation
+          	                             insert node attribute xsi:noNamespaceSchemaLocation {$SLH) into $ROOT
+          	                           )
+          	           return $NEWDOC'
+          	           passing V_XML_INSTANCE as "DOC", 
+          	                   doc.TARGET as "SLH"
+          	           returning content
+          	       )
+          	     ELSE 
+         	        XMLQUERY(
+          	          '$NEWDOC := $DOC modify (
+          	                 	           let $ROOT = $NEWDOC/*
+          	                             delete nodes $ROOT/@xsi:schemaLocation
+          	                             insert node attribute xsi:schemaLocation {$SLH) into $ROOT
+          	                           )
+          	           return $NEWDOC'
+          	           passing V_XML_INSTANCE as "DOC", 
+          	                   doc.NAMESPACE || ' ' || doc.TARGET as "SLH"
+          	           returning content
+          	       )
+          	   END
+  	      into V_XML_INSTANCE
+  	      from dual;
+      end if;    	    
+    	execute immediate V_STATEMENT using V_XML_INSTANCE;
       V_SUCCESS_COUNT := V_SUCCESS_COUNT + 1;
     exception
       when OTHERS then

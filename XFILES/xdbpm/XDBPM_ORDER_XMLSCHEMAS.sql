@@ -167,7 +167,7 @@ begin
   return V_SCHEMA_LOCATION_LIST;
 end;
 --
-procedure buildDependencyGraph(P_XML_SCHEMA_PATH VARCHAR2, P_LOCATION_PREFIX VARCHAR2, P_SCHEMA_DEPENDENCY_LIST IN OUT SCHEMA_DEPENDENCY_LIST_T) 
+procedure buildDependencyGraph(P_XML_SCHEMA_PATH VARCHAR2, P_LOCATION_PREFIX VARCHAR2, P_XML_SCHEMA_FOLDER VARCHAR2, P_SCHEMA_DEPENDENCY_LIST IN OUT SCHEMA_DEPENDENCY_LIST_T) 
 as
   V_SCHEMA_DEPENDENCY_REC  SCHEMA_DEPENDENCY_REC;
   V_XML_SCHEMA_PATH        VARCHAR2(700);
@@ -194,14 +194,14 @@ as
          );   
 begin
   $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('  Processing XML Schema : "' || P_XML_SCHEMA_PATH|| '".');
+  XDB_OUTPUT.writeTraceFileEntry('  Processing XML Schema : "' || P_XML_SCHEMA_PATH|| '".',TRUE);
   $END
 
   -- Check if this schema has already been processed.. 
   
   for s in schemaRegistered loop
     $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeTraceFileEntry('Schema already Registered.');
+      XDB_OUTPUT.writeTraceFileEntry('Schema already Registered.',TRUE);
     $END
     return;
   end loop;
@@ -209,14 +209,14 @@ begin
   for i in 1..P_SCHEMA_DEPENDENCY_LIST.count() loop
     if (P_SCHEMA_DEPENDENCY_LIST(i).SCHEMA_PATH = P_XML_SCHEMA_PATH) then
       $IF $$DEBUG $THEN
-      XDB_OUTPUT.writeTraceFileEntry('Schema already Processed.');
+        XDB_OUTPUT.writeTraceFileEntry('Schema already Processed.',TRUE);
       $END      
       return;
     end if;
   end loop;
   
 	V_XML_SCHEMA := xdburitype(P_XML_SCHEMA_PATH).getXML();
-
+	
   V_SCHEMA_DEPENDENCY_REC.SCHEMA_PATH := P_XML_SCHEMA_PATH;
   for n in getTargetNamespace(V_XML_SCHEMA) loop
     V_SCHEMA_DEPENDENCY_REC.TARGET_NAMESPACE := n.TARGET_NAMESPACE;
@@ -224,22 +224,25 @@ begin
   V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST := getDependentList(V_XML_SCHEMA,P_XML_SCHEMA_PATH,P_LOCATION_PREFIX);
 
   $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('Checking Dependencies.');
+  XDB_OUTPUT.writeTraceFileEntry('Checking Dependencies.',TRUE);
   $END
   
   P_SCHEMA_DEPENDENCY_LIST.extend();
   P_SCHEMA_DEPENDENCY_LIST(P_SCHEMA_DEPENDENCY_LIST.LAST) := V_SCHEMA_DEPENDENCY_REC;
   
   $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('Dependency count  = ' || V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST.count());
+  XDB_OUTPUT.writeTraceFileEntry('Dependency count  = ' || V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST.count(),TRUE);
   $END 
   if (V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST.count() > 0) then
     for i in V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST.FIRST..V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST.LAST loop
       $IF $$DEBUG $THEN
-      XDB_OUTPUT.writeTraceFileEntry('Dependency [' || i || '] : = "' || V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST(i) || '".');
+      XDB_OUTPUT.writeTraceFileEntry('Dependency [' || i || '] : = "' || V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST(i) || '".',TRUE);
       $END     
       V_XML_SCHEMA_PATH:= V_SCHEMA_DEPENDENCY_REC.DEPENDENCY_LIST(i);
-      buildDependencyGraph(V_XML_SCHEMA_PATH, P_LOCATION_PREFIX, P_SCHEMA_DEPENDENCY_LIST);
+      if (instr(V_XML_SCHEMA_PATH,P_LOCATION_PREFIX) = 1) then
+         V_XML_SCHEMA_PATH := P_XML_SCHEMA_FOLDER || '/' || substr(V_XML_SCHEMA_PATH,length(P_LOCATION_PREFIX)+2);
+      end if;
+      buildDependencyGraph(V_XML_SCHEMA_PATH, P_LOCATION_PREFIX, P_XML_SCHEMA_FOLDER, P_SCHEMA_DEPENDENCY_LIST);
     end loop;
   end if;
   
@@ -250,11 +253,11 @@ as
 begin
 	for i in P_SCHEMA_DEPENDENCY_LIST.FIRST..P_SCHEMA_DEPENDENCY_LIST.LAST LOOP
     if (P_SCHEMA_DEPENDENCY_LIST.exists(i)) THEN
-      XDB_OUTPUT.writeTraceFileEntry('Schema "' || P_SCHEMA_DEPENDENCY_LIST(i).SCHEMA_PATH  || '".');
+      XDB_OUTPUT.writeTraceFileEntry('Schema "' || P_SCHEMA_DEPENDENCY_LIST(i).SCHEMA_PATH  || '".',TRUE);
   	  if (P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST.count() > 0) THEN
       	for j in P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST.FIRST..P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST.LAST  LOOP
           if (P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST.exists(j)) THEN
-            XDB_OUTPUT.writeTraceFileEntry('>> "' || P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST(j) || '".');
+            XDB_OUTPUT.writeTraceFileEntry('>> "' || P_SCHEMA_DEPENDENCY_LIST(i).DEPENDENCY_LIST(j) || '".',TRUE);
   	      end if;
   	    end loop;
   	  end if;
@@ -267,11 +270,11 @@ as
 begin
 	for i in P_SCHEMA_DEPENDENCY_LIST.FIRST..P_SCHEMA_DEPENDENCY_LIST.LAST LOOP
     if (P_SCHEMA_DEPENDENCY_LIST.exists(i)) THEN
-      XDB_OUTPUT.writeTraceFileEntry('Schema "' || P_SCHEMA_DEPENDENCY_LIST(i).SCHEMA_PATH  || '". Recursive Path count = ' || P_SCHEMA_DEPENDENCY_LIST(i).RECURSIVE_PATH_COUNT || '. Extended Path Count = ' || P_SCHEMA_DEPENDENCY_LIST(i).EXTENDED_DEPENDENCY_LIST.count() || '.' );
+      XDB_OUTPUT.writeTraceFileEntry('Schema "' || P_SCHEMA_DEPENDENCY_LIST(i).SCHEMA_PATH  || '". Recursive Path count = ' || P_SCHEMA_DEPENDENCY_LIST(i).RECURSIVE_PATH_COUNT || '. Extended Path Count = ' || P_SCHEMA_DEPENDENCY_LIST(i).EXTENDED_DEPENDENCY_LIST.count() || '.',TRUE);
   	  if (P_SCHEMA_DEPENDENCY_LIST(i).EXTENDED_DEPENDENCY_LIST.count() > 0) THEN
       	for j in P_SCHEMA_DEPENDENCY_LIST(i).EXTENDED_DEPENDENCY_LIST.FIRST..P_SCHEMA_DEPENDENCY_LIST(i).EXTENDED_DEPENDENCY_LIST.LAST  LOOP
           if (P_SCHEMA_DEPENDENCY_LIST(i).EXTENDED_DEPENDENCY_LIST.exists(j)) THEN
-            XDB_OUTPUT.writeTraceFileEntry('>> "' || P_SCHEMA_DEPENDENCY_LIST(i).EXTENDED_DEPENDENCY_LIST(j) || '".');
+            XDB_OUTPUT.writeTraceFileEntry('>> "' || P_SCHEMA_DEPENDENCY_LIST(i).EXTENDED_DEPENDENCY_LIST(j) || '".',TRUE);
             NULL;
   	      end if;
   	    end loop;
@@ -287,12 +290,12 @@ begin
 	-- Do not reprocess the current schema
 	--
 $IF $$DEBUG $THEN
-	XDB_OUTPUT.writeTraceFileEntry('"' || P_CURRENT_SCHEMA || '" : Checking Dependency "' || P_DEPENDENCY_LOCATION || '".');
+	XDB_OUTPUT.writeTraceFileEntry('"' || P_CURRENT_SCHEMA || '" : Checking Dependency "' || P_DEPENDENCY_LOCATION || '".',TRUE);
 $END
 
   if (P_CURRENT_SCHEMA = P_DEPENDENCY_LOCATION) then
 $IF $$DEBUG $THEN
-   	XDB_OUTPUT.writeTraceFileEntry('"' || P_CURRENT_SCHEMA || '" : Skipping recursive dependency.');
+   	XDB_OUTPUT.writeTraceFileEntry('"' || P_CURRENT_SCHEMA || '" : Skipping recursive dependency.',TRUE);
 $END   	
    	P_RECURSIVE_PATH_COUNT := P_RECURSIVE_PATH_COUNT + 1;
     return;
@@ -306,7 +309,7 @@ $END
 	    if (P_SCHEMA_LOCATION_LIST.exists(i)) then
   	    if (P_SCHEMA_LOCATION_LIST(i) = P_DEPENDENCY_LOCATION) then 
 $IF $$DEBUG $THEN
-        	XDB_OUTPUT.writeTraceFileEntry('"' || P_CURRENT_SCHEMA || '" : Skipping known dependency.');
+        	XDB_OUTPUT.writeTraceFileEntry('"' || P_CURRENT_SCHEMA || '" : Skipping known dependency.',TRUE);
 $END        	
 	        return;
 	      end if;
@@ -669,6 +672,8 @@ as
   V_TYPE_OPTIMIZATION_FILENAME VARCHAR2(700);
   V_REGISTER_SCRIPT_FILENAME   VARCHAR2(700);
   V_DOCUMENT_UPLOAD_FILENAME   VARCHAR2(700);
+  
+  V_LOCATION_PREFIX            VARCHAR2(700);
 begin  	
  
   V_TRACE_FILENAME             := P_OUTPUT_FOLDER || generateOutputFileName(P_XML_SCHEMA_FOLDER,P_LOCAL_PATH,'SchemaRegistrationOrdering','log');
@@ -680,6 +685,10 @@ begin
 
  	XDB_OUTPUT.createOutputFile(V_TRACE_FILENAME,true);
  
+  $IF $$DEBUG $THEN
+	  XDB_OUTPUT.writeTraceFileEntry('Ordering Schemas for Folder: "' || P_XML_SCHEMA_FOLDER || '". : Local Path "' || P_LOCAL_PATH || '".');
+  $END
+ 
   if (P_LOCAL_PATH is NULL) then
     V_TARGET_PATH := P_XML_SCHEMA_FOLDER;
     $IF $$DEBUG $THEN
@@ -687,15 +696,43 @@ begin
     $END  
 
   	for x in getXMLSchemas() loop
-	    buildDependencyGraph(x.ANY_PATH, P_LOCATION_PREFIX, V_SCHEMA_DEPENDENCY_LIST);  
+	    buildDependencyGraph(x.ANY_PATH, P_LOCATION_PREFIX, P_XML_SCHEMA_FOLDER, V_SCHEMA_DEPENDENCY_LIST);  
 	  end loop;
   else
     V_TARGET_PATH := P_XML_SCHEMA_FOLDER || '/' || P_LOCAL_PATH;
     $IF $$DEBUG $THEN
-       XDB_OUTPUT.writeTraceFileEntry('Processing XML Schema "' || V_TARGET_PATH || '".');
+       XDB_OUTPUT.writeTraceFileEntry('Processing XML Schema "' || V_TARGET_PATH || '".',TRUE);
+    $END
+
+    V_LOCATION_PREFIX := P_LOCATION_PREFIX;
+    if ((V_LOCATION_PREFIX = '') or (V_LOCATION_PREFIX is null)) then
+	    select XMLCAST( 
+	             XMLQUERY(
+		            'fn:doc($PATH)/xs:schema/@targetNamespace'
+		             passing V_TARGET_PATH as "PATH"
+		             returning content
+		           )
+		           as VARCHAR2(700)
+		         )
+		    into V_LOCATION_PREFIX
+		    from dual;
+		       
+      $IF $$DEBUG $THEN
+         XDB_OUTPUT.writeTraceFileEntry('Target namespace : "' || V_LOCATION_PREFIX || '".',TRUE);
+      $END
+      
+	    -- TODO : Code here to attempt to LOCAL PATH to XMLSchema path from targetNamespace.
+
+	    if (INSTR(V_LOCATION_PREFIX,'.xsd',-1) = (length(V_LOCATION_PREFIX)-4)) then
+		    V_LOCATION_PREFIX := substr(V_LOCATION_PREFIX,length(V_LOCATION_PREFIX)-4);
+		  end if;
+    end if;
+    
+    $IF $$DEBUG $THEN
+       XDB_OUTPUT.writeTraceFileEntry('Using Schema Location Hint Prefix: "' || V_LOCATION_PREFIX || '".',TRUE);
     $END
     
-    buildDependencyGraph(P_XML_SCHEMA_FOLDER || '/' || P_LOCAL_PATH, P_LOCATION_PREFIX, V_SCHEMA_DEPENDENCY_LIST);  
+    buildDependencyGraph(P_XML_SCHEMA_FOLDER || '/' || P_LOCAL_PATH, V_LOCATION_PREFIX, P_XML_SCHEMA_FOLDER, V_SCHEMA_DEPENDENCY_LIST);  
   end if;
    
   $IF $$DEBUG $THEN
@@ -768,7 +805,7 @@ end;
 begin
 	NULL;
 	$IF $$DEBUG $THEN
-    XDB_OUTPUT.createTraceFile('/public/XDBPM_ORDER_XMLSCHEMAS.log');
+    XDB_OUTPUT.createTraceFile('/public/XDBPM_ORDER_XMLSCHEMAS_' || to_char(SYSTIMESTAMP,'YYYY-MM-DD"T"HH24.MI.SSTZHTZM') || '.log',TRUE);
   $END
 end XDBPM_ORDER_XMLSCHEMAS;
 /

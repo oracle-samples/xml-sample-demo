@@ -51,7 +51,8 @@ as
 
   function  createSchemaRegistrationScript(P_XML_SCHEMA_CONFIGURATION XMLTYPE) return VARCHAR2;
   procedure appendTableCreationScript(P_XML_SCHEMA_CONFIGURATION XMLTYPE);
-    
+  procedure appendFileUploadScript(P_XML_SCHEMA_CONFIGURATION XMLTYPE);
+  
   -- procedure schemaRegistrationScript(P_OUTPUT_FOLDER VARCHAR2, P_XMLSCHEMA_FOLDER VARCHAR2, P_XML_SCHEMA_CONFIGURATION XMLType, P_SCHEMA_LOCATION_HINT VARCHAR2 DEFAULT NULL, P_OWNER VARCHAR2 DEFAULT USER, P_LIMIT NUMBER DEFAULT 3);
   -- procedure printSchemaRegistrationScript(P_SCRIPT_FILE VARCHAR2, P_COMMENT VARCHAR2, P_XML_SCHEMA_CONFIGURATION XMLTYPE, P_XMLSCHEMA_FOLDER VARCHAR2);
   procedure describeAnnotations(P_RESOURCE_PATH VARCHAR2, P_SCHEMA_LOCATION_HINT VARCHAR2,P_OWNER VARCHAR2 DEFAULT USER);
@@ -1794,6 +1795,7 @@ begin
  	
     V_BUFFER := 'declare' || C_NEW_LINE
              || '  V_XML_SCHEMA_PATH        VARCHAR2(700) := ''' || s.REPOSITORY_PATH || ''';' || C_NEW_LINE
+             || '  V_NEW_SCHEMA_PATH        VARCHAR2(700) := ''' || replace(s.REPOSITORY_PATH,'.xsd','.xdb.xsd') || ''';' || C_NEW_LINE
              || '  V_XML_SCHEMA             XMLType       := xdburitype(V_XML_SCHEMA_PATH).getXML(); ' || C_NEW_LINE
              || '  V_SCHEMA_LOCATION_HINT   VARCHAR2(700) := ''' || V_SCHEMA_LOCATION_HINT || '''; ' || C_NEW_LINE
              || 'begin' || C_NEW_LINE
@@ -1825,7 +1827,7 @@ begin
       DBMS_LOB.APPEND(V_SCRIPT,s.ANNOTATIONS);
     end if;
     
-    V_BUFFER := '  XDB_EDIT_XMLSCHEMA.saveAnnotatedSchema(V_XML_SCHEMA_PATH, V_XML_SCHEMA);' || C_BLANK_LINE
+    V_BUFFER := '  XDB_EDIT_XMLSCHEMA.saveAnnotatedSchema(V_NEW_SCHEMA_PATH, V_XML_SCHEMA);' || C_BLANK_LINE
              || '  commit;' || C_BLANK_LINE 
              || 'end;' || C_NEW_LINE
              || '/' || C_NEW_LINE
@@ -2281,8 +2283,8 @@ begin
   V_INSTANCE_UPLOAD_FILENAME := P_XML_SCHEMA_CONFIGURATION.extract('/SchemaRegistrationConfiguration/FileNames/instanceUploadLog/text()','xmlns="http://xmlns.oracle.com/xdb/pm/registrationConfiguration' ).getStringVal();
 
 	
-	V_FOLDER_PATH := substr(V_INSTANCE_UPLOAD_FILENAME,1,instr(V_INSTANCE_UPLOAD_FILENAME,'/',-1));
-	V_LOGFILE_NAME  := substr(V_INSTANCE_UPLOAD_FILENAME,instr(V_INSTANCE_UPLOAD_FILENAME,'/',+1));
+	V_FOLDER_PATH := substr(V_INSTANCE_UPLOAD_FILENAME,1,instr(V_INSTANCE_UPLOAD_FILENAME,'/',-1)-1);
+	V_LOGFILE_NAME  := substr(V_INSTANCE_UPLOAD_FILENAME,instr(V_INSTANCE_UPLOAD_FILENAME,'/',-1)+1);
 	
 	V_SCRIPT := '--' ||  C_NEW_LINE 
 	          || '-- File Upload Script for "' || V_TARGET || '"' || C_NEW_LINE 
@@ -2295,7 +2297,7 @@ begin
   DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
 
 	V_BUFFER := replace(V_PROCESS_INSTANCE_DOCUMENTS,'%FOLDER_PATH%',V_FOLDER_PATH);
-	V_BUFFER := replace(V_PROCESS_INSTANCE_DOCUMENTS,'%LOGFILE_NAME%',V_LOGFILE_NAME);
+	V_BUFFER := replace(V_BUFFER,'%LOGFILE_NAME%',V_LOGFILE_NAME);
   DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
 
   appendScript(V_SCRIPT_FILE,V_SCRIPT);  
@@ -2332,7 +2334,7 @@ end;
 begin
 	G_EVENT_LIST := EVENT_LIST_T();
   $IF $$DEBUG $THEN
-    XDB_OUTPUT.createTraceFile('/public/XDB_OPTIMIZE_XMLSCHEMA.log');
+    XDB_OUTPUT.createTraceFile('/public/XDB_OPTIMIZE_XMLSCHEMA_' || to_char(SYSTIMESTAMP,'YYYY-MM-DD"T"HH24.MI.SSTZHTZM') || '.log');
   $END
 end XDBPM_OPTIMIZE_XMLSCHEMA;
 /
