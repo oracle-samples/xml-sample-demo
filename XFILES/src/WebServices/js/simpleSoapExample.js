@@ -156,7 +156,7 @@ function loadSimpleInputFormXSL() {
 }
 
 function loadTableFormatterXSL() {
-  TableFormatterXSL = loadXSLDocument("/XFILES/WebDemo/xsl/formatResponse.xsl");
+  TableFormatterXSL = loadXSLDocument("/XFILES/common/xsl/formatResponse.xsl");
 }
 
 function loadQueryServiceWSDL() {

@@ -1,0 +1,4 @@
+*.jdb
+*.lck
+/.data
+XFILES/xdbpm/.data/xdbpm/00000000/00000000.jdb

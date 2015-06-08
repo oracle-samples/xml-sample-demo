@@ -48,13 +48,21 @@ begin
   XFILES_LOGGING.writeErrorRecord('/orawsv/XFILES/XFILES_WEBDEMO_SERVICES/',P_MODULE_NAME, P_INIT_TIME, P_PARAMETERS, P_STACK_TRACE);
 end;
 --
-procedure handleException(P_MODULE_NAME VARCHAR2, P_INIT_TIME TIMESTAMP WITH TIME ZONE,P_PARAMETERS XMLTYPE)
+procedure handleException(P_MODULE_NAME VARCHAR2, P_INIT_TIME TIMESTAMP WITH TIME ZONE,P_PARAMETERS XMLTYPE,P_TRANSACTION BOOLEAN DEFAULT TRUE)
 as
+  NO_ACTIVE_TRANSACTION exception;
+  PRAGMA EXCEPTION_INIT( NO_ACTIVE_TRANSACTION , -14552);
+  
   V_STACK_TRACE XMLType;
   V_RESULT      boolean;
 begin
   V_STACK_TRACE := XFILES_LOGGING.captureStackTrace();
-  rollback; 
+  begin
+    rollback; 
+  exception
+    when NO_ACTIVE_TRANSACTION then
+      NULL;
+  end;
   writeErrorRecord(P_MODULE_NAME,P_INIT_TIME,P_PARAMETERS,V_STACK_TRACE);
 end;
 --
@@ -138,13 +146,14 @@ begin
      and owner = V_OWNER 
      and subobject_name is null;
      
-  dbms_output.put_line(V_OBJECT_TYPE);
-     
+  $IF $$DEBUG $THEN
+     XDB_OUTPUT.writeTraceFileEntry('Object Type = "' || V_OBJECT_TYPE || '"',TRUE);
+  $END
+  
   V_HNDL := DBMS_METADATA.OPEN(V_OBJECT_TYPE); 
   DBMS_METADATA.SET_FILTER(V_HNDL,'SCHEMA',V_OWNER); 
   DBMS_METADATA.SET_FILTER(V_HNDL,'NAME',V_OBJECT_NAME); 
   V_RESULT := XMLType(DBMS_METADATA.FETCH_CLOB(V_HNDL)); 
-  
   DBMS_METADATA.CLOSE(V_hndl);
       
   if V_OBJECT_TYPE = 'TYPE' then
@@ -165,36 +174,40 @@ begin
     V_TYPE_STRUCTURE := dbms_xmlgen.getxmlType('select * from all_type_attrs where type_name = ''' || V_OBJECT_NAME || ''' and owner = ''' || V_OWNER || ''' order by ATTR_NO');     
         
     V_TYPE_HIERARCHY := dbms_xmlgen.getxmlType('select * from all_types connect by type_name = prior supertype_name and owner = supertype_owner start with type_name = ''' || V_OBJECT_NAME || ''' and owner =  ''' || V_OWNER || '''');
-
-    select extract(schema,'//xsd:complexType[@xdb:SQLType="' || V_OBJECT_NAME || '" and @xdb:SQLSchema="'|| V_OWNER ||'"]',XDB_NAMESPACES.XDBSCHEMA_PREFIXES)
-      into V_SCHEMA_DEFINITION
-      from all_xml_schemas
-     where existsNode(schema,'//xsd:complexType[@xdb:SQLType="' || V_OBJECT_NAME || '" and @xdb:SQLSchema="'|| V_OWNER ||'"]',XDB_NAMESPACES.XDBSCHEMA_PREFIXES) = 1;
-
-    V_RESULT := V_RESULT.insertXMLBefore
-              ( 
-               '/ROWSET/ROW/FULL_TYPE_T/TYPE_T/HASHCODE',
-               V_TYPE_STRUCTURE
-              );
-
-    V_RESULT := V_RESULT.insertXMLBefore
-              ( 
-               '/ROWSET/ROW/FULL_TYPE_T/TYPE_T/HASHCODE',
-               V_TYPE_HIERARCHY
-              );
-
-    V_RESULT := V_RESULT.insertXMLBefore
-              (
-               '/ROWSET/ROW/FULL_TYPE_T/TYPE_T/HASHCODE',
-                xmlType('<SCHEMA_DEFINITION/>')
-              ); 
-            
-    V_RESULT := V_RESULT.appendChildXML
-              (
-               '/ROWSET/ROW/FULL_TYPE_T/TYPE_T/SCHEMA_DEFINITION',
-               V_SCHEMA_DEFINITION
-              ); 
    
+    begin
+      select extract(schema,'//xsd:complexType[@xdb:SQLType="' || V_OBJECT_NAME || '" and @xdb:SQLSchema="'|| V_OWNER ||'"]',XDB_NAMESPACES.XDBSCHEMA_PREFIXES)
+        into V_SCHEMA_DEFINITION
+        from all_xml_schemas
+       where existsNode(schema,'//xsd:complexType[@xdb:SQLType="' || V_OBJECT_NAME || '" and @xdb:SQLSchema="'|| V_OWNER ||'"]',XDB_NAMESPACES.XDBSCHEMA_PREFIXES) = 1;
+  
+      V_RESULT := V_RESULT.insertXMLBefore
+                ( 
+                 '/ROWSET/ROW/FULL_TYPE_T/TYPE_T/HASHCODE',
+                 V_TYPE_STRUCTURE
+                );
+  
+      V_RESULT := V_RESULT.insertXMLBefore
+                ( 
+                 '/ROWSET/ROW/FULL_TYPE_T/TYPE_T/HASHCODE',
+                 V_TYPE_HIERARCHY
+                );
+  
+      V_RESULT := V_RESULT.insertXMLBefore
+                (
+                 '/ROWSET/ROW/FULL_TYPE_T/TYPE_T/HASHCODE',
+                  xmlType('<SCHEMA_DEFINITION/>')
+                ); 
+              
+      V_RESULT := V_RESULT.appendChildXML
+                (
+                 '/ROWSET/ROW/FULL_TYPE_T/TYPE_T/SCHEMA_DEFINITION',
+                 V_SCHEMA_DEFINITION
+                ); 
+    exception
+      WHEN NO_DATA_FOUND THEN
+        NULL;
+    end; 
   end if;
 
   if V_OBJECT_TYPE = 'VIEW' then

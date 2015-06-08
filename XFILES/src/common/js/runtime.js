@@ -59,6 +59,8 @@ function SqlScript(id) {
 
   var commandId         = 1;
   var statementList     = new Array();
+  
+  var username = getHttpUsername();
 
   function stripOracleCopyRightNotice() {
   	
@@ -628,7 +630,7 @@ function DemonstrationPlayer() {
     username.value = targetUser;
     username.disabled = true;
 
-    var password =document.getElementById('demonstrationPassword');
+    var password = document.getElementById('demonstrationPassword');
     password.value = 'XXXXXXX';
     password.disabled = true;
 
@@ -1854,6 +1856,15 @@ function SqlProcessor() {
     objectName = objectName.replace( /\s+$/g, "" );// strip trailing
     if (objectName.indexOf('"') == 0) {
     	objectName = objectName.substring(1,objectName.length-1);
+    }
+    if (objectName.indexOf(".") > 0) {
+    	// SCHEMA.OBJECT_NAME or SCHEMA"."OBJECT_NAME
+    	ownerName = objectName.substring(0,objectName.indexOf("."));
+     	objectName = objectName.substring(objectName.indexOf(".")+1);
+     	if (objectName.indexOf('"') == 0) {
+    	  ownerName = ownerName.substring(0,objectName.length-1);
+    	  objectName = objectName.substring(1);
+    	}
     }
 
    	var XHR = mgr.createPostRequest();

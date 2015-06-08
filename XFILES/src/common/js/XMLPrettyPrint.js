@@ -705,7 +705,7 @@ function XMLPrettyPrinter() {
 
   }
 
-  function expandXML(node,target,div) {
+  this.expandXML = function(node,target,div) {
     var element =  copyElement(node, false, new Array()) 
     target.replaceChild(element,div);
   }
@@ -806,7 +806,7 @@ function XMLPrettyPrinter() {
 
   }
 
-  function printRootFragment(xml, target) {
+  this.printRootFragment = function (xml, target) {
   	
   	// Used when the document to be printed has been returned as the child of another element.
   	// Typically required when the document to be printed is embedded in a SOAP response
