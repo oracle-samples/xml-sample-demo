@@ -268,8 +268,9 @@
 	</xsl:template>
 	<xsl:template name="unknownContentModel">
 		<span style="padding-right:3px;">
-			<img alt="Expand" src="/XFILES/lib/icons/elementExpand.png" border="0"/>
-			<xsl:attribute name="onclick"><xsl:text>findContentModel(</xsl:text><xsl:value-of select="$NodeMapName"/><xsl:text>,'</xsl:text><xsl:choose><xsl:when test="parent::x:Elements or parent::x:NodeMap"><xsl:value-of select="@ID"/></xsl:when><xsl:otherwise><xsl:value-of select="parent::x:SubGroup/@SelectedMember"/></xsl:otherwise></xsl:choose><xsl:text>');return false;</xsl:text></xsl:attribute>
+			<img alt="Expand" src="/XFILES/lib/icons/elementExpand.png" border="0" data-toggle="tooltip" data-placement="top" title="Expand Element">
+				<xsl:attribute name="onclick"><xsl:text>findContentModel(</xsl:text><xsl:value-of select="$NodeMapName"/><xsl:text>,'</xsl:text><xsl:choose><xsl:when test="parent::x:Elements or parent::x:NodeMap"><xsl:value-of select="@ID"/></xsl:when><xsl:otherwise><xsl:value-of select="parent::x:SubGroup/@SelectedMember"/></xsl:otherwise></xsl:choose><xsl:text>');return false;</xsl:text></xsl:attribute>
+			</img>
 		</span>
 		<xsl:call-template name="printElementName"/>
 	</xsl:template>
