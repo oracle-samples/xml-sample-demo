@@ -43,4 +43,14 @@ XMLSCHEMA "http://xmlns.oracle.com/xdb/demonstration/xsd/nvPairStorage.xsd" elem
 /
 call DBMS_XMLSTORAGE_MANAGE.renameCollectionTable(USER,'DATA_SET_TABLE',null,'/DataSet/DataItem','DATA_ITEM_TABLE')
 /
-
+desc DATA_SET_TABLE
+--
+insert into DATA_SET_TABLE
+select OBJECT_VALUE
+  from DEPARTMENT_NVPAIR x
+/
+insert into DATA_SET_TABLE
+select OBJECT_VALUE
+  from EMPLOYEE_NVPAIR x
+/
+quit

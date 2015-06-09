@@ -43,7 +43,74 @@ begin
     DBMS_XMLSCHEMA.deleteSchema(s.SCHEMA_URL,DBMS_XMLSCHEMA.DELETE_CASCADE_FORCE);
   end loop;
 end;
-/                                                        
+/        
+create or replace view DEPARTMENT_NVPAIR of xmltype
+with object id
+(
+  XMLCast(XMLQuery('/DataSet[@objectType="DEPARTMENT"]/IntegerValue[@name="DEPARTMENT_ID"]' passing OBJECT_VALUE returning content) as number(4))  
+) 
+as
+select COLUMN_VALUE 
+  from XMLTABLE(
+        'xquery version "1.0"; (: :)
+         declare namespace xsi = "http://www.w3.org/2001/XMLSchema-instance"; (: :) 
+         for $row in fn:collection("oradb:/HR/DEPARTMENTS")/ROW
+             return (
+                element DataSet { 
+                   attribute {"xsi:noNamespaceSchemaLocation"} { "http://xmlns.oracle.com/xdb/demonstration/xsd/nvPairStorage.xsd" }, 
+                   attribute {"objectType"} {"DEPARTMENT"},                    
+                   for $column in $row/*
+                     let $name := fn:local-name($column)
+                     return element {                      
+                              if ($name="DEPARTMENT_ID" or $name="MANAGER_ID" or $name="LOCATION_ID")  then
+                                "IntegerValue"
+                              else
+                                "StringValue"
+                            } 
+                            {
+                              attribute {"name"} {$name},
+                              attribute value {$column/text()
+                            }
+             	    }
+                }
+             )'
+       )
+/
+create or replace view EMPLOYEE_NVPAIR of xmltype
+with object id
+(
+  XMLCast(XMLQuery('/DataSet[@objectType="EMPLOYEE"]/IntegerValue[@name="EMPLOYEE_ID"]' passing OBJECT_VALUE returning content) as number(4))  
+) 
+as
+select COLUMN_VALUE 
+  from XMLTABLE(
+        'xquery version "1.0"; (: :)
+         declare namespace xsi = "http://www.w3.org/2001/XMLSchema-instance"; (: :) 
+         for $row in fn:collection("oradb:/HR/EMPLOYEES")/ROW
+             return (
+                element DataSet { 
+                   attribute {"xsi:noNamespaceSchemaLocation"} { "http://xmlns.oracle.com/xdb/demonstration/xsd/nvPairStorage.xsd" }, 
+                   attribute {"objectType"} {"EMPLOYEE"},                    
+                   for $column in $row/*
+                     let $name := fn:local-name($column)
+                     return element {
+                              if ($name="EMPLOYEE_ID" or $name="MANAGER_ID" or $name="DEPARTMENT_ID") then
+                                "IntegerValue"
+                              else if ($name="SALARY" or $name="COMMISSION_PCT") then
+                                "FloatValue"
+                              else if ($name="HIRE_DATE") then
+                                "DateValue"
+                              else
+                                "StringValue"
+                           }
+                           {
+                             attribute {"name"} {$name},
+                             attribute value {$column/text()}
+             	             }
+                }
+             )'
+           )
+/                                             
 purge recyclebin
 /
 

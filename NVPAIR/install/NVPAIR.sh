@@ -369,26 +369,26 @@ then
   echo "Installation Failed: See $logfilename for details."
   exit 5
 fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPairs/sql/loadSampleData.sql" | head -1)
+HttpStatus=$(curl --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPairs/sql/showSampleData.sql" | head -1)
 if [ $HttpStatus != "404" ] 
 then
   if [ $HttpStatus == "200" ] 
   then
-    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPairs/sql/loadSampleData.sql" | head -1)
+    HttpStatus=$(curl --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPairs/sql/showSampleData.sql" | head -1)
     if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
     then
-      echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/NVPairs/sql/loadSampleData.sql":$HttpStatus - Operation Failed" >> $logfilename
+      echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/NVPairs/sql/showSampleData.sql":$HttpStatus - Operation Failed" >> $logfilename
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   else
-    echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/NVPairs/sql/loadSampleData.sql":$HttpStatus - Operation Failed" >> $logfilename
+    echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/NVPairs/sql/showSampleData.sql":$HttpStatus - Operation Failed" >> $logfilename
     echo "Installation Failed: See $logfilename for details."
     exit 5
   fi
 fi
-HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/loadSampleData.sql" "$SERVER/home/$USER/demonstrations/NVPairs/sql/loadSampleData.sql" | head -1)
-echo "PUT:"$demohome/sql/loadSampleData.sql" --> "$SERVER/home/$USER/demonstrations/NVPairs/sql/loadSampleData.sql":$HttpStatus" >> $logfilename
+HttpStatus=$(curl --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/showSampleData.sql" "$SERVER/home/$USER/demonstrations/NVPairs/sql/showSampleData.sql" | head -1)
+echo "PUT:"$demohome/sql/showSampleData.sql" --> "$SERVER/home/$USER/demonstrations/NVPairs/sql/showSampleData.sql":$HttpStatus" >> $logfilename
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename
