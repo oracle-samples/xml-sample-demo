@@ -1832,7 +1832,7 @@ begin
              || 'end;' || C_NEW_LINE
              || '/' || C_NEW_LINE
              || 'declare' || C_NEW_LINE
-             || '  V_XML_SCHEMA_PATH        VARCHAR2(700) := ''' || s.REPOSITORY_PATH || ''';' || C_NEW_LINE
+             || '  V_XML_SCHEMA_PATH        VARCHAR2(700) := ''' || replace(s.REPOSITORY_PATH,'.xsd','.xdb.xsd') || ''';' || C_NEW_LINE
              || '  V_XML_SCHEMA             XMLType       := xdburitype(V_XML_SCHEMA_PATH).getXML(); ' || C_NEW_LINE
              || '  V_SCHEMA_LOCATION_HINT   VARCHAR2(700) := ''' || V_SCHEMA_LOCATION_HINT || '''; ' || C_NEW_LINE
              || '  V_REGISTRATION_TIMESTAMP TIMESTAMP; ' || C_NEW_LINE

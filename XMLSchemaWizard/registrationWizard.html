@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+  <head>
+		<meta http-equiv="X-UA-Compatible" content="IE=8" >
+		<meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+		<title>Welcome to the X-Files XML Schema Registration Wizard</title>
+		<link rel="stylesheet" charset="UTF-8" type="text/css" href="/XFILES/lite/css/XFiles.css"/>
+		<script type="text/javascript" language="javascript">
+
+function launchWizard() {
+    var folder = window.location.pathname.substr(0,window.location.pathname.lastIndexOf("/"));
+    var target="/XFILES/lite/Resource.html?target=" + folder + "&stylesheet=/XFILES/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl";
+    window.location.href = target;
+}
+
+    </script>
+  </head>
+  <body onload="launchWizard();">
+    <table height="100%" align="center" border="0">
+		  <tr align="center" valign="middle">
+			  <td align="center" valign="middle">
+		  	Welcome to the XFiles XML Schema Registration Wizard
+		    <br/>
+			  Opening this page should automatically launch the XML Schema Registration Wizard
+		    <br/>
+		    <br/>
+				<a href="#" onclick="launchWizard();false">
+				  <img src="/XFILES/logo.png" alt="Oracle Files" border="0"/>
+				</a>
+			  <br/>
+			  <br/>
+			  If your browser does not support redirection, Please <span class="xp"><a href="#" onClick="launchWizard();false">click here</a></span> to launch the wizard.
+			  </td>	
+  		</tr>
+    </table>
+  </body>
+</html>

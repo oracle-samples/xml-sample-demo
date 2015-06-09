@@ -59,7 +59,7 @@ DEMOPWD=$8
 HOSTNAME=$9
 HTTPPORT=${10}
 ORDSHOME=${11}
-SERVERURL="$HOSTNAME:$HTTPPORT"
+SERVERURL="http://$HOSTNAME:$HTTPPORT"
 INSTALLROOT=`pwd`
 rm install.log
 doInstall 2>&1 | tee -a install.log

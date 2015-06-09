@@ -1472,27 +1472,30 @@ as
   V_RESID                 RAW(16);
   V_LOB_LOCATOR           BLOB;
 begin
-	begin
-		DBMS_XDB_VERSION.CHECKOUT(P_XML_SCHEMA_PATH);
-  exception
-    WHEN NOT_VERSIONED then
-      V_RESID := DBMS_XDB_VERSION.makeVersioned(P_XML_SCHEMA_PATH);
-      DBMS_XDB_VERSION.checkOut(P_XML_SCHEMA_PATH);
-    WHEN OTHERS THEN
-      RAISE;
-  end;
+	if (not DBMS_XDB.existsResource(P_XML_SCHEMA_PATH)) then
+	  V_RESULT := DBMS_XDB.createResource(P_XML_SCHEMA_PATH,P_XML_SCHEMA);
+	else
+	  begin
+		  DBMS_XDB_VERSION.CHECKOUT(P_XML_SCHEMA_PATH);
+    exception
+      WHEN NOT_VERSIONED then
+        V_RESID := DBMS_XDB_VERSION.makeVersioned(P_XML_SCHEMA_PATH);
+        DBMS_XDB_VERSION.checkOut(P_XML_SCHEMA_PATH);
+      WHEN OTHERS THEN
+        RAISE;
+    end;
 
-  -- update RESOURCE_VIEW
-  --    set RES = updateXML(RES,'/r:Resource/r:Contents/xsd:schema',P_XML_SCHEMA,DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R || ' ' || DBMS_XDB_CONSTANTS.NSPREFIX_XMLSCHEMA_XSD)
-  --  where equals_path(RES,P_XML_SCHEMA_PATH) = 1;
+    -- update RESOURCE_VIEW
+    --    set RES = updateXML(RES,'/r:Resource/r:Contents/xsd:schema',P_XML_SCHEMA,DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R || ' ' || DBMS_XDB_CONSTANTS.NSPREFIX_XMLSCHEMA_XSD)
+    --  where equals_path(RES,P_XML_SCHEMA_PATH) = 1;
 
-  V_RESOURCE := DBMS_XDB.getResource(P_XML_SCHEMA_PATH);
-  DBMS_XDBRESOURCE.setContent(V_RESOURCE,P_XML_SCHEMA);
-  DBMS_XDBRESOURCE.setComment(V_RESOURCE,P_COMMENT);
-  DBMS_XDBRESOURCE.save(V_RESOURCE);
+    V_RESOURCE := DBMS_XDB.getResource(P_XML_SCHEMA_PATH);
+    DBMS_XDBRESOURCE.setContent(V_RESOURCE,P_XML_SCHEMA);
+    DBMS_XDBRESOURCE.setComment(V_RESOURCE,P_COMMENT);
+    DBMS_XDBRESOURCE.save(V_RESOURCE);
 
-  V_RESID := DBMS_XDB_VERSION.checkIn(P_XML_SCHEMA_PATH);
-
+    V_RESID := DBMS_XDB_VERSION.checkIn(P_XML_SCHEMA_PATH);
+  end if;
 end;
 --     
 procedure mapAnyToClob(P_XML_SCHEMA in out XMLType)

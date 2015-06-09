@@ -1,0 +1,7 @@
+--
+begin
+  DBMS_XDB.setACL(XFILES_CONSTANTS.XFILES_APPS || '/XMLSchemaWizard',XFILES_CONSTANTS.ACL_XFILES_USERS);
+end;
+/
+--
+exit
