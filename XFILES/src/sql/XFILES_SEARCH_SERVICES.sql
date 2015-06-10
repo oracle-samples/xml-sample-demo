@@ -25,6 +25,7 @@ as
   function getSubstitutionGroup(P_HEAD_ELEMENT NUMBER)  return XMLType;
   
   function getRepositoryNodeMap return XMLType;
+  function getDataGuideNodeMap(P_TABLE_NAME VARCHAR2, P_COLUMN_NAME VARCHAR2) return xmlType;
 
 end;
 /
@@ -186,6 +187,30 @@ begin
 exception
   when others then
     handleException('GETREPOSITORYNODEMAP',V_INIT,NULL);
+    raise;
+end;
+--
+function getDataGuideNodeMap(P_TABLE_NAME VARCHAR2, P_COLUMN_NAME VARCHAR2) 
+return xmlType
+as  
+  V_PARAMETERS        XMLType;
+  V_INIT              TIMESTAMP WITH TIME ZONE := SYSTIMESTAMP; 
+  V_RESULT            XMLType;
+begin
+  select xmlConcat
+         (
+           xmlElement("table",P_TABLE_NAME),
+           xmlElement("column",P_COLUMN_NAME)
+         )
+    into V_PARAMETERS
+    from dual;
+  
+  V_RESULT := XDB_DATAGUIDE_SEARCH.getDataGuideNodeMap(P_TABLE_NAME,P_COLUMN_NAME);  
+  writeLogRecord('GETDATAGUIDENODEMAP',V_INIT,V_PARAMETERS);
+  return V_RESULT;
+exception
+  when others then
+    handleException('GETDATAGUIDENODEMAP',V_INIT,V_PARAMETERS);
     raise;
 end;
 --

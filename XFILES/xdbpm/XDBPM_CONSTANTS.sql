@@ -71,7 +71,15 @@ as
     C_OVERWRITE       constant VARCHAR2(12)  := 'OVERWRITE';
     C_RAISE_ERROR     constant VARCHAR2(12)  := 'RAISE';
     C_SKIP            constant VARCHAR2(12)  := 'SKIP';
-
+    
+    C_NAMESPACE_XDBPM        constant VARCHAR2(700) := 'http://xmlns.oracle.com/xdb/pm';
+    C_NAMESPACE_XDBPM_DEMO   constant VARCHAR2(700) := C_NAMESPACE_XDBPM    || '/demo';
+    C_NAMESPACE_XDBPM_SEARCH constant VARCHAR2(700) := C_NAMESPACE_XDBPM_DEMO || '/search';
+    
+    C_NSPREFIX_XDBPM_XDBPM constant VARCHAR2(128) := 'xmlns:xdbpm="'        || C_NAMESPACE_XDBPM || '"';
+    C_NSPREFIX_DEMO_DEMO   constant VARCHAR2(128) := 'xmlns:demo="'         || C_NAMESPACE_XDBPM_DEMO || '"';
+    C_NSPREFIX_SEARCH_SRCH constant VARCHAR2(128) := 'xmlns:srch="'         || C_NAMESPACE_XDBPM_SEARCH || '"';
+    
     function FOLDER_SYSTEM                       return VARCHAR2 deterministic;
     function FOLDER_SYSTEM_ACLS                  return VARCHAR2 deterministic;
     function FOLDER_SYSTEM_SCHEMAS               return VARCHAR2 deterministic;
@@ -100,6 +108,15 @@ as
     function OVERWRITE            return VARCHAR2 deterministic;
     function RAISE_ERROR          return VARCHAR2 deterministic;
     function SKIP                 return VARCHAR2 deterministic;
+    
+    function NAMESPACE_XDBPM        return VARCHAR2 deterministic;
+    function NAMESPACE_XDBPM_DEMO   return VARCHAR2 deterministic;
+    function NAMESPACE_XDBPM_SEARCH return VARCHAR2 deterministic;
+
+    function NSPREFIX_XDBPM_XDBPM   return VARCHAR2 deterministic;
+    function NSPREFIX_DEMO_DEMO     return VARCHAR2 deterministic;
+    function NSPREFIX_SEARCH_SRCH   return VARCHAR2 deterministic;
+    
 end;
 /
 show errors
@@ -151,13 +168,25 @@ function ENCODING_ISOLATIN1                  return VARCHAR2 deterministic as be
 --                                           
 function ENCODING_DEFAULT                    return VARCHAR2 deterministic as begin return DBMS_XDB_CONSTANTS.ENCODING_DEFAULT; end;
 --                                           
-function OVERWRITE                           return VARCHAR2 deterministic as begin return C_OVERWRITE ; end;
+function OVERWRITE                           return VARCHAR2 deterministic as begin return C_OVERWRITE; end;
 --                                           
-function VERSION                             return VARCHAR2 deterministic as begin return C_VERSION ; end;
+function VERSION                             return VARCHAR2 deterministic as begin return C_VERSION; end;
 --                                           
-function RAISE_ERROR                         return VARCHAR2 deterministic as begin return C_RAISE_ERROR ; end;
+function RAISE_ERROR                         return VARCHAR2 deterministic as begin return C_RAISE_ERROR; end;
 --                                           
-function SKIP                                return VARCHAR2 deterministic as begin return C_SKIP ; end;
+function SKIP                                return VARCHAR2 deterministic as begin return C_SKIP; end;
+--
+function NAMESPACE_XDBPM                     return VARCHAR2 deterministic as begin return C_NAMESPACE_XDBPM; end;
+--
+function NAMESPACE_XDBPM_DEMO                return VARCHAR2 deterministic as begin return C_NAMESPACE_XDBPM_DEMO; end;
+--
+function NAMESPACE_XDBPM_SEARCH              return VARCHAR2 deterministic as begin return C_NAMESPACE_XDBPM_SEARCH; end;
+--
+function NSPREFIX_XDBPM_XDBPM                return VARCHAR2 deterministic as begin return C_NSPREFIX_XDBPM_XDBPM; end;
+--
+function NSPREFIX_DEMO_DEMO                  return VARCHAR2 deterministic as begin return C_NSPREFIX_DEMO_DEMO; end;
+--
+function NSPREFIX_SEARCH_SRCH                return VARCHAR2 deterministic as begin return C_NSPREFIX_SEARCH_SRCH; end;
 --
 end XDBPM_CONSTANTS;
 /

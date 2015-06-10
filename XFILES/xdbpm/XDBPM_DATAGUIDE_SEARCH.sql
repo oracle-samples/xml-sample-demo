@@ -12,11 +12,36 @@
  *
  * ================================================
  */
+set echo on
+--
+-- XDBPM_DATAGUIDE_SEARCH should be created under XDBPM
+--
+alter session set current_schema = XDBPM
+/
+create or replace package XDBPM_DATAGUIDE_SEARCH
+authid CURRENT_USER 
+as
+  function getDataGuideNodeMap(P_TABLE_NAME VARCHAR2, P_COLUMN_NAME VARCHAR2) return XMLTYPE;
+end;
+/
+show errors
+--
+create or replace synonym XDB_DATAGUIDE_SEARCH for XDBPM_DATAGUIDE_SEARCH
+/
+grant execute on XDBPM_DATAGUIDE_SEARCH to public
+/
+create or replace package body XDBPM_DATAGUIDE_SEARCH
+as
+--
+function getDataGuideNodeMap(P_TABLE_NAME VARCHAR2, P_COLUMN_NAME VARCHAR2) return XMLTYPE
+as
+begin
+  return XMLTYPE('<srch:NodeMap xmlns:srch="http://xmlns.oracle.com/xdb/pm/demo/search"><srch:Element ID="1"><srch:Name>DataGuide</srch:Name><srch:Elements/></srch:Element></srch:NodeMap>');
+end;
+--
+end;
+/
+show errors
+/
 
---
--- Added in 12.1.0.1.0
---
-@@XDBPM_ADMIN
-@@XDBPM_DATAGUIDE_SEARCH
-@@XDBPM_SYNONYMS_12100
---
+    

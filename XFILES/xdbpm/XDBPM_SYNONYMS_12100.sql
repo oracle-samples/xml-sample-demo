@@ -16,7 +16,9 @@
 --
 alter session set current_schema = XDBPM
 /
-create or replace public synonym XDB_ADMIN     		for XDBPM_ADMIN
+create or replace public synonym XDB_ADMIN     		    for XDBPM_ADMIN
+/
+create or replace public synonym XDB_DATAGUIDE_SEARCH for XDBPM_DATAGUIDE_SEARCH
 /
 alter session set current_schema = SYS
 /
