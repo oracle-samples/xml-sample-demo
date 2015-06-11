@@ -4,5 +4,5 @@ infile '%DEMODIRECTORY%\%USER%\sampleData\purchaseOrderFiles.dat'
 append
 into table %TABLE1% 
 xmltype(XMLDATA) (
- filename filler char(120),
+ filename filler char(999),
  XMLDATA  lobfile(filename) terminated by eof)
