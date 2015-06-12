@@ -39,5 +39,5 @@ cd ../../NVPAIR/install
 sh NVPAIR.sh $DBA $DBAPWD $DEMOUSER $DEMOPWD $SERVERURL
 cd ../../..
 cd ../../XMLSchemaWizard/install
-sh XMLSchemaWizard.sh $DBA $DBAPWD $DEMOUSER $DEMOPWD $SERVERURL
+sh XMLSchemaWizard.sh $DBA $DBAPWD $XFILES $XFILESPWD $SERVERURL
 cd ../../..
