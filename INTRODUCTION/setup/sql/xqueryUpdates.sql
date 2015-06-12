@@ -40,7 +40,7 @@ update %TABLE1%
                         'copy $NEWXML := $XML modify (
                            for $PO in $NEWXML/PurchaseOrder return (
                                 replace value of node $PO/User with $NEWUSER,
-                                replace value of node $PO/Requestor with NEWNAME,
+                                replace value of node $PO/Requestor with $NEWNAME,
                                 replace value of node $PO/LineItems/LineItem/Part[@Description=$OLDTITLE]/@Description with $NEWTITLE 
                                )
                          )
