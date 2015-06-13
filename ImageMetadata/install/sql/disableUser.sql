@@ -19,6 +19,6 @@ def METADATA_OWNER = &1
 --
 alter user &METADATA_OWNER identified by &METADATA_OWNER account lock
 /
-revoke CONNECT, XDB_SET_INVOKER from &METADATA_OWNER
+revoke connect from &METADATA_OWNER
 /
 quit
