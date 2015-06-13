@@ -14,6 +14,10 @@
 set echo on
 spool configureContainer.log
 --
+prompt "Please connect as a DBA when prompted"
+--
+connect
+--
 def TARGET_PDB = &1
 --
 def DBA = &2
