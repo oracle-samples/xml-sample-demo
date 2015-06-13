@@ -25,6 +25,9 @@ doInstall() {
      mv oracle-xml-sample-demo-* xml-sample-demo
    fi
    cd xml-sample-demo
+   sqlplus sys @configureContainer $PDB $DBA $DBAPWD $HTTPPORT
+   export TWO_TASK=$PDB
+   export ORACLE_SID=$PDB
    sqlplus $DBA/$DBAPWD @install/installXFiles $XFILES $XFILESPWD $HTTPPORT
    sqlplus $DBA/$DBAPWD @install/installMetadata $XDBEXT $XDBEXTPWD
    sh install/installXMLRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $XDBEXT $XDBEXTPWD $DEMOUSER $DEMOPWD $SERVERURL
@@ -48,15 +51,16 @@ doInstall() {
    fi
    sh install/installJSONRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $DEMOUSER $DEMOPWD $SERVERURL
 }
-DBA=$1
-DBAPWD=$2
-XFILES=$3
-XFILESPWD=$4
-XDBEXT=$5
-XDBEXTPWD=$6
-DEMOUSER=$7
-DEMOPWD=$8
-HOSTNAME=$9
+PDB=${1}
+DBA=${2}
+DBAPWD=${3}
+XFILES=XFILES
+XFILESPWD=${4}
+XDBEXT=${5}
+XDBEXTPWD=${6}
+DEMOUSER=${7}
+DEMOPWD=${8}
+HOSTNAME=${9}
 HTTPPORT=${10}
 ORDSHOME=${11}
 SERVERURL="http://$HOSTNAME:$HTTPPORT"
