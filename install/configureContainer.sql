@@ -30,7 +30,7 @@ alter session set container = &TARGET_PDB
 /
 alter user anonymous account unlock
 /
-grant connect, resource, SYSDBA, DBA to &DBA6/13/2015 4:46:55 PM identified by &DBAPWD
+grant connect, resource, SYSDBA, DBA to &DBA identified by &DBAPWD
 /
 call DBMS_XDB_CONFIG.setHttpPort(&HTTP)
 /
