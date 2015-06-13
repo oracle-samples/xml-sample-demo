@@ -963,6 +963,6 @@ then
 fi
 sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/sql/createImageCategoryFolders.sql $USER
 sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/publishAppFolder.sql $USER imageMetadata XFILES
-sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/disableUser.sql $USER
+sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/sql/lockUser.sql $USER
 echo "Installation Complete" >> $logfilename
 echo "Installation Complete: See $logfilename for details."

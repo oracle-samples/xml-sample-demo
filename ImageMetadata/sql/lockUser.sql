@@ -1,8 +1,7 @@
 
 /* ================================================  
- * Oracle XFiles Demonstration.  
  *    
- * Copyright (c) 2014 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2015 Oracle and/or its affiliates.  All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
@@ -13,46 +12,13 @@
  * ================================================
  */
 
-set echo on 
-spool XDB_REPOSITORY_INDEX.log
+set echo on
+spool sqlOperations.log APPEND
 --
--- Release specific script
+def METADATA_OWNER = &1
 --
-var REPOS_INDEX_SCRIPT VARCHAR2(120)
---
-declare
-  V_REPOS_INDEX_SCRIPT VARCHAR2(120);
-begin
-	begin
-    select 'XFILES_DO_NOTHING.sql'
-      into V_REPOS_INDEX_SCRIPT
-      from ALL_OBJECTS
-     where OBJECT_NAME = 'XDB$CI' 
-       and OBJECT_TYPE = 'INDEX' 
-       and OWNER = 'XDB';
-  exception
-    when no_data_found then
-      $IF DBMS_DB_VERSION.VER_LE_11_2 $THEN
-         V_REPOS_INDEX_SCRIPT := 'XDB_REPOSITORY_INDEX_11200.sql';
-      $ELSE
-         V_REPOS_INDEX_SCRIPT := 'XDB_REPOSITORY_INDEX_12100.sql';
-      $END
-    when others then
-      RAISE;
-  end;
-  :REPOS_INDEX_SCRIPT := V_REPOS_INDEX_SCRIPT;
-end;
+alter user &METADATA_OWNER identified by &METADATA_OWNER account lock
 /
-undef REPOS_INDEX_SCRIPT
---
-column REPOS_INDEX_SCRIPT new_value REPOS_INDEX_SCRIPT
---
-select :REPOS_INDEX_SCRIPT REPOS_INDEX_SCRIPT from dual
+revoke CONNECT, XDB_SET_INVOKER from &METADATA_OWNER
 /
-def REPOS_INDEX_SCRIPT
-set define on
---
-@@&REPOS_INDEX_SCRIPT
---
 quit
- 

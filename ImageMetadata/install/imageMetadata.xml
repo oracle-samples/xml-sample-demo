@@ -265,7 +265,7 @@
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishAppFolder.sql %USER% imageMetadata %XFILES_SCHEMA%</action>
 
 		<!-- Lock the Metadata Database Schema down -->
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\disableUser.sql %USER%</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\lockUser.sql %USER%</action>
 
 	</installation>
 
