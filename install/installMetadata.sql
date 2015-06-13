@@ -16,7 +16,7 @@ def USERNAME = &1
 --
 def PASSWORD = &2
 --
-grant connect, resource, unlimited tablespace to &USERNAME identified by &PASSWORD
+grant CONNECT, RESOURCE, UNLIMITED TABLESPACE, XDB_SET_INVOKER to &USERNAME identified by &PASSWORD
 /
 alter user &USERNAME identified by &PASSWORD account unlock
 /
