@@ -25,7 +25,7 @@ doInstall() {
      mv oracle-xml-sample-demo-* xml-sample-demo
    fi
    cd xml-sample-demo
-   sqlplus @install/configureContainer $PDB $DBA $DBAPWD $HTTPPORT
+   sqlplus /nolog @install/configureContainer $PDB $DBA $DBAPWD $HTTPPORT
    export TWO_TASK=$PDB
    export ORACLE_SID=$PDB
    sqlplus $DBA/$DBAPWD @install/installXFiles $XFILES $XFILESPWD $HTTPPORT
