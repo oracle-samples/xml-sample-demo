@@ -262,7 +262,7 @@
 
 
 		<!-- Publish the demo -->
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishAppFolder.sql %USER% imageMetadata %XFILES_SCHEMA%</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishAppFolder.sql %BASEFOLDER% XFILES_CONSTANTS.ACL_XFILES_USERS</action>
 
 		<!-- Lock the Metadata Database Schema down -->
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\lockUser.sql %USER%</action>

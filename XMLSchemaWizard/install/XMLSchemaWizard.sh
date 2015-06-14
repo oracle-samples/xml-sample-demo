@@ -410,7 +410,7 @@ then
 fi
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/XFILES_XMLSCHEMA_WIZARD.sql
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/PUBLISH_XMLSCHEMA_WIZARD.sql
-sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/publishAppFolder.sql XMLSchemaWizard XFILES_CONSTANTS.ACL_XFILES_USERS
+sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/publishAppFolder.sql /home/$USER/Applications/XMLSchemaWizard XFILES_CONSTANTS.ACL_XFILES_USERS
 shellscriptName="$demohome/XML_Schema_Registration_Wizard.sh"
 echo "Shell Script : $shellscriptName" >> $logfilename
 echo "Shell Script : $shellscriptName"

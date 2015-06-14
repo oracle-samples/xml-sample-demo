@@ -52,7 +52,7 @@
   	</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\XFILES_XMLSCHEMA_WIZARD.sql</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\PUBLISH_XMLSCHEMA_WIZARD.sql</action>
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\publishAppFolder.sql %DEMOFOLDERNAME% XFILES_CONSTANTS.ACL_XFILES_USERS</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\publishAppFolder.sql %BASEFOLDER% XFILES_CONSTANTS.ACL_XFILES_USERS</action>
 	  <action type="LAUNCH"/>
 	</installation>
 	
