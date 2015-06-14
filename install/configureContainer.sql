@@ -16,7 +16,7 @@ spool configureContainer.log
 --
 prompt "Please connect as a DBA when prompted"
 --
-connect system
+connect sys/ as sysdba
 
 --
 def TARGET_PDB = &1
