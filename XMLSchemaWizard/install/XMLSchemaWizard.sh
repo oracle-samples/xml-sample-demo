@@ -34,7 +34,7 @@ echo "sqlplus $DBA:$rc" >> $logfilename
 if [ $rc != 2 ] 
 then 
   echo "Operation Failed : Unable to connect via SQLPLUS as $DBA - Installation Aborted." >> $logfilename
-  echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+  echo "Installation Failed [$HttpStatus]: See $logfilename for details."
   exit 2
 fi
 sqlplus -L $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/verifyConnection.sql
@@ -43,7 +43,7 @@ echo "sqlplus $USER:$rc" >> $logfilename
 if [ $rc != 2 ] 
 then 
   echo "Operation Failed : Unable to connect via SQLPLUS as $USER - Installation Aborted." >> $logfilename
-  echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+  echo "Installation Failed [$HttpStatus]: See $logfilename for details."
   exit 3
 fi
 HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X GET --write-out "%{http_code}\n" -s --output /dev/null $SERVER/xdbconfig.xml | head -1)
@@ -54,10 +54,10 @@ then
     then
       echo "Unable to establish HTTP connection as '$DBA'. Please note username is case sensitive with Digest Authentication">> $logfilename
       echo "Unable to establish HTTP connection as '$DBA'. Please note username is case sensitive with Digest Authentication"
-      echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+      echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     else
       echo "Operation Failed- Installation Aborted." >> $logfilename
-      echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+      echo "Installation Failed [$HttpStatus]: See $logfilename for details."
   fi
   exit 4
 fi
@@ -69,10 +69,10 @@ then
     then
       echo "Unable to establish HTTP connection as '$USER'. Please note username is case sensitive with Digest Authentication">> $logfilename
       echo "Unable to establish HTTP connection as '$USER'. Please note username is case sensitive with Digest Authentication"
-      echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+      echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     else
       echo "Operation Failed- Installation Aborted." >> $logfilename
-      echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+      echo "Installation Failed [$HttpStatus]: See $logfilename for details."
   fi
   exit 4
 fi
@@ -84,7 +84,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -96,7 +96,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -108,7 +108,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -120,7 +120,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -132,7 +132,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -144,7 +144,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -156,7 +156,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -168,7 +168,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -180,7 +180,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -192,7 +192,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -204,7 +204,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -216,7 +216,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -228,7 +228,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -240,7 +240,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -252,7 +252,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -264,7 +264,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -276,7 +276,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -288,7 +288,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -300,7 +300,7 @@ then
   if [ $HttpStatus != "201" ]
   then
     echo "Operation Failed [$HttpStatus] - Installation Aborted." >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 6
 	 fi
 fi
@@ -313,12 +313,12 @@ then
     if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
     then
       echo "DELETE(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html":$HttpStatus - Operation Failed" >> $logfilename
-      echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+      echo "Installation Failed [$HttpStatus]: See $logfilename for details."
       exit 5
     fi
   else
     echo "HEAD(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html":$HttpStatus - Operation Failed" >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 5
   fi
 fi
@@ -327,7 +327,7 @@ echo "PUT:"$demohome/registrationWizard.html" --> "$SERVER/home/$USER/Applicatio
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename
-  echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+  echo "Installation Failed [$HttpStatus]: See $logfilename for details."
   exit 5
 fi
 HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl" | head -1)
@@ -339,12 +339,12 @@ then
     if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
     then
       echo "DELETE(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl":$HttpStatus - Operation Failed" >> $logfilename
-      echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+      echo "Installation Failed [$HttpStatus]: See $logfilename for details."
       exit 5
     fi
   else
     echo "HEAD(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl":$HttpStatus - Operation Failed" >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 5
   fi
 fi
@@ -353,7 +353,7 @@ echo "PUT:"$demohome/xsl/registrationWizard.xsl" --> "$SERVER/home/$USER/Applica
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename
-  echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+  echo "Installation Failed [$HttpStatus]: See $logfilename for details."
   exit 5
 fi
 HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js" | head -1)
@@ -365,12 +365,12 @@ then
     if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
     then
       echo "DELETE(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js":$HttpStatus - Operation Failed" >> $logfilename
-      echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+      echo "Installation Failed [$HttpStatus]: See $logfilename for details."
       exit 5
     fi
   else
     echo "HEAD(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js":$HttpStatus - Operation Failed" >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 5
   fi
 fi
@@ -379,7 +379,7 @@ echo "PUT:"$demohome/js/registrationWizard.js" --> "$SERVER/home/$USER/Applicati
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename
-  echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+  echo "Installation Failed [$HttpStatus]: See $logfilename for details."
   exit 5
 fi
 HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql" | head -1)
@@ -391,12 +391,12 @@ then
     if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
     then
       echo "DELETE(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql":$HttpStatus - Operation Failed" >> $logfilename
-      echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+      echo "Installation Failed [$HttpStatus]: See $logfilename for details."
       exit 5
     fi
   else
     echo "HEAD(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql":$HttpStatus - Operation Failed" >> $logfilename
-    echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+    echo "Installation Failed [$HttpStatus]: See $logfilename for details."
     exit 5
   fi
 fi
@@ -405,7 +405,7 @@ echo "PUT:"$demohome/sql/XFILES_XMLSCHEMA_WIZARD.sql" --> "$SERVER/home/$USER/Ap
 if [ $HttpStatus != "201" ] 
 then
   echo "Operation Failed: Installation Aborted." >> $logfilename
-  echo "InstallationFailed [$HttpStatus]: See $logfilename for details."
+  echo "Installation Failed [$HttpStatus]: See $logfilename for details."
   exit 5
 fi
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/XFILES_XMLSCHEMA_WIZARD.sql
