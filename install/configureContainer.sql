@@ -14,7 +14,7 @@
 set echo on
 spool configureContainer.log
 --
-prompt "Please connect as a DBA when prompted"
+prompt "Please enter password for SYS/ as SYSDBA when prompted"
 --
 connect sys/ as sysdba
 
@@ -27,6 +27,10 @@ def DBAPWD = &3
 --
 def HTTP = &4
 --
+def USERNAME = &5
+--
+def USERPWD = &6 
+--
 alter user anonymous account unlock
 /
 alter system set shared_servers = 25 scope = both
@@ -38,5 +42,7 @@ alter user anonymous account unlock
 grant connect, resource, SYSDBA, DBA to &DBA identified by &DBAPWD
 /
 call DBMS_XDB_CONFIG.setHttpPort(&HTTP)
+/
+alter user &USERNAME identified by &USERPWD account unlock
 /
 quit
