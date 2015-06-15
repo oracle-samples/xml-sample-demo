@@ -1,0 +1,401 @@
+<installerConfiguration>
+	
+	<parameters>
+		<parameter name="%DEMONAME%"           value="An Introduction to the Oracle XML DB Repository"/>
+		<parameter name="%LAUNCHPAD%"          value="Repository Features"/>
+		<parameter name="%LAUNCHPADFOLDER%"    value="%STARTMENU%\Oracle XML DB Demonstrations"/>
+		<parameter name="%SHORTCUTFOLDER%"     value="%DEMODIRECTORY%\%USER%"/>
+
+		<parameter name="%PUBLICFOLDER%"       value="/publishedContent"/>
+  	<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/demonstrations/repository"/>
+		<parameter name="%HOMEFOLDER%"         value="/home/%USER%"/>
+   	<parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/demonstrations/repository"/>
+		<parameter name="%XFILES_SCHEMA%"      value="XFILES"/>
+		<parameter name="%XFILES_ROOT%"        value="XFILES"/>
+
+		<parameter name="%SCHEMAURL%"          value="http://xmlns.oracle.com/demo/imageMetadata.xsd"/>
+		<parameter name="%XFILESAPP%"          value="/%XFILES_ROOT%/Applications/imageMetadata"/>
+		<parameter name="%METADATA_OWNER%"     value="XDBEXT"/>
+
+		<parameter name="protocol"             value="HTTP"/>
+		<parameter name="enableHTTPTrace"      value="false"/>
+	</parameters>
+
+	<installation>
+
+		<action type="MAKEFOLDERS"/>
+		<action type="COPYFOLDERS"/>
+		
+		<action type="UNZIP"/>
+		
+		<action type="CLONEFOLDERS"/>
+		<action type="CLONEFILES"/>
+		
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\grantPermissions.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createHomeFolder.sql</action>
+
+	  <action type="UPLOAD">
+  		<!-- Delete existing Source Code -->
+  		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%</remote>
+  		</action>
+  		<action type="DELETE" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%</remote>
+  		</action>
+  		
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/assets</remote>
+  		</action>
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/simulation</remote>
+  		</action>
+  
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\Setup\assets\4.3.png</local>
+  			<remote>%DEMOCOMMON%/assets/4.3.png</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\Setup\assets\6.2.png</local>
+  			<remote>%DEMOCOMMON%/assets/6.2.png</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\Setup\assets\6.3.png</local>
+  			<remote>%DEMOCOMMON%/assets/6.3.png</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\Setup\assets\6.4.png</local>
+  			<remote>%DEMOCOMMON%/assets/6.4.png</remote>
+  		</action>
+  
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\Setup\ImageLibrary.zip</local>
+  			<remote>%DEMOCOMMON%/simulation/ImageLibrary.zip</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%</remote>
+  		</action>
+
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%/sql</remote>
+  		</action>
+
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\countMetadata.sql</local>
+  			<remote>%DEMOLOCAL%/sql/countMetadata.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\listRepositoryEvents.sql</local>
+  			<remote>%DEMOLOCAL%/sql/listRepositoryEvents.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\resetDemo.sql</local>
+  			<remote>%DEMOLOCAL%/sql/resetDemo.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\createDirectories.sql</local>
+  			<remote>%DEMOLOCAL%/sql/createDirectories.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\queryMetadata.sql</local>
+  			<remote>%DEMOLOCAL%/sql/queryMetadata.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\addAdditionalMetadata.sql</local>
+  			<remote>%DEMOLOCAL%/sql/addAdditionalMetadata.sql</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\%USER%\sql\simulateImageLoad.sql</local>
+  			<remote>%DEMOLOCAL%/sql/simulateImageLoad.sql</remote>
+  		</action>
+  
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%HOMEFOLDER%/ImageLibrary</remote>
+  		</action>
+   		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%PUBLICFOLDER%/categorization/images</remote>
+  		</action>
+ 
+  
+    </action>
+    
+		<action type="DAV"/>
+		<action type="SQL"/>
+		<action type="VIEW"/>
+		<action type="HTTP"/>
+		<action type="SHELL"/>
+		
+	  <action type="UPLOAD">
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOLOCAL%/Links</remote>
+  		</action>
+  	  <action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%SHORTCUTFOLDER%\4.3 Copy Images (WebDAV).lnk</local>
+  			<remote>%DEMOLOCAL%/Links/4.3 Copy Images (WebDAV).lnk</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%SHORTCUTFOLDER%\6.4 View Image Categories (WebDav).lnk</local>
+  			<remote>%DEMOLOCAL%/Links/6.4 View Image Categories (WebDav).lnk</remote>
+  		</action>
+  	</action>
+  	
+		<action type="DEMOCONFIG" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+			<remote>%DEMOLOCAL%</remote>
+		</action>
+		
+	  <action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishDemo.sql %DEMOLOCAL% %XFILES_SCHEMA%</action>
+	  <action type="LAUNCH"/>
+
+	</installation>
+
+	<make>
+		<folders>
+			<folder>%DEMODIRECTORY%\%USER%</folder>
+			<folder>%DEMODIRECTORY%\%USER%\WebDAV</folder>
+			<folder>%DEMODIRECTORY%\%USER%\WebDAV\ImageLibrary</folder>
+			<folder>%DEMODIRECTORY%\%USER%\WebDAV\ImageCategories</folder>
+			<folder>%DEMODIRECTORY%\%USER%\SampleData</folder>
+			<folder>%DEMODIRECTORY%\%USER%\sql</folder>
+		</folders>
+	</make>
+	
+	<copy>
+		<files/>
+		<folders/>
+	</copy>
+	
+	<clone>
+		<folders>
+			<folder>
+				<source>%DEMODIRECTORY%\Setup\sql</source>
+				<target>%DEMODIRECTORY%\%USER%\sql</target>
+			</folder>
+		</folders>
+		<files>
+			<file>
+				<source>%DEMODIRECTORY%\Setup\XML Spy Project.spp</source>
+				<target>%SHORTCUTFOLDER%\1.1 Show XML Schema (XMLSPY).spp</target>
+			</file>
+			<file>
+				<source>%DEMODIRECTORY%\Setup\sqlldr\ImageList.dat</source>
+				<target>%DEMODIRECTORY%\%USER%\SampleData\ImageList.dat</target>
+			</file>
+			<file>
+				<source>%DEMODIRECTORY%\Setup\sqlldr\ImageLoad.ctl</source>
+				<target>%DEMODIRECTORY%\%USER%\SampleData\ImageLoad.ctl</target>
+			</file>
+		</files>
+	</clone>
+	
+	<unzip>
+			<archives>
+					<archive>
+							<source>%DEMODIRECTORY%\Setup\ImageLibrary.zip</source>
+					    <target>%DEMODIRECTORY%\%USER%\SampleData</target>
+					</archive>
+			</archives>
+	</unzip>
+		
+	<shortCuts>
+		<WEBDAV>
+			<shortCut>
+				<name>ImageLibrary on %HOSTNAME%</name>
+				<URL>/home/%USER%/ImageLibrary</URL>
+				<location>%DEMODIRECTORY%\%USER%\WebDAV\ImageLibrary</location>
+			</shortCut>
+			<shortCut>
+				<name>Image Categories on %HOSTNAME%</name>
+				<URL>%PUBLICFOLDER%/categorization/images</URL>
+				<location>%DEMODIRECTORY%\%USER%\WebDAV\ImageCategories</location>
+			</shortCut>
+			<shortCut>
+				<name>%USER% on %HOSTNAME%</name>
+				<URL>%HOMEFOLDER%</URL>
+				<location>%DEMODIRECTORY%\%USER%\sampleData</location>
+			</shortCut>
+		</WEBDAV>
+		
+		<SQL executionMode="local">
+			<defaults>
+				<serverLandingPad>/%XFILES_ROOT%/lite/Resource.html?stylesheet=/%XFILES_ROOT%/WebDemo/xsl/LaunchPad.xsl&amp;includeContent=true</serverLandingPad>
+				<scriptPrefix>%DEMOLOCAL%</scriptPrefix>
+				<username>%USER%</username>
+				<password>%PASSWORD%</password>
+				<tnsAlias>%TNSALIAS%</tnsAlias>
+				<icon>%DEMODIRECTORY%\onstall\sqlplus.ico</icon>
+			</defaults>
+			<shortCut>
+				<name>0.1 Initialize Demo</name>
+				<script>/sql/resetDemo.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>2.1 List Repository Events</name>
+				<script>/sql/listRepositoryEvents.sql</script>
+				<rerunnable>true</rerunnable>
+			</shortCut>
+			<shortCut>
+				<name>4.1 Create Folder</name>
+				<script>/sql/createDirectories.sql</script>
+			</shortCut>
+			<shortCut>
+				<name>4.2 Count Metadata</name>
+				<script>/sql/countMetadata.sql</script>
+				<rerunnable>true</rerunnable>
+			</shortCut>
+			<shortCut>
+				<name>4.4 Recount Metadata</name>
+				<script>/sql/countMetadata.sql</script>
+				<rerunnable>true</rerunnable>
+			</shortCut>
+			<shortCut>
+				<name>5.1 Query Metadata</name>
+				<script>/sql/queryMetadata.sql</script>
+				<rerunnable>true</rerunnable>
+			</shortCut>
+			<shortCut>
+				<name>5.2 Expand Metadata</name>
+				<script>/sql/addAdditionalMetadata.sql</script>
+			</shortCut>
+		</SQL>
+
+		<VIEW>
+			<defaults>
+				<pathPrefix></pathPrefix>
+				<localViewer/>
+				<remoteViewer/>
+				<contentType>text/plain</contentType>
+				<username>%USER%</username>
+				<arguments/>
+			</defaults>
+			<shortCut>
+				<name>1.2 View XML Schema (Browser)</name>
+				<target>%XFILESAPP%/xsd/imageMetadata.xsd</target>
+				<contentType>text/xml</contentType>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+			</shortCut>
+			<shortCut>
+				<name>2.2 Repository Event Configuration File</name>
+				<target>%XFILESAPP%/resConfig/imageEventConfiguration.xml</target>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+				<contentType>text/xml</contentType>
+				<remoteViewer/>
+			</shortCut>
+			<shortCut>
+				<name>2.3 Repository Event Package</name>
+				<target>%XFILESAPP%/sql/imageEventManager.sql</target>
+				<contentType>text/plain</contentType>
+			</shortCut>
+			<shortCut>
+				<name>2.4 Register Event Manager</name>
+				<target>%XFILESAPP%/sql/activateImageEventManager.sql</target>
+				<contentType>text/plain</contentType>
+			</shortCut>
+			<shortCut>
+				<name>3.1 Repository Event Queue</name>
+				<target>%XFILESAPP%/sql/repositoryQueue.sql</target>
+				<contentType>text/plain</contentType>
+			</shortCut>
+			<shortCut>
+				<name>3.2 Image Processor</name>
+				<target>%XFILESAPP%/sql/imageProcessor.sql</target>
+				<contentType>text/plain</contentType>
+			</shortCut>
+			<shortCut>
+				<name>6.1 View Resource XML</name>
+				<target>/sys/servlets/%XFILES_ROOT%/Protected/%XFILES_SCHEMA%.XFILES_REST_SERVICES.GETRESOURCE</target>
+				<arguments>P_RESOURCE_PATH=/home/%USER%/ImageLibrary/Norwich (3).jpg</arguments>
+				<contentType>text/xml</contentType>
+				<remoteViewer>/%XFILES_ROOT%/xmlViewer/xmlViewer.html</remoteViewer>
+			</shortCut>
+	 	</VIEW>
+ 	
+		<HTTP>
+			<defaults>
+				<username>%USER%</username>
+			</defaults>
+			<shortCut>
+				<name>6.2 View Images (XFILES)</name>
+				<URL>%SERVERURL%/%XFILES_ROOT%/lite/Folder.html</URL>
+				<arguments>target=/home/%USER%/ImageLibrary&amp;stylesheet=/%XFILES_ROOT%/lite/xsl/FolderBrowser.xsl</arguments>
+				<target>REPOS_6_2</target>
+				<screenshot>%DEMOCOMMON%/assets/6.2.png</screenshot>
+				<contentType>text/html</contentType>
+			</shortCut>
+			<shortCut>
+				<name>6.3 View Image Categories (XFILES)</name>
+				<URL>%SERVERURL%/%XFILES_ROOT%/lite/Folder.html</URL>
+				<arguments>target=/publishedContent/categorization/images&amp;stylesheet=/%XFILES_ROOT%/lite/xsl/FolderBrowser.xsl</arguments>
+				<target>REPOS_6_3</target>
+				<screenshot>%DEMOCOMMON%/assets/6.3.png</screenshot>
+				<contentType>text/html</contentType>
+			</shortCut>
+		</HTTP>
+		
+		<General>
+			<defaults>
+				<icon>%SystemRoot%\system32\SHELL32.dll,3</icon>
+				<username>%USER%</username>
+			</defaults>
+			<shortCut>
+				<name>4.3 Copy Images (WebDAV)</name>
+				<path>%DEMODIRECTORY%\%USER%\sampleData</path>
+				<simulation>
+					<type>SQLLDR</type>
+					<screenshot>4.3.png</screenshot>
+					<SQL>%DEMOLOCAL%/sql/simulateImageLoad.sql</SQL>
+				</simulation>
+			</shortCut>
+			<shortCut>
+				<name>6.4 View Image Categories (WebDav)</name>
+				<path>%DEMODIRECTORY%\%USER%\WebDAV\ImageCategories</path>
+				<simulation>
+					<type>Folder</type>
+					<screenshot>6.4.png</screenshot>
+					<URL>%PUBLICFOLDER%/categorization/images</URL>
+				</simulation>
+			</shortCut>
+		</General>
+
+		<LAUNCH>
+			<shortCut type="url">
+				<name>%LAUNCHPAD%</name>
+				<location>%LAUNCHPADFOLDER%</location>
+				<target>%SERVERURL%%DEMOLOCAL%/index.html</target>
+			</shortCut>
+			<shortCut type="lnk">
+				<name>%LAUNCHPAD% Files</name>
+				<location>%LAUNCHPADFOLDER%</location>
+				<target>%DEMODIRECTORY%\%USER%</target>
+			</shortCut>
+		</LAUNCH>
+	</shortCuts>
+
+</installerConfiguration>

@@ -124,6 +124,8 @@ begin
   dbms_xdb.link(XFILES_CONSTANTS.FOLDER_HOME || '/src/images/Barber_Pole_Red.gif',                       V_TARGET_FOLDER,             'loading.gif',DBMS_XDB.LINK_TYPE_WEAK);
 end;
 /
+commit
+/
 -- 
 -- Publish Xinha under FRAMEWORKS
 --
@@ -144,6 +146,8 @@ begin
 	
   DBMS_XDB.link(V_FRAMEWORK_ROOT,XFILES_CONSTANTS.FOLDER_FRAMEWORKS_PUBLIC,'Xinha',DBMS_XDB.LINK_TYPE_WEAK);
 end;
+/
+commit
 /
 -- 
 -- Publish Bootstap Dialogs 3 under FRAMEWORKS
@@ -166,6 +170,8 @@ begin
   DBMS_XDB.link(V_FRAMEWORK_ROOT,XFILES_CONSTANTS.FOLDER_FRAMEWORKS_PUBLIC,'bootstrap-dialog',DBMS_XDB.LINK_TYPE_WEAK);
 end;
 /
+commit
+/
 -- 
 -- Publish Bootstap 3.2.0 under FRAMEWORKS
 --
@@ -187,6 +193,8 @@ begin
   DBMS_XDB.link(V_FRAMEWORK_ROOT,XFILES_CONSTANTS.FOLDER_FRAMEWORKS_PUBLIC,'bootstrap',DBMS_XDB.LINK_TYPE_WEAK);
 end;
 /
+commit
+/
 -- 
 -- Publish JQuery 2.1.1 under FRAMEWORKS
 --
@@ -207,6 +215,23 @@ begin
 	
   DBMS_XDB.link(V_FRAMEWORK_ROOT,XFILES_CONSTANTS.FOLDER_FRAMEWORKS_PUBLIC,'jquery.js',DBMS_XDB.LINK_TYPE_WEAK);
 end;
+/
+commit
+/
+-- 
+-- Publish jssor under FRAMEWORKS
+--
+declare 
+  V_FRAMEWORK_ROOT    VARCHAR2(700) := XFILES_CONSTANTS.FOLDER_FRAMEWORKS_PRIVATE || '/jssor';
+  V_LINK_TARGET       VARCHAR2(700) := XFILES_CONSTANTS.FOLDER_FRAMEWORKS_PUBLIC || '/jssor';
+begin
+  if DBMS_XDB.existsResource(V_LINK_TARGET) then
+	  DBMS_XDB.deleteResource(V_LINK_TARGET);
+	end if;
+  DBMS_XDB.link(V_FRAMEWORK_ROOT,XFILES_CONSTANTS.FOLDER_FRAMEWORKS_PUBLIC,'jssor',DBMS_XDB.LINK_TYPE_WEAK);
+end;
+/
+commit
 /
 @@PUBLISH_XFILES_ICONS
 --

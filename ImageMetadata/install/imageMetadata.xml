@@ -206,16 +206,6 @@
   			<local>%DEMODIRECTORY%\xsl\EXIFCommon.xsl</local>
   			<remote>%BASEFOLDER%/xsl/EXIFCommon.xsl</remote>
   		</action>
-  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
-  			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\xsl\left-arrow-circle.png</local>
-  			<remote>%BASEFOLDER%/xsl/left-arrow-circle.png</remote>
-  		</action>
-  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
-  			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\xsl\right-arrow-circle.png</local>
-  			<remote>%BASEFOLDER%/xsl/right-arrow-circle.png</remote>
-  		</action>
   
       <!-- Upload Javascript -->
       

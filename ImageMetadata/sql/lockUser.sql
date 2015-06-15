@@ -17,6 +17,10 @@ spool sqlOperations.log APPEND
 --
 def METADATA_OWNER = &1
 --
+call dbms_xdb.setAcl(XDB_CONSTANTS.FOLDER_HOME || '/&METADATA_OWNER','/sys/acls/bootstrap_acl.xml')
+/
+commit
+/
 alter user &METADATA_OWNER identified by &METADATA_OWNER account lock
 /
 revoke CONNECT, XDB_SET_INVOKER from &METADATA_OWNER

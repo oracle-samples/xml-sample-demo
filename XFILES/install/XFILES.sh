@@ -4541,7 +4541,7 @@ sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/bootstrap3-dialog-master.zip  /home/$USER/Frameworks               /home/$USER/Frameworks/bootstrap3-dialog-master.log
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/bootstrap-3.2.0-dist.zip      /home/$USER/Frameworks               /home/$USER/Frameworks/bootstrap-3.2.0-dist.log
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/jquery-2.1.1.min.zip          /home/$USER/Frameworks/jquery-2.1.1  /home/$USER/Frameworks/jquery-2.1.1.min.log
-sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/jssor.zip                     /home/$USER/Frameworks/jssor         /home/$USER/Frameworks/jssor.log
+sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/jssor.zip                     /home/$USER/Frameworks               /home/$USER/Frameworks/jssor.log
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/WebDemo/sql/XFILES_WEBDEMO_SERVICES.sql $USER
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/PUBLISH_XFILES.sql OracleTransparent3d.png
 sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_STATUS_PAGE.sql $USER

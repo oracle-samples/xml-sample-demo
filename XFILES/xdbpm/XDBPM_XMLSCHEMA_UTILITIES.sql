@@ -1150,9 +1150,11 @@ begin
          	       WHEN doc.NAMESPACE is NULL THEN
           	        XMLQUERY(
           	          '$NEWDOC := $DOC modify (
-          	                 	           let $ROOT = $NEWDOC/*
-          	                             delete nodes $ROOT/@xsi:noNamespaceSchemaLocation
-          	                             insert node attribute xsi:noNamespaceSchemaLocation {$SLH) into $ROOT
+          	                 	           let $ROOT := $NEWDOC/*
+          	                 	           return (
+            	                             delete nodes $ROOT/@xsi:noNamespaceSchemaLocation,
+            	                             insert node attribute xsi:noNamespaceSchemaLocation {$SLH) into $ROOT
+          	                             )
           	                           )
           	           return $NEWDOC'
           	           passing V_XML_INSTANCE as "DOC", 
@@ -1162,9 +1164,11 @@ begin
           	     ELSE 
          	        XMLQUERY(
           	          '$NEWDOC := $DOC modify (
-          	                 	           let $ROOT = $NEWDOC/*
-          	                             delete nodes $ROOT/@xsi:schemaLocation
-          	                             insert node attribute xsi:schemaLocation {$SLH) into $ROOT
+          	                 	           let $ROOT := $NEWDOC/*
+          	                 	           return (
+          	                               delete nodes $ROOT/@xsi:schemaLocation,
+          	                               insert node attribute xsi:schemaLocation {$SLH) into $ROOT
+          	                             )
           	                           )
           	           return $NEWDOC'
           	           passing V_XML_INSTANCE as "DOC", 

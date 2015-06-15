@@ -803,6 +803,7 @@ function DemonstrationPlayer() {
   }
 
   this.loadIFrame = function(iFrameId,targetURL,contentType) {
+  	
   	var iFrame = document.getElementById(iFrameId)
   	
   	// Localize the URL
@@ -811,21 +812,38 @@ function DemonstrationPlayer() {
     loc.href = targetURL
   	
   	if ((contentType == "text/xml") || (contentType == "application/xml")) {
+  		var url
     	if (loc.pathname.substring(0,1) == "/") {
     		// Firefox - Will see problem with X-Site Scripting with absolute URL
-    	  iFrame.src = "/XFILES/xmlViewer/xmlViewer.html?target=" + encodeURIComponent(location.protocol + "//" + location.hostname + ":" + location.port + loc.pathname);
+    	  url = location.protocol + "//" + location.hostname + ":" + location.port + loc.pathname;
     	}
     	else {
     		// Internet Explorer
-    	  iFrame.src = "/XFILES/xmlViewer/xmlViewer.html?target=" + encodeURIComponent("/" + loc.pathname);
+    	  url = "/" + loc.pathname;
       }	
+      if ((loc.search != "") && (loc.search != null)) {
+      	url = url + loc.search
+      }
+      iFrame.src = "/XFILES/xmlViewer/xmlViewer.html?target=" + encodeURIComponent(url)
   	  return;
   	}
 
-  	if ((contentType == "text/plain") || (contentType == "text/html")) { if 
-  	(loc.pathname.substring(0,1) == "/") { iFrame.src = loc.pathname + "?" + 
-  	loc.search } else { iFrame.src = "/" + loc.pathname + loc.search } return; } 
+  	if ((contentType == "text/plain") || (contentType == "text/html")) {
+  		var url;
+  		if (loc.pathname.substring(0,1) == "/") { 
+  			url = loc.pathname
+  	  } 
+  	  else { 
+  	  	url = "/" + loc.pathname
+  	  } 
+      if ((loc.search != "") && (loc.search != null)) {
+      	url = url + "?" + loc.search
+      }
+  	  iFrame.src = url;
+  	  return
   	}
+
+  }
 
   this.setAutoTrace = function (state,scriptId) {
 
