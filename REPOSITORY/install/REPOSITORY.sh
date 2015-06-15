@@ -45,8 +45,7 @@ doInstall() {
         echo "Unable to establish HTTP connection as '$DBA'. Please note username is case sensitive with Digest Authentication"
         echo "Installation Failed: See $logfilename for details."
       else
-        echo "Operation Failed- Installation Aborted.
-        echo "Installation Failed: See $logfilename for details."
+        echo "Operation Failed- Installation Aborted. See $logfilename for details."
     fi
     exit 4
   fi
@@ -59,8 +58,7 @@ doInstall() {
         echo "Unable to establish HTTP connection as '$USER'. Please note username is case sensitive with Digest Authentication"
         echo "Installation Failed: See $logfilename for details."
       else
-        echo "Operation Failed- Installation Aborted.
-        echo "Installation Failed: See $logfilename for details."
+        echo "Operation Failed- Installation Aborted. See $logfilename for details."
     fi
     exit 4
   fi
@@ -106,8 +104,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -118,8 +115,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent/demonstrations":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -130,8 +126,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent/demonstrations/repository":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -142,8 +137,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -154,8 +148,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent/demonstrations":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -166,8 +159,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent/demonstrations/repository":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -178,8 +170,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent/demonstrations/repository/assets":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -190,8 +181,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -202,8 +192,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent/demonstrations":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -214,8 +203,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent/demonstrations/repository":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -226,8 +214,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent/demonstrations/repository/simulation":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -363,8 +350,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -375,8 +361,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -387,8 +372,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER/demonstrations":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -399,8 +383,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER/demonstrations/repository":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -411,8 +394,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -423,8 +405,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -435,8 +416,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER/demonstrations":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -447,8 +427,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER/demonstrations/repository":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -459,8 +438,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER/demonstrations/repository/sql":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -646,8 +624,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -658,8 +635,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -670,8 +646,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER/ImageLibrary":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -682,8 +657,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -694,8 +668,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent/categorization":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -706,8 +679,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/publishedContent/categorization/images":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -721,8 +693,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -733,8 +704,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -745,8 +715,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER/demonstrations":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -757,8 +726,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER/demonstrations/repository":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -769,8 +737,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     echo "MKCOL "$SERVER/home/$USER/demonstrations/repository/Links":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi

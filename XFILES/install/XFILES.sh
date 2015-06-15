@@ -53,8 +53,7 @@ doInstall() {
         echo "Unable to establish HTTP connection as '$DBA'. Please note username is case sensitive with Digest Authentication"
         echo "Installation Failed: See $logfilename for details."
       else
-        echo "Operation Failed- Installation Aborted.
-        echo "Installation Failed: See $logfilename for details."
+        echo "Operation Failed- Installation Aborted. See $logfilename for details."
     fi
     exit 4
   fi
@@ -67,8 +66,7 @@ doInstall() {
         echo "Unable to establish HTTP connection as '$USER'. Please note username is case sensitive with Digest Authentication"
         echo "Installation Failed: See $logfilename for details."
       else
-        echo "Operation Failed- Installation Aborted.
-        echo "Installation Failed: See $logfilename for details."
+        echo "Operation Failed- Installation Aborted. See $logfilename for details."
     fi
     exit 4
   fi
@@ -91,8 +89,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -103,8 +100,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -115,8 +111,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -127,8 +122,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -139,8 +133,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -151,8 +144,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/Applications":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -313,8 +305,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -325,8 +316,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -337,8 +327,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -349,8 +338,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/apex":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -361,8 +349,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/apex/xsl":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -398,8 +385,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -410,8 +396,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -422,8 +407,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -434,8 +418,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/common":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -446,8 +429,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -458,8 +440,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -470,8 +451,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -482,8 +462,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/common":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -494,8 +473,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/common/js":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -706,8 +684,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -718,8 +695,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -730,8 +706,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -742,8 +717,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/common":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -754,8 +728,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/common/xsl":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -891,8 +864,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -903,8 +875,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -915,8 +886,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -927,8 +897,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/lite":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -1089,8 +1058,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -1101,8 +1069,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -1113,8 +1080,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -1125,8 +1091,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/lite":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -1137,8 +1102,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/lite/js":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -1624,8 +1588,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -1636,8 +1599,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -1648,8 +1610,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -1660,8 +1621,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/lite":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -1672,8 +1632,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/lite/xsl":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2259,8 +2218,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2271,8 +2229,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2283,8 +2240,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2295,8 +2251,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/WebServices":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2332,8 +2287,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2344,8 +2298,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2356,8 +2309,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2368,8 +2320,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/WebServices":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2380,8 +2331,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/WebServices/js":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2442,8 +2392,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2454,8 +2403,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2466,8 +2414,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2478,8 +2425,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/WebServices":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2490,8 +2436,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/WebServices/xsl":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2552,8 +2497,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2564,8 +2508,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2576,8 +2519,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2588,8 +2530,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/XMLSearch":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2700,8 +2641,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2712,8 +2652,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2724,8 +2663,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2736,8 +2674,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/XMLSearch":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2748,8 +2685,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/XMLSearch/js":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2885,8 +2821,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2897,8 +2832,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2909,8 +2843,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2921,8 +2854,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/XMLSearch":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -2933,8 +2865,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/XMLSearch/xsl":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3195,8 +3126,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3207,8 +3137,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3219,8 +3148,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3231,8 +3159,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/WebDemo":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3293,8 +3220,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3305,8 +3231,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3317,8 +3242,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3329,8 +3253,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/WebDemo":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3341,8 +3264,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/WebDemo/xsl":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3378,8 +3300,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3390,8 +3311,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3402,8 +3322,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3414,8 +3333,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/xmlViewer":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3451,8 +3369,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3463,8 +3380,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3475,8 +3391,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3487,8 +3402,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/xmlViewer":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3499,8 +3413,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/xmlViewer/js":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3536,8 +3449,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3548,8 +3460,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3560,8 +3471,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/xfilesStatus":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3597,8 +3507,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3609,8 +3518,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3621,8 +3529,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3633,8 +3540,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/lite":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3645,8 +3551,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/lite/css":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3707,8 +3612,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3719,8 +3623,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3731,8 +3634,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3743,8 +3645,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/acls":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3755,8 +3656,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3767,8 +3667,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3779,8 +3678,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3791,8 +3689,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/resConfig":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3978,8 +3875,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -3990,8 +3886,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4002,8 +3897,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4014,8 +3908,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/src/images":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4176,8 +4069,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4188,8 +4080,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4200,8 +4091,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/Frameworks":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4212,8 +4102,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/Frameworks/Xinha-0.96.1":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4224,8 +4113,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4236,8 +4124,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4248,8 +4135,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/Frameworks":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4260,8 +4146,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/Frameworks/bootstrap3-dialog-master":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4272,8 +4157,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4284,8 +4168,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4296,8 +4179,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/Frameworks":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4308,8 +4190,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/Frameworks/bootstrap-3.2.0-dist":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4320,8 +4201,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4332,8 +4212,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4344,8 +4223,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/Frameworks":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4356,8 +4234,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/Frameworks/jquery-2.1.1":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4368,8 +4245,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4380,8 +4256,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4392,8 +4267,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/Frameworks":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
@@ -4404,8 +4278,7 @@ doInstall() {
     echo "MKCOL "$SERVER/home/$USER/Frameworks/jssor":$HttpStatus
     if [ $HttpStatus != "201" ]
     then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted.
-      echo "Installation Failed: See $logfilename for details."
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
   	 fi
   fi
