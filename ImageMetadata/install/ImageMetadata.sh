@@ -193,12 +193,12 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
     exit 5
   fi
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/imageMetadataConstants.sql $USER
-  sqlplus $DBA/$DBAPWD@$ORACLE_SID as sysdba @$demohome/install/sql/remove10gR2Demo.sql
-  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/deleteMetadataSchema.sql $USER
-  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/removeEventHandler.sql XDBMETADATA /publishedContent/repositoryFeatures/xml/imageEventConfiguration.xml
-  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/removeRepositoryQueue.sql XDBMETADATA
-  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/removeEventHandler.sql $USER /home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml
-  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/removeRepositoryQueue.sql $USER
+  sqlplus $DBA/$DBAPWD@$ORACLE_SID as sysdba @$demohome/deinstall/sql/remove10gR2Demo.sql
+  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/deleteMetadataSchema.sql $USER
+  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeEventHandler.sql XDBMETADATA /publishedContent/repositoryFeatures/xml/imageEventConfiguration.xml
+  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeRepositoryQueue.sql XDBMETADATA
+  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeEventHandler.sql $USER /home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml
+  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeRepositoryQueue.sql $USER
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/categorized_image_folder_acl.xml" | head -1)
   if [ $HttpStatus != "404" ] 
   then
