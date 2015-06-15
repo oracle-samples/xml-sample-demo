@@ -21,24 +21,35 @@ DEMOPWD=$8
 SERVERURL=$9
 cd XFILES/install 
 sh XFILES.sh $DBA $DBAPWD $XFILES $XFILESPWD $SERVERURL
+cat $logfilename >> install.log
 cd ../../ImageMetadata/install
 sh ImageMetadata.sh $DBA $DBAPWD $XDBEXT $XDBEXTPWD $SERVERURL
+cat $logfilename >> install.log
 cd ../../XMLSchemaWizard/install
 sh XMLSchemaWizard.sh $DBA $DBAPWD $XFILES $XFILESPWD $SERVERURL
+cat $logfilename >> install.log
 cd ../../EVOLUTION/install
 sh EVOLUTION.sh $DBA $DBAPWD $DEMOUSER $DEMOPWD $SERVERURL
+cat $logfilename >> install.log
 cd ../../FULLTEXT-LITE/install
 sh FULLTEXT-LITE.sh $DBA $DBAPWD $DEMOUSER $DEMOPWD $SERVERURL
+cat $logfilename >> install.log
 cd ../../GENERATION/install
 sh GENERATION.sh $DBA $DBAPWD $DEMOUSER $DEMOPWD $SERVERURL
+cat $logfilename >> install.log
 cd ../../INTRODUCTION/install
 sh INTRODUCTION.sh $DBA $DBAPWD $DEMOUSER $DEMOPWD $SERVERURL
+cat $logfilename >> install.log
 cd ../../NVPAIR/install
 sh NVPAIR.sh $DBA $DBAPWD $DEMOUSER $DEMOPWD $SERVERURL
+cat $logfilename >> install.log
 cd ../../PARTITIONING/install
 sh PARTITIONING.sh $DBA $DBAPWD $DEMOUSER $DEMOPWD $SERVERURL
+cat $logfilename >> install.log
 cd ../../REPOSITORY/install
 sh REPOSITORY.sh $DBA $DBAPWD $DEMOUSER $DEMOPWD $SERVERURL
+cat $logfilename >> install.log
 cd ../../XQUERY/install
 sh XQUERY.sh $DBA $DBAPWD $DEMOUSER $DEMOPWD $SERVERURL
+cat $logfilename >> install.log
 cd ../../..

@@ -58,22 +58,22 @@
   	<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\imageMetadataConstants.sql %USER%</action>
 
     <!-- Remove 10gR2 version of the demo -->
-		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\remove10gR2Demo.sql</action>
+		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\remove10gR2Demo.sql</action>
         
 		<!-- Remove Legacy versions of Image Metadata XMLSchema -->
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\deleteMetadataSchema.sql %USER%</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\deleteMetadataSchema.sql %USER%</action>
 
 		<!-- Remove Legacy Event Handler -->
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\removeEventHandler.sql XDBMETADATA /publishedContent/repositoryFeatures/xml/imageEventConfiguration.xml</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\removeEventHandler.sql XDBMETADATA /publishedContent/repositoryFeatures/xml/imageEventConfiguration.xml</action>
 
 		<!-- Remove Legacy Event Queue -->
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\removeRepositoryQueue.sql XDBMETADATA</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\removeRepositoryQueue.sql XDBMETADATA</action>
 
 		<!-- Remove Current Event Handler -->
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\removeEventHandler.sql %USER% %RESCONFIG_PATH%</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\removeEventHandler.sql %USER% %RESCONFIG_PATH%</action>
 
 		<!-- Remove Current Event Queue -->
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\removeRepositoryQueue.sql %USER%</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\removeRepositoryQueue.sql %USER%</action>
 
     <!-- Image Publishing ACLs -->
     <action type="UPLOAD">
