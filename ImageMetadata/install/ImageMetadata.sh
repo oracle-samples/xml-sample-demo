@@ -85,27 +85,23 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/acl_initialization_fix.xml" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/acl_initialization_fix.xml" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/sys/acls/acl_initialization_fix.xml\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/sys/acls/acl_initialization_fix.xml\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/sys/acls/acl_initialization_fix.xml\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/sys/acls/acl_initialization_fix.xml\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/acls/categorized_image_folder_acl.xml" "$SERVER/sys/acls/acl_initialization_fix.xml" | head -1)
-  echo "PUT:"$demohome/acls/categorized_image_folder_acl.xml" --> \"$SERVER/sys/acls/acl_initialization_fix.xml\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/sys/acls/acl_initialization_fix.xml\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/acl_initialization_fix.xml" | head -1)
@@ -163,27 +159,23 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/imageMetadataConstants.sql" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/imageMetadataConstants.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/sql/imageMetadataConstants.sql\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/sql/imageMetadataConstants.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/sql/imageMetadataConstants.sql\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/sql/imageMetadataConstants.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/imageMetadataConstants.sql" "$SERVER/home/$USER/imageMetadata/sql/imageMetadataConstants.sql" | head -1)
-  echo "PUT:"$demohome/sql/imageMetadataConstants.sql" --> \"$SERVER/home/$USER/imageMetadata/sql/imageMetadataConstants.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/sql/imageMetadataConstants.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/imageMetadataConstants.sql $USER
@@ -193,55 +185,51 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeRepositoryQueue.sql XDBMETADATA
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeEventHandler.sql $USER /home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeRepositoryQueue.sql $USER
+  skipOperation=false
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/categorized_image_folder_acl.xml" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/categorized_image_folder_acl.xml" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
-      then
-        echo "DELETE(PUT) \"$SERVER/sys/acls/categorized_image_folder_acl.xml\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
-        exit 5
-      fi
+      skipOperation=true
     else
-      echo "HEAD(PUT) \"$SERVER/sys/acls/categorized_image_folder_acl.xml\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/sys/acls/categorized_image_folder_acl.xml\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/acls/categorized_image_folder_acl.xml" "$SERVER/sys/acls/categorized_image_folder_acl.xml" | head -1)
-  echo "PUT:"$demohome/acls/categorized_image_folder_acl.xml" --> \"$SERVER/sys/acls/categorized_image_folder_acl.xml\":$HttpStatus"
-  if [ $HttpStatus != "201" ] 
+  if [ $skipOperation == "false" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/acls/categorized_image_folder_acl.xml" "$SERVER/sys/acls/categorized_image_folder_acl.xml" | head -1)
+    if [ $HttpStatus != "201" ] 
+    then
+      echo "PUT \"$SERVER/sys/acls/categorized_image_folder_acl.xml\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+      exit 5
+    fi
+    echo "PUT:"$demohome/acls/categorized_image_folder_acl.xml" --> \"$SERVER/sys/acls/categorized_image_folder_acl.xml\":$HttpStatus"
+  else
+    echo "PUT:"$demohome/acls/categorized_image_folder_acl.xml" --> \"$SERVER/sys/acls/categorized_image_folder_acl.xml\": Operation Skipped, - document exists."
   fi
+  skipOperation=false
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/categorized_image_acl.xml" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/categorized_image_acl.xml" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
-      then
-        echo "DELETE(PUT) \"$SERVER/sys/acls/categorized_image_acl.xml\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
-        exit 5
-      fi
+      skipOperation=true
     else
-      echo "HEAD(PUT) \"$SERVER/sys/acls/categorized_image_acl.xml\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/sys/acls/categorized_image_acl.xml\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/acls/categorized_image_acl.xml" "$SERVER/sys/acls/categorized_image_acl.xml" | head -1)
-  echo "PUT:"$demohome/acls/categorized_image_acl.xml" --> \"$SERVER/sys/acls/categorized_image_acl.xml\":$HttpStatus"
-  if [ $HttpStatus != "201" ] 
+  if [ $skipOperation == "false" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/acls/categorized_image_acl.xml" "$SERVER/sys/acls/categorized_image_acl.xml" | head -1)
+    if [ $HttpStatus != "201" ] 
+    then
+      echo "PUT \"$SERVER/sys/acls/categorized_image_acl.xml\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+      exit 5
+    fi
+    echo "PUT:"$demohome/acls/categorized_image_acl.xml" --> \"$SERVER/sys/acls/categorized_image_acl.xml\":$HttpStatus"
+  else
+    echo "PUT:"$demohome/acls/categorized_image_acl.xml" --> \"$SERVER/sys/acls/categorized_image_acl.xml\": Operation Skipped, - document exists."
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
   if [ $HttpStatus == "404" ] 
@@ -289,131 +277,111 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsd/imageMetadata.xsd" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsd/imageMetadata.xsd" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/xsd/imageMetadata.xsd\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/xsd/imageMetadata.xsd\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/xsd/imageMetadata.xsd\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/xsd/imageMetadata.xsd\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xsd/imageMetadata.xsd" "$SERVER/home/$USER/imageMetadata/xsd/imageMetadata.xsd" | head -1)
-  echo "PUT:"$demohome/xsd/imageMetadata.xsd" --> \"$SERVER/home/$USER/imageMetadata/xsd/imageMetadata.xsd\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/xsd/imageMetadata.xsd\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/registerSchema.sql" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/registerSchema.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/sql/registerSchema.sql\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/sql/registerSchema.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/sql/registerSchema.sql\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/sql/registerSchema.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/registerSchema.sql" "$SERVER/home/$USER/imageMetadata/sql/registerSchema.sql" | head -1)
-  echo "PUT:"$demohome/sql/registerSchema.sql" --> \"$SERVER/home/$USER/imageMetadata/sql/registerSchema.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/sql/registerSchema.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/registerSchema.sql /home/$USER/imageMetadata/xsd/imageMetadata.xsd
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/patchSchemaLocation.sql $HOSTNAME /home/$USER/imageMetadata/xsd/imageMetadata.xsd
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/imageProcessor.sql" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/imageProcessor.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/sql/imageProcessor.sql\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/sql/imageProcessor.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/sql/imageProcessor.sql\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/sql/imageProcessor.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/imageProcessor.sql" "$SERVER/home/$USER/imageMetadata/sql/imageProcessor.sql" | head -1)
-  echo "PUT:"$demohome/sql/imageProcessor.sql" --> \"$SERVER/home/$USER/imageMetadata/sql/imageProcessor.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/sql/imageProcessor.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/imageProcessor.sql $USER XFILES
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/repositoryQueue.sql" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/repositoryQueue.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/sql/repositoryQueue.sql\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/sql/repositoryQueue.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/sql/repositoryQueue.sql\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/sql/repositoryQueue.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/repositoryQueue.sql" "$SERVER/home/$USER/imageMetadata/sql/repositoryQueue.sql" | head -1)
-  echo "PUT:"$demohome/sql/repositoryQueue.sql" --> \"$SERVER/home/$USER/imageMetadata/sql/repositoryQueue.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/sql/repositoryQueue.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/repositoryQueue.sql $USER
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/imageEventManager.sql" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/imageEventManager.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/sql/imageEventManager.sql\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/sql/imageEventManager.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/sql/imageEventManager.sql\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/sql/imageEventManager.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/imageEventManager.sql" "$SERVER/home/$USER/imageMetadata/sql/imageEventManager.sql" | head -1)
-  echo "PUT:"$demohome/sql/imageEventManager.sql" --> \"$SERVER/home/$USER/imageMetadata/sql/imageEventManager.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/sql/imageEventManager.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
@@ -462,129 +430,109 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/resConfig/imageEventConfiguration.xml" "$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml" | head -1)
-  echo "PUT:"$demohome/resConfig/imageEventConfiguration.xml" --> \"$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/imageEventManager.sql $USER XFILES false
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/metadataServices.sql" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/metadataServices.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/sql/metadataServices.sql\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/sql/metadataServices.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/sql/metadataServices.sql\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/sql/metadataServices.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/metadataServices.sql" "$SERVER/home/$USER/imageMetadata/sql/metadataServices.sql" | head -1)
-  echo "PUT:"$demohome/sql/metadataServices.sql" --> \"$SERVER/home/$USER/imageMetadata/sql/metadataServices.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/sql/metadataServices.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/metadataServices.sql $USER
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/enumerateRepositoryEvents.sql" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/enumerateRepositoryEvents.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/sql/enumerateRepositoryEvents.sql\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/sql/enumerateRepositoryEvents.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/sql/enumerateRepositoryEvents.sql\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/sql/enumerateRepositoryEvents.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/enumerateRepositoryEvents.sql" "$SERVER/home/$USER/imageMetadata/sql/enumerateRepositoryEvents.sql" | head -1)
-  echo "PUT:"$demohome/sql/enumerateRepositoryEvents.sql" --> \"$SERVER/home/$USER/imageMetadata/sql/enumerateRepositoryEvents.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/sql/enumerateRepositoryEvents.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/activateImageEventManager.sql" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/activateImageEventManager.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/sql/activateImageEventManager.sql\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/sql/activateImageEventManager.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/sql/activateImageEventManager.sql\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/sql/activateImageEventManager.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/activateImageEventManager.sql" "$SERVER/home/$USER/imageMetadata/sql/activateImageEventManager.sql" | head -1)
-  echo "PUT:"$demohome/sql/activateImageEventManager.sql" --> \"$SERVER/home/$USER/imageMetadata/sql/activateImageEventManager.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/sql/activateImageEventManager.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/enableEventManager.sql" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/enableEventManager.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/sql/enableEventManager.sql\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/sql/enableEventManager.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/sql/enableEventManager.sql\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/sql/enableEventManager.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/enableEventManager.sql" "$SERVER/home/$USER/imageMetadata/sql/enableEventManager.sql" | head -1)
-  echo "PUT:"$demohome/sql/enableEventManager.sql" --> \"$SERVER/home/$USER/imageMetadata/sql/enableEventManager.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/sql/enableEventManager.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/enableEventManager.sql $USER
@@ -635,77 +583,65 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsl/ImageGallery.xsl" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsl/ImageGallery.xsl" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/xsl/ImageGallery.xsl\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/xsl/ImageGallery.xsl\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/xsl/ImageGallery.xsl\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/xsl/ImageGallery.xsl\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xsl/ImageGallery.xsl" "$SERVER/home/$USER/imageMetadata/xsl/ImageGallery.xsl" | head -1)
-  echo "PUT:"$demohome/xsl/ImageGallery.xsl" --> \"$SERVER/home/$USER/imageMetadata/xsl/ImageGallery.xsl\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/xsl/ImageGallery.xsl\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsl/EXIFViewer.xsl" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsl/EXIFViewer.xsl" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/xsl/EXIFViewer.xsl\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/xsl/EXIFViewer.xsl\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/xsl/EXIFViewer.xsl\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/xsl/EXIFViewer.xsl\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xsl/EXIFViewer.xsl" "$SERVER/home/$USER/imageMetadata/xsl/EXIFViewer.xsl" | head -1)
-  echo "PUT:"$demohome/xsl/EXIFViewer.xsl" --> \"$SERVER/home/$USER/imageMetadata/xsl/EXIFViewer.xsl\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/xsl/EXIFViewer.xsl\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsl/EXIFCommon.xsl" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsl/EXIFCommon.xsl" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/xsl/EXIFCommon.xsl\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/xsl/EXIFCommon.xsl\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/xsl/EXIFCommon.xsl\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/xsl/EXIFCommon.xsl\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xsl/EXIFCommon.xsl" "$SERVER/home/$USER/imageMetadata/xsl/EXIFCommon.xsl" | head -1)
-  echo "PUT:"$demohome/xsl/EXIFCommon.xsl" --> \"$SERVER/home/$USER/imageMetadata/xsl/EXIFCommon.xsl\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/xsl/EXIFCommon.xsl\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
@@ -754,52 +690,44 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/js/ImageGallery.js" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/js/ImageGallery.js" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/js/ImageGallery.js\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/js/ImageGallery.js\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/js/ImageGallery.js\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/js/ImageGallery.js\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/js/ImageGallery.js" "$SERVER/home/$USER/imageMetadata/js/ImageGallery.js" | head -1)
-  echo "PUT:"$demohome/js/ImageGallery.js" --> \"$SERVER/home/$USER/imageMetadata/js/ImageGallery.js\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/js/ImageGallery.js\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/js/EXIFViewer.js" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/js/EXIFViewer.js" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/js/EXIFViewer.js\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/js/EXIFViewer.js\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/js/EXIFViewer.js\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/js/EXIFViewer.js\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/js/EXIFViewer.js" "$SERVER/home/$USER/imageMetadata/js/EXIFViewer.js" | head -1)
-  echo "PUT:"$demohome/js/EXIFViewer.js" --> \"$SERVER/home/$USER/imageMetadata/js/EXIFViewer.js\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/js/EXIFViewer.js\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
@@ -827,27 +755,23 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/sql/enableImageGallery.sql $USER
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/resConfig/imageGalleryResConfig.xml" "$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml" | head -1)
-  echo "PUT:"$demohome/resConfig/imageGalleryResConfig.xml" --> \"$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/sql/createImageCategoryFolders.sql $USER

@@ -273,102 +273,86 @@ doInstall() {
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/registrationWizard.html" "$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html" | head -1)
-  echo "PUT:"$demohome/registrationWizard.html" --> \"$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xsl/registrationWizard.xsl" "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl" | head -1)
-  echo "PUT:"$demohome/xsl/registrationWizard.xsl" --> \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/js/registrationWizard.js" "$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js" | head -1)
-  echo "PUT:"$demohome/js/registrationWizard.js" --> \"$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql" | head -1)
   if [ $HttpStatus != "404" ] 
-  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql\":$HttpStatus - Operation Failed"
-        echo "Installation Failed: See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql\":$HttpStatus - Operation Failed"
-      echo "Installation Failed: See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/XFILES_XMLSCHEMA_WIZARD.sql" "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql" | head -1)
-  echo "PUT:"$demohome/sql/XFILES_XMLSCHEMA_WIZARD.sql" --> \"$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
-    echo "Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/XFILES_XMLSCHEMA_WIZARD.sql
