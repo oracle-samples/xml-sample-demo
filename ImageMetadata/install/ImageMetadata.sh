@@ -85,6 +85,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/acl_initialization_fix.xml" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/acl_initialization_fix.xml" | head -1)
@@ -159,6 +160,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/imageMetadataConstants.sql" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/imageMetadataConstants.sql" | head -1)
@@ -188,6 +190,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   skipOperation=false
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/categorized_image_folder_acl.xml" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       skipOperation=true
@@ -211,6 +214,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   skipOperation=false
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/sys/acls/categorized_image_acl.xml" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       skipOperation=true
@@ -277,6 +281,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsd/imageMetadata.xsd" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsd/imageMetadata.xsd" | head -1)
@@ -298,6 +303,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/registerSchema.sql" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/registerSchema.sql" | head -1)
@@ -321,6 +327,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/patchSchemaLocation.sql $HOSTNAME /home/$USER/imageMetadata/xsd/imageMetadata.xsd
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/imageProcessor.sql" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/imageProcessor.sql" | head -1)
@@ -343,6 +350,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/imageProcessor.sql $USER XFILES
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/repositoryQueue.sql" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/repositoryQueue.sql" | head -1)
@@ -365,6 +373,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/repositoryQueue.sql $USER
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/imageEventManager.sql" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/imageEventManager.sql" | head -1)
@@ -430,6 +439,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml" | head -1)
@@ -452,6 +462,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/imageEventManager.sql $USER XFILES false
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/metadataServices.sql" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/metadataServices.sql" | head -1)
@@ -474,6 +485,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/sql/metadataServices.sql $USER
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/enumerateRepositoryEvents.sql" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/enumerateRepositoryEvents.sql" | head -1)
@@ -495,6 +507,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/activateImageEventManager.sql" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/activateImageEventManager.sql" | head -1)
@@ -516,6 +529,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/enableEventManager.sql" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/sql/enableEventManager.sql" | head -1)
@@ -583,6 +597,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsl/ImageGallery.xsl" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsl/ImageGallery.xsl" | head -1)
@@ -604,6 +619,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsl/EXIFViewer.xsl" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsl/EXIFViewer.xsl" | head -1)
@@ -625,6 +641,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsl/EXIFCommon.xsl" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/xsl/EXIFCommon.xsl" | head -1)
@@ -690,6 +707,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/js/ImageGallery.js" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/js/ImageGallery.js" | head -1)
@@ -711,6 +729,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/js/EXIFViewer.js" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/js/EXIFViewer.js" | head -1)
@@ -755,6 +774,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/sql/enableImageGallery.sql $USER
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml" | head -1)
   if [ $HttpStatus != "404" ] 
+  then
     if [ $HttpStatus == "200" ] 
     then
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml" | head -1)
