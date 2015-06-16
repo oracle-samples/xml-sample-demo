@@ -106,7 +106,7 @@
   	</action>
 
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\registerSchema.sql %BASEFOLDER%/xsd/imageMetadata.xsd</action>
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\patchSchemaLocation.sql %HOSTNAME% %BASEFOLDER%/xsd/imageMetadata.xsd</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\patchSchemaLocation.sql %HOSTNAME% %BASEFOLDER%/xsd/imageMetadata.xsd</action>
 
     <!-- Load the Image Processor Package -->
     <action type="UPLOAD">

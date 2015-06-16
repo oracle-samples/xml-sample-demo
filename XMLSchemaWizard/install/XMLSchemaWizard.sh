@@ -11,18 +11,18 @@
 # * ================================================ 
 # */
 doInstall() {
-  echo "Installation Parameters for Oracle XML DB XML Schema Registration Wizard".
-  echo "\$DBA         : $DBA
-  echo "\$USER        : $USER
-  echo "\$SERVER      : $SERVER
-  echo "\$DEMOHOME    : $demohome
-  echo "\$ORACLE_HOME : $ORACLE_HOME
-  echo "\$ORACLE_SID  : $ORACLE_SID
+  echo "Installation Parameters for Oracle XML DB XML Schema Registration Wizard."
+  echo "\$DBA         : $DBA"
+  echo "\$USER        : $USER"
+  echo "\$SERVER      : $SERVER"
+  echo "\$DEMOHOME    : $demohome"
+  echo "\$ORACLE_HOME : $ORACLE_HOME"
+  echo "\$ORACLE_SID  : $ORACLE_SID"
   spexe=$(which sqlplus | head -1)
-  echo "sqlplus      : $spexe
+  echo "sqlplus      : $spexe"
   sqlplus -L $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/verifyConnection.sql
   rc=$?
-  echo "sqlplus $DBA:$rc
+  echo "sqlplus $DBA:$rc"
   if [ $rc != 2 ] 
   then 
     echo "Operation Failed : Unable to connect via SQLPLUS as $DBA - Installation Aborted. See $logfilename for details."
@@ -30,14 +30,14 @@ doInstall() {
   fi
   sqlplus -L $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/verifyConnection.sql
   rc=$?
-  echo "sqlplus $USER:$rc
+  echo "sqlplus $USER:$rc"
   if [ $rc != 2 ] 
   then 
     echo "Operation Failed : Unable to connect via SQLPLUS as $USER - Installation Aborted. See $logfilename for details."
     exit 3
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X GET --write-out "%{http_code}\n" -s --output /dev/null $SERVER/xdbconfig.xml | head -1)
-  echo "GET:$SERVER/xdbconfig.xml:$HttpStatus
+  echo "GET:$SERVER/xdbconfig.xml:$HttpStatus"
   if [ $HttpStatus != "200" ] 
   then
     if [ $HttpStatus == "401" ] 
@@ -50,7 +50,7 @@ doInstall() {
     exit 4
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X GET --write-out "%{http_code}\n" -s --output /dev/null $SERVER/public | head -1)
-  echo "GET:$SERVER/public:$HttpStatus
+  echo "GET:$SERVER/public:$HttpStatus"
   if [ $HttpStatus != "200" ] 
   then
     if [ $HttpStatus == "401" ] 
@@ -66,210 +66,210 @@ doInstall() {
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
-    echo "MKCOL "$SERVER/home":$HttpStatus
+    echo "MKCOL \"$SERVER/home\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-    echo "MKCOL "$SERVER/home/$USER":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/Applications":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/Applications\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/Applications/XMLSchemaWizard":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/Applications/XMLSchemaWizard\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
-    echo "MKCOL "$SERVER/home":$HttpStatus
+    echo "MKCOL \"$SERVER/home\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-    echo "MKCOL "$SERVER/home/$USER":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/Applications":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/Applications\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/Applications/XMLSchemaWizard":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/Applications/XMLSchemaWizard\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/js" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/js" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/Applications/XMLSchemaWizard/js":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/Applications/XMLSchemaWizard/js\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
-    echo "MKCOL "$SERVER/home":$HttpStatus
+    echo "MKCOL \"$SERVER/home\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-    echo "MKCOL "$SERVER/home/$USER":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/Applications":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/Applications\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/Applications/XMLSchemaWizard":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/Applications/XMLSchemaWizard\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
-    echo "MKCOL "$SERVER/home":$HttpStatus
+    echo "MKCOL \"$SERVER/home\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-    echo "MKCOL "$SERVER/home/$USER":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/Applications":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/Applications\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/Applications/XMLSchemaWizard":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/Applications/XMLSchemaWizard\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/Applications/XMLSchemaWizard/sql\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html" | head -1)
   if [ $HttpStatus != "404" ] 
@@ -279,18 +279,18 @@ doInstall() {
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/registrationWizard.html" "$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html" | head -1)
-  echo "PUT:"$demohome/registrationWizard.html" --> "$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html":$HttpStatus
+  echo "PUT:"$demohome/registrationWizard.html" --> \"$SERVER/home/$USER/Applications/XMLSchemaWizard/registrationWizard.html\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -304,18 +304,18 @@ doInstall() {
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xsl/registrationWizard.xsl" "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl" | head -1)
-  echo "PUT:"$demohome/xsl/registrationWizard.xsl" --> "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl":$HttpStatus
+  echo "PUT:"$demohome/xsl/registrationWizard.xsl" --> \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -329,18 +329,18 @@ doInstall() {
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/js/registrationWizard.js" "$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js" | head -1)
-  echo "PUT:"$demohome/js/registrationWizard.js" --> "$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js":$HttpStatus
+  echo "PUT:"$demohome/js/registrationWizard.js" --> \"$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -354,18 +354,18 @@ doInstall() {
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/XFILES_XMLSCHEMA_WIZARD.sql" "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql" | head -1)
-  echo "PUT:"$demohome/sql/XFILES_XMLSCHEMA_WIZARD.sql" --> "$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql":$HttpStatus
+  echo "PUT:"$demohome/sql/XFILES_XMLSCHEMA_WIZARD.sql" --> \"$SERVER/home/$USER/Applications/XMLSchemaWizard/sql/XFILES_XMLSCHEMA_WIZARD.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -375,7 +375,6 @@ doInstall() {
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/PUBLISH_XMLSCHEMA_WIZARD.sql
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/publishAppFolder.sql /home/$USER/Applications/XMLSchemaWizard XFILES_CONSTANTS.ACL_XFILES_USERS
   shellscriptName="$demohome/XML_Schema_Registration_Wizard.sh"
-  echo "Shell Script : $shellscriptName
   echo "Shell Script : $shellscriptName"
   echo "firefox $SERVER/XFILES/Applications/XMLSchemaWizard/registrationWizard.html"> $shellscriptName
   echo "Installation Complete. See $logfilename for details."
@@ -390,4 +389,4 @@ logfilename=$demohome/install/XMLSchemaWizard.log
 echo "Log File : $logfilename"
 rm $logfilename
 doInstall 2>&1 | tee -a $logfilename
-export $logfilename
+export logfilename

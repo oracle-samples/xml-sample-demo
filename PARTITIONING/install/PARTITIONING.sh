@@ -11,18 +11,18 @@
 # * ================================================ 
 # */
 doInstall() {
-  echo "Installation Parameters for Partitioning XML Storage using Oracle XML DB".
-  echo "\$DBA         : $DBA
-  echo "\$USER        : $USER
-  echo "\$SERVER      : $SERVER
-  echo "\$DEMOHOME    : $demohome
-  echo "\$ORACLE_HOME : $ORACLE_HOME
-  echo "\$ORACLE_SID  : $ORACLE_SID
+  echo "Installation Parameters for Partitioning XML Storage using Oracle XML DB."
+  echo "\$DBA         : $DBA"
+  echo "\$USER        : $USER"
+  echo "\$SERVER      : $SERVER"
+  echo "\$DEMOHOME    : $demohome"
+  echo "\$ORACLE_HOME : $ORACLE_HOME"
+  echo "\$ORACLE_SID  : $ORACLE_SID"
   spexe=$(which sqlplus | head -1)
-  echo "sqlplus      : $spexe
+  echo "sqlplus      : $spexe"
   sqlplus -L $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/verifyConnection.sql
   rc=$?
-  echo "sqlplus $DBA:$rc
+  echo "sqlplus $DBA:$rc"
   if [ $rc != 2 ] 
   then 
     echo "Operation Failed : Unable to connect via SQLPLUS as $DBA - Installation Aborted. See $logfilename for details."
@@ -30,14 +30,14 @@ doInstall() {
   fi
   sqlplus -L $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/verifyConnection.sql
   rc=$?
-  echo "sqlplus $USER:$rc
+  echo "sqlplus $USER:$rc"
   if [ $rc != 2 ] 
   then 
     echo "Operation Failed : Unable to connect via SQLPLUS as $USER - Installation Aborted. See $logfilename for details."
     exit 3
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X GET --write-out "%{http_code}\n" -s --output /dev/null $SERVER/xdbconfig.xml | head -1)
-  echo "GET:$SERVER/xdbconfig.xml:$HttpStatus
+  echo "GET:$SERVER/xdbconfig.xml:$HttpStatus"
   if [ $HttpStatus != "200" ] 
   then
     if [ $HttpStatus == "401" ] 
@@ -50,7 +50,7 @@ doInstall() {
     exit 4
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X GET --write-out "%{http_code}\n" -s --output /dev/null $SERVER/public | head -1)
-  echo "GET:$SERVER/public:$HttpStatus
+  echo "GET:$SERVER/public:$HttpStatus"
   if [ $HttpStatus != "200" ] 
   then
     if [ $HttpStatus == "401" ] 
@@ -97,7 +97,7 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   sqlldr -Userid=$USER/$USERPWD@$ORACLE_SID control=$demohome/$USER/sqlldr/sampleData.ctl
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/executeAndQuit.sql $demohome/$USER/sql/resetDemo.sql
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning" | head -1)
-  echo "DELETE "$SERVER/publishedContent/demonstrations/partitioning":$HttpStatus
+  echo "DELETE \"$SERVER/publishedContent/demonstrations/partitioning\":$HttpStatus"
   if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ] && [ $HttpStatus != "404" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -107,111 +107,111 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
-    echo "MKCOL "$SERVER/publishedContent":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations/partitioning":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/partitioning\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
-    echo "MKCOL "$SERVER/publishedContent":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations/partitioning":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/partitioning\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
-    echo "MKCOL "$SERVER/publishedContent":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations/partitioning":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/partitioning\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/assets" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/assets" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations/partitioning/assets":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/partitioning/assets\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/assets/2.1.png" | head -1)
   if [ $HttpStatus != "404" ] 
@@ -221,18 +221,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/assets/2.1.png" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/publishedContent/demonstrations/partitioning/assets/2.1.png":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/publishedContent/demonstrations/partitioning/assets/2.1.png\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/publishedContent/demonstrations/partitioning/assets/2.1.png":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/publishedContent/demonstrations/partitioning/assets/2.1.png\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/assets/2.1.png" "$SERVER/publishedContent/demonstrations/partitioning/assets/2.1.png" | head -1)
-  echo "PUT:"$demohome/setup/assets/2.1.png" --> "$SERVER/publishedContent/demonstrations/partitioning/assets/2.1.png":$HttpStatus
+  echo "PUT:"$demohome/setup/assets/2.1.png" --> \"$SERVER/publishedContent/demonstrations/partitioning/assets/2.1.png\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -242,45 +242,45 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
-    echo "MKCOL "$SERVER/publishedContent":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations/partitioning":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/partitioning\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/xsd" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/xsd" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations/partitioning/xsd":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/partitioning/xsd\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.xsd" | head -1)
   if [ $HttpStatus != "404" ] 
@@ -290,18 +290,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.xsd" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.xsd":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.xsd\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.xsd":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.xsd\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/xsd/purchaseOrder.xsd" "$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.xsd" | head -1)
-  echo "PUT:"$demohome/setup/xsd/purchaseOrder.xsd" --> "$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.xsd":$HttpStatus
+  echo "PUT:"$demohome/setup/xsd/purchaseOrder.xsd" --> \"$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.xsd\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -315,18 +315,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.v2.xsd" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.v2.xsd":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.v2.xsd\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.v2.xsd":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.v2.xsd\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/xsd/purchaseOrder.v2.xsd" "$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.v2.xsd" | head -1)
-  echo "PUT:"$demohome/setup/xsd/purchaseOrder.v2.xsd" --> "$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.v2.xsd":$HttpStatus
+  echo "PUT:"$demohome/setup/xsd/purchaseOrder.v2.xsd" --> \"$SERVER/publishedContent/demonstrations/partitioning/xsd/purchaseOrder.v2.xsd\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -336,45 +336,45 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
-    echo "MKCOL "$SERVER/publishedContent":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations/partitioning":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/partitioning\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/xml" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/xml" | head -1)
-    echo "MKCOL "$SERVER/publishedContent/demonstrations/partitioning/xml":$HttpStatus
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/partitioning/xml\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/xml/PurchaseOrder.xml" | head -1)
   if [ $HttpStatus != "404" ] 
@@ -384,25 +384,25 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/partitioning/xml/PurchaseOrder.xml" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/publishedContent/demonstrations/partitioning/xml/PurchaseOrder.xml":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/publishedContent/demonstrations/partitioning/xml/PurchaseOrder.xml\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/publishedContent/demonstrations/partitioning/xml/PurchaseOrder.xml":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/publishedContent/demonstrations/partitioning/xml/PurchaseOrder.xml\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sampleData/xml/PurchaseOrder.xml" "$SERVER/publishedContent/demonstrations/partitioning/xml/PurchaseOrder.xml" | head -1)
-  echo "PUT:"$demohome/$USER/sampleData/xml/PurchaseOrder.xml" --> "$SERVER/publishedContent/demonstrations/partitioning/xml/PurchaseOrder.xml":$HttpStatus
+  echo "PUT:"$demohome/$USER/sampleData/xml/PurchaseOrder.xml" --> \"$SERVER/publishedContent/demonstrations/partitioning/xml/PurchaseOrder.xml\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning" | head -1)
-  echo "DELETE "$SERVER/home/$USER/demonstrations/partitioning":$HttpStatus
+  echo "DELETE \"$SERVER/home/$USER/demonstrations/partitioning\":$HttpStatus"
   if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ] && [ $HttpStatus != "404" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -412,100 +412,100 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
-    echo "MKCOL "$SERVER/home":$HttpStatus
+    echo "MKCOL \"$SERVER/home\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-    echo "MKCOL "$SERVER/home/$USER":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/demonstrations":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/demonstrations/partitioning":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/partitioning\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
-    echo "MKCOL "$SERVER/home":$HttpStatus
+    echo "MKCOL \"$SERVER/home\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-    echo "MKCOL "$SERVER/home/$USER":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/demonstrations":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/demonstrations/partitioning":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/partitioning\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/demonstrations/partitioning/sql":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/partitioning/sql\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/resetDemo.sql" | head -1)
   if [ $HttpStatus != "404" ] 
@@ -515,18 +515,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/resetDemo.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/resetDemo.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/resetDemo.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/resetDemo.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/resetDemo.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/resetDemo.sql" "$SERVER/home/$USER/demonstrations/partitioning/sql/resetDemo.sql" | head -1)
-  echo "PUT:"$demohome/$USER/sql/resetDemo.sql" --> "$SERVER/home/$USER/demonstrations/partitioning/sql/resetDemo.sql":$HttpStatus
+  echo "PUT:"$demohome/$USER/sql/resetDemo.sql" --> \"$SERVER/home/$USER/demonstrations/partitioning/sql/resetDemo.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -540,18 +540,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/simulateSQLLDR.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/simulateSQLLDR.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/simulateSQLLDR.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/simulateSQLLDR.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/simulateSQLLDR.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/simulateSQLLDR.sql" "$SERVER/home/$USER/demonstrations/partitioning/sql/simulateSQLLDR.sql" | head -1)
-  echo "PUT:"$demohome/$USER/sql/simulateSQLLDR.sql" --> "$SERVER/home/$USER/demonstrations/partitioning/sql/simulateSQLLDR.sql":$HttpStatus
+  echo "PUT:"$demohome/$USER/sql/simulateSQLLDR.sql" --> \"$SERVER/home/$USER/demonstrations/partitioning/sql/simulateSQLLDR.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -565,18 +565,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/registerSchema.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/registerSchema.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/registerSchema.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/registerSchema.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/registerSchema.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/registerSchema.sql" "$SERVER/home/$USER/demonstrations/partitioning/sql/registerSchema.sql" | head -1)
-  echo "PUT:"$demohome/$USER/sql/registerSchema.sql" --> "$SERVER/home/$USER/demonstrations/partitioning/sql/registerSchema.sql":$HttpStatus
+  echo "PUT:"$demohome/$USER/sql/registerSchema.sql" --> \"$SERVER/home/$USER/demonstrations/partitioning/sql/registerSchema.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -590,18 +590,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/rowsByPartition.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/rowsByPartition.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/rowsByPartition.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/rowsByPartition.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/rowsByPartition.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/rowsByPartition.sql" "$SERVER/home/$USER/demonstrations/partitioning/sql/rowsByPartition.sql" | head -1)
-  echo "PUT:"$demohome/$USER/sql/rowsByPartition.sql" --> "$SERVER/home/$USER/demonstrations/partitioning/sql/rowsByPartition.sql":$HttpStatus
+  echo "PUT:"$demohome/$USER/sql/rowsByPartition.sql" --> \"$SERVER/home/$USER/demonstrations/partitioning/sql/rowsByPartition.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -615,18 +615,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/simpleQueries.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/simpleQueries.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/simpleQueries.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/simpleQueries.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/simpleQueries.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/simpleQueries.sql" "$SERVER/home/$USER/demonstrations/partitioning/sql/simpleQueries.sql" | head -1)
-  echo "PUT:"$demohome/$USER/sql/simpleQueries.sql" --> "$SERVER/home/$USER/demonstrations/partitioning/sql/simpleQueries.sql":$HttpStatus
+  echo "PUT:"$demohome/$USER/sql/simpleQueries.sql" --> \"$SERVER/home/$USER/demonstrations/partitioning/sql/simpleQueries.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -640,18 +640,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/createIndexes.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/createIndexes.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/createIndexes.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/createIndexes.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/createIndexes.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/createIndexes.sql" "$SERVER/home/$USER/demonstrations/partitioning/sql/createIndexes.sql" | head -1)
-  echo "PUT:"$demohome/$USER/sql/createIndexes.sql" --> "$SERVER/home/$USER/demonstrations/partitioning/sql/createIndexes.sql":$HttpStatus
+  echo "PUT:"$demohome/$USER/sql/createIndexes.sql" --> \"$SERVER/home/$USER/demonstrations/partitioning/sql/createIndexes.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -665,18 +665,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries1.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries1.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries1.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries1.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries1.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/runQueries1.sql" "$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries1.sql" | head -1)
-  echo "PUT:"$demohome/$USER/sql/runQueries1.sql" --> "$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries1.sql":$HttpStatus
+  echo "PUT:"$demohome/$USER/sql/runQueries1.sql" --> \"$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries1.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -690,18 +690,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries2.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries2.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries2.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries2.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries2.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/runQueries2.sql" "$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries2.sql" | head -1)
-  echo "PUT:"$demohome/$USER/sql/runQueries2.sql" --> "$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries2.sql":$HttpStatus
+  echo "PUT:"$demohome/$USER/sql/runQueries2.sql" --> \"$SERVER/home/$USER/demonstrations/partitioning/sql/runQueries2.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -715,18 +715,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/insertDocument.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/insertDocument.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/insertDocument.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/insertDocument.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/insertDocument.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/insertDocument.sql" "$SERVER/home/$USER/demonstrations/partitioning/sql/insertDocument.sql" | head -1)
-  echo "PUT:"$demohome/$USER/sql/insertDocument.sql" --> "$SERVER/home/$USER/demonstrations/partitioning/sql/insertDocument.sql":$HttpStatus
+  echo "PUT:"$demohome/$USER/sql/insertDocument.sql" --> \"$SERVER/home/$USER/demonstrations/partitioning/sql/insertDocument.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -740,18 +740,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/inplaceEvolution.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/inplaceEvolution.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/inplaceEvolution.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/inplaceEvolution.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/inplaceEvolution.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/inplaceEvolution.sql" "$SERVER/home/$USER/demonstrations/partitioning/sql/inplaceEvolution.sql" | head -1)
-  echo "PUT:"$demohome/$USER/sql/inplaceEvolution.sql" --> "$SERVER/home/$USER/demonstrations/partitioning/sql/inplaceEvolution.sql":$HttpStatus
+  echo "PUT:"$demohome/$USER/sql/inplaceEvolution.sql" --> \"$SERVER/home/$USER/demonstrations/partitioning/sql/inplaceEvolution.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -765,18 +765,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/addPartition.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/addPartition.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/addPartition.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/addPartition.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/addPartition.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/addPartition.sql" "$SERVER/home/$USER/demonstrations/partitioning/sql/addPartition.sql" | head -1)
-  echo "PUT:"$demohome/$USER/sql/addPartition.sql" --> "$SERVER/home/$USER/demonstrations/partitioning/sql/addPartition.sql":$HttpStatus
+  echo "PUT:"$demohome/$USER/sql/addPartition.sql" --> \"$SERVER/home/$USER/demonstrations/partitioning/sql/addPartition.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -790,18 +790,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/sql/dropPartition.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/dropPartition.sql":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/dropPartition.sql\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/sql/dropPartition.sql":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/sql/dropPartition.sql\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/dropPartition.sql" "$SERVER/home/$USER/demonstrations/partitioning/sql/dropPartition.sql" | head -1)
-  echo "PUT:"$demohome/$USER/sql/dropPartition.sql" --> "$SERVER/home/$USER/demonstrations/partitioning/sql/dropPartition.sql":$HttpStatus
+  echo "PUT:"$demohome/$USER/sql/dropPartition.sql" --> \"$SERVER/home/$USER/demonstrations/partitioning/sql/dropPartition.sql\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -811,56 +811,56 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
-    echo "MKCOL "$SERVER/home":$HttpStatus
+    echo "MKCOL \"$SERVER/home\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-    echo "MKCOL "$SERVER/home/$USER":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/demonstrations":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/demonstrations/partitioning":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/partitioning\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/Links" | head -1)
   if [ $HttpStatus == "404" ] 
   then
     HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/Links" | head -1)
-    echo "MKCOL "$SERVER/home/$USER/demonstrations/partitioning/Links":$HttpStatus
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/partitioning/Links\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
-  	 fi
+    fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.ctl" | head -1)
   if [ $HttpStatus != "404" ] 
@@ -870,18 +870,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.ctl" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.ctl":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.ctl\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.ctl":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.ctl\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sampleData/loadPurchaseOrders.ctl" "$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.ctl" | head -1)
-  echo "PUT:"$demohome/$USER/sampleData/loadPurchaseOrders.ctl" --> "$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.ctl":$HttpStatus
+  echo "PUT:"$demohome/$USER/sampleData/loadPurchaseOrders.ctl" --> \"$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.ctl\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -895,18 +895,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.log" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.log":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.log\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.log":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.log\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sampleData/loadPurchaseOrders.log" "$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.log" | head -1)
-  echo "PUT:"$demohome/$USER/sampleData/loadPurchaseOrders.log" --> "$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.log":$HttpStatus
+  echo "PUT:"$demohome/$USER/sampleData/loadPurchaseOrders.log" --> \"$SERVER/home/$USER/demonstrations/partitioning/loadPurchaseOrders.log\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -921,18 +921,18 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
       HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/partitioning/configuration.xml" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ]
       then
-        echo "DELETE(PUT) "$SERVER/home/$USER/demonstrations/partitioning/configuration.xml":$HttpStatus - Operation Failed
+        echo "DELETE(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/configuration.xml\":$HttpStatus - Operation Failed"
         echo "Installation Failed: See $logfilename for details."
         exit 5
       fi
     else
-      echo "HEAD(PUT) "$SERVER/home/$USER/demonstrations/partitioning/configuration.xml":$HttpStatus - Operation Failed
+      echo "HEAD(PUT) \"$SERVER/home/$USER/demonstrations/partitioning/configuration.xml\":$HttpStatus - Operation Failed"
       echo "Installation Failed: See $logfilename for details."
       exit 5
     fi
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/install/configuration.xml" "$SERVER/home/$USER/demonstrations/partitioning/configuration.xml" | head -1)
-  echo "PUT:"$demohome/install/configuration.xml" --> "$SERVER/home/$USER/demonstrations/partitioning/configuration.xml":$HttpStatus
+  echo "PUT:"$demohome/install/configuration.xml" --> \"$SERVER/home/$USER/demonstrations/partitioning/configuration.xml\":$HttpStatus"
   if [ $HttpStatus != "201" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -940,7 +940,6 @@ sed -e "s|%DESKTOP%|C:\Users\Mark D Drake\Desktop|g" -e "s|%STARTMENU%|C:\Users\
   fi
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/publishDemo.sql /home/$USER/demonstrations/partitioning XFILES
   shellscriptName="$demohome/Partitioning_XML.sh"
-  echo "Shell Script : $shellscriptName
   echo "Shell Script : $shellscriptName"
   echo "firefox $SERVER/home/$USER/demonstrations/partitioning/index.html"> $shellscriptName
   echo "Installation Complete. See $logfilename for details."
@@ -955,4 +954,4 @@ logfilename=$demohome/install/PARTITIONING.log
 echo "Log File : $logfilename"
 rm $logfilename
 doInstall 2>&1 | tee -a $logfilename
-export $logfilename
+export logfilename
