@@ -69,27 +69,32 @@ Sub batchInstall
     Set DEMONSTRATION   = new demonstrationConfiguration
  
     If (INSTALLER.requiresSYSDBA()) then
+   	  wscript.echo "Testing SYSDBA Credentials."
       If (Not validSYSDBA(INSTALLER,SQLPLUS)) Then
     	  wscript.echo "Fatal Error : SYSDBA Credentials required and not correct"
     	  wscript.quit
       End If
     End If
  
+ 	  wscript.echo "Testing DBA Credentials."
     If (Not validDBA(INSTALLER,SQLPLUS)) Then
     	wscript.echo "Fatal Error : DBA Credentials not correct"
     	wscript.quit
     End If
  
+ 	  wscript.echo "Testing User Credentials."
     If (Not validUsername(INSTALLER,SQLPLUS)) Then
     	wscript.echo "Fatal Error : User Credentials not correct"
     	wscript.quit
     End If
- 
+
+ 	  wscript.echo "Testing HTTP Connectivity." 
     If (Not validHTTPConnection(INSTALLER,REPOS)) Then
     	wscript.echo "Fatal Error : HTTP Connectivity not available"
     	wscript.quit
     End If
  
+ 	  wscript.echo "Testing WebDAV Connectivity." 
     If (Not validDriveLetter(INSTALLER)) Then
       wscript.echo "Fatal Error : WebDAV Connectivity not available"
       wscript.quit
@@ -103,6 +108,7 @@ Sub batchInstall
       End If
     End If
  
+ 	  wscript.echo "Connectivity tests compeleted Successfully." 
  	  doBatchInstall
  	  
     writeLogFile LOGBUFFER
