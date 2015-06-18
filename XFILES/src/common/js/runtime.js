@@ -240,6 +240,7 @@ function DemonstrationStep(id) {
   var documentURL;
   var documentContent;
   var contentType;
+  var windowName;
 
 	this.isClientCommand = function() {
 		return action == "OSCMD";
@@ -261,6 +262,18 @@ function DemonstrationStep(id) {
     return stepId;
   }
 
+  this.getDocumentURL = function() {
+    return documentURL;
+  }
+
+  this.getContentType = function() {
+    return contentType;
+  }
+
+  this.getWindowName = function() {
+    return windowName;
+  }
+
   this.getSQLScript = function() {
   	return sqlScript;
   }
@@ -278,7 +291,7 @@ function DemonstrationStep(id) {
   	sqlScript.resumeExecution();
   	sqlProcessor.runSQLCommand(sqlScript);
   }
-
+  
   function initialize(id) {
 
     stepId = id
@@ -290,19 +303,19 @@ function DemonstrationStep(id) {
       sqlScript.loadScriptFromURL(scriptLocation);
     }
     else if (self.isViewer()) {
-      documentURL      = document.getElementById(stepId + '.target').value;
-      contentType      = document.getElementById(stepId + '.contentType').value;
-      try {
-        documentContent  = getDocumentContentImpl(documentURL)
+    	var locationInfo   = document.getElementById(stepId + '.target')
+      documentURL   = makeLocal(locationInfo.value);
+      locationInfo.value = makeRemote(documentURL);
+      contentType   = document.getElementById(stepId + '.contentType').value;
+    }
+    else if (self.isLink()) {
+    	documentURL   = makeLocal(document.getElementById(stepId + '.link').value);
+    	var locationInfo   = document.getElementById(stepId + '.target')
+      if (locationInfo != null) {   
+        locationInfo.value = makeRemote(documentURL);
       }
-      catch (e) {
-    	  if (contentType == "text/xml" ) {
-    	    documentContent = '<Error># Unable to load "' + documentURL + '"</Error>';
-    	  }
-    	  else {
-      	  documentContent = '# Unable to load "' + documentURL + '".';
-        }
-      }
+      contentType = "text/html";
+      windowName  = document.getElementById(stepId + '.windowName')
     }
   }
 
@@ -416,6 +429,11 @@ function DemonstrationPlayer() {
       spacer.style.display="inline-block";
       spacer.style.width="5px";
 
+  }
+  
+  function setViewer(step) {
+    var iFrameID = step.getStepId() + ".iFrame"
+    loadIFrame(iFrameID,step.getDocumentURL(),step.getContentType());
   }
 
   function setStatementTab (step) {
@@ -535,7 +553,8 @@ function DemonstrationPlayer() {
     }
 
     if ( step.isViewer() ) {
-    	 return;
+     	setViewer(step)    
+      return;
     }
 
     if (step.isSQLScript()) {
@@ -775,6 +794,18 @@ function DemonstrationPlayer() {
     }
   }
 
+  this.openLink = function(stepId) {
+
+  	var step = steps[stepId];
+
+  	if (step.getWindowName() == step.getStepId() + ".iFrame") {
+  	  setViewer(step);
+  	}
+  	else {
+  	  window.open(step.getDocumentURL(),step.getWindowName());
+  	}
+  }
+
   this.resizeIFrame = function(iFrame) {
 
     var newHeight;
@@ -802,44 +833,23 @@ function DemonstrationPlayer() {
     }
   }
 
-  this.loadIFrame = function(iFrameId,targetURL,contentType) {
+	this.reloadIFrame = function(stepId) {
+		var step = steps[stepId]
+		var iFrameID = step.getStepId() + ".iFrame"
+    loadIFrame(iFrameID,step.getDocumentURL(),step.getContentType());
+  }
+
+  function loadIFrame(iFrameId,targetURL,contentType) {
   	
   	var iFrame = document.getElementById(iFrameId)
   	
-  	// Localize the URL
-  	
-    var loc = document.createElement("a");
-    loc.href = targetURL
-  	
   	if ((contentType == "text/xml") || (contentType == "application/xml")) {
-  		var url
-    	if (loc.pathname.substring(0,1) == "/") {
-    		// Firefox - Will see problem with X-Site Scripting with absolute URL
-    	  url = location.protocol + "//" + location.hostname + ":" + location.port + loc.pathname;
-    	}
-    	else {
-    		// Internet Explorer
-    	  url = "/" + loc.pathname;
-      }	
-      if ((loc.search != "") && (loc.search != null)) {
-      	url = url + loc.search
-      }
-      iFrame.src = "/XFILES/xmlViewer/xmlViewer.html?target=" + encodeURIComponent(url)
+      iFrame.src = "/XFILES/xmlViewer/xmlViewer.html?target=" + encodeURIComponent(targetURL)
   	  return;
   	}
 
   	if ((contentType == "text/plain") || (contentType == "text/html")) {
-  		var url;
-  		if (loc.pathname.substring(0,1) == "/") { 
-  			url = loc.pathname
-  	  } 
-  	  else { 
-  	  	url = "/" + loc.pathname
-  	  } 
-      if ((loc.search != "") && (loc.search != null)) {
-      	url = url + "?" + loc.search
-      }
-  	  iFrame.src = url;
+  		iFrame.src = targetURL;
   	  return
   	}
 
@@ -1949,6 +1959,7 @@ function onPageLoaded() {
   sqlScriptUsername = getParameter('sqlUsername');
 
 	setHttpUsername();
+	// patchHref(document.getElementsByName("A"));
   demoPlayer = new DemonstrationPlayer();
   demoPlayer.showStep(1);
 

@@ -4,33 +4,45 @@
 	<xsl:include href="/XFILES/lite/xsl/common.xsl"/>
 	<xsl:include href="/XFILES/Applications/imageMetadata/xsl/EXIFCommon.xsl"/>
 	<xsl:template name="editTitleDialog">
-		<div style="display: none;" id="editTitleDialog" onclick="stopBubble(event)">
-			<div style="position:relative; top: 0px;">
-				<div class="popupOuterEdge" style="top: 10px; left: 10px;">
-					<div class="popupBackground" style="width:520px;">
-						<div class="popupInnerEdge">
-							<div class="row popupTitle">
-								<xsl:text>Edit Image Title</xsl:text>
-							</div>
-							<div style="height:5px"/>
-							<div style="display:table-row">
-								<input id="currentImageTitle" type="hidden"/>
-								<span style="display:table-cell;">
-									<input id="editImageTitle" name="editImageTitle" size="80" maxlength="80" type="text">
-										<xsl:attribute name="value"><xsl:value-of select="img:imageMetadata/img:Title"/></xsl:attribute>
+		<div class="modal fade" id="editTitleDialog" tabindex="-1" role="dialog" aria-labelledby="editTitleDialogTitle" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<div>
+							<button type="button" class="close" data-dismiss="modal">
+								<span aria-hidden="true">&#215;</span>
+								<span class="sr-only">Close</span>
+							</button>
+							<h4 class="modal-title text-left" id="editTitleDialogTitle">Edit Title</h4>
+						</div>
+					</div>
+					<div class="modal-body">
+						<div>
+							<div class="form-horizontal">
+								<div class="form-group">
+									<input id="currentImageTitle" type="hidden"/>
+									<input class="form-control" id="editImageTitle" name="editImageTitle" maxlength="128" type="text">
+										<xsl:attribute name="value">
+											<xsl:value-of select="img:imageMetadata/img:Title"/>
+										</xsl:attribute>
 									</input>
-								</span>
+								</div>
 							</div>
-							<div style="height:5px;"/>
-							<div style="text-align:right;">
-								<span id="resetTitleOption" style=":display:none;">
-									<img id="btnResetTitle" src="/XFILES/lib/icons/undoSimpleText.png" alt="Restore Value" border="0" width="16" height="16" onclick="doResetEditTitle(event);return false;"/>
-									<span style="width:10px; display:inline-block;"/>
-								</span>
-								<img id="btnCancelTitle" src="/XFILES/lib/icons/cancel.png" alt="Cancel Operation" border="0" width="16" height="16" onclick="doCancelEditTitle(event);return false;"/>
-								<span style="width:10px; display:inline-block;"/>
-								<img id="btnUpdateTitle" src="/XFILES/lib/icons/saveAndClose.png" alt="Update Image Title" border="0" width="16" height="16" onclick="doSaveEditTitle(event);return false;"/>
-							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<div>
+							<span id="resetTitleOption" style="display:none;">
+								<button id="btnResetTitle" type="button" class="btn btn-default btn-med" data-dismiss="modal" onclick="doResetEditTitle(event);return false;">
+									<img src="/XFILES/lib/icons/undoSimpleText.png" alt="Restore Value" border="0" width="16" height="16"/>
+								</button>
+							</span>
+							<button id="btnCancelTitle" type="button" class="btn btn-default btn-med" data-dismiss="modal" onclick="doCancelEditTitle(event);return false;">
+								<img src="/XFILES/lib/icons/cancel.png" alt="Cancel Operation" border="0" width="16" height="16"/>
+							</button>
+							<button id="btnUpdateTitle" type="button" class="btn btn-default btn-med" onclick="doSaveEditTitle(event);return false;">
+								<img src="/XFILES/lib/icons/saveAndClose.png" alt="Update Image Title" border="0" width="16" height="16"/>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -38,28 +50,38 @@
 		</div>
 	</xsl:template>
 	<xsl:template name="editDescriptionDialog">
-		<div style="display: none;" id="editDescriptionDialog" onclick="stopBubble(event)">
-			<div style="position:relative; top: 0px;">
-				<div class="popupOuterEdge" style="top: 10px; left: 10px;">
-					<div id="editDescriptionContainer" class="popupBackground" style="width:670px;">
-						<div class="popupInnerEdge">
-							<div class="row popupTitle">
-								<xsl:text>Edit Image Description (HTML)</xsl:text>
-							</div>
-							<div style="height:5px"/>
+		<div class="modal fade" id="editDescriptionDialog" tabindex="-1" role="dialog" aria-labelledby="editDescriptionDialogTitle" aria-hidden="true">
+			<div class="modal-dialog" style="width:1000px;">
+				<div class="modal-content">
+					<div class="modal-header">
+						<div>
+							<button type="button" class="close" data-dismiss="modal">
+								<span aria-hidden="true">&#215;</span>
+								<span class="sr-only">Close</span>
+							</button>
+							<h4 class="modal-title text-left" id="editDescriptionDialogTitle">Edit Image Description (HTML)</h4>
+						</div>
+					</div>
+					<div class="modal-body">
+						<div class="form-horizontal">
 							<div align="center">
-								<textarea name="xinhaDescriptionEditor" id="xinhaDescriptionEditor" rows="10" cols="80"/>
+								<textarea name="xinhaDescriptionEditor" id="xinhaDescriptionEditor" rows="10" cols="64"/>
 							</div>
-							<div style="height:5px;"/>
-							<div style="text-align:right;">
-								<span id="resetDescriptionOption" style="display:none;">
-									<img id="btnResetTitle" src="/XFILES/lib/icons/undoMultiLineText.png" alt="Restore Value" border="0" width="16" height="16" onclick="doResetEditDescription(event);return false;"/>
-									<span style="width:10px; display:inline-block;"/>
-								</span>
-								<img id="btnCancelDescription" src="/XFILES/lib/icons/cancel.png" alt="Cancel Operation" border="0" width="16" height="16" onclick="doCancelEditDescription(event);return false;"/>
-								<span style="width:10px; display:inline-block;"/>
-								<img id="btnUpdateDescription" src="/XFILES/lib/icons/saveAndClose.png" alt="Update Image Description" border="0" width="16" height="16" onclick="doSaveEditDescription(event);return false;"/>
-							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<div>
+							<span id="resetDescriptionOption" style="display:none;">
+								<button id="btnResetDescription" type="button" class="btn btn-default btn-med" data-dismiss="modal" onclick="doResetEditDescription(event);return false;">
+									<img src="/XFILES/lib/icons/undoMultiLineText.png" alt="Restore Value" border="0" width="16" height="16"/>
+								</button>
+							</span>
+							<button id="btnCancelDescription" type="button" class="btn btn-default btn-med" data-dismiss="modal" onclick="doCancelEditDescription(event);return false;">
+								<img src="/XFILES/lib/icons/cancel.png" alt="Cancel Operation" border="0" width="16" height="16"/>
+							</button>
+							<button id="btnUpdateDescription" type="button" class="btn btn-default btn-med" onclick="doSaveEditDescription(event);return false;">
+								<img src="/XFILES/lib/icons/saveAndClose.png" alt="Update Image Title" border="0" width="16" height="16"/>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -92,12 +114,12 @@
 			</xsl:call-template>
 			<span style="float:right;display:block;">
 				<span style="display:inline-block;width:21px;">
-						<img id="btnEditDesc" src="/XFILES/lib/icons/editMultiLineText.png" alt="Edit Title" height="16" width="16" border="0" onclick="javascript:doOpenEditDescription(event);return false;" data-toggle="tooltip" data-placement="top" title="Edit Image Description."/>
+					<img id="btnEditDesc" src="/XFILES/lib/icons/editMultiLineText.png" alt="Edit Title" height="16" width="16" border="0" onclick="javascript:doOpenEditDescription(event);return false;" data-toggle="tooltip" data-placement="top" title="Edit Image Description."/>
 				</span>
 			</span>
 			<span style="float:right;display:block;">
 				<span style="display:inline-block;width:21px;">
-						<img id="btnEditTitle" src="/XFILES/lib/icons/editSimpleText.png" alt="Edit Title" height="16" width="16" border="0" onclick="javascript:doOpenEditTitle(event);return false;" data-toggle="tooltip" data-placement="top" title="Edit Image Title."/>
+					<img id="btnEditTitle" src="/XFILES/lib/icons/editSimpleText.png" alt="Edit Title" height="16" width="16" border="0" onclick="javascript:doOpenEditTitle(event);return false;" data-toggle="tooltip" data-placement="top" title="Edit Image Title."/>
 				</span>
 			</span>
 		</div>
@@ -121,7 +143,9 @@
 					<div id="imageContainer" style="float:left;">
 						<xsl:if test="substring-before(r:ContentType,'/')='image'">
 							<img id="image" alt="Unavailable">
-								<xsl:attribute name="src"><xsl:value-of select="concat('/sys/oid/',xfiles:ResourceStatus/xfiles:Resid)"/></xsl:attribute>
+								<xsl:attribute name="src">
+									<xsl:value-of select="concat('/sys/oid/',xfiles:ResourceStatus/xfiles:Resid)"/>
+								</xsl:attribute>
 							</img>
 						</xsl:if>
 					</div>

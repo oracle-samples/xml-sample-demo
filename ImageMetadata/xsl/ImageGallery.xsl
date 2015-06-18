@@ -153,8 +153,8 @@
 							<span>/XFILES/Applications/imageMetadata/js/ImageGallery.js</span>
 							<!-- use jssor.slider.min.js instead for release -->
 							<!-- jssor.slider.min.js = (jssor.js + jssor.slider.js) -->
-							<!-- <span>/XFILES/Frameworks/jssor/js/jssor.js</span> -->
-							<!-- <span>/XFILES/Frameworks/jssor/js/jssor.slider.js</span> -->
+					    <span>/XFILES/Frameworks/jssor/js/jssor.js</span>
+							<span>/XFILES/Frameworks/jssor/js/jssor.slider.js</span>
 						</div>
 						<div>
 							<xsl:call-template name="XFilesSeperator">

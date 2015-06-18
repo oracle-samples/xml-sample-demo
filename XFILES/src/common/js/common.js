@@ -546,6 +546,7 @@ var errStackXSL
 
 var contentToHTMLSource  = 
 '<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xhtml="http://www.w3.org/1999/xhtml">' + '\n' +
+' <xsl:output method="html"/>' + '\n' + 
 '	<xsl:template match="/">' + '\n' +
 '		<xsl:for-each select="xhtml:*/node()">' + '\n' +
 '			<xsl:copy-of select="."/>' + '\n' +
@@ -1948,6 +1949,31 @@ function getRadioButtonValue(radioName) {
    return "";
 
 }
+
+function makeLocal(url) {
+  	
+	var a = document.createElement("A");
+	a.href = url;
+	if ((a.hostname != location.hostname) || (a.protocol != location.protocol) || (a.port != location.port)) {
+		url = a.pathname;
+	  if (url.substring(0,1) != "/") {
+	  	// Internet Explorer
+	    url = "/" + url;
+	  } 
+    if ((a.search != "") && (a.search != null)) {
+  	  url = url + a.search
+    }
+    url;
+  }
+  return url
+}
+
+function makeRemote(url) {
+  	
+  return location.protocol + "//" + location.hostname + ":" + location.port + url;
+
+}
+
 
 function hideSiblings(me,display){
 	

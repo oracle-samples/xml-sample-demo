@@ -23,85 +23,6 @@ var currentDescription
 var descriptionUpdated = false;
 var imageMetadataNamespace = 'http://xmlns.oracle.com/xdb/metadata/ImageMetadata';
 
-function resizeImageToForm() {
-	
-  var maxWidth    = document.getElementById("upperSpacer").clientWidth - 300;
-  var maxHeight   = maxWidth * (9/16);
-
-  var propsHeight = document.getElementById("propertyContainer").clientHeight;
-  if (propsHeight < maxHeight) {
-  	maxHeight = propsHeight;
-  }
-  
-  if (maxHeight < 480) {
-  	maxHeight = 480;
-  }
-  
-  document.getElementById("editDescriptionContainer").style.width = maxWidth;
-  document.getElementById("editDescriptionContainer").style.height = maxHeight;
-
-  if (document.getElementById("imageWidth")) {
-  	var imgWidth = document.getElementById("imageWidth").value;
-    var imgHeight = document.getElementById("imageHeight").value;
-	
-    var widthRatio  = maxWidth  / imgWidth;
-    var heightRatio = maxHeight / imgHeight;
-
-    var img = document.getElementById("image");  
-    
-    if (heightRatio < widthRatio) {
- 	    img.width = Math.round(imgWidth * heightRatio)
-    }
-    else {
-	    img.width = Math.round(imgHeight * widthRatio)
-    } 
-  }
-  
-  return new Array (maxWidth, maxHeight);
- 
-}  
-  
-function onPageLoaded() {
-
-  // Initialize currentDescription and currentTitle to the current title of the Image.
-
-  displayName = resource.selectNodes("/res:Resource/res:DisplayName/text()",xfilesNamespaces).item(0).nodeValue;
-  resid = resource.selectNodes("/res:Resource/xfiles:ResourceStatus/xfiles:Resid/text()",xfilesNamespaces).item(0).nodeValue;
-
-  var nl = resource.selectNodes("/res:Resource/img:imageMetadata/img:Title/text()",xfilesNamespaces);
-  if (nl.length > 0) {
-    originalTitle = nl.item(0).nodeValue;
-  }
-  else {
-  	originalTitle = "";
-  }
-
-  currentTitle = originalTitle;
-  
-  var nl = resource.selectNodes("/res:Resource/img:imageMetadata/img:Description/xhtml:div",xfilesNamespaces);
-  if (nl.length > 0) {
-    originalDescription = new xmlDocument();
-    originalDescription.appendChild(originalDescription.importNode(nl.item(0).cloneNode(true),true));
-  }
-  else {
-    originalDescription = new xmlDocument().parse("<div xmlns=\"http://www.w3.org/1999/xhtml\"/>");
-  }
-
-  currentDescription = originalDescription;
-  var viewDescription = document.getElementById("viewDescription");
-  viewDescription.innerHTML = contentToHTML.toText(currentDescription);
-  
-  setButtonState();
-  sizing = resizeImageToForm();
-
-  editorFrame = document.getElementById("editDescriptionDialog");
-  editorFrame.style.display ="block";
-  editorFrame.firstChild.firstChild.style.left = ((sizing[0] + 100) * -1) + "px";
-  initXinhaEXIF(sizing[0],sizing[1]);
-  xinha_init();
-    
-}
-    
 function initXinhaEXIF(width,height) {
                                                                               
   // This contains the names of textareas we will make into Xinha editors
@@ -112,24 +33,28 @@ function initXinhaEXIF(width,height) {
     * page.  List all the plugins you will need, even if not all the editors
     * will use all the plugins.
     *
-    * The list of plugins below is a good starting point, but if you prefer
-    * a must simpler editor to start with then you can use the following 
+    * The list of plugins below is a good starting point
     * 
+    *     xinha_plugins = xinha_plugins ? xinha_plugins :
+    *     [
+    *       'CharacterMap',
+    *       'ContextMenu',
+    *       'ListType',
+    *       'SpellChecker',
+    *       'Stylist',
+    *       'SuperClean',
+    *       'TableOperations'
+    *     ];
+    *     
+    *,If you prefer a much simpler editor to start with then you can use 
+    * the following :
+    *
     * xinha_plugins = xinha_plugins ? xinha_plugins : [ ];
     *
     * which will load no extra plugins at all.
     ************************************************************************/
-  
-    xinha_plugins = xinha_plugins ? xinha_plugins :
-    [
-      'CharacterMap',
-      'ContextMenu',
-      'ListType',
-      'SpellChecker',
-      'Stylist',
-      'SuperClean',
-      'TableOperations'
-    ];
+   
+		xinha_plugins = xinha_plugins ? xinha_plugins : [ ];
   
     // THIS BIT OF JAVASCRIPT LOADS THE PLUGINS, NO TOUCHING  :)
     if(!Xinha.loadPlugins(xinha_plugins, xinha_init)) return;
@@ -188,7 +113,7 @@ function initXinhaEXIF(width,height) {
     *
     ************************************************************************/
   
-    xinha_editors.xinhaDescriptionEditor.config.width  = (width - 20) + "px";
+    xinha_editors.xinhaDescriptionEditor.config.width  = (width - 40) + "px";
     xinha_editors.xinhaDescriptionEditor.config.height = (height - 60) + "px";
     
     xinha_editors.xinhaDescriptionEditor._onGenerate = function()
@@ -208,6 +133,83 @@ function initXinhaEXIF(width,height) {
   }
 
 }
+
+function resizeImageToForm() {
+	
+  var maxWidth    = document.getElementById("upperSpacer").clientWidth - 300;
+  var maxHeight   = maxWidth * (9/16);
+
+  var propsHeight = document.getElementById("propertyContainer").clientHeight;
+  if (propsHeight < maxHeight) {
+  	maxHeight = propsHeight;
+  }
+  
+  if (maxHeight < 480) {
+  	maxHeight = 480;
+  }
+  
+  if (document.getElementById("imageWidth")) {
+  	var imgWidth = document.getElementById("imageWidth").value;
+    var imgHeight = document.getElementById("imageHeight").value;
+	
+    var widthRatio  = maxWidth  / imgWidth;
+    var heightRatio = maxHeight / imgHeight;
+
+    var img = document.getElementById("image");  
+    
+    if (heightRatio < widthRatio) {
+ 	    img.width = Math.round(imgWidth * heightRatio)
+    }
+    else {
+	    img.width = Math.round(imgHeight * widthRatio)
+    } 
+  }
+  
+  return new Array (maxWidth, maxHeight);
+ 
+}  
+  
+function onPageLoaded() {
+
+  // Initialize currentDescription and currentTitle to the current title and description of the Image.
+
+  sizing = resizeImageToForm();
+
+  displayName = resource.selectNodes("/res:Resource/res:DisplayName/text()",xfilesNamespaces).item(0).nodeValue;
+  resid = resource.selectNodes("/res:Resource/xfiles:ResourceStatus/xfiles:Resid/text()",xfilesNamespaces).item(0).nodeValue;
+
+  var nl = resource.selectNodes("/res:Resource/img:imageMetadata/img:Title/text()",xfilesNamespaces);
+  if (nl.length > 0) {
+    originalTitle = nl.item(0).nodeValue;
+  }
+  else {
+  	originalTitle = "";
+  }
+  currentTitle = originalTitle;
+  
+  var nl = resource.selectNodes("/res:Resource/img:imageMetadata/img:Description/xhtml:div",xfilesNamespaces);
+  if (nl.length > 0) {
+    originalDescription = new xmlDocument();
+    originalDescription.appendChild(originalDescription.importNode(nl.item(0).cloneNode(true),true));
+  }
+  else {
+    originalDescription = new xmlDocument().parse("<div xmlns=\"http://www.w3.org/1999/xhtml\"/>");
+  }
+  currentDescription = originalDescription;
+
+  var viewDescription = document.getElementById("viewDescription");
+  viewDescription.innerHTML = contentToHTML.toText(currentDescription);
+  
+  setButtonState();
+
+  editorFrame = document.getElementById("editDescriptionDialog");
+  editorFrame.style.display ="block";
+  // editorFrame.firstChild.firstChild.style.left = ((sizing[0] + 100) * -1) + "px";
+  initXinhaEXIF(1000,sizing[1]);
+  xinha_init();
+    
+}
+    
 
 function showTitle() {
 
@@ -236,18 +238,18 @@ function titleUpdated() {
 } 
 
 function doCancelEditTitle(evt) {
-	closePopupDialog();
+	closeModalDialog("editTitleDialog");
 }
 
 function doResetEditTitle(evt) {
-	closePopupDialog();
+	closeModalDialog("editTitleDialog");
 	currentTitle = originalTitle;
 	showTitle();
 	setButtonState();
 } 
 
 function doSaveEditTitle(evt) {
-	closePopupDialog()
+	closeModalDialog("editTitleDialog")
 	currentTitle = document.getElementById("editImageTitle").value;  		
 	showTitle();
 	setButtonState();
@@ -263,13 +265,13 @@ function doOpenEditTitle(evt) {
   }
 
 	document.getElementById("editImageTitle").value = currentTitle;  		
-	openPopupDialog(evt,"editTitleDialog");
+	openModalDialog("editTitleDialog");
 
 }
 
 function doCancelEditDescription(evt) {
 
-	closePopupDialog();
+	closeModalDialog("editDescriptionDialog");
 	setButtonState();
 }
 
@@ -279,7 +281,7 @@ function doResetEditDescription(evt) {
   currentDescription = originalDescription;  
   veiwer = document.getElementById("viewDescription");
   viewer.innerHTML = contentToHTML.toText(currentDescription);  
-	closePopupDialog();
+	closeModalDialog("editDescriptionDialog");
 	setButtonState();
 
 } 
@@ -292,7 +294,7 @@ function doSaveEditDescription(evt) {
 
   currentDescription = xinhaToDiv(editor);
 	viewer.innerHTML = contentToHTML.toText(currentDescription);
-	closePopupDialog()
+	closeModalDialog("editDescriptionDialog")
 	setButtonState();
 }
 
@@ -305,7 +307,7 @@ function doOpenEditDescription(evt) {
   	document.getElementById("resetDescriptionOption").style.display = "none";
   }
 
-	openPopupDialog(evt,"editDescriptionDialog");
+	openModalDialog("editDescriptionDialog");
 
 	var editor = xinha_editors.xinhaDescriptionEditor;	
 	editor.setHTML(editor.inwardHtml(contentToHTML.toText(currentDescription)));

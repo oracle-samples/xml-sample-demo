@@ -77,23 +77,28 @@ function loadXinhaWiki() {
     * page.  List all the plugins you will need, even if not all the editors
     * will use all the plugins.
     *
-    * The list of plugins below is a good starting point, but if you prefer
-    * a simpler editor to start with then you can use the following 
+    * The list of plugins below is a good starting point
     * 
+    *     xinha_plugins = xinha_plugins ? xinha_plugins :
+    *     [
+    *       'CharacterMap',
+    *       'ContextMenu',
+    *       'ListType',
+    *       'SpellChecker',
+    *       'Stylist',
+    *       'SuperClean',
+    *       'TableOperations'
+    *     ];
+    *     
+    *,If you prefer a much simpler editor to start with then you can use 
+    * the following :
+    *
     * xinha_plugins = xinha_plugins ? xinha_plugins : [ ];
     *
     * which will load no extra plugins at all.
     ************************************************************************/
-  
-    xinha_plugins = xinha_plugins ? xinha_plugins :
-    [
-      'CharacterMap',
-      'ContextMenu',
-      'ListType',
-      'Stylist',
-      'SuperClean',
-      'TableOperations'
-    ];
+   
+		xinha_plugins = xinha_plugins ? xinha_plugins : [ ];
     
     // THIS BIT OF JAVASCRIPT LOADS THE PLUGINS, NO TOUCHING  :)
     if(!Xinha.loadPlugins(xinha_plugins, xinha_init)) return;

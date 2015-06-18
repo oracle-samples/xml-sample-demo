@@ -153,15 +153,22 @@
 							<xsl:attribute name="id"><xsl:value-of select="concat(position(),'.link')"/></xsl:attribute>
 							<xsl:attribute name="value"><xsl:value-of select="link"/></xsl:attribute>
 						</input>
+						<input type="hidden">
+							<xsl:attribute name="id"><xsl:value-of select="concat(position(),'.WindowName')"/></xsl:attribute>
+							<xsl:choose>
+								<xsl:when test="link[@windowName]">
+									<xsl:attribute name="value"><xsl:value-of select="link/@windowName"/></xsl:attribute>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:attribute name="value"><xsl:value-of select="concat(position(),'.iFrame')"/></xsl:attribute>
+								</xsl:otherwise>
+							</xsl:choose>
+						</input>
 					</xsl:when>
 					<xsl:when test="stepType='VIEW'">
 						<input type="hidden">
 							<xsl:attribute name="id"><xsl:value-of select="concat(position(),'.action')"/></xsl:attribute>
 							<xsl:attribute name="value"><xsl:text>VIEW</xsl:text></xsl:attribute>
-						</input>
-						<input type="hidden">
-							<xsl:attribute name="id"><xsl:value-of select="concat(position(),'.target')"/></xsl:attribute>
-							<xsl:attribute name="value"><xsl:value-of select="link"/></xsl:attribute>
 						</input>
 						<input type="hidden">
 							<xsl:attribute name="id"><xsl:value-of select="concat(position(),'.contentType')"/></xsl:attribute>
@@ -280,23 +287,15 @@
 								</xsl:if>
 							</xsl:when>
 							<xsl:when test="stepType='HTTP'">
-								<a>
-									<xsl:attribute name="href"><xsl:value-of select="link"></xsl:value-of></xsl:attribute>
-									<xsl:choose>
-										<xsl:when test="link[@targetWindow]">
-											<xsl:attribute name="target"><xsl:value-of select="link/@targetWindow"/></xsl:attribute>
-										</xsl:when>
-										<xsl:otherwise>
-											<xsl:attribute name="target"><xsl:value-of select="concat(position(),'.iFrame')"/></xsl:attribute>
-										</xsl:otherwise>
-									</xsl:choose>
+								<a href="#">
+									<xsl:attribute name="onclick"><xsl:text>demoPlayer.openLink('</xsl:text><xsl:value-of select="position()"/><xsl:text>');return false</xsl:text></xsl:attribute>
 									<xsl:value-of select="name"/>
 								</a>
 							</xsl:when>
 							<xsl:when test="stepType='VIEW'">
 								<a>
 									<xsl:attribute name="href"><xsl:value-of select="link"></xsl:value-of></xsl:attribute>
-									<xsl:attribute name="onclick"><xsl:text>demoPlayer.loadIFrame('</xsl:text><xsl:value-of select="concat(position(),'.iFrame')"/><xsl:text>','</xsl:text><xsl:value-of select="link"/><xsl:text>','</xsl:text><xsl:value-of select="link/@contentType"/><xsl:text>');return false</xsl:text></xsl:attribute>
+									<xsl:attribute name="onclick"><xsl:text>demoPlayer.reloadIFrame('</xsl:text><xsl:value-of select="position()"/><xsl:text>');return false</xsl:text></xsl:attribute>
 									<xsl:value-of select="name"/>
 								</a>
 							</xsl:when>
@@ -317,22 +316,22 @@
 							<xsl:when test="stepType='VIEW'">
 								<div>
 									<input type="text" disabled="true" style="width:100%">
+										<xsl:attribute name="id"><xsl:value-of select="concat(position(),'.target')"/></xsl:attribute>
 										<xsl:attribute name="value"><xsl:value-of select="link"></xsl:value-of></xsl:attribute>
 									</input>
 									<iframe style="width:100%; height:100%; background-color:white;" onload="demoPlayer.resizeIFrame(this)">
-										<!-- <xsl:attribute name="name"><xsl:value-of select="concat(position(),'.iFrame')"/></xsl:attribute> -->
 										<xsl:attribute name="id"><xsl:value-of select="concat(position(),'.iFrame')"/></xsl:attribute>
 									</iframe>
 								</div>
 							</xsl:when>
 							<xsl:when test="stepType='HTTP'">
 								<xsl:choose>
-									<xsl:when test="link[@targetWindow]">
+									<xsl:when test="link[@windowName]">
 										<xsl:if test="screenshot">
 											<div style="display:table-cell; vertical-align:middle;text-align:center">
 												<xsl:attribute name="id"><xsl:value-of select="concat(position(),'.Screenshot')"/></xsl:attribute>
 												<img style="border:none;">
-													<xsl:attribute name="onclick"><xsl:text>window.open('</xsl:text><xsl:value-of select="link"/><xsl:text>','</xsl:text><xsl:value-of select="link/@targetWindow"/><xsl:text>');</xsl:text></xsl:attribute>
+													<xsl:attribute name="onclick"><xsl:text>demoPlayer.openLink('</xsl:text><xsl:value-of select="position()"/><xsl:text>');return false</xsl:text></xsl:attribute>
 													<xsl:attribute name="src"><xsl:value-of select="screenshot"></xsl:value-of></xsl:attribute>
 													<xsl:attribute name="alt"><xsl:value-of select="stepType"></xsl:value-of></xsl:attribute>
 												</img>
@@ -342,6 +341,7 @@
 									<xsl:otherwise>
 										<div>
 											<input type="text" disabled="true" style="width:100%">
+												<xsl:attribute name="id"><xsl:value-of select="concat(position(),'.target')"/></xsl:attribute>
 												<xsl:attribute name="value"><xsl:value-of select="link"></xsl:value-of></xsl:attribute>
 											</input>
 											<iframe style="width:100%; height:100%;">
