@@ -19,14 +19,13 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="http://www.w3.org/2001/XMLSchema" xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd" xmlns:xfiles="http://xmlns.oracle.com/xdb/xfiles" xmlns:xr="http://xmlns.oracle.com/xdb/xfiles" xmlns:img="http://xmlns.oracle.com/xdb/metadata/ImageMetadata" xmlns:exif="http://xmlns.oracle.com/ord/meta/exif" xmlns:wiki="http://xmlns.oracle.com/xdb/xfiles/wiki" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 	<xsl:output version="1.0" encoding="utf-8" omit-xml-declaration="no" indent="no" media-type="text/html" method="html"/>
 	<xsl:include href="/XFILES/lite/xsl/common.xsl"/>
-	<xsl:template name="loadWikiPage">
+	<xsl:template name="wikiPage">
 		<div>
-			<div style="height:5px;"/>
-			<div align="left" id="viewContent" style="display:block; min-height:10em"/>
-			<div id="editContent" style="display:none;margin:0px;border-width:0px;padding:0px;text-align:center;width:100%">
+			<div align="left" id="viewWikiPage" style="display:block; min-height:10em"/>
+			<div id="editWikiPage" style="display:none;margin:0px;border-width:0px;padding:0px;text-align:center;width:100%">
 				<div style="height:5px;"/>
 				<div>
-					<textarea name="xinhaWiki" id="xinhaWiki" rows="10" cols="150"/>
+					<textarea name="wikiEditor" id="wikiEditor" rows="10" cols="150"/>
 				</div>
 			</div>
 			<div style="height:10px;"/>
@@ -50,33 +49,33 @@
 				<xsl:with-param name="saveButton" select="'true'"/>
 				<xsl:with-param name="saveAndCloseButton" select="'true'"/>
 			</xsl:call-template>
-			<span style="float:right;display:none;" id="wikiViewerControls">
+			<span style="float:right;display:none;" id="wikiControls">
 				<span style="display:inline-block;width:21px;">
 				</span>
 				<span style="display:inline-block;width:21px;">
 				</span>
 			</span>
-			<span style="float:right;display:block;" id="wikiEditingControls">
-				<span style="display:inline-block;width:21px;" id="undoEditingOption">
-					<img id="btnResetWiki" src="/XFILES/lib/icons/undoMultiLineText.png" alt="Reset Wiki" height="16" width="16" border="0" onclick="javascript:doRevertToSaved();return false;" data-toggle="tooltip" data-placement="top" title="Revert to saved state."/>
+			<span style="float:right;display:block;" id="editingControls">
+				<span style="display:inline-block;width:21px;" id="undoControls">
+					<img id="btnResetWiki" src="/XFILES/lib/icons/undoMultiLineText.png" alt="Reset Wiki" height="16" width="16" border="0" onclick="xinhaController.undoChanges();return false;" data-toggle="tooltip" data-placement="top" title="Revert to saved state."/>
 				</span>
 				<span style="display:inline-block;width:21px;">
-					<img id="btnDiscardWikiEdits" src="/XFILES/lib/icons/cancel.png" alt="Cancel" height="16" width="16" border="0" onclick="javascript:doCancelEdits();return false;" data-toggle="tooltip" data-placement="top" title="Undo current edits."/>
+					<img id="btnDiscardWikiEdits" src="/XFILES/lib/icons/cancel.png" alt="Cancel" height="16" width="16" border="0" onclick="xinhaController.cancel();return false;" data-toggle="tooltip" data-placement="top" title="Undo current edits."/>
 				</span>
 				<span style="display:inline-block;width:21px;">
-					<img id="btnSaveWikiEdits" src="/XFILES/lib/icons/saveAndClose.png" alt="Save" height="16" width="16" border="0" onclick="javascript:doSaveEdits();return false;" data-toggle="tooltip" data-placement="top" title="Save edits."/>
+					<img id="btnSaveWikiEdits" src="/XFILES/lib/icons/saveAndClose.png" alt="Save" height="16" width="16" border="0" onclick="xinhaController.saveChanges();return false;" data-toggle="tooltip" data-placement="top" title="Save edits."/>
 				</span>
 			</span>
-			<span style="float:right;display:block;" id="wikiViewingControls">
+			<span style="float:right;display:block;" id="viewingControls">
 				<span style="display:inline-block;width:21px;">
-					<img id="btnEditWiki" src="/XFILES/lib/icons/editMultiLineText.png" alt="Edit Description" height="16" width="16" border="0" onclick="javascript:setEditingMode(contentUpdatedFlag);return false;" data-toggle="tooltip" data-placement="top" title="Edit Wiki Page."/>
+					<img id="btnEditWiki" src="/XFILES/lib/icons/editMultiLineText.png" alt="Edit Description" height="16" width="16" border="0" onclick="xinhaController.showEditor();return false;" data-toggle="tooltip" data-placement="top" title="Edit Wiki Page."/>
 				</span>
 			</span>
 		</div>
 		<div class="formAreaBackground">
 			<div class="xfilesIndent">
 				<xsl:for-each select="r:Resource">
-					<xsl:call-template name="loadWikiPage"/>
+					<xsl:call-template name="wikiPage"/>
 				</xsl:for-each>
 			</div>
 		</div>

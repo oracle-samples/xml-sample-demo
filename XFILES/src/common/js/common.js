@@ -544,22 +544,12 @@ var errStackXSLSource =
 
 var errStackXSL
 
-var contentToHTMLSource  = 
-'<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xhtml="http://www.w3.org/1999/xhtml">' + '\n' +
-' <xsl:output method="html"/>' + '\n' + 
-'	<xsl:template match="/">' + '\n' +
-'		<xsl:for-each select="xhtml:*/node()">' + '\n' +
-'			<xsl:copy-of select="."/>' + '\n' +
-'		</xsl:for-each>' + '\n' +
-'</xsl:template></xsl:stylesheet>';
 
 var TargetTreeXSL;
 
 function loadTargetTreeXSL() {
   TargetTreeXSL = loadXSLDocument("/XFILES/lite/xsl/folderTree.xsl");
 }
-
-var contentToHTML;
 
 function loadOracleWebServiceNamespaces() {
   orawsvNamespaces = new namespaceManager(orawsvPrefixList);
@@ -691,7 +681,6 @@ function initCommon() {
   }
       
   errStackXSL   = new xmlDocument().parse(errStackXSLSource);
-  contentToHTML = new xsltProcessor(new xmlDocument().parse(contentToHTMLSource),document);
   
   // Check if the current session is authenticated to allow for REST/SOAP descisions when loading pages
 
@@ -1990,28 +1979,6 @@ function hideSiblings(me,display){
   	}
     me.style.display = display;   
   }
-}
-
-function xinhaToDiv(editor) {
-
-  // Assume the content of a xinhaDescriptionEditor.getHTML()is always valid XHTML Fragment can that be manageded as the child of an XHTML Body Element..
-  // ? Need to replace &nbsp in XHTML ? then 
-  var xinhaContent = editor.outwardHtml(editor.getHTML());
-  xinhaContent = xinhaContent.replace( /\&nbsp/gi, "&#160" )
-  xinhaContent = xinhaContent.replace( /class=" htmtableborders" style=" htmtableborders"/gi, "class=\" htmtableborders\" " )
-  var xhtmlBody = new xmlDocument().parse("<div xmlns=\"http://www.w3.org/1999/xhtml\">" +  xinhaContent + "</div>");
-  return xhtmlBody;
-  
-}
-
-function textAreaToDiv(textArea) {
-
-  // Assume the content of a xinhaDescriptionEditor.getHTML()is always valid XHTML Fragment can that be manageded as the child of an XHTML Body Element..
-  // ? Need to replace &nbsp in XHTML ? then 
-  
-  var xhtmlBody = new xmlDocument().parse("<div xmlns=\"http://www.w3.org/1999/xhtml\">" + textArea.innerHTML.replace( /\&nbsp/gi, "&#160" ) + "</div>");
-  return xhtmlBody;
-  
 }
  
 function booleanToNumber(booleanValue) {

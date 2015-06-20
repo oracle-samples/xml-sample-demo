@@ -18,121 +18,7 @@ var resid
 var originalTitle
 var currentTitle
 
-var originalDescription
-var currentDescription
-var descriptionUpdated = false;
 var imageMetadataNamespace = 'http://xmlns.oracle.com/xdb/metadata/ImageMetadata';
-
-function initXinhaEXIF(width,height) {
-                                                                              
-  // This contains the names of textareas we will make into Xinha editors
-  xinha_init = xinha_init ? xinha_init : function() {
-  
-    /** STEP 1 ***************************************************************
-    * First, what are the plugins you will be using in the editors on this
-    * page.  List all the plugins you will need, even if not all the editors
-    * will use all the plugins.
-    *
-    * The list of plugins below is a good starting point
-    * 
-    *     xinha_plugins = xinha_plugins ? xinha_plugins :
-    *     [
-    *       'CharacterMap',
-    *       'ContextMenu',
-    *       'ListType',
-    *       'SpellChecker',
-    *       'Stylist',
-    *       'SuperClean',
-    *       'TableOperations'
-    *     ];
-    *     
-    *,If you prefer a much simpler editor to start with then you can use 
-    * the following :
-    *
-    * xinha_plugins = xinha_plugins ? xinha_plugins : [ ];
-    *
-    * which will load no extra plugins at all.
-    ************************************************************************/
-   
-		xinha_plugins = xinha_plugins ? xinha_plugins : [ ];
-  
-    // THIS BIT OF JAVASCRIPT LOADS THE PLUGINS, NO TOUCHING  :)
-    if(!Xinha.loadPlugins(xinha_plugins, xinha_init)) return;
-  
-    /** STEP 2 ***************************************************************
-    * Now, what are the names of the textareas you will be turning into
-    * editors?
-    ************************************************************************/
-  
-    xinha_editors = xinha_editors ? xinha_editors :
-    [
-      'xinhaDescriptionEditor'
-    ];
-  
-    /** STEP 3 ***************************************************************
-    * We create a default configuration to be used by all the editors.
-    * If you wish to configure some of the editors differently this will be
-    * done in step 5.
-    *
-    * If you want to modify the default config you might do something like this.
-    *
-    *   xinha_config = new Xinha.Config();
-    *   xinha_config.width  = '640px';
-    *   xinha_config.height = '420px';
-    *
-    *************************************************************************/
-  
-    xinha_config = xinha_config ? xinha_config() : new Xinha.Config();
-  
-    /** STEP 4 ***************************************************************
-    * We first create editors for the textareas.
-    *
-    * You can do this in two ways, either
-    *
-    *   xinha_editors   = Xinha.makeEditors(xinha_editors, xinha_config, xinha_plugins);
-    *
-    * if you want all the editor objects to use the same set of plugins, OR;
-    *
-    *   xinha_editors = Xinha.makeEditors(xinha_editors, xinha_config);
-    *   xinha_editors['myTextArea'].registerPlugins(['Stylist','FullScreen']);
-    *   xinha_editors['anotherOne'].registerPlugins(['CSS','SuperClean']);
-    *
-    * if you want to use a different set of plugins for one or more of the
-    * editors.
-    ************************************************************************/
-  
-    xinha_editors   = Xinha.makeEditors(xinha_editors, xinha_config, xinha_plugins);
-  
-    /** STEP 5 ***************************************************************
-    * If you want to change the configuration variables of any of the
-    * editors,  this is the place to do that, for example you might want to
-    * change the width and height of one of the editors, like this...
-    *
-    *   xinha_editors.myTextArea.config.width  = '640px';
-    *   xinha_editors.myTextArea.config.height = '480px';
-    *
-    ************************************************************************/
-  
-    xinha_editors.xinhaDescriptionEditor.config.width  = (width - 40) + "px";
-    xinha_editors.xinhaDescriptionEditor.config.height = (height - 60) + "px";
-    
-    xinha_editors.xinhaDescriptionEditor._onGenerate = function()
-    { 
-      editorFrame = document.getElementById("editDescriptionDialog");
-      editorFrame.style.display = "none";
-      editorFrame.firstChild.firstChild.style.left = "10px";
-    }
-    
-    /** STEP 6 ***************************************************************
-    * Finally we "start" the editors, this turns the textareas into
-    * Xinha editors.
-    ************************************************************************/
-  
-    Xinha.startEditors(xinha_editors);
-  
-  }
-
-}
 
 function resizeImageToForm() {
 	
@@ -195,18 +81,12 @@ function onPageLoaded() {
   else {
     originalDescription = new xmlDocument().parse("<div xmlns=\"http://www.w3.org/1999/xhtml\"/>");
   }
-  currentDescription = originalDescription;
 
-  var viewDescription = document.getElementById("viewDescription");
-  viewDescription.innerHTML = contentToHTML.toText(currentDescription);
-  
-  setButtonState();
-
-  editorFrame = document.getElementById("editDescriptionDialog");
-  editorFrame.style.display ="block";
-  // editorFrame.firstChild.firstChild.style.left = ((sizing[0] + 100) * -1) + "px";
-  initXinhaEXIF(1000,sizing[1]);
-  xinha_init();
+ 	xinhaDescription = new XinhaController("editImageDescription","viewImageDescription","viewingControls","editDescriptionControls","resetDescriptionOption","saveAndCloseButtons")
+  xinhaDescription.loadXinha("xinhaDescriptionEditor","960px",(sizing[1]*0.8)+"px");
+ 	xinhaDescription.setDialogName("editDescriptionDialog");
+  xinhaDescription.hideEditor();
+  xinhaDescription.setContent(originalDescription);
     
 }
     
@@ -269,59 +149,12 @@ function doOpenEditTitle(evt) {
 
 }
 
-function doCancelEditDescription(evt) {
-
-	closeModalDialog("editDescriptionDialog");
-	setButtonState();
-}
-
-function doResetEditDescription(evt) {
-
-  descriptionUpdated = false;
-  currentDescription = originalDescription;  
-  veiwer = document.getElementById("viewDescription");
-  viewer.innerHTML = contentToHTML.toText(currentDescription);  
-	closeModalDialog("editDescriptionDialog");
-	setButtonState();
-
-} 
-
-function doSaveEditDescription(evt) {
-
-  descriptionUpdated = true;
-	var editor = xinha_editors.xinhaDescriptionEditor;	
-  var viewer = document.getElementById("viewDescription");
-
-  currentDescription = xinhaToDiv(editor);
-	viewer.innerHTML = contentToHTML.toText(currentDescription);
-	closeModalDialog("editDescriptionDialog")
-	setButtonState();
-}
-
-function doOpenEditDescription(evt) {
-
-  if (descriptionUpdated) {
-  	document.getElementById("resetDescriptionOption").style.display = "inline-block";
-  }
-  else {
-  	document.getElementById("resetDescriptionOption").style.display = "none";
-  }
-
-	openModalDialog("editDescriptionDialog");
-
-	var editor = xinha_editors.xinhaDescriptionEditor;	
-	editor.setHTML(editor.inwardHtml(contentToHTML.toText(currentDescription)));
-  editor.activateEditor();    
-  editor.focusEditor();
-
-}
-
-function processUpdate(mgr,updatedTitle,updatedDescription,closeFormWhenFinished) {
+function processUpdate(mgr,updatedTitle,updatedDescription,closeForm) {
 	
 	try {
     var soapResponse = mgr.getSoapResponse('EXIFViewer.processUpdate');
     showInfoMessage("Image Updated.");       
-    if (closeFormWhenFinished) {
+    if (closeForm) {
       closeCurrentWindow();
     }
 
@@ -336,7 +169,7 @@ function processUpdate(mgr,updatedTitle,updatedDescription,closeFormWhenFinished
 
 }
 
-function saveChanges(closeFormWhenFinished) {
+function saveChanges(closeForm) {
 
   try {
     var newTitle = new xmlDocument().parse('<img:Title xmlns:img="' + imageMetadataNamespace + '"/>');
@@ -350,7 +183,8 @@ function saveChanges(closeFormWhenFinished) {
     newTitle.getDocumentElement().appendChild(text);
     
 	  var newDescription = new xmlDocument().parse('<img:Description xmlns:img="' + imageMetadataNamespace + '" xmlns:xhtml="http://www.w3.org/1999/xhtml"/>');
-    newDescription.getDocumentElement().appendChild(newDescription.importNode(currentDescription.getDocumentElement().cloneNode(true),true));
+    newDescription.getDocumentElement().appendChild(newDescription.importNode(xinhaDescription.getContent().getDocumentElement().cloneNode(true),true));
+    xinhaDescription.setContent(xinhaDescription.getContent());
 
     var schema  = "XDBEXT";
     var package = "METADATA_SERVICES";
@@ -358,7 +192,7 @@ function saveChanges(closeFormWhenFinished) {
   
   	var mgr = soapManager.getRequestManager(schema,package,method);  	
   	var XHR = mgr.createPostRequest();
-    XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processUpdate(mgr, currentTitle, currentDescription, closeFormWhenFinished) } };
+    XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processUpdate(mgr, currentTitle, currentDescription, closeForm) } };
   
   	var parameters = new Object;
   	parameters["P_RESID-VARCHAR2-IN"] = resid
