@@ -282,6 +282,9 @@ function XinhaController (editorControl, htmlControl, viewerControls, editorCont
     if (bootstrapDialog) {
       // Disable FullScreen when using a Bootstrap Modal Dialog.. It causes extreme wierdness.
       editor.config.hideSomeButtons(" popupeditor ")
+      $('#' + name).on('shown.bs.modal', function () {
+        self.startEditor();
+      })
     }
   }
 		
@@ -335,6 +338,15 @@ function XinhaController (editorControl, htmlControl, viewerControls, editorCont
  
   }
   
+  this.startEditor  = function () {
+    editor.focusEditor();
+    editor.activateEditor();      	
+    if (!contentLoaded) {
+      loadContent(originalContent);
+    }
+    fixEditorSize();
+  }
+  	
   this.showEditor = function() {
   
     toggleControls(viewerControlList,"none");
@@ -347,27 +359,22 @@ function XinhaController (editorControl, htmlControl, viewerControls, editorCont
       toggleControls(undoControlList,"none");
     }
 
+    toggleControls(editorControlList,"inline-block");
+
     if (dialogName != null) {
     	if (bootstrapDialog) {
       	openModalDialog(dialogName);
 			}
 			else {
 				openPopupDialog(dialogName);
+        self.startEditor();
 		  }
     }	
     else {
     	htmlContainer.style.display = "none";
      	editorContainer.style.display = "block";
+      self.startEditor();
     }
-
-    toggleControls(editorControlList,"inline-block");
-
-    editor.focusEditor();
-    editor.activateEditor();      	
-    if (!contentLoaded) {
-    	loadContent(originalContent);
-    }
-    fixEditorSize();
   }
   
   this.cancel = function() {

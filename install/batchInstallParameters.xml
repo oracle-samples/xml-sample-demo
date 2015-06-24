@@ -9,5 +9,6 @@
 	<Demo name="NVPAIR"           user="SCOTT"  password="tiger"/> 
 	<Demo name="PARTITIONING"     user="SCOTT"  password="tiger"/>
 	<Demo name="REPOSITORY"       user="SCOTT"  password="tiger"/>
+	<Demo name="XMLDB-HOL"        user="SCOTT"  password="tiger"/>
 	<Demo name="XQUERY"           user="SCOTT"  password="tiger"/>
 </InstallList>		

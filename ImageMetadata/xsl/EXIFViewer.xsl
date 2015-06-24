@@ -100,7 +100,7 @@
 			</div>
 		</div>
 	</xsl:template>
-	<xsl:template name="editDescriptionDialog_bootstrap">
+	<xsl:template name="editDescriptionDialog_BOOTSTRAP">
 		<div class="modal fade" id="editDescriptionDialog" tabindex="-1" role="dialog" aria-labelledby="editDescriptionDialogTitle" aria-hidden="true">
 			<div class="modal-dialog" style="width:1000px;">
 				<div class="modal-content">

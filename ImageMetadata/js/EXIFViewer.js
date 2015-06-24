@@ -87,7 +87,7 @@ function onPageLoaded() {
  	xinhaDescription.setDialogName("editDescriptionDialog");
   xinhaDescription.hideEditor();
   xinhaDescription.setContent(originalDescription);
-    
+
 }
     
 
