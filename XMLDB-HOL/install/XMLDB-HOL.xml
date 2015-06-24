@@ -194,7 +194,7 @@
   		
   	</action>
 
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\SQL\unzipArchive.sql %DEMOLOCAL%/manual/manual.zip %DEMOLOCAL% %DEMOLOCAL%/manual/manual.log</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\unzipArchive.sql %DEMOLOCAL%/manual/manual.zip %DEMOLOCAL% %DEMOLOCAL%/manual/manual.log</action>
 
 		<action type="SQL"/>
 		<action type="SHELL"/>
