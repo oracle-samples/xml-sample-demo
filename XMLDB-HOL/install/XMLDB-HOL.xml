@@ -191,6 +191,11 @@
   			<local>%DEMODIRECTORY%\manual.zip</local>
   			<remote>%DEMOLOCAL%/manual/manual.zip</remote>
   		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\manual.pdf</local>
+  			<remote>%DEMOLOCAL%/manual/manual.pdf</remote>
+  		</action>
   		
   	</action>
 

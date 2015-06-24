@@ -37,7 +37,7 @@ declare
   select TABLE_NAME
     from ALL_XML_TABLES
    where TABLE_NAME in ('%DATA_STAGING_TABLE%')
-     and OWNER = '&USERNAME'
+     and OWNER = '&USERNAME';
 begin
   for t in getTables() loop
     execute immediate 'DROP TABLE "&USERNAME"."' || t.TABLE_NAME || '" PURGE';

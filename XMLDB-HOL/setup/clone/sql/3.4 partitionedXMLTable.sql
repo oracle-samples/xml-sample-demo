@@ -58,4 +58,4 @@ create index "PART_NUMBER_QUANTITY_INDEX"
        Local
 /
 call DBMS_STATS.gather_schema_stats(USER)
-/yyyyhyhikiiii
+/

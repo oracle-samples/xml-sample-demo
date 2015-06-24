@@ -936,6 +936,28 @@ doInstall() {
     echo "PUT \"$SERVER/home/$USER/Hands-On-Labs/XMLDB/manual/manual.zip\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Hands-On-Labs/XMLDB/manual/manual.pdf" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Hands-On-Labs/XMLDB/manual/manual.pdf" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/home/$USER/Hands-On-Labs/XMLDB/manual/manual.pdf\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/home/$USER/Hands-On-Labs/XMLDB/manual/manual.pdf\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/manual.pdf" "$SERVER/home/$USER/Hands-On-Labs/XMLDB/manual/manual.pdf" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/home/$USER/Hands-On-Labs/XMLDB/manual/manual.pdf\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/unzipArchive.sql /home/$USER/Hands-On-Labs/XMLDB/manual/manual.zip /home/$USER/Hands-On-Labs/XMLDB /home/$USER/Hands-On-Labs/XMLDB/manual/manual.log
   sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|XMLDB-HOL|g" -e "s|%DEMONAME%|Oracle XML DB Hands on Lab : Oracle Database 12c|g" -e "s|%LAUNCHPAD%|Hands on Lab|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/Hands-On-Labs\/XMLDB|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/Hands-On-Labs\/XMLDB|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%DATA_STAGING_TABLE%|SAMPLE_DATASET_XMLDB_HOL|g" -e "s|%TABLE_NAME%|PURCHASEORDER|g" -e "s|%SCHEMAURL%|http:\/\/localhost:80\/publishedContent\/HOL\/xsd\/purchaseOrder.xsd|g" -e "s|enableHTTPTrace|false|g" -e "s|silentInstall|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i $demohome/install/configuration.xml
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Hands-On-Labs/XMLDB/configuration.xml" | head -1)
