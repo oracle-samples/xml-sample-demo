@@ -215,7 +215,7 @@
   		</action>		
   	</action>
   	
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\SQL\publishDemo.sql %DEMOLOCAL% %XFILES_SCHEMA%</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishDemo.sql %DEMOLOCAL% %XFILES_SCHEMA%</action>
 		<action type="LAUNCH"/>
 	</installation>
 

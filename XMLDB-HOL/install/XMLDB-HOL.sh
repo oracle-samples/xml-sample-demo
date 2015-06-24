@@ -1015,7 +1015,7 @@ doInstall() {
       exit 6
     fi
   fi
-  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/SQL/publishDemo.sql /home/$USER/Hands-On-Labs/XMLDB XFILES
+  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/publishDemo.sql /home/$USER/Hands-On-Labs/XMLDB XFILES
   shellscriptName="$demohome/Hands_on_Lab.sh"
   echo "Shell Script : $shellscriptName"
   echo "firefox $SERVER/home/$USER/Hands-On-Labs/XMLDB/index.html"> $shellscriptName
