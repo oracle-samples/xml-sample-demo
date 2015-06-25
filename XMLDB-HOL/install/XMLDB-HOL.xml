@@ -1,22 +1,22 @@
 <!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by Mark D. Drake and Geoff Lee (Oracle XML Dev) -->
 <installerConfiguration>
 	<parameters>
-		<parameter name="%DEMONAME%"             value="Oracle XML DB Hands on Lab : Oracle Database 12c"/>
-			<parameter name="%LAUNCHPAD%"          value="Hands on Lab"/>
-			<parameter name="%LAUNCHPADFOLDER%"    value="%STARTMENU%\Oracle XML DB Demonstrations"/>
-			<parameter name="%SHORTCUTFOLDER%"     value="%DEMODIRECTORY%\%USER%"/>
+		<parameter name="%DEMONAME%"           value="Oracle XML DB Hands on Lab : Oracle Database 12c"/>
+		<parameter name="%LAUNCHPAD%"          value="Hands on Lab"/>
+		<parameter name="%LAUNCHPADFOLDER%"    value="%STARTMENU%\Oracle XML DB Demonstrations"/>
+		<parameter name="%SHORTCUTFOLDER%"     value="%DEMODIRECTORY%\%USER%"/>
 	
-			<parameter name="%PUBLICFOLDER%"       value="/publishedContent"/>
-			<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/Hands-On-Labs/XMLDB"/>
-			<parameter name="%HOMEFOLDER%"         value="/home/%USER%"/>
-			<parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/Hands-On-Labs/XMLDB"/>
-			<parameter name="%XFILES_SCHEMA%"      value="XFILES"/>
-		  <parameter name="%DATA_STAGING_TABLE%" value="SAMPLE_DATASET_XMLDB_HOL"/>
-		  <parameter name="%TABLE_NAME%"         value="PURCHASEORDER"/> 
-			<parameter name="%SCHEMAURL%"          value="http://localhost:80/publishedContent/HOL/xsd/purchaseOrder.xsd"/>
-
-		<parameter name="enableHTTPTrace"        value="false"/>
-		<parameter name="silentInstall"          value="false"/>
+		<parameter name="%PUBLICFOLDER%"       value="/publishedContent"/>
+		<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/Hands-On-Labs/XMLDB"/>
+  	<parameter name="%DOCLIBRARY%"         value="%PUBLICFOLDER%/Hands-On-Labs/XMLDB"/>
+		<parameter name="%HOMEFOLDER%"         value="/home/%USER%"/>
+		<parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/Hands-On-Labs/XMLDB"/>
+		<parameter name="%XFILES_SCHEMA%"      value="XFILES"/>
+		<parameter name="%DATA_STAGING_TABLE%" value="SAMPLE_DATASET_XMLDB_HOL"/>
+		<parameter name="%TABLE_NAME%"         value="PURCHASEORDER"/> 
+		<parameter name="%SCHEMAURL%"          value="http://localhost:80/publishedContent/HOL/xsd/purchaseOrder.xsd"/>
+		
+		<parameter name="enableHTTPTrace"      value="false"/>
 	</parameters>
 
 	<installation>
@@ -79,17 +79,21 @@
 
  			<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
   			<mode>FORCE</mode>
-  			<remote>%DEMOCOMMON%/manual</remote>
+  			<remote>%DOCLIBRARY%</remote>
+  		</action>
+ 			<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DOCLIBRARY%/manual</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
   			<mode>FORCE</mode>
   			<local>%DEMODIRECTORY%\manual\manual.zip</local>
-  			<remote>%DEMOCOMMON%/manual/manual.zip</remote>
+  			<remote>%DOCLIBRARY%/manual/manual.zip</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
   			<mode>FORCE</mode>
   			<local>%DEMODIRECTORY%\manual\manual.pdf</local>
-  			<remote>%DEMOCOMMON%/manual/manual.pdf</remote>
+  			<remote>%DOCLIBRARY%/manual/manual.pdf</remote>
   		</action>
 
   		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
@@ -200,7 +204,7 @@
   		
   	</action>
 
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\unzipArchive.sql %DEMOCOMMON%/manual/manual.zip %DEMOCOMMON%/manual %DEMOCOMMON%/manual/manual.log</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\unzipArchive.sql %DOCLIBRARY%/manual/manual.zip %DOCLIBRARY%/manual %DOCLIBRARY%/manual/manual.log</action>
 
 		<action type="SQL"/>
 		<action type="SHELL"/>
@@ -221,7 +225,8 @@
   		</action>		
   	</action>
   	
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\%USER%\install\createLinks.sql</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createLink.sql %DOCLIBRARY%/manual %DEMOLOCAL% manual</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createLink.sql %DOCLIBRARY%/xsd %DEMOLOCAL% xsd</action>
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishDemo.sql %DEMOLOCAL% %XFILES_SCHEMA%</action>
 		<action type="LAUNCH"/>
 	</installation>
@@ -256,10 +261,6 @@
 			<file>
 				<source>%DEMODIRECTORY%\setup\clone\install\setupLab.sql</source>
 				<target>%DEMODIRECTORY%\%USER%\install\setupLab.sql</target>
-			</file>
-			<file>
-				<source>%DEMODIRECTORY%\setup\clone\install\createLinks.sql</source>
-				<target>%DEMODIRECTORY%\%USER%\install\createLinks.sql</target>
 			</file>
 			<file>
 				<source>%DEMODIRECTORY%\setup\clone\sqlldr\DATA-STAGE-2015.ctl</source>

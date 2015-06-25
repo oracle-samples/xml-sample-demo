@@ -13,11 +13,16 @@
  */
  
 set echo on
-spool createLinks.log
+spool createLinks.log append
+--
+def SOURCE = &1
+--
+def TARGET_FOLDER = &2
+--
+def TARGET_NAME = &3
 --
 begin
-  DBMS_XDB.link('%DEMOCOMMON%/xsd','%DEMOLOCAL%','xsd',DBMS_XDB.LINK_TYPE_WEAK);
-  DBMS_XDB.link('%DEMOCOMMON%/manual','%DEMOLOCAL%','manual',DBMS_XDB.LINK_TYPE_WEAK);
+  DBMS_XDB.link('&SOURCE','&TARGET_FOLDER','&TARGET_NAME',DBMS_XDB.LINK_TYPE_WEAK);
   commit;
 end;
 /
