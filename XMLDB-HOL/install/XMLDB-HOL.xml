@@ -200,7 +200,7 @@
   		
   	</action>
 
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\unzipArchive.sql %DEMOLOCAL%/manual/manual.zip %DEMOLOCAL% %DEMOLOCAL%/manual/manual.log</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\unzipArchive.sql %DEMOCOMMON%/manual/manual.zip %DEMOCOMMON%/manual %DEMOCOMMON%/manual/manual.log</action>
 
 		<action type="SQL"/>
 		<action type="SHELL"/>
@@ -221,6 +221,7 @@
   		</action>		
   	</action>
   	
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\%USER%\install\createLinks.sql</action>
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishDemo.sql %DEMOLOCAL% %XFILES_SCHEMA%</action>
 		<action type="LAUNCH"/>
 	</installation>

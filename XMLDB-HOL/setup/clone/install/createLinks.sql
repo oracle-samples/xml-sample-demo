@@ -17,8 +17,8 @@ spool createLinks.log
 --
 begin
   DBMS_XDB.link('%DEMOCOMMON%/xsd','%DEMOLOCAL%','xsd',DBMS_XDB.LINK_TYPE_WEAK);
-  DBMS_XDB.link('%DEMOCOMMON%/manul','%DEMOLOCAL%','manual',DBMS_XDB.LINK_TYPE_WEAK);
-  commit
+  DBMS_XDB.link('%DEMOCOMMON%/manual','%DEMOLOCAL%','manual',DBMS_XDB.LINK_TYPE_WEAK);
+  commit;
 end;
 /
 quit
