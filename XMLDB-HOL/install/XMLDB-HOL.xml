@@ -28,7 +28,7 @@
 
 		<action type="RUNSQL" user="%DBA%"  password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\grantPermissions.sql %USER%</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createHomeFolder.sql</action>
-		<action type="RUNSQL" user="%DBA%"  password="%DBAPASSWORD%">"%DEMODIRECTORY%\%USER%\install\0.0 setupLab.sql" %USER% %PASSWORD%</action> -->
+		<action type="RUNSQL" user="%DBA%"  password="%DBAPASSWORD%">"%DEMODIRECTORY%\%USER%\install\setupLab.sql" %USER% %PASSWORD%</action> -->
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">"%DEMODIRECTORY%\%USER%\sql\0.0 resetLab.sql"</action> -->
 	 	<action type="SQLLDR"/>
  		
@@ -184,17 +184,17 @@
 
  			<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<remote>%DEMOLOCAL%/manual</remote>
+  			<remote>%DEMOCOMMON%/manual</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\manual.zip</local>
-  			<remote>%DEMOLOCAL%/manual/manual.zip</remote>
+  			<local>%DEMODIRECTORY%\manual\manual.zip</local>
+  			<remote>%DEMOCOMMON%/manual/manual.zip</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\manual.pdf</local>
-  			<remote>%DEMOLOCAL%/manual/manual.pdf</remote>
+  			<local>%DEMODIRECTORY%\manual\manual.pdf</local>
+  			<remote>%DEMOCOMMON%/manual/manual.pdf</remote>
   		</action>
   		
   	</action>
@@ -252,8 +252,12 @@
 	<clone>
 		<files>
 			<file>
-				<source>%DEMODIRECTORY%\setup\clone\install\0.0 setupLab.sql</source>
-				<target>%DEMODIRECTORY%\%USER%\install\0.0 setupLab.sql</target>
+				<source>%DEMODIRECTORY%\setup\clone\install\setupLab.sql</source>
+				<target>%DEMODIRECTORY%\%USER%\install\setupLab.sql</target>
+			</file>
+			<file>
+				<source>%DEMODIRECTORY%\setup\clone\install\createLinks.sql</source>
+				<target>%DEMODIRECTORY%\%USER%\install\createLinks.sql</target>
 			</file>
 			<file>
 				<source>%DEMODIRECTORY%\setup\clone\sqlldr\DATA-STAGE-2015.ctl</source>
