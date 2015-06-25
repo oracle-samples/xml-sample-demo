@@ -7,9 +7,9 @@
 		<parameter name="%SHORTCUTFOLDER%"     value="%DEMODIRECTORY%\%USER%"/>
 
 		<parameter name="%PUBLICFOLDER%"       value="/publishedContent"/>
-  	<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/demonstrations/partitioning"/>
+  	<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/demonstrations/NVPAIR/partitioning"/>
 		<parameter name="%HOMEFOLDER%"         value="/home/%USER%"/>
-  	<parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/demonstrations/partitioning"/>
+  	<parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/demonstrations/NVPAIR/partitioning"/>
 		<parameter name="%XFILES_SCHEMA%"      value="XFILES"/>
 		<parameter name="%XFILES_ROOT%"        value="XFILES"/>
 

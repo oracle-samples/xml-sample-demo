@@ -99,7 +99,6 @@ def PRVTXUTIL_SCRIPT
 @&SCRIPT_LOCATION\&PRVTXUTIL_SCRIPT
 --
 set define off
-set termout off
 --
 -- Release specific scritps
 --
@@ -166,8 +165,6 @@ set define on
 @@XDBPM_CONFIGURE_USER
 @@XDBPM_REGISTER_SCHEMAS
 @@XDBPM_ZIP_SUPPORT
---
-set termout on
 --
 @@XDBPM_CHECK_STATUS
 --

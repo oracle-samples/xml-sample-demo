@@ -67,21 +67,21 @@ doInstall() {
   mkdir -p $demohome/$USER/RepositoryFolders
   echo "Cloning \"$demohome/setup/cloneSource/sql\" into \"$demohome/$USER/sql\""
   cp -r "$demohome/setup/cloneSource/sql"/* "$demohome/$USER/sql"
-  find "$demohome/$USER/sql" -type f -print0 | xargs -0   sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|GENERATION|g" -e "s|%DEMONAME%|XML Generation using Oracle XML DB|g" -e "s|%LAUNCHPAD%|XML Generation|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/xmlGeneration|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/xmlGeneration|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i
+  find "$demohome/$USER/sql" -type f -print0 | xargs -0   sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|GENERATION|g" -e "s|%DEMONAME%|XML Generation using Oracle XML DB|g" -e "s|%LAUNCHPAD%|XML Generation|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/XMLDB\/xmlGeneration|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/XMLDB\/xmlGeneration|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i
   echo "Cloning Completed"
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/grantPermissions.sql $USER
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/createHomeFolder.sql
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/$USER/sql/setup.sql
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/executeAndQuit.sql $demohome/$USER/sql/resetDemo.sql
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration" | head -1)
-  echo "DELETE \"$SERVER/publishedContent/demonstrations/xmlGeneration\":$HttpStatus"
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration" | head -1)
+  echo "DELETE \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration\":$HttpStatus"
   if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ] && [ $HttpStatus != "404" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
     exit 6
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration" | head -1)
-  echo "DELETE \"$SERVER/home/$USER/demonstrations/xmlGeneration\":$HttpStatus"
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration" | head -1)
+  echo "DELETE \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration\":$HttpStatus"
   if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ] && [ $HttpStatus != "404" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -109,11 +109,22 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations/xmlGeneration\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/XMLDB\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
@@ -142,180 +153,125 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations/xmlGeneration\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/XMLDB\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/assets" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/assets" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/assets/4.5.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/4.5.png" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/assets/4.5.png" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/4.5.png" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets/4.5.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/4.5.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets/4.5.png\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/4.5.png\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/assets/4.5.png" "$SERVER/publishedContent/demonstrations/xmlGeneration/assets/4.5.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/assets/4.5.png" "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/4.5.png" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets/4.5.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/4.5.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.5.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.5.png" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.5.png" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.5.png" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.5.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.5.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.5.png\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.5.png\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/assets/5.5.png" "$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.5.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/assets/5.5.png" "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.5.png" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.5.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.5.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.6.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.6.png" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.6.png" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.6.png" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.6.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.6.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.6.png\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.6.png\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/assets/5.6.png" "$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.6.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/assets/5.6.png" "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.6.png" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.6.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.6.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.8.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.8.png" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.8.png" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.8.png" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.8.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.8.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.8.png\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.8.png\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/assets/5.8.png" "$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.8.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/assets/5.8.png" "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.8.png" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/publishedContent/demonstrations/xmlGeneration/assets/5.8.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations/xmlGeneration\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/xml" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/xml" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations/xmlGeneration/xml\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/xml/Styles.xml" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/xml/Styles.xml" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/xmlGeneration/xml/Styles.xml\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/xmlGeneration/xml/Styles.xml\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/xml/Styles.xml" "$SERVER/publishedContent/demonstrations/xmlGeneration/xml/Styles.xml" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/publishedContent/demonstrations/xmlGeneration/xml/Styles.xml\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/assets/5.8.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
@@ -340,48 +296,136 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations/xmlGeneration\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/XMLDB\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/xsl" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/xsl" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations/xmlGeneration/xsl\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/xsl/viewDepartment.xsl" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xml" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xml" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xml\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xml/Styles.xml" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/xmlGeneration/xsl/viewDepartment.xsl" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xml/Styles.xml" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/xmlGeneration/xsl/viewDepartment.xsl\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xml/Styles.xml\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/xmlGeneration/xsl/viewDepartment.xsl\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xml/Styles.xml\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/xsl/viewDepartment.xsl" "$SERVER/publishedContent/demonstrations/xmlGeneration/xsl/viewDepartment.xsl" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/xml/Styles.xml" "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xml/Styles.xml" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/publishedContent/demonstrations/xmlGeneration/xsl/viewDepartment.xsl\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xml/Styles.xml\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/XMLDB\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xsl" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xsl" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xsl\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xsl/viewDepartment.xsl" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xsl/viewDepartment.xsl" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xsl/viewDepartment.xsl\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xsl/viewDepartment.xsl\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/xsl/viewDepartment.xsl" "$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xsl/viewDepartment.xsl" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/publishedContent/demonstrations/XMLDB/xmlGeneration/xsl/viewDepartment.xsl\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
@@ -417,319 +461,22 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/xmlGeneration\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
-    echo "MKCOL \"$SERVER/home\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/xmlGeneration\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/resetDemo.sql" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/resetDemo.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/resetDemo.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/resetDemo.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/resetDemo.sql" "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/resetDemo.sql" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/resetDemo.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/simpleQueries.sql" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/simpleQueries.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/simpleQueries.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/simpleQueries.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/simpleQueries.sql" "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/simpleQueries.sql" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/simpleQueries.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/nlsExamples.sql" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/nlsExamples.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/nlsExamples.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/nlsExamples.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/nlsExamples.sql" "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/nlsExamples.sql" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/nlsExamples.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/createXMLView.sql" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/createXMLView.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/createXMLView.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/createXMLView.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/createXMLView.sql" "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/createXMLView.sql" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/createXMLView.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/viewQueries.sql" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/viewQueries.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/viewQueries.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/viewQueries.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/viewQueries.sql" "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/viewQueries.sql" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/viewQueries.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/folderDepartments.sql" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/folderDepartments.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/folderDepartments.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/folderDepartments.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/folderDepartments.sql" "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/folderDepartments.sql" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/folderDepartments.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/createWorkbooks.sql" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/createWorkbooks.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/createWorkbooks.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/createWorkbooks.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/createWorkbooks.sql" "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/createWorkbooks.sql" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/createWorkbooks.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/folderWorkbooks.sql" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/folderWorkbooks.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/folderWorkbooks.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/folderWorkbooks.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/folderWorkbooks.sql" "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/folderWorkbooks.sql" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/folderWorkbooks.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/moveGrantToIT.sql" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/moveGrantToIT.sql" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/moveGrantToIT.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/moveGrantToIT.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/moveGrantToIT.sql" "$SERVER/home/$USER/demonstrations/xmlGeneration/sql/moveGrantToIT.sql" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/xmlGeneration/sql/moveGrantToIT.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
-    echo "MKCOL \"$SERVER/home\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/xmlGeneration\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/Departments" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/Departments" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/xmlGeneration/Departments\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
@@ -769,22 +516,363 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/xmlGeneration\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/Spreadsheets" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/Spreadsheets" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/xmlGeneration/Spreadsheets\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/resetDemo.sql" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/resetDemo.sql" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/resetDemo.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/resetDemo.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/resetDemo.sql" "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/resetDemo.sql" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/resetDemo.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/simpleQueries.sql" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/simpleQueries.sql" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/simpleQueries.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/simpleQueries.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/simpleQueries.sql" "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/simpleQueries.sql" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/simpleQueries.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/nlsExamples.sql" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/nlsExamples.sql" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/nlsExamples.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/nlsExamples.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/nlsExamples.sql" "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/nlsExamples.sql" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/nlsExamples.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/createXMLView.sql" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/createXMLView.sql" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/createXMLView.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/createXMLView.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/createXMLView.sql" "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/createXMLView.sql" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/createXMLView.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/viewQueries.sql" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/viewQueries.sql" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/viewQueries.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/viewQueries.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/viewQueries.sql" "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/viewQueries.sql" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/viewQueries.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/folderDepartments.sql" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/folderDepartments.sql" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/folderDepartments.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/folderDepartments.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/folderDepartments.sql" "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/folderDepartments.sql" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/folderDepartments.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/createWorkbooks.sql" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/createWorkbooks.sql" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/createWorkbooks.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/createWorkbooks.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/createWorkbooks.sql" "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/createWorkbooks.sql" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/createWorkbooks.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/folderWorkbooks.sql" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/folderWorkbooks.sql" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/folderWorkbooks.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/folderWorkbooks.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/folderWorkbooks.sql" "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/folderWorkbooks.sql" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/folderWorkbooks.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/moveGrantToIT.sql" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/moveGrantToIT.sql" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/moveGrantToIT.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/moveGrantToIT.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/moveGrantToIT.sql" "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/moveGrantToIT.sql" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/sql/moveGrantToIT.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
+    echo "MKCOL \"$SERVER/home\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/Departments" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/Departments" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/Departments\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
+    echo "MKCOL \"$SERVER/home\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/Spreadsheets" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/Spreadsheets" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/Spreadsheets\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
@@ -792,7 +880,7 @@ doInstall() {
     fi
   fi
   # Junction Point : Location : $demohome\$USER\RepositoryFolders. Name : 4.5 Departments on $HOSTNAME. Target : DEMOLOCAL%\Departments%.
-  # Junction Point : Location : $demohome\$USER\RepositoryFolders. Name : 5.5 Spreadsheets on $HOSTNAME. Target : \home\$USER\demonstrations\xmlGeneration\Spreadsheets.
+  # Junction Point : Location : $demohome\$USER\RepositoryFolders. Name : 5.5 Spreadsheets on $HOSTNAME. Target : \home\$USER\demonstrations\XMLDB\xmlGeneration\Spreadsheets.
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
   if [ $HttpStatus == "404" ] 
   then
@@ -826,55 +914,66 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/xmlGeneration\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/Links" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/Links" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/xmlGeneration/Links\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|GENERATION|g" -e "s|%DEMONAME%|XML Generation using Oracle XML DB|g" -e "s|%LAUNCHPAD%|XML Generation|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/xmlGeneration|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/xmlGeneration|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i $demohome/install/configuration.xml
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/configuration.xml" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/Links" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/Links" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/Links\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|GENERATION|g" -e "s|%DEMONAME%|XML Generation using Oracle XML DB|g" -e "s|%LAUNCHPAD%|XML Generation|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/XMLDB\/xmlGeneration|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/XMLDB\/xmlGeneration|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i $demohome/install/configuration.xml
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/configuration.xml" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/xmlGeneration/configuration.xml" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/configuration.xml" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/xmlGeneration/configuration.xml\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/configuration.xml\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/xmlGeneration/configuration.xml\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/configuration.xml\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/install/configuration.xml" "$SERVER/home/$USER/demonstrations/xmlGeneration/configuration.xml" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/install/configuration.xml" "$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/configuration.xml" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/xmlGeneration/configuration.xml\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/configuration.xml\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/publishDemo.sql /home/$USER/demonstrations/xmlGeneration XFILES
+  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/publishDemo.sql /home/$USER/demonstrations/XMLDB/xmlGeneration XFILES
   shellscriptName="$demohome/XML_Generation.sh"
   echo "Shell Script : $shellscriptName"
-  echo "firefox $SERVER/home/$USER/demonstrations/xmlGeneration/index.html"> $shellscriptName
+  echo "firefox $SERVER/home/$USER/demonstrations/XMLDB/xmlGeneration/index.html"> $shellscriptName
   echo "Installation Complete. See $logfilename for details."
 }
 DBA=${1}

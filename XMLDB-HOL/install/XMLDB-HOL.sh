@@ -1059,8 +1059,8 @@ doInstall() {
       exit 6
     fi
   fi
-  sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/createLink.sql /publishedContent/Hands-On-Labs/XMLDB/manual /home/$USER/Hands-On-Labs/XMLDB manual
-  sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/createLink.sql /publishedContent/Hands-On-Labs/XMLDB/xsd /home/$USER/Hands-On-Labs/XMLDB xsd
+  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/createLink.sql /publishedContent/Hands-On-Labs/XMLDB/manual /home/$USER/Hands-On-Labs/XMLDB manual
+  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/createLink.sql /publishedContent/Hands-On-Labs/XMLDB/xsd /home/$USER/Hands-On-Labs/XMLDB xsd
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/publishDemo.sql /home/$USER/Hands-On-Labs/XMLDB XFILES
   shellscriptName="$demohome/Hands_on_Lab.sh"
   echo "Shell Script : $shellscriptName"

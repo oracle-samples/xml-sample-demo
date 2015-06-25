@@ -7,9 +7,9 @@
 		<parameter name="%SHORTCUTFOLDER%"     value="%DEMODIRECTORY%\%USER%"/>
 
 		<parameter name="%PUBLICFOLDER%"       value="/publishedContent"/>
-		<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/demonstrations/XQuery"/>
+		<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/demonstrations/XMLDB/XQuery"/>
 		<parameter name="%HOMEFOLDER%"         value="/home/%USER%"/>
-		<parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/demonstrations/XQuery"/>
+		<parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/demonstrations/XMLDB/XQuery"/>
 		<parameter name="%XFILES_SCHEMA%"      value="XFILES"/>
 		<parameter name="%XFILES_ROOT%"        value="XFILES"/>
 

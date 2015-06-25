@@ -73,25 +73,25 @@ doInstall() {
   echo "Unzip Completed"
   echo "Cloning \"$demohome/Setup/sql\" into \"$demohome/$USER/sql\""
   cp -r "$demohome/Setup/sql"/* "$demohome/$USER/sql"
-  find "$demohome/$USER/sql" -type f -print0 | xargs -0   sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|REPOSITORY|g" -e "s|%DEMONAME%|An Introduction to the Oracle XML DB Repository|g" -e "s|%LAUNCHPAD%|Repository Features|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/repository|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/repository|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/demo\/imageMetadata.xsd|g" -e "s|%XFILESAPP%|\/XFILES\/Applications\/imageMetadata|g" -e "s|%METADATA_OWNER%|XDBEXT|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i
+  find "$demohome/$USER/sql" -type f -print0 | xargs -0   sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|REPOSITORY|g" -e "s|%DEMONAME%|An Introduction to the Oracle XML DB Repository|g" -e "s|%LAUNCHPAD%|Repository Features|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/NVPAIR\/repository|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/NVPAIR\/repository|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/demo\/imageMetadata.xsd|g" -e "s|%XFILESAPP%|\/XFILES\/Applications\/imageMetadata|g" -e "s|%METADATA_OWNER%|XDBEXT|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i
   echo "Cloning Completed"
   cp "$demohome/Setup/XML Spy Project.spp" "$demohome/$USER/1.1 Show XML Schema (XMLSPY).spp"
-  sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|REPOSITORY|g" -e "s|%DEMONAME%|An Introduction to the Oracle XML DB Repository|g" -e "s|%LAUNCHPAD%|Repository Features|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/repository|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/repository|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/demo\/imageMetadata.xsd|g" -e "s|%XFILESAPP%|\/XFILES\/Applications\/imageMetadata|g" -e "s|%METADATA_OWNER%|XDBEXT|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i "$demohome/$USER/1.1 Show XML Schema (XMLSPY).spp"
+  sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|REPOSITORY|g" -e "s|%DEMONAME%|An Introduction to the Oracle XML DB Repository|g" -e "s|%LAUNCHPAD%|Repository Features|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/NVPAIR\/repository|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/NVPAIR\/repository|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/demo\/imageMetadata.xsd|g" -e "s|%XFILESAPP%|\/XFILES\/Applications\/imageMetadata|g" -e "s|%METADATA_OWNER%|XDBEXT|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i "$demohome/$USER/1.1 Show XML Schema (XMLSPY).spp"
   cp "$demohome/Setup/sqlldr/ImageList.dat" "$demohome/$USER/SampleData/ImageList.dat"
-  sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|REPOSITORY|g" -e "s|%DEMONAME%|An Introduction to the Oracle XML DB Repository|g" -e "s|%LAUNCHPAD%|Repository Features|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/repository|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/repository|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/demo\/imageMetadata.xsd|g" -e "s|%XFILESAPP%|\/XFILES\/Applications\/imageMetadata|g" -e "s|%METADATA_OWNER%|XDBEXT|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i "$demohome/$USER/SampleData/ImageList.dat"
+  sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|REPOSITORY|g" -e "s|%DEMONAME%|An Introduction to the Oracle XML DB Repository|g" -e "s|%LAUNCHPAD%|Repository Features|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/NVPAIR\/repository|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/NVPAIR\/repository|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/demo\/imageMetadata.xsd|g" -e "s|%XFILESAPP%|\/XFILES\/Applications\/imageMetadata|g" -e "s|%METADATA_OWNER%|XDBEXT|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i "$demohome/$USER/SampleData/ImageList.dat"
   cp "$demohome/Setup/sqlldr/ImageLoad.ctl" "$demohome/$USER/SampleData/ImageLoad.ctl"
-  sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|REPOSITORY|g" -e "s|%DEMONAME%|An Introduction to the Oracle XML DB Repository|g" -e "s|%LAUNCHPAD%|Repository Features|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/repository|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/repository|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/demo\/imageMetadata.xsd|g" -e "s|%XFILESAPP%|\/XFILES\/Applications\/imageMetadata|g" -e "s|%METADATA_OWNER%|XDBEXT|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i "$demohome/$USER/SampleData/ImageLoad.ctl"
+  sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|REPOSITORY|g" -e "s|%DEMONAME%|An Introduction to the Oracle XML DB Repository|g" -e "s|%LAUNCHPAD%|Repository Features|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/NVPAIR\/repository|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/NVPAIR\/repository|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/demo\/imageMetadata.xsd|g" -e "s|%XFILESAPP%|\/XFILES\/Applications\/imageMetadata|g" -e "s|%METADATA_OWNER%|XDBEXT|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i "$demohome/$USER/SampleData/ImageLoad.ctl"
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/grantPermissions.sql $USER
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/createHomeFolder.sql
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository" | head -1)
-  echo "DELETE \"$SERVER/publishedContent/demonstrations/repository\":$HttpStatus"
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository" | head -1)
+  echo "DELETE \"$SERVER/publishedContent/demonstrations/NVPAIR/repository\":$HttpStatus"
   if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ] && [ $HttpStatus != "404" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
     exit 6
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository" | head -1)
-  echo "DELETE \"$SERVER/home/$USER/demonstrations/repository\":$HttpStatus"
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository" | head -1)
+  echo "DELETE \"$SERVER/home/$USER/demonstrations/NVPAIR/repository\":$HttpStatus"
   if [ $HttpStatus != "200" ] && [ $HttpStatus != "204" ] && [ $HttpStatus != "404" ] 
   then
     echo "Operation Failed: Installation Aborted. See $logfilename for details."
@@ -119,11 +119,22 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations/repository\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/NVPAIR\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/NVPAIR/repository\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
@@ -152,22 +163,33 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations/repository\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/NVPAIR\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/assets" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/assets" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations/repository/assets\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/NVPAIR/repository\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
@@ -196,136 +218,147 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations/repository\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/NVPAIR\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/simulation" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/simulation" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/demonstrations/repository/simulation\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/NVPAIR/repository\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/assets/4.3.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/simulation" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/simulation" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/simulation\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/4.3.png" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/assets/4.3.png" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/4.3.png" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/repository/assets/4.3.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/4.3.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/repository/assets/4.3.png\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/4.3.png\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/Setup/assets/4.3.png" "$SERVER/publishedContent/demonstrations/repository/assets/4.3.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/Setup/assets/4.3.png" "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/4.3.png" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/publishedContent/demonstrations/repository/assets/4.3.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/4.3.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/assets/6.2.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.2.png" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/assets/6.2.png" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.2.png" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/repository/assets/6.2.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.2.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/repository/assets/6.2.png\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.2.png\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/Setup/assets/6.2.png" "$SERVER/publishedContent/demonstrations/repository/assets/6.2.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/Setup/assets/6.2.png" "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.2.png" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/publishedContent/demonstrations/repository/assets/6.2.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.2.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/assets/6.3.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.3.png" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/assets/6.3.png" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.3.png" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/repository/assets/6.3.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.3.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/repository/assets/6.3.png\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.3.png\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/Setup/assets/6.3.png" "$SERVER/publishedContent/demonstrations/repository/assets/6.3.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/Setup/assets/6.3.png" "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.3.png" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/publishedContent/demonstrations/repository/assets/6.3.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.3.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/assets/6.4.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.4.png" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/assets/6.4.png" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.4.png" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/repository/assets/6.4.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.4.png\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/repository/assets/6.4.png\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.4.png\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/Setup/assets/6.4.png" "$SERVER/publishedContent/demonstrations/repository/assets/6.4.png" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/Setup/assets/6.4.png" "$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.4.png" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/publishedContent/demonstrations/repository/assets/6.4.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/assets/6.4.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/simulation/ImageLibrary.zip" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/simulation/ImageLibrary.zip" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/repository/simulation/ImageLibrary.zip" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/NVPAIR/repository/simulation/ImageLibrary.zip" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/repository/simulation/ImageLibrary.zip\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/simulation/ImageLibrary.zip\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/repository/simulation/ImageLibrary.zip\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/simulation/ImageLibrary.zip\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/Setup/ImageLibrary.zip" "$SERVER/publishedContent/demonstrations/repository/simulation/ImageLibrary.zip" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/Setup/ImageLibrary.zip" "$SERVER/publishedContent/demonstrations/NVPAIR/repository/simulation/ImageLibrary.zip" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/publishedContent/demonstrations/repository/simulation/ImageLibrary.zip\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/publishedContent/demonstrations/NVPAIR/repository/simulation/ImageLibrary.zip\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
@@ -361,11 +394,22 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/repository\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/NVPAIR\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/NVPAIR/repository\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
@@ -405,180 +449,191 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/repository\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/NVPAIR\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/repository/sql\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/NVPAIR/repository\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/countMetadata.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/countMetadata.sql" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/countMetadata.sql" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/countMetadata.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/repository/sql/countMetadata.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/countMetadata.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/repository/sql/countMetadata.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/countMetadata.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/countMetadata.sql" "$SERVER/home/$USER/demonstrations/repository/sql/countMetadata.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/countMetadata.sql" "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/countMetadata.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/repository/sql/countMetadata.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/countMetadata.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/listRepositoryEvents.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/listRepositoryEvents.sql" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/listRepositoryEvents.sql" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/listRepositoryEvents.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/repository/sql/listRepositoryEvents.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/listRepositoryEvents.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/repository/sql/listRepositoryEvents.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/listRepositoryEvents.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/listRepositoryEvents.sql" "$SERVER/home/$USER/demonstrations/repository/sql/listRepositoryEvents.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/listRepositoryEvents.sql" "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/listRepositoryEvents.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/repository/sql/listRepositoryEvents.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/listRepositoryEvents.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/resetDemo.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/resetDemo.sql" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/resetDemo.sql" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/resetDemo.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/repository/sql/resetDemo.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/resetDemo.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/repository/sql/resetDemo.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/resetDemo.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/resetDemo.sql" "$SERVER/home/$USER/demonstrations/repository/sql/resetDemo.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/resetDemo.sql" "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/resetDemo.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/repository/sql/resetDemo.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/resetDemo.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/createDirectories.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/createDirectories.sql" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/createDirectories.sql" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/createDirectories.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/repository/sql/createDirectories.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/createDirectories.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/repository/sql/createDirectories.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/createDirectories.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/createDirectories.sql" "$SERVER/home/$USER/demonstrations/repository/sql/createDirectories.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/createDirectories.sql" "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/createDirectories.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/repository/sql/createDirectories.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/createDirectories.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/queryMetadata.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/queryMetadata.sql" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/queryMetadata.sql" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/queryMetadata.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/repository/sql/queryMetadata.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/queryMetadata.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/repository/sql/queryMetadata.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/queryMetadata.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/queryMetadata.sql" "$SERVER/home/$USER/demonstrations/repository/sql/queryMetadata.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/queryMetadata.sql" "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/queryMetadata.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/repository/sql/queryMetadata.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/queryMetadata.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/addAdditionalMetadata.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/addAdditionalMetadata.sql" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/addAdditionalMetadata.sql" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/addAdditionalMetadata.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/repository/sql/addAdditionalMetadata.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/addAdditionalMetadata.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/repository/sql/addAdditionalMetadata.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/addAdditionalMetadata.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/addAdditionalMetadata.sql" "$SERVER/home/$USER/demonstrations/repository/sql/addAdditionalMetadata.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/addAdditionalMetadata.sql" "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/addAdditionalMetadata.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/repository/sql/addAdditionalMetadata.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/addAdditionalMetadata.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/simulateImageLoad.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/simulateImageLoad.sql" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/sql/simulateImageLoad.sql" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/simulateImageLoad.sql" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/repository/sql/simulateImageLoad.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/simulateImageLoad.sql\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/repository/sql/simulateImageLoad.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/simulateImageLoad.sql\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/simulateImageLoad.sql" "$SERVER/home/$USER/demonstrations/repository/sql/simulateImageLoad.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/simulateImageLoad.sql" "$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/simulateImageLoad.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/repository/sql/simulateImageLoad.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/sql/simulateImageLoad.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
@@ -683,55 +738,66 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/repository\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/NVPAIR\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/Links" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/Links" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/demonstrations/repository/Links\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/NVPAIR/repository\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
   fi
-  sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|REPOSITORY|g" -e "s|%DEMONAME%|An Introduction to the Oracle XML DB Repository|g" -e "s|%LAUNCHPAD%|Repository Features|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/repository|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/repository|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/demo\/imageMetadata.xsd|g" -e "s|%XFILESAPP%|\/XFILES\/Applications\/imageMetadata|g" -e "s|%METADATA_OWNER%|XDBEXT|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i $demohome/install/configuration.xml
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/configuration.xml" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/Links" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/Links" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/Links\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|REPOSITORY|g" -e "s|%DEMONAME%|An Introduction to the Oracle XML DB Repository|g" -e "s|%LAUNCHPAD%|Repository Features|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/NVPAIR\/repository|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/NVPAIR\/repository|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|%XFILES_ROOT%|XFILES|g" -e "s|%SCHEMAURL%|http:\/\/xmlns.oracle.com\/demo\/imageMetadata.xsd|g" -e "s|%XFILESAPP%|\/XFILES\/Applications\/imageMetadata|g" -e "s|%METADATA_OWNER%|XDBEXT|g" -e "s|protocol|HTTP|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i $demohome/install/configuration.xml
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/configuration.xml" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/repository/configuration.xml" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/NVPAIR/repository/configuration.xml" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/repository/configuration.xml\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/configuration.xml\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/repository/configuration.xml\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/configuration.xml\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/install/configuration.xml" "$SERVER/home/$USER/demonstrations/repository/configuration.xml" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/install/configuration.xml" "$SERVER/home/$USER/demonstrations/NVPAIR/repository/configuration.xml" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/home/$USER/demonstrations/repository/configuration.xml\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/demonstrations/NVPAIR/repository/configuration.xml\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/publishDemo.sql /home/$USER/demonstrations/repository XFILES
+  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/publishDemo.sql /home/$USER/demonstrations/NVPAIR/repository XFILES
   shellscriptName="$demohome/Repository_Features.sh"
   echo "Shell Script : $shellscriptName"
-  echo "firefox $SERVER/home/$USER/demonstrations/repository/index.html"> $shellscriptName
+  echo "firefox $SERVER/home/$USER/demonstrations/NVPAIR/repository/index.html"> $shellscriptName
   echo "Installation Complete. See $logfilename for details."
 }
 DBA=${1}

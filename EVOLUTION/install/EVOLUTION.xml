@@ -8,9 +8,9 @@
 		<parameter name="%SHORTCUTFOLDER%"     value="%DEMODIRECTORY%\%USER%"/>
 
 		<parameter name="%PUBLICFOLDER%"       value="/publishedContent"/>
-  	<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/demonstrations/evolution"/>
+  	<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/demonstrations/XMLDB/evolution"/>
 		<parameter name="%HOMEFOLDER%"         value="/home/%USER%"/>
-    <parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/demonstrations/evolution"/>
+    <parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/demonstrations/XMLDB/evolution"/>
 		<parameter name="%XFILES_SCHEMA%"      value="XFILES"/>
 		<parameter name="%XFILES_ROOT%"        value="XFILES"/>
 

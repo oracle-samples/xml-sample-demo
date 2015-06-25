@@ -7,9 +7,9 @@
 		<parameter name="%SHORTCUTFOLDER%" value="%DEMODIRECTORY%\%USER%"/>
 
 		<parameter name="%PUBLICFOLDER%" value="/publishedContent"/>
-		<parameter name="%DEMOCOMMON%" value="%PUBLICFOLDER%/demonstrations/NVPairs"/>
+		<parameter name="%DEMOCOMMON%" value="%PUBLICFOLDER%/demonstrations/XMLDB/NVPairs"/>
 		<parameter name="%HOMEFOLDER%" value="/home/%USER%"/>
-		<parameter name="%DEMOLOCAL%" value="%HOMEFOLDER%/demonstrations/NVPairs"/>
+		<parameter name="%DEMOLOCAL%" value="%HOMEFOLDER%/demonstrations/XMLDB/NVPairs"/>
 		<parameter name="%XFILES_SCHEMA%" value="XFILES"/>
 
 		<parameter name="enableHTTPTrace" value="false"/>

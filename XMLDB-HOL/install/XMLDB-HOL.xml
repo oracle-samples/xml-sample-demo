@@ -225,8 +225,8 @@
   		</action>		
   	</action>
   	
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createLink.sql %DOCLIBRARY%/manual %DEMOLOCAL% manual</action>
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createLink.sql %DOCLIBRARY%/xsd %DEMOLOCAL% xsd</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\createLink.sql %DOCLIBRARY%/manual %DEMOLOCAL% manual</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\createLink.sql %DOCLIBRARY%/xsd %DEMOLOCAL% xsd</action>
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\publishDemo.sql %DEMOLOCAL% %XFILES_SCHEMA%</action>
 		<action type="LAUNCH"/>
 	</installation>
