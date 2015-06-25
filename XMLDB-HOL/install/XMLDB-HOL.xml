@@ -77,7 +77,7 @@
   			<remote>%DEMOCOMMON%/assets/3.1.png</remote>
   		</action>
 
- 			<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="DBAPASSWORD">
+ 			<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
   			<mode>FORCE</mode>
   			<remote>%DEMOCOMMON%/manual</remote>
   		</action>

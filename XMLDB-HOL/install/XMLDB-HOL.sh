@@ -344,10 +344,10 @@ doInstall() {
     echo "PUT \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/assets/3.1.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
     echo "MKCOL \"$SERVER/publishedContent\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
@@ -355,10 +355,10 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs" | head -1)
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs" | head -1)
     echo "MKCOL \"$SERVER/publishedContent/Hands-On-Labs\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
@@ -366,10 +366,10 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB" | head -1)
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB" | head -1)
     echo "MKCOL \"$SERVER/publishedContent/Hands-On-Labs/XMLDB\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
@@ -377,10 +377,10 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual" | head -1)
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual" | head -1)
     echo "MKCOL \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
