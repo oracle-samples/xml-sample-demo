@@ -344,6 +344,94 @@ doInstall() {
     echo "PUT \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/assets/3.1.png\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/Hands-On-Labs\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/Hands-On-Labs/XMLDB\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual" | head -1)
+  if [ $HttpStatus == "404" ] 
+  then
+    HttpStatus=$(curl --noproxy '*' --digest -u $DBA:DBAPASSWORD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual" | head -1)
+    echo "MKCOL \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual\":$HttpStatus"
+    if [ $HttpStatus != "201" ]
+    then
+      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
+      exit 6
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.zip" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.zip" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.zip\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.zip\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/manual/manual.zip" "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.zip" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.zip\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.pdf" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.pdf" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.pdf\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.pdf\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/manual/manual.pdf" "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.pdf" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.pdf\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
+  fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
   if [ $HttpStatus == "404" ] 
   then
@@ -859,94 +947,6 @@ doInstall() {
   if [ $HttpStatus != "201" ] 
   then
     echo "PUT \"$SERVER/home/$USER/Hands-On-Labs/XMLDB/sql/5.3 xqueryOnRelationalData.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/Hands-On-Labs\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/Hands-On-Labs/XMLDB\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual" | head -1)
-  if [ $HttpStatus == "404" ] 
-  then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual" | head -1)
-    echo "MKCOL \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual\":$HttpStatus"
-    if [ $HttpStatus != "201" ]
-    then
-      echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
-      exit 6
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.zip" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.zip" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.zip\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.zip\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/manual/manual.zip" "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.zip" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.zip\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.pdf" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.pdf" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.pdf\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.pdf\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/manual/manual.pdf" "$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.pdf" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/publishedContent/Hands-On-Labs/XMLDB/manual/manual.pdf\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/unzipArchive.sql /home/$USER/Hands-On-Labs/XMLDB/manual/manual.zip /home/$USER/Hands-On-Labs/XMLDB /home/$USER/Hands-On-Labs/XMLDB/manual/manual.log

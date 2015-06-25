@@ -77,6 +77,21 @@
   			<remote>%DEMOCOMMON%/assets/3.1.png</remote>
   		</action>
 
+ 			<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="DBAPASSWORD">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/manual</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\manual\manual.zip</local>
+  			<remote>%DEMOCOMMON%/manual/manual.zip</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\manual\manual.pdf</local>
+  			<remote>%DEMOCOMMON%/manual/manual.pdf</remote>
+  		</action>
+
   		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
   			<remote>%DEMOLOCAL%</remote>
@@ -182,20 +197,6 @@
   			<remote>%DEMOLOCAL%/sql/5.3 xqueryOnRelationalData.sql</remote>
   		</action>
 
- 			<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
-  			<mode>FORCE</mode>
-  			<remote>%DEMOCOMMON%/manual</remote>
-  		</action>
-  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
-  			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\manual\manual.zip</local>
-  			<remote>%DEMOCOMMON%/manual/manual.zip</remote>
-  		</action>
-  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
-  			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\manual\manual.pdf</local>
-  			<remote>%DEMOCOMMON%/manual/manual.pdf</remote>
-  		</action>
   		
   	</action>
 
