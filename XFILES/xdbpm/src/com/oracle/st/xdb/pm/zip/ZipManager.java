@@ -16,16 +16,11 @@
 package com.oracle.st.xdb.pm.zip;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 
 import java.sql.SQLException;
 
@@ -34,7 +29,6 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import oracle.jdbc.OracleCallableStatement;
-import oracle.jdbc.OracleDriver;
 import oracle.jdbc.OracleResultSet;
 import oracle.jdbc.driver.OracleConnection;
 
@@ -44,15 +38,12 @@ import oracle.sql.BLOB;
 
 import oracle.xdb.XMLType;
 
-import oracle.xml.parser.v2.XMLDocument;
-import oracle.xml.parser.v2.XMLElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.w3c.dom.NodeList;
 
-import org.w3c.dom.Text;
 
 import org.xml.sax.SAXException;
 

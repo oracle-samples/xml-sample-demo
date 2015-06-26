@@ -833,7 +833,7 @@ as
     from TABLE(XDBPM.AS_ZIP.unZip(V_ZIP_FILE,NULL))
    order by FILENAME;
     
-  V_FOLDER VARCHAR2(4000);
+  V_FOLDER_PATH   VARCHAR2(4000);
   V_RESOURCE_PATH VARCHAR2(4000);
   V_RESULT BOOLEAN;
   
@@ -848,15 +848,15 @@ begin
 	  for f in getContents loop
 	
 	    V_RESOURCE_PATH := P_TARGET_FOLDER || '/' || f.FILENAME;
-	
-	    if substr(f.FILENAME,length(f.FILENAME)) = '/' then
-	      V_RESOURCE_PATH := substr(V_RESOURCE_PATH,1,LENGTH(V_RESOURCE_PATH)-1);
-	      if (not DBMS_XDB.existsResource(V_RESOURCE_PATH)) then
-          V_BUFFER := to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' : ' || 'Creating Folder "' || V_RESOURCE_PATH || '".' || CHR(13) || CHR(10);
-          DBMS_LOB.WRITEAPPEND(V_LOG_FILE_BUFFER,LENGTH(V_BUFFER),V_BUFFER);
-	        XDB_UTILITIES.mkdir(V_RESOURCE_PATH,TRUE);
-	      end if;
-	    else
+
+	   	V_FOLDER_PATH   := substr(V_RESOURCE_PATH,1,INSTR(V_RESOURCE_PATH,'/',-1)-1);
+      if (not DBMS_XDB.existsResource(V_FOLDER_PATH)) then
+        V_BUFFER := to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' : ' || 'Creating Folder "' || V_FOLDER_PATH || '".' || CHR(13) || CHR(10);
+        DBMS_LOB.WRITEAPPEND(V_LOG_FILE_BUFFER,LENGTH(V_BUFFER),V_BUFFER);
+	      XDB_UTILITIES.mkdir(V_FOLDER_PATH,TRUE);
+	    end if;
+
+			if (instr(V_RESOURCE_PATH,'/',-1) != length(V_RESOURCE_PATH)) then
         V_BUFFER := to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' : ' || 'Creating Resource "' || V_RESOURCE_PATH || '".' || CHR(13) || CHR(10);
         DBMS_LOB.WRITEAPPEND(V_LOG_FILE_BUFFER,LENGTH(V_BUFFER),V_BUFFER);
   	    XDB_IMPORT_UTILITIES.createResource(V_RESOURCE_PATH, f.CONTENT, P_DUPLICATE_ACTION);	      
