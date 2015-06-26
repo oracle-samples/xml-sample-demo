@@ -21,7 +21,7 @@ VAR FILELIST CLOB;
 -- Workaround for issue introduced by fix for bug #20111613 and reported in bug #21321998
 --
 begin
-	:FILELIST := empty_lob();
+	:FILELIST := empty_clob();
 end;
 / 
 column FILELIST format A256

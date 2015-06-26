@@ -17,7 +17,6 @@ spool configureContainer.log
 prompt "Please enter password for SYS/ as SYSDBA when prompted"
 --
 connect sys/ as sysdba
-
 --
 def TARGET_PDB = &1
 --
@@ -31,6 +30,8 @@ def USERNAME = &5
 --
 def USERPWD = &6 
 --
+alter session set container = CDB$ROOT
+/
 alter user anonymous account unlock
 /
 alter system set shared_servers = 25 scope = both
