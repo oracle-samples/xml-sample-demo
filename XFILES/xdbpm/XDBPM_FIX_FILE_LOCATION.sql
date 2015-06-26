@@ -18,6 +18,12 @@
 --
 VAR FILELIST CLOB;
 --
+-- Workaround for issue introduced by fix for bug #20111613 and reported in bug #21321998
+--
+begin
+	:FILELIST := empty_lob();
+end;
+/ 
 column FILELIST format A256
 set pages 0 lines 256 long 1000000 trimspool on
 -- 
