@@ -114,19 +114,8 @@
  			<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
   			<remote>%DEMOLOCAL%/manual</remote>
-  		</action>
-<!--
-  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
-  			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\manual.zip</local>
-  			<remote>%DEMOLOCAL%/manual/manual.zip</remote>
-  		</action>
--->  		
-  	</action>
-
-<!--
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\unzipArchive.sql %DEMOLOCAL%/manual/manual.zip %DEMOLOCAL% %DEMOLOCAL%/manual/manual.log</action>
--->  		
+  		</action>		
+  	</action>	
 
 		<action type="SQL"/>
 		<action type="VIEW"/>
