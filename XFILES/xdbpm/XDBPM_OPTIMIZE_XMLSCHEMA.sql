@@ -2482,10 +2482,10 @@ as
   V_PROCESS_INSTANCE_DOCUMENTS VARCHAR2(4000) 
     := 'select *' || C_NEW_LINE 
     || '  from TABLE(' || C_NEW_LINE 
-    || '         XDB_XMLSCHEMA_UTILITIES.getInstanceDocuments(''%FOLDER_PATH%'')' || C_NEW_LINE 
+    || '         XDB_REGISTRATION_HELPER.getInstanceDocuments(''%FOLDER_PATH%'')' || C_NEW_LINE 
     || '        )' || C_NEW_LINE 
     || '/' || C_NEW_LINE
-    || 'call XDB_XMLSCHEMA_UTILITIES.loadInstanceDocuments(''%FOLDER_PATH%'',''%LOGFILE_NAME%'')' || C_NEW_LINE
+    || 'call XDB_REGISTRATION_HELPER.loadInstanceDocuments(''%FOLDER_PATH%'',''%LOGFILE_NAME%'')' || C_NEW_LINE
     || '/' || C_NEW_LINE
     || 'set long 1000000 pages 0 lines 256 trimspool on' || C_NEW_LINE
 	  || 'column log format A250' || C_NEW_LINE
