@@ -18,15 +18,6 @@
 --
 alter session set current_schema = XDBPM
 /
---
--- Set mime-type to text/plain for common extensions
---
-call DBMS_XDB.addMimeMapping('log','text/plain')
-/
-call DBMS_XDB.addMimeMapping('trc','text/plain')
-/
-call DBMS_XDB.addMimeMapping('trace','text/plain')
-/
 create or replace package XDBPM_OUTPUT
 authid CURRENT_USER
 as
@@ -82,11 +73,21 @@ as
   V_WARNING          integer;
   V_LANG_CONTEXT     integer := 0;
 
+$IF DBMS_DB_VERSION.VER_LE_10_2 
+$THEN
+  V_RESULT           boolean;
+$END
+
 begin	
   dbms_lob.createTemporary(V_BINARY_CONTENT,true);
   dbms_lob.convertToBlob(V_BINARY_CONTENT,P_CONTENT,dbms_lob.getLength(P_CONTENT),V_SOURCE_OFFSET,V_TARGET_OFFSET,nls_charset_id('AL32UTF8'),V_LANG_CONTEXT,V_WARNING);
 
+$IF DBMS_DB_VERSION.VER_LE_10_2 
+$THEN
+  V_RESULT := DBMS_XDB.createResource(P_RESOURCE_PATH,'');
+$ELSE
   DBMS_XDB.touchResource(P_RESOURCE_PATH);
+$END
    
   select extractValue(res,'/Resource/XMLLob') 
     into V_EXISTING_CONTENT

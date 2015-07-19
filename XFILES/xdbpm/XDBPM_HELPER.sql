@@ -554,7 +554,7 @@ as
 begin
   begin
     update RESOURCE_VIEW 
-       set res =sertChildXML
+       set res = insertChildXML
                  (
                    res,
                    '/Resource',
@@ -1483,8 +1483,11 @@ as
   V_STATEMENT           VARCHAR2(256);
   V_DBNAME              VARCHAR2(256);
 begin
-$IF DBMS_DB_VERSION.VER_LE_11_2 
+$IF DBMS_DB_VERSION.VER_LE_10_2 
 $THEN  
+  execute immediate 'select VALUE from SYS.V_$PARAMETER where NAME = ''user_dump_dest''' into V_USER_TRACE_LOCATION;
+$ELSIF DBMS_DB_VERSION.VER_LE_11_2 
+$THEN
   execute immediate 'select VALUE from SYS.V_$PARAMETER where NAME = ''user_dump_dest''' into V_USER_TRACE_LOCATION;
 $ELSE
   execute immediate 'select VALUE from V$DIAG_INFO where NAME = ''Diag Trace''' into V_USER_TRACE_LOCATION;

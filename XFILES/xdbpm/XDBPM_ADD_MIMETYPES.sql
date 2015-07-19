@@ -13,21 +13,28 @@
  * ================================================
  */
 
-@@XDBPM_CLEANUP
-@@XDBPM_CREATE_USER
-@@XDBPM_SET_PERMISSIONS
 --
-@@XDBPM_SYNONYMS
-@@XDBPM_CONSTANTS
-@@XDBPM_NAMESPACES
-@@XDBPM_HELPER
-@@XDBPM_OUTPUT
-@@XDBPM_DOM_UTILITIES
-@@XDBPM_INTERNAL
-@@XDBPM_UTILITIES   
-@@XDBPM_MONITOR
-@@XDBPM_IMPORT_UTILITIES
-@@XDBPM_ZIP_UTILITIES
-@@XDBPM_DEBUG
-@@XDBPM_CONFIGURATION
-@@XDBPM_SQLLDR_INTERFACE
+-- Set mime-type to text/plain for common extensions
+--
+begin
+$IF DBMS_DB_VERSION.VER_LE_10_2 
+$THEN
+  XDB_CONFIGURATION.addMimeMapping('log','text/plain');
+  XDB_CONFIGURATION.addMimeMapping('trc','text/plain');
+  XDB_CONFIGURATION.addMimeMapping('trace','text/plain');
+$ELSIF DBMS_DB_VERSION.VER_LE_12_1 
+$THEN
+  DBMS_XDB.addMimeMapping('log','text/plain');
+  DBMS_XDB.addMimeMapping('trc','text/plain');
+  DBMS_XDB.addMimeMapping('trace','text/plain');
+$ELSE
+  DBMS_XDB_CONFIG.addMimeMapping('log','text/plain');
+  DBMS_XDB_CONFIG.addMimeMapping('trc','text/plain');
+  DBMS_XDB_CONFIG.addMimeMapping('trace','text/plain');
+$END
+end;
+/
+commit
+/
+
+  
