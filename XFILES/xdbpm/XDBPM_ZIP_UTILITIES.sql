@@ -21,7 +21,7 @@ create or replace type ZIP_CONTENTS_LIST
 /
 grant execute on ZIP_CONTENTS_LIST to public
 /
-create or replace type ZIP_ENTRY force as OBJECT
+create or replace type ZIP_ENTRY as OBJECT
 (
   FILENAME VARCHAR2(4000),
   CONTENT  BLOB

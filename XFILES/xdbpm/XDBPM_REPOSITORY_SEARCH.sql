@@ -63,6 +63,11 @@ begin
     into V_RESULT
     from RESOURCE_VIEW rv, 
          TABLE(V_ACL_REF_LIST) ar
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
+   where HEXTOREF(extractValue(rv.RES,'/r:Resource/r:XMLRef',DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R)) = value(ar);
+$ELSIF DBMS_DB_VERSION.VER_LE_11_1 $THEN
+   where HEXTOREF(extractValue(rv.RES,'/r:Resource/r:XMLRef',DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R)) = value(ar);
+$ELSE   
    where XMLCast(
              XMLQuery(
               'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
@@ -71,7 +76,7 @@ begin
                returning content
              ) as REF XMLType
            ) = value(ar);
-   
+$END   
    return V_RESULT;
          
 end;

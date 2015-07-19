@@ -183,6 +183,13 @@ as
      and exists (
            select 1 
              from RESOURCE_VIEW rv
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
+            where extractValue(rv.RES,'/r:Resource/r:ACLOID',DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R)
+                = SYS_OP_R2O(HEXTOREF(extractValue(rv.RES,'/r:Resource/r:XMLRef',DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R)))
+$ELSIF DBMS_DB_VERSION.VER_LE_11_1 $THEN
+            where extractValue(rv.RES,'/r:Resource/r:ACLOID',DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R)
+                = SYS_OP_R2O(HEXTOREF(extractValue(rv.RES,'/r:Resource/r:XMLRef',DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R)))
+$ELSE                
             where XMLCast(
                     XMLQuery(
                      'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
@@ -200,6 +207,7 @@ as
                          ) as REF XMLType
                        )
                      )
+$END                     
              and ar.RESID <> rv.RESID
          );
          
@@ -210,6 +218,13 @@ as
     from XDB.RESOURCE_VIEW rv, RESOURCE_VIEW ar
    where under_Path(ar.res,P_TEMPORARY_ACL_FOLDER) = 1
      and equals_path(ar.res,rv.ANY_PATH) = 1
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
+     and extractValue(rv.RES,'/r:Resource/r:ACLOID',DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R)
+       = SYS_OP_R2O(HEXTOREF(extractValue(rv.RES,'/r:Resource/r:XMLRef',DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R)));
+$ELSIF DBMS_DB_VERSION.VER_LE_11_1 $THEN
+    and extractValue(rv.RES,'/r:Resource/r:ACLOID',DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R)
+      = SYS_OP_R2O(HEXTOREF(extractValue(rv.RES,'/r:Resource/r:XMLRef',DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R)));
+$ELSE                
      and XMLCast(
            XMLQuery(
              'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
@@ -227,7 +242,7 @@ as
                  ) as REF XMLType
                )
              );
-            
+$END            
   cursor getUnusedAcls
   is
   select ANY_PATH 

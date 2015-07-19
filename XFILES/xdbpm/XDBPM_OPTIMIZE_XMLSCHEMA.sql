@@ -23,6 +23,235 @@ ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 --
 set define on
 --
+@@XDBPM_SQLTYPE_VIEWS.sql
+--
+create or replace TYPE XMLTYPE_REF_TABLE_T 
+                    IS TABLE of REF XMLTYPE
+/
+show errors
+--
+grant execute on XMLTYPE_REF_TABLE_T to public
+/
+create global temporary table STORAGE_MODEL_CACHE
+(
+  TYPE_NAME           VARCHAR2(128),
+  TYPE_OWNER          VARCHAR2(32),
+  EXTENDED_DEFINITION VARCHAR2(3),
+  STORAGE_MODEL       XMLType
+)
+ON COMMIT PRESERVE ROWS
+/
+grant all on STORAGE_MODEL_CACHE to public
+/
+create  global temporary table TYPE_SUMMARY
+(
+  TYPE_NAME     VARCHAR2(30),
+  OWNER         VARCHAR2(30),
+  COLUMN_COUNT  NUMBER,
+  PRIMARY KEY (OWNER, TYPE_NAME)
+)
+ON COMMIT PRESERVE ROWS
+/
+grant all on TYPE_SUMMARY to public
+/
+create GLOBAL TEMPORARY TABLE REVISED_TYPE_SUMMARY
+(
+  TYPE_NAME     VARCHAR2(30),
+  OWNER         VARCHAR2(30),
+  COLUMN_COUNT  NUMBER,
+  PRIMARY KEY (OWNER, TYPE_NAME)
+)
+ON COMMIT PRESERVE ROWS
+/
+grant all on REVISED_TYPE_SUMMARY to public
+/
+create global temporary table REVISED_TYPES
+(
+  OWNER                      VARCHAR2(30),
+  TYPE_NAME                  VARCHAR2(30),
+  TYPE_OID                   RAW(16),
+  TYPECODE                   VARCHAR2(30),
+  ATTRIBUTES                 NUMBER,
+  METHODS                    NUMBER,
+  PREDEFINED                 VARCHAR2(3),
+  INCOMPLETE                 VARCHAR2(3),
+  FINAL                      VARCHAR2(3),
+  INSTANTIABLE               VARCHAR2(3),
+  SUPERTYPE_OWNER            VARCHAR2(30),
+  SUPERTYPE_NAME             VARCHAR2(30),
+  LOCAL_ATTRIBUTES           NUMBER,
+  LOCAL_METHODS              NUMBER,
+  TYPEID                     RAW(16),
+  PRIMARY KEY(OWNER,TYPE_NAME)
+)
+ON COMMIT PRESERVE ROWS      
+/
+grant all on REVISED_TYPES to public
+/
+create global temporary table REVISED_COLL_TYPES
+(
+  OWNER                      VARCHAR2(30) NOT NULL ,
+  TYPE_NAME                  VARCHAR2(30) NOT NULL ,
+  COLL_TYPE                  VARCHAR2(30) NOT NULL ,
+  UPPER_BOUND                NUMBER,
+  ELEM_TYPE_MOD              VARCHAR2(7),
+  ELEM_TYPE_OWNER            VARCHAR2(30),
+  ELEM_TYPE_NAME             VARCHAR2(30),
+  LENGTH                     NUMBER,
+  PRECISION                  NUMBER,
+  SCALE                      NUMBER,
+  CHARACTER_SET_NAME         VARCHAR2(44),
+  ELEM_STORAGE               VARCHAR2(7),
+  NULLS_STORED               VARCHAR2(3),
+  CHAR_USED                  VARCHAR2(1),
+  PRIMARY KEY (OWNER,TYPE_NAME)
+)
+ON COMMIT PRESERVE ROWS      
+/
+grant all on REVISED_COLL_TYPES to public
+/
+create GLOBAL TEMPORARY TABLE REVISED_TYPE_ATTRS
+(
+  OWNER                VARCHAR2(30),
+  TYPE_NAME            VARCHAR2(30),
+  ATTR_NAME            VARCHAR2(30),
+  ATTR_TYPE_MOD        VARCHAR2(7),
+  ATTR_TYPE_OWNER      VARCHAR2(30),
+  ATTR_TYPE_NAME       VARCHAR2(30),
+  LENGTH               NUMBER,
+  PRECISION            NUMBER,
+  SCALE                NUMBER,
+  CHARACTER_SET_NAME   VARCHAR2(44),
+  ATTR_NO              NUMBER,
+  INHERITED            VARCHAR2(3),
+  CHAR_USED            VARCHAR2(1),
+  PRIMARY KEY (OWNER, TYPE_NAME, ATTR_NAME)
+)
+ON COMMIT PRESERVE ROWS
+/
+grant all on REVISED_TYPE_ATTRS to public
+/
+create index XDBPM_ATTR_TYPE_INDEX 
+    on REVISED_TYPE_ATTRS (ATTR_TYPE_OWNER, ATTR_TYPE_NAME)
+/
+create GLOBAL TEMPORARY TABLE REVISED_CHOICE_MODEL
+(
+  CHOICE_REFERENCE REF XMLTYPE,
+  SQLTYPE          VARCHAR2(30),
+  COLUMN_COUNT     NUMBER,
+  PRIMARY KEY      (SQLTYPE)
+)
+/
+grant all on REVISED_TYPE_ATTRS to public
+/
+create table XDBPM_INDEX_DDL_CACHE
+(
+  TABLE_NAME           VARCHAR2(128),
+  OWNER                VARCHAR2(32),
+  INDEX_DDL            XMLType
+)
+/
+grant all on XDBPM_INDEX_DDL_CACHE to public
+/
+create or replace view MISSING_TYPES
+as
+select * 
+  from XDBPM.XDBPM_ALL_TYPES at
+ where not exists
+       (
+          select 1 
+            from TYPE_SUMMARY ts
+           where nvl(ts.OWNER,'SYS') = nvl(at.OWNER,'SYS')
+             and ts.TYPE_NAME = at.TYPE_NAME
+       )   
+/
+grant all on MISSING_TYPES to public
+/
+create or replace view MISSING_TYPE_ATTRS
+as
+select ata.*
+  from MISSING_TYPES mt, XDBPM.XDBPM_ALL_TYPE_ATTRS ata
+ where mt.TYPE_NAME = ata.TYPE_NAME
+   and mt.OWNER = ata.OWNER
+   and not exists
+       (
+          select 1 
+            from TYPE_SUMMARY ts
+           where nvl(ts.OWNER,'SYS') = nvl(ata.ATTR_TYPE_OWNER,'SYS')
+             and ts.TYPE_NAME = ata.ATTR_TYPE_NAME
+       )   
+/
+grant all on MISSING_TYPE_ATTRS to public
+/
+create or replace view MISSING_TYPE_HIERARCHY
+as
+select level TYPE_LEVEL, ata.TYPE_NAME, ata.OWNER, ATTR_NAME, ATTR_TYPE_NAME, ATTR_TYPE_OWNER
+  from XDBPM.XDBPM_ALL_TYPES at, XDBPM.XDBPM_ALL_TYPE_ATTRS ata
+ where at.TYPE_NAME = ata.TYPE_NAME
+   and INHERITED = 'NO'
+   and at.OWNER     = ata.OWNER
+   and not exists
+       (
+          select 1 
+            from TYPE_SUMMARY ts
+           where nvl(ts.OWNER,'SYS') = nvl(ata.ATTR_TYPE_OWNER,'SYS')
+             and ts.TYPE_NAME = ata.ATTR_TYPE_NAME
+       )   
+       and not exists
+       ( 
+         select syn.SYNONYM_NAME, syn.OWNER
+           from ALL_SYNONYMS syn, XDBPM.XDBPM_ALL_TYPES at
+          where syn.TABLE_NAME  = at.TYPE_NAME
+            and syn.TABLE_OWNER = at.OWNER
+            and syn.SYNONYM_NAME = ata.ATTR_TYPE_NAME
+            and syn.OWNER        = ata.ATTR_TYPE_OWNER
+       )
+       connect by SUPERTYPE_NAME = prior at.TYPE_NAME
+              and SUPERTYPE_OWNER = prior at.OWNER
+/
+grant all on MISSING_TYPE_HIERARCHY to public
+/
+create or replace view BASE_TYPE_SUMMARY 
+as
+select ata.TYPE_NAME, ata.OWNER, ata.ATTR_NAME, ata.ATTR_TYPE_NAME, ata.ATTR_TYPE_OWNER,
+       case when ts.OWNER = 'XDB' and (ts.TYPE_NAME = 'XDB$RAW_LIST_T' or ts.TYPE_NAME = 'XDB$ENUM_T')
+            then ts.COLUMN_COUNT
+            else case when exists (
+                                    select 1 from XDBPM.XDBPM_ALL_TYPES at
+                                     where at.TYPE_NAME = ts.TYPE_NAME
+                                       and at.OWNER = ts.OWNER
+                                       and at.FINAL = 'YES'
+                                       and at.TYPECODE = 'OBJECT'
+                                  )
+                      then ts.COLUMN_COUNT + 2
+                      else ts.COLUMN_COUNT
+                 end       
+       end COLUMN_COUNT
+  from XDBPM.XDBPM_ALL_TYPE_ATTRS ata, TYPE_SUMMARY ts
+ where ata.ATTR_TYPE_NAME = ts.TYPE_NAME
+	 and nvl(ata.ATTR_TYPE_OWNER,'SYS') = nvl(ts.OWNER,'SYS')
+/
+grant all on BASE_TYPE_SUMMARY to public
+/
+create or replace view EXPANDED_TYPE_SUMMARY
+as
+select bts.TYPE_NAME, bts.OWNER, bts.ATTR_NAME, bts.ATTR_TYPE_NAME, bts.ATTR_TYPE_OWNER, bts.COLUMN_COUNT
+  from BASE_TYPE_SUMMARY bts
+union all
+select at.SUPERTYPE_NAME TYPE_NAME, at.SUPERTYPE_OWNER OWNER, 'SYS$EXTENSION' ATTR_TYPE_NAME, at.TYPE_NAME ATTR_TYPE_NAME, at.OWNER ATTR_TYPE_OWNER, 
+       ts.COLUMN_COUNT -
+	     (
+	       select sum(COLUMN_COUNT)
+		       from BASE_TYPE_SUMMARY bts
+		      where bts.TYPE_NAME = at.SUPERTYPE_NAME
+		        and bts.OWNER = at.SUPERTYPE_OWNER
+ 	     )
+  from XDBPM.XDBPM_ALL_TYPES at, TYPE_SUMMARY ts
+ where at.TYPE_NAME = ts.TYPE_NAME
+	and at.OWNER = ts.OWNER
+/
+grant all on EXPANDED_TYPE_SUMMARY to public
+/
 create or replace package XDBPM_OPTIMIZE_XMLSCHEMA
 authid CURRENT_USER
 as

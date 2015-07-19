@@ -14,34 +14,51 @@
  */
 
 --
-set define off
+-- Register valid versions of XMLSchema.xsd and Resource.xsd
 --
--- Release specific scritps
---
-var XDBPM_ZIP_SUPPORT VARCHAR2(120)
---
+alter session set current_schema = XDBPM
+/
 declare
-  V_XDBPM_ZIP_SUPPORT VARCHAR2(120);
+  V_XML_SCHEMA XMLTYPE := xdburitype('/publishedContent/XDBPM/lib/xdbAnnotations.xsd').getXML();
 begin
-$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
-  V_XDBPM_ZIP_SUPPORT := 'XDBPM_DO_NOTHING.sql';
-$ELSE
-  V_XDBPM_ZIP_SUPPORT := 'XDBPM_ZIP_SUPPORT_11100.sql';
-$END
-  :XDBPM_ZIP_SUPPORT := V_XDBPM_ZIP_SUPPORT;
+  dbms_xmlSchema.registerSchema(
+    SCHEMAURL => 'http://xmlns.oracle.com/xdb/xdbpm/xdbAnnotations.xsd',
+    SCHEMADOC => V_XML_SCHEMA,
+    LOCAL     => FALSE,
+    GENTYPES  => FALSE,
+    GENBEAN   => FALSE,
+    GENTABLES => FALSE,
+    OWNER     => 'XDBPM'
+  );
 end;
 /
-undef XDBPM_ZIP_SUPPORT
---
-column XDBPM_ZIP_SUPPORT new_value XDBPM_ZIP_SUPPORT
---
-select :XDBPM_ZIP_SUPPORT XDBPM_ZIP_SUPPORT 
-  from dual
+declare
+  V_XML_SCHEMA XMLTYPE := xdburitype('/publishedContent/XDBPM/lib/XDBSchema.xsd').getXML();
+begin
+  dbms_xmlSchema.registerSchema(
+    SCHEMAURL => 'http://xmlns.oracle.com/xdb/xdbpm/XDBSchema.xsd',
+    SCHEMADOC => V_XML_SCHEMA,
+    LOCAL     => FALSE,
+    GENTYPES  => FALSE,
+    GENBEAN   => FALSE,
+    GENTABLES => FALSE,
+    OWNER     => 'XDBPM'
+  );
+end;
 /
-select '&XDBPM_ZIP_SUPPORT'
-  from DUAL
+declare
+  V_XML_SCHEMA XMLTYPE := xdburitype('/publishedContent/XDBPM/lib/XDBResource.xsd').getXML();
+begin
+  dbms_xmlSchema.registerSchema(
+    SCHEMAURL => 'http://xmlns.oracle.com/xdb/xdbpm/XDBResource.xsd',
+    SCHEMADOC => V_XML_SCHEMA,
+    LOCAL     => FALSE,
+    GENTYPES  => FALSE,
+    GENBEAN   => FALSE,
+    GENTABLES => FALSE,
+    OWNER     => 'XDBPM'
+  );
+end;
 /
-set define on
---
-@@&XDBPM_ZIP_SUPPORT
---
+alter session set current_schema = SYS
+/

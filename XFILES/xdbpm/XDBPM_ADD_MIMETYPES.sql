@@ -17,13 +17,15 @@
 -- Set mime-type to text/plain for common extensions
 --
 begin
-$IF DBMS_DB_VERSION.VER_LE_10_2 
-$THEN
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
   XDB_CONFIGURATION.addMimeMapping('log','text/plain');
   XDB_CONFIGURATION.addMimeMapping('trc','text/plain');
   XDB_CONFIGURATION.addMimeMapping('trace','text/plain');
-$ELSIF DBMS_DB_VERSION.VER_LE_12_1 
-$THEN
+$ELSIF DBMS_DB_VERSION.VER_LE_11_1 $THEN
+  DBMS_XDB.addMimeMapping('log','text/plain');
+  DBMS_XDB.addMimeMapping('trc','text/plain');
+  DBMS_XDB.addMimeMapping('trace','text/plain');
+$ELSIF DBMS_DB_VERSION.VER_LE_11_2 $THEN
   DBMS_XDB.addMimeMapping('log','text/plain');
   DBMS_XDB.addMimeMapping('trc','text/plain');
   DBMS_XDB.addMimeMapping('trace','text/plain');

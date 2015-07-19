@@ -222,12 +222,33 @@ show errors
 --
 set pages 50
 set long 2048
-select xmlSerialize(
-         DOCUMENT
-         XDB_MONITOR.GETSTATISTICS()
-         as CLOB INDENT SIZE = 2
-       )
+--
+var XDBPM_MONITOR VARCHAR2(120)
+--
+declare
+  V_XDBPM_MONITOR VARCHAR2(120);
+begin
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
+  V_XDBPM_MONITOR := 'XDBPM_MONITOR_10200.sql';
+$ELSE
+  V_XDBPM_MONITOR := 'XDBPM_MONITOR_11100.sql';
+$END
+  :XDBPM_MONITOR := V_XDBPM_MONITOR;
+end;
+/
+undef XDBPM_MONITOR
+--
+column XDBPM_MONITOR new_value XDBPM_MONITOR
+--
+select :XDBPM_MONITOR XDBPM_MONITOR 
   from dual
 /
+select '&XDBPM_MONITOR'
+  from DUAL
+/
+set define on
+--
+@@&XDBPM_MONITOR
+
 alter session set current_schema = SYS
 /

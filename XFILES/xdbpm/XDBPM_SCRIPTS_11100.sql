@@ -14,13 +14,18 @@
  */
  
 --
+-- XML Import Utilities and Zip Utilities only supported in 11.1.x and later.
+--
+@@XDBPM_IMPORT_UTILITIES
+@@XDBPM_ZIP_UTILITIES
+--
 -- XML Schema optimization only supported in 11.1.x and later.
 --
 @@XDBPM_EDIT_XMLSCHEMA
 @@XDBPM_ANNOTATE_XMLSCHEMA
-@@XDBPM_ANALYZE_XMLSCHEMA
 @@XDBPM_OPTIMIZE_XMLSCHEMA
-@@XDBPM_XMLSCHEMA_UTILITIES
+@@XDBPM_ANALYZE_XMLSCHEMA
+@@XDBPM_REGISTRATION_HELPER
 @@XDBPM_ORDER_XMLSCHEMAS
 --
 -- Added in 11.1.0.6.0

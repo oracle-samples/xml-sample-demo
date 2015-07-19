@@ -44,6 +44,8 @@ create or replace public synonym XDB_ORDER_XMLSCHEMAS     for XDBPM.XDBPM_ORDER_
 /
 create or replace public synonym XDB_XMLSCHEMA_UTILITIES  for XDBPM.XDBPM_XMLSCHEMA_UTILITIES
 /
+create or replace public synonym XDB_REGISTRATION_HELPER  for XDBPM.XDBPM_REGISTRATION_HELPER
+/
 create or replace public synonym XDB_ANALYZE_XMLSCHEMA    for XDBPM.XDBPM_ANALYZE_XMLSCHEMA
 /
 create or replace public synonym XDB_ANALYZE_SCHEMA       for XDBPM.XDBPM_ANALYZE_XMLSCHEMA

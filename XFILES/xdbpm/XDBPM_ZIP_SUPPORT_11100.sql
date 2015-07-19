@@ -13,20 +13,46 @@
  * ================================================
  */
 
-@@XDBPM_CLEANUP
-@@XDBPM_CREATE_USER
-@@XDBPM_SET_PERMISSIONS
 --
-@@XDBPM_SYNONYMS
-@@XDBPM_CONSTANTS
-@@XDBPM_NAMESPACES
-@@XDBPM_HELPER
-@@XDBPM_OUTPUT
-@@XDBPM_DOM_UTILITIES
-@@XDBPM_INTERNAL
-@@XDBPM_XMLSCHEMA_UTILITIES   
-@@XDBPM_UTILITIES   
-@@XDBPM_MONITOR
-@@XDBPM_DEBUG
-@@XDBPM_CONFIGURATION
-@@XDBPM_SQLLDR_INTERFACE
+alter session set current_schema = XDBPM
+/
+--
+DEF SOURCE_PATH = /home/XDBPM/java/src 
+DEF CLASS_PATH = com/oracle/st/xdb/pm/zip
+--
+DEF JAVA_SOURCE_NAME = ExternalConnectionProvider
+@@XDBPM_COMPILE_JAVA   
+--
+DEF JAVA_SOURCE_NAME = ArchiveManager
+@@XDBPM_COMPILE_JAVA   
+--
+DEF JAVA_SOURCE_NAME = RepositoryImport
+@@XDBPM_COMPILE_JAVA 
+--
+DEF JAVA_SOURCE_NAME = RepositoryExport
+@@XDBPM_COMPILE_JAVA 
+--
+DEF JAVA_SOURCE_NAME = ZipManager
+@@XDBPM_COMPILE_JAVA 
+--
+set serveroutput on
+--
+declare
+  cursor getClasses
+  is
+  select NAME, dbms_java.shortname(NAME) SHORT_NAME
+    from ALL_JAVA_CLASSES
+   where OWNER = 'XDBPM'
+     and NAME like '&CLASS_PATH%'; 
+begin
+  for c in getClasses() loop
+    DBMS_OUTPUT.put_line('Processing class ' || c.NAME);
+    execute immediate 'grant execute on "' || c.SHORT_NAME || '" to public';
+  end loop;
+end;
+/
+--
+set serveroutput off
+--
+alter session set current_schema = SYS
+/

@@ -13,52 +13,34 @@
  * ================================================
  */
 
+set define off
 --
--- Register valid versions of XMLSchema.xsd and Resource.xsd
+-- Release specific scritps
 --
-alter session set current_schema = XDBPM
-/
+var XDBPM_REGISTER_XMLSCHEMAS VARCHAR2(120)
+--
 declare
-  V_XML_SCHEMA XMLTYPE := xdburitype('/publishedContent/XDBPM/lib/xdbAnnotations.xsd').getXML();
+  V_XDBPM_REGISTER_XMLSCHEMAS VARCHAR2(120);
 begin
-  dbms_xmlSchema.registerSchema(
-    SCHEMAURL => 'http://xmlns.oracle.com/xdb/xdbpm/xdbAnnotations.xsd',
-    SCHEMADOC => V_XML_SCHEMA,
-    LOCAL     => FALSE,
-    GENTYPES  => FALSE,
-    GENBEAN   => FALSE,
-    GENTABLES => FALSE,
-    OWNER     => 'XDBPM'
-  );
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
+  V_XDBPM_REGISTER_XMLSCHEMAS := 'XDBPM_DO_NOTHING.sql';
+$ELSE
+  V_XDBPM_REGISTER_XMLSCHEMAS := 'XDBPM_REGISTER_XMLSCHEMAS_11100.sql';
+$END
+  :XDBPM_REGISTER_XMLSCHEMAS := V_XDBPM_REGISTER_XMLSCHEMAS;
 end;
 /
-declare
-  V_XML_SCHEMA XMLTYPE := xdburitype('/publishedContent/XDBPM/lib/XDBSchema.xsd').getXML();
-begin
-  dbms_xmlSchema.registerSchema(
-    SCHEMAURL => 'http://xmlns.oracle.com/xdb/xdbpm/XDBSchema.xsd',
-    SCHEMADOC => V_XML_SCHEMA,
-    LOCAL     => FALSE,
-    GENTYPES  => FALSE,
-    GENBEAN   => FALSE,
-    GENTABLES => FALSE,
-    OWNER     => 'XDBPM'
-  );
-end;
+undef XDBPM_REGISTER_XMLSCHEMAS
+--
+column XDBPM_REGISTER_XMLSCHEMAS new_value XDBPM_REGISTER_XMLSCHEMAS
+--
+select :XDBPM_REGISTER_XMLSCHEMAS XDBPM_REGISTER_XMLSCHEMAS 
+  from dual
 /
-declare
-  V_XML_SCHEMA XMLTYPE := xdburitype('/publishedContent/XDBPM/lib/XDBResource.xsd').getXML();
-begin
-  dbms_xmlSchema.registerSchema(
-    SCHEMAURL => 'http://xmlns.oracle.com/xdb/xdbpm/XDBResource.xsd',
-    SCHEMADOC => V_XML_SCHEMA,
-    LOCAL     => FALSE,
-    GENTYPES  => FALSE,
-    GENBEAN   => FALSE,
-    GENTABLES => FALSE,
-    OWNER     => 'XDBPM'
-  );
-end;
+select '&XDBPM_REGISTER_XMLSCHEMAS'
+  from DUAL
 /
-alter session set current_schema = SYS
-/
+set define on
+--
+@@&XDBPM_REGISTER_XMLSCHEMAS
+--

@@ -22,235 +22,6 @@ ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
 set define on
 --
-@@XDBPM_SQLTYPE_VIEWS.sql
---
-create or replace TYPE XMLTYPE_REF_TABLE_T 
-                    IS TABLE of REF XMLTYPE
-/
-show errors
---
-grant execute on XMLTYPE_REF_TABLE_T to public
-/
-create global temporary table STORAGE_MODEL_CACHE
-(
-  TYPE_NAME           VARCHAR2(128),
-  TYPE_OWNER          VARCHAR2(32),
-  EXTENDED_DEFINITION VARCHAR2(3),
-  STORAGE_MODEL       XMLType
-)
-ON COMMIT PRESERVE ROWS
-/
-grant all on STORAGE_MODEL_CACHE to public
-/
-create  global temporary table TYPE_SUMMARY
-(
-  TYPE_NAME     VARCHAR2(30),
-  OWNER         VARCHAR2(30),
-  COLUMN_COUNT  NUMBER,
-  PRIMARY KEY (OWNER, TYPE_NAME)
-)
-ON COMMIT PRESERVE ROWS
-/
-grant all on TYPE_SUMMARY to public
-/
-create GLOBAL TEMPORARY TABLE REVISED_TYPE_SUMMARY
-(
-  TYPE_NAME     VARCHAR2(30),
-  OWNER         VARCHAR2(30),
-  COLUMN_COUNT  NUMBER,
-  PRIMARY KEY (OWNER, TYPE_NAME)
-)
-ON COMMIT PRESERVE ROWS
-/
-grant all on REVISED_TYPE_SUMMARY to public
-/
-create global temporary table REVISED_TYPES
-(
-  OWNER                      VARCHAR2(30),
-  TYPE_NAME                  VARCHAR2(30),
-  TYPE_OID                   RAW(16),
-  TYPECODE                   VARCHAR2(30),
-  ATTRIBUTES                 NUMBER,
-  METHODS                    NUMBER,
-  PREDEFINED                 VARCHAR2(3),
-  INCOMPLETE                 VARCHAR2(3),
-  FINAL                      VARCHAR2(3),
-  INSTANTIABLE               VARCHAR2(3),
-  SUPERTYPE_OWNER            VARCHAR2(30),
-  SUPERTYPE_NAME             VARCHAR2(30),
-  LOCAL_ATTRIBUTES           NUMBER,
-  LOCAL_METHODS              NUMBER,
-  TYPEID                     RAW(16),
-  PRIMARY KEY(OWNER,TYPE_NAME)
-)
-ON COMMIT PRESERVE ROWS      
-/
-grant all on REVISED_TYPES to public
-/
-create global temporary table REVISED_COLL_TYPES
-(
-  OWNER                      VARCHAR2(30) NOT NULL ,
-  TYPE_NAME                  VARCHAR2(30) NOT NULL ,
-  COLL_TYPE                  VARCHAR2(30) NOT NULL ,
-  UPPER_BOUND                NUMBER,
-  ELEM_TYPE_MOD              VARCHAR2(7),
-  ELEM_TYPE_OWNER            VARCHAR2(30),
-  ELEM_TYPE_NAME             VARCHAR2(30),
-  LENGTH                     NUMBER,
-  PRECISION                  NUMBER,
-  SCALE                      NUMBER,
-  CHARACTER_SET_NAME         VARCHAR2(44),
-  ELEM_STORAGE               VARCHAR2(7),
-  NULLS_STORED               VARCHAR2(3),
-  CHAR_USED                  VARCHAR2(1),
-  PRIMARY KEY (OWNER,TYPE_NAME)
-)
-ON COMMIT PRESERVE ROWS      
-/
-grant all on REVISED_COLL_TYPES to public
-/
-create GLOBAL TEMPORARY TABLE REVISED_TYPE_ATTRS
-(
-  OWNER                VARCHAR2(30),
-  TYPE_NAME            VARCHAR2(30),
-  ATTR_NAME            VARCHAR2(30),
-  ATTR_TYPE_MOD        VARCHAR2(7),
-  ATTR_TYPE_OWNER      VARCHAR2(30),
-  ATTR_TYPE_NAME       VARCHAR2(30),
-  LENGTH               NUMBER,
-  PRECISION            NUMBER,
-  SCALE                NUMBER,
-  CHARACTER_SET_NAME   VARCHAR2(44),
-  ATTR_NO              NUMBER,
-  INHERITED            VARCHAR2(3),
-  CHAR_USED            VARCHAR2(1),
-  PRIMARY KEY (OWNER, TYPE_NAME, ATTR_NAME)
-)
-ON COMMIT PRESERVE ROWS
-/
-grant all on REVISED_TYPE_ATTRS to public
-/
-create index XDBPM_ATTR_TYPE_INDEX 
-    on REVISED_TYPE_ATTRS (ATTR_TYPE_OWNER, ATTR_TYPE_NAME)
-/
-create GLOBAL TEMPORARY TABLE REVISED_CHOICE_MODEL
-(
-  CHOICE_REFERENCE REF XMLTYPE,
-  SQLTYPE          VARCHAR2(30),
-  COLUMN_COUNT     NUMBER,
-  PRIMARY KEY      (SQLTYPE)
-)
-/
-grant all on REVISED_TYPE_ATTRS to public
-/
-create table XDBPM_INDEX_DDL_CACHE
-(
-  TABLE_NAME           VARCHAR2(128),
-  OWNER                VARCHAR2(32),
-  INDEX_DDL            XMLType
-)
-/
-grant all on XDBPM_INDEX_DDL_CACHE to public
-/
-create or replace view MISSING_TYPES
-as
-select * 
-  from XDBPM.XDBPM_ALL_TYPES at
- where not exists
-       (
-          select 1 
-            from TYPE_SUMMARY ts
-           where nvl(ts.OWNER,'SYS') = nvl(at.OWNER,'SYS')
-             and ts.TYPE_NAME = at.TYPE_NAME
-       )   
-/
-grant all on MISSING_TYPES to public
-/
-create or replace view MISSING_TYPE_ATTRS
-as
-select ata.*
-  from MISSING_TYPES mt, XDBPM.XDBPM_ALL_TYPE_ATTRS ata
- where mt.TYPE_NAME = ata.TYPE_NAME
-   and mt.OWNER = ata.OWNER
-   and not exists
-       (
-          select 1 
-            from TYPE_SUMMARY ts
-           where nvl(ts.OWNER,'SYS') = nvl(ata.ATTR_TYPE_OWNER,'SYS')
-             and ts.TYPE_NAME = ata.ATTR_TYPE_NAME
-       )   
-/
-grant all on MISSING_TYPE_ATTRS to public
-/
-create or replace view MISSING_TYPE_HIERARCHY
-as
-select level TYPE_LEVEL, ata.TYPE_NAME, ata.OWNER, ATTR_NAME, ATTR_TYPE_NAME, ATTR_TYPE_OWNER
-  from XDBPM.XDBPM_ALL_TYPES at, XDBPM.XDBPM_ALL_TYPE_ATTRS ata
- where at.TYPE_NAME = ata.TYPE_NAME
-   and INHERITED = 'NO'
-   and at.OWNER     = ata.OWNER
-   and not exists
-       (
-          select 1 
-            from TYPE_SUMMARY ts
-           where nvl(ts.OWNER,'SYS') = nvl(ata.ATTR_TYPE_OWNER,'SYS')
-             and ts.TYPE_NAME = ata.ATTR_TYPE_NAME
-       )   
-       and not exists
-       ( 
-         select syn.SYNONYM_NAME, syn.OWNER
-           from ALL_SYNONYMS syn, XDBPM.XDBPM_ALL_TYPES at
-          where syn.TABLE_NAME  = at.TYPE_NAME
-            and syn.TABLE_OWNER = at.OWNER
-            and syn.SYNONYM_NAME = ata.ATTR_TYPE_NAME
-            and syn.OWNER        = ata.ATTR_TYPE_OWNER
-       )
-       connect by SUPERTYPE_NAME = prior at.TYPE_NAME
-              and SUPERTYPE_OWNER = prior at.OWNER
-/
-grant all on MISSING_TYPE_HIERARCHY to public
-/
-create or replace view BASE_TYPE_SUMMARY 
-as
-select ata.TYPE_NAME, ata.OWNER, ata.ATTR_NAME, ata.ATTR_TYPE_NAME, ata.ATTR_TYPE_OWNER,
-       case when ts.OWNER = 'XDB' and (ts.TYPE_NAME = 'XDB$RAW_LIST_T' or ts.TYPE_NAME = 'XDB$ENUM_T')
-            then ts.COLUMN_COUNT
-            else case when exists (
-                                    select 1 from XDBPM.XDBPM_ALL_TYPES at
-                                     where at.TYPE_NAME = ts.TYPE_NAME
-                                       and at.OWNER = ts.OWNER
-                                       and at.FINAL = 'YES'
-                                       and at.TYPECODE = 'OBJECT'
-                                  )
-                      then ts.COLUMN_COUNT + 2
-                      else ts.COLUMN_COUNT
-                 end       
-       end COLUMN_COUNT
-  from XDBPM.XDBPM_ALL_TYPE_ATTRS ata, TYPE_SUMMARY ts
- where ata.ATTR_TYPE_NAME = ts.TYPE_NAME
-	 and nvl(ata.ATTR_TYPE_OWNER,'SYS') = nvl(ts.OWNER,'SYS')
-/
-grant all on BASE_TYPE_SUMMARY to public
-/
-create or replace view EXPANDED_TYPE_SUMMARY
-as
-select bts.TYPE_NAME, bts.OWNER, bts.ATTR_NAME, bts.ATTR_TYPE_NAME, bts.ATTR_TYPE_OWNER, bts.COLUMN_COUNT
-  from BASE_TYPE_SUMMARY bts
-union all
-select at.SUPERTYPE_NAME TYPE_NAME, at.SUPERTYPE_OWNER OWNER, 'SYS$EXTENSION' ATTR_TYPE_NAME, at.TYPE_NAME ATTR_TYPE_NAME, at.OWNER ATTR_TYPE_OWNER, 
-       ts.COLUMN_COUNT -
-	     (
-	       select sum(COLUMN_COUNT)
-		       from BASE_TYPE_SUMMARY bts
-		      where bts.TYPE_NAME = at.SUPERTYPE_NAME
-		        and bts.OWNER = at.SUPERTYPE_OWNER
- 	     )
-  from XDBPM.XDBPM_ALL_TYPES at, TYPE_SUMMARY ts
- where at.TYPE_NAME = ts.TYPE_NAME
-	and at.OWNER = ts.OWNER
-/
-grant all on EXPANDED_TYPE_SUMMARY to public
-/
 create or replace package XDBPM_ANALYZE_XMLSCHEMA
 authid CURRENT_USER
 as  
@@ -275,6 +46,29 @@ create or replace synonym XDB_ANALYZE_SCHEMA for XDBPM_ANALYZE_XMLSCHEMA
 /
 create or replace package body XDBPM_ANALYZE_XMLSCHEMA
 as
+--
+  TYPE TYPE_DEFINITION_T 
+  is RECORD
+  (
+    TYPE_NAME VARCHAR2(30),
+    OWNER     VARCHAR2(30)
+  );
+--
+  TYPE TYPE_LIST_T 
+    is TABLE of TYPE_DEFINITION_T;
+--
+  TYPE CYCLE_LIST_ENTRY_T 
+    is RECORD(
+    TYPE            TYPE_DEFINITION_T,
+    SUPER_TYPE_LIST TYPE_LIST_T
+  );
+--
+  TYPE CYCLE_LIST_T
+    is TABLE of CYCLE_LIST_ENTRY_T;
+--  
+  G_KNOWN_CYCLE_LIST TYPE_LIST_T;
+--
+  G_PROCESSED_TYPE_LIST TYPE_LIST_T;
 --
   G_DEPTH_COUNT NUMBER(2) := 0;
 --
@@ -1707,6 +1501,159 @@ begin
     
   return xmlSchema;
     
+end;
+--
+function isCyclicReference(P_TYPE_NAME VARCHAR2, P_OWNER VARCHAR2, P_ATTR_NAME VARCHAR2, P_ATTR_TYPE_NAME VARCHAR2, P_ATTR_TYPE_OWNER VARCHAR2, P_LEVEL NUMBER,  P_CYCLE_LIST CYCLE_LIST_T)
+return BOOLEAN
+as
+begin	
+	if (P_LEVEL > 50) then
+	  XDB_OUTPUT.WRITEOUTPUTFILEENTRY('Level limit excceeded.',TRUE);
+	  return true;
+	end if;
+	if P_CYCLE_LIST.count() > 0 then
+	  for i in P_CYCLE_LIST.first .. P_CYCLE_LIST.last loop
+	    if P_CYCLE_LIST(i).TYPE.TYPE_NAME = P_ATTR_TYPE_NAME and P_CYCLE_LIST(i).TYPE.OWNER = P_ATTR_TYPE_OWNER then
+     	  XDB_OUTPUT.WRITEOUTPUTFILEENTRY('isCyclicReference [' || P_LEVEL || '] : "' || P_OWNER || '"."' || P_TYPE_NAME || '"."' || P_ATTR_NAME || '"  of type "' || P_ATTR_TYPE_OWNER || '"."' || P_ATTR_TYPE_NAME || '". Cycle Detected.',TRUE);
+	      G_KNOWN_CYCLE_LIST.extend();
+	      G_KNOWN_CYCLE_LIST(G_KNOWN_CYCLE_LIST.last).TYPE_NAME := P_TYPE_NAME;
+	      G_KNOWN_CYCLE_LIST(G_KNOWN_CYCLE_LIST.last).OWNER := P_OWNER;
+        return true;
+      end if;
+      if P_CYCLE_LIST(i).SUPER_TYPE_LIST.count() > 0 then
+        for j in P_CYCLE_LIST(i).SUPER_TYPE_LIST.first .. P_CYCLE_LIST(i).SUPER_TYPE_LIST.last loop
+    	    if P_CYCLE_LIST(i).SUPER_TYPE_LIST(j).TYPE_NAME = P_ATTR_TYPE_NAME and P_CYCLE_LIST(i).SUPER_TYPE_LIST(j).OWNER = P_ATTR_TYPE_OWNER then
+        	  XDB_OUTPUT.WRITEOUTPUTFILEENTRY('isCyclicReference [' || P_LEVEL || '] : "' || P_OWNER || '"."' || P_TYPE_NAME || '"."' || P_ATTR_NAME || '"  of type "' || P_ATTR_TYPE_OWNER || '"."' || P_ATTR_TYPE_NAME || '". Cycle by Supertype Detected.',TRUE);
+     	      G_KNOWN_CYCLE_LIST.extend();
+	          G_KNOWN_CYCLE_LIST(G_KNOWN_CYCLE_LIST.last).TYPE_NAME := P_TYPE_NAME;
+	          G_KNOWN_CYCLE_LIST(G_KNOWN_CYCLE_LIST.last).OWNER := P_OWNER;
+            return true;
+          end if;
+        end loop;
+      end if;
+    end loop;
+  end if;    
+	return false;
+end;
+--
+procedure processType(P_TYPE_NAME VARCHAR2, P_OWNER VARCHAR2,P_LEVEL NUMBER,  P_CYCLE_LIST CYCLE_LIST_T)
+as
+  V_CYCLE_LIST CYCLE_LIST_T := P_CYCLE_LIST;
+  V_LEVEL NUMBER := P_LEVEL + 1;
+  cursor findChildren 
+  is
+  select ATTR_NAME, ATTR_TYPE_NAME, ATTR_TYPE_OWNER
+    from XDBPM.MISSING_TYPE_ATTRS
+   where TYPE_NAME = P_TYPE_NAME
+     and P_OWNER = P_OWNER;
+     
+  cursor findSubTypes
+  is
+  select TYPE_NAME, OWNER
+    from XDBPM.MISSING_TYPES
+   where SUPERTYPE_NAME = P_TYPE_NAME
+    and SUPERTYPE_OWNER = P_OWNER;
+    
+  cursor findSuperTypes 
+  is
+  select SUPERTYPE_NAME, SUPERTYPE_OWNER
+    FROM XDBPM.XDBPM_ALL_TYPES
+         CONNECT BY prior SUPERTYPE_NAME = TYPE_NAME
+                      and SUPERTYPE_OWNER = OWNER
+         START WITH TYPE_NAME = P_TYPE_NAME
+                and OWNER = P_OWNER;
+                   
+  V_CYCLE_DETECTED BOOLEAN := FALSE;
+  
+begin
+	
+	if G_KNOWN_CYCLE_LIST.count() > 0 then
+	  for i in G_KNOWN_CYCLE_LIST.first .. G_KNOWN_CYCLE_LIST.last loop
+	    if G_KNOWN_CYCLE_LIST(i).TYPE_NAME = P_TYPE_NAME and G_KNOWN_CYCLE_LIST(i).OWNER = P_OWNER then
+        XDB_OUTPUT.WRITEOUTPUTFILEENTRY('Skipping known cyclic type : "' || P_OWNER || '"."' || P_TYPE_NAME || '".',TRUE);
+	      return;
+	    end if;
+	  end loop;
+  end if;
+	    
+	if G_PROCESSED_TYPE_LIST.count() > 0 then
+	  for i in G_PROCESSED_TYPE_LIST.first .. G_PROCESSED_TYPE_LIST.last loop
+	    if G_PROCESSED_TYPE_LIST(i).TYPE_NAME = P_TYPE_NAME and G_PROCESSED_TYPE_LIST(i).OWNER = P_OWNER then
+        XDB_OUTPUT.WRITEOUTPUTFILEENTRY('Skipping known non-cyclic type : "' || P_OWNER || '"."' || P_TYPE_NAME || '".',TRUE);
+	      return;
+	    end if;
+	  end loop;
+  end if;
+  
+	V_CYCLE_LIST.extend();
+	V_CYCLE_LIST(V_CYCLE_LIST.last).TYPE.TYPE_NAME := P_TYPE_NAME;
+	V_CYCLE_LIST(V_CYCLE_LIST.last).TYPE.OWNER := P_OWNER;
+	V_CYCLE_LIST(V_CYCLE_LIST.last).SUPER_TYPE_LIST := TYPE_LIST_T();
+	for s in findSupertypes loop
+	  V_CYCLE_LIST(V_CYCLE_LIST.last).SUPER_TYPE_LIST.extend();
+	  V_CYCLE_LIST(V_CYCLE_LIST.last).SUPER_TYPE_LIST(V_CYCLE_LIST(V_CYCLE_LIST.last).SUPER_TYPE_LIST.last).TYPE_NAME := s.SUPERTYPE_NAME;
+	  V_CYCLE_LIST(V_CYCLE_LIST.last).SUPER_TYPE_LIST(V_CYCLE_LIST(V_CYCLE_LIST.last).SUPER_TYPE_LIST.last).OWNER := s.SUPERTYPE_OWNER;
+  end loop;
+	  
+  XDB_OUTPUT.WRITEOUTPUTFILEENTRY('processType [' || P_LEVEL || '] : Checking "' || P_OWNER || '"."' || P_TYPE_NAME || '".',TRUE);
+	for c in findChildren() loop 
+   	XDB_OUTPUT.WRITEOUTPUTFILEENTRY('Child : "' || c.ATTR_TYPE_OWNER || '"."' || c.ATTR_TYPE_NAME || '"."' || c.ATTR_NAME || '".',TRUE);
+	  V_CYCLE_DETECTED := isCyclicReference(P_TYPE_NAME, P_OWNER, c.ATTR_NAME, c.ATTR_TYPE_NAME, c.ATTR_TYPE_OWNER, V_LEVEL,V_CYCLE_LIST);
+	  if ( not V_CYCLE_DETECTED) then
+   	  processType(c.ATTR_TYPE_NAME,C.ATTR_TYPE_OWNER,V_LEVEL,V_CYCLE_LIST);
+	  end if;
+	end loop;
+	
+  for st in findSubTypes() loop
+    XDB_OUTPUT.WRITEOUTPUTFILEENTRY('SubType : "' || st.OWNER || '"."' || st.TYPE_NAME || '".',TRUE);
+ 	  processType(st.TYPE_NAME,st.OWNER,V_LEVEL,V_CYCLE_LIST);
+	end loop;
+
+  G_KNOWN_CYCLE_LIST.extend();
+  G_KNOWN_CYCLE_LIST(G_KNOWN_CYCLE_LIST.last).TYPE_NAME := P_TYPE_NAME;
+  G_KNOWN_CYCLE_LIST(G_KNOWN_CYCLE_LIST.last).OWNER := P_OWNER;
+	  	    
+end;
+--
+procedure generateCycleReport(P_RESOURCE_PATH VARCHAR2 DEFAULT '/public/cycleReport.log')
+as
+  cursor findUnresolvedElements
+  is
+  select ge.XMLDATA.PROPERTY.SQLTYPE  TYPE_NAME,
+         ge.XMLDATA.PROPERTY.SQLSCHEMA OWNER
+    from xdb.xdb$ELEMENT ge, XDBPM.MISSING_TYPES mt
+   where ge.XMLDATA.PROPERTY.SQLTYPE = mt.TYPE_NAME
+     and ge.XMLDATA.PROPERTY.SQLSCHEMA = mt.OWNER
+     and ge.XMLDATA.PROPERTY.GLOBAL = hexToRaw('01')
+     and ge.XMLDATA.HEAD_ELEM_REF is null
+     and not exists
+         (
+           select 1 
+             from XDB.XDB$ELEMENT le
+            where le.XMLDATA.PROPERTY.PROPREF_REF = ref(ge)
+              and le.XMLDATA.PROPERTY.GLOBAL = hexToRaw('00')
+         )
+   order by ge.XMLDATA.PROPERTY.SQLTYPE;
+
+  V_CYCLE_LIST CYCLE_LIST_T;
+  V_TYPE_SUMMARY_SIZE NUMBER :=0;
+  
+begin
+	select count(*) 
+	  into V_TYPE_SUMMARY_SIZE
+	  from XDBPM.TYPE_SUMMARY;
+	  
+	if (V_TYPE_SUMMARY_SIZE = 0) then
+	  XDB_OPTIMIZE_XMLSCHEMA.generateTypeSummary();
+	end if;
+
+	XDB_OUTPUT.createOutputFile(P_RESOURCE_PATH,TRUE);
+	G_KNOWN_CYCLE_LIST := TYPE_LIST_T();
+	G_PROCESSED_TYPE_LIST := TYPE_LIST_T();
+  for ge in findUnresolvedElements() loop
+    V_CYCLE_LIST := CYCLE_LIST_T();
+    processType(ge.TYPE_NAME,ge.OWNER,1,V_CYCLE_LIST);
+  end loop;
 end;
 --
 end XDBPM_ANALYZE_XMLSCHEMA;
