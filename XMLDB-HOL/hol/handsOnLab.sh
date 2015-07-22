@@ -137,7 +137,7 @@ DBAPWD=${2}
 USER=${3}
 USERPWD=${4}
 SERVER=${5}
-XMLDB_HOL_BASE=~/Desktop/DatabaseTrack/XMLDB
+XMLDB_HOL_BASE=~/Desktop/Database_Track/XMLDB
 demohome="$(dirname "$(pwd)")"
 logfilename=$demohome/hol/handsOnLab.log
 echo "Log File : $logfilename"
