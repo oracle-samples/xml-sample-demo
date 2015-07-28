@@ -64,6 +64,7 @@ doInstall() {
     fi
     exit 4
   fi
+  rm -rf $XMLDB_HOL_BASE
   mkdir -p $XMLDB_HOL_BASE
   mkdir -p $XMLDB_HOL_BASE/sampleData
   mkdir -p $XMLDB_HOL_BASE/sql
