@@ -25,7 +25,9 @@ doInstall() {
      mv oracle-xml-sample-demo-* xml-sample-demo
    fi
    cd xml-sample-demo
+   echo "connect sys/$SYSPWD as sysdba" >> install/connect.sql
    sqlplus /nolog @install/configureContainer $PDB $DBA $DBAPWD $HTTPPORT $DEMOUSER $DEMOPWD
+   rm install/connect.sql
    export TWO_TASK=$PDB
    export ORACLE_SID=$PDB
    sqlplus $DBA/$DBAPWD @install/installXFiles $XFILES $XFILESPWD $HTTPPORT
