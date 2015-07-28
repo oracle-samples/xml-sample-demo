@@ -47,7 +47,7 @@ doInstall() {
      mv oracle-json-in-db-* json-in-db
    fi
    cd json-in-db
-   if [ -z "$ORDSHOME/ords.war" ]
+   if [ -n "$ORDSHOME" && -e "$ORDSHOME/ords.war" ]
    then
      sh install/installDBJSON.sh $DBA $DBAPWD $ORDSHOME
    fi
