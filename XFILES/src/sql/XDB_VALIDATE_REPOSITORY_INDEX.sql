@@ -14,13 +14,16 @@
  */
 
 --
+set echo on 
+spool XDB_REPOSITORY_INDEX.log append
+--
 declare
   cursor get_invalid_indexes
   is
   select 1
-    from DBA_OBJECTS
-   where OBJECT_NAME = 'XDB$CI' and OBJECT_TYPE = ''
-     and OWNER = 'XDB' and STATUS = 'INVALID';
+    from DBA_INDEXES
+   where INDEX_NAME = 'XDB$CI' and OWNER = 'XDB'
+     and DOMIDX_OPSTATUS = 'FAILED';
 begin
 	for i in get_invalid_indexes loop
 	  execute immediate 'DROP INDEX XDB.XDB$CI FORCE';
