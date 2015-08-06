@@ -809,17 +809,13 @@ function unimplementedFunction(message) {
 }
 
 function showPageContent() {
-
+	
+  var pageLoading = document.getElementById('pageLoading');
+  pageLoading.style.display="none";
+  var greyLoading = document.getElementById('greyLoading');
+  greyLoading.style.display="none";
   var pageContent = document.getElementById('pageContent');
-  if (pageContent != null) {	
-    var pageLoading = document.getElementById('pageLoading');
-	  if (pageLoading != null) {	
-      pageLoading.style.display="none";
-      var greyLoading = document.getElementById('greyLoading');
-      greyLoading.style.display="none";
-    }
-    pageContent.style.display="block";
-  }
+  pageContent.style.display="block";
 
 }
 
