@@ -24,16 +24,6 @@ doInstall() {
      unzip -o xml-sample-demo-curl.zip
      mv oracle-xml-sample-demo-* xml-sample-demo
    fi
-   cd xml-sample-demo
-   echo "connect sys/$SYSPWD as sysdba" >> install/connect.sql
-   sqlplus /nolog @install/configureContainer $PDB $DBA $DBAPWD $HTTPPORT $DEMOUSER $DEMOPWD
-   rm install/connect.sql
-   export TWO_TASK=$PDB
-   export ORACLE_SID=$PDB
-   sqlplus $DBA/$DBAPWD @install/installXFiles $XFILES $XFILESPWD $HTTPPORT
-   sqlplus $DBA/$DBAPWD @install/installMetadata $XDBEXT $XDBEXTPWD
-   sh install/installXMLRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $XDBEXT $XDBEXTPWD $DEMOUSER $DEMOPWD $SERVERURL
-   cd $INSTALLROOT
    rm -rf json-in-db
    if [ -f "json-in-db-master.zip" ] 
    then
@@ -46,6 +36,19 @@ doInstall() {
      unzip -o json-in-db-curl.zip
      mv oracle-json-in-db-* json-in-db
    fi
+   cd xml-sample-demo
+   echo "connect sys/$SYSPWD as sysdba" >> install/connect.sql
+   unset http_proxy
+   unset https_proxy
+   unset no_proxy   
+   sqlplus /nolog @install/configureContainer $PDB $DBA $DBAPWD $HTTPPORT $DEMOUSER $DEMOPWD
+   rm install/connect.sql
+   export TWO_TASK=$PDB
+   export ORACLE_SID=$PDB
+   sqlplus $DBA/$DBAPWD @install/installXFiles $XFILES $XFILESPWD $HTTPPORT
+   sqlplus $DBA/$DBAPWD @install/installMetadata $XDBEXT $XDBEXTPWD
+   sh install/installXMLRepository.sh $DBA $DBAPWD $XFILES $XFILESPWD $XDBEXT $XDBEXTPWD $DEMOUSER $DEMOPWD $SERVERURL
+   cd $INSTALLROOT
    cd json-in-db
    if [ -n "$ORDSHOME" ] && [ -e "$ORDSHOME/ords.war" ]
    then
