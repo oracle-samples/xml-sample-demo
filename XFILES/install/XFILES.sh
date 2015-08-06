@@ -3953,7 +3953,6 @@ doInstall() {
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/PUBLISH_XFILES.sql OracleTransparent3d.png
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_STATUS_PAGE.sql $USER
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/src/sql/XDB_REPOSITORY_INDEX.sql $DBA $DBAPWD $ORACLE_SID
-  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/src/sql/XDB_VALIDATE_REPOSITORY_INDEX.sql
   shellscriptName="$demohome/XFILES_Application.sh"
   echo "Shell Script : $shellscriptName"
   echo "firefox $SERVER/XFILES"> $shellscriptName

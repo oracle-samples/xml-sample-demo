@@ -782,7 +782,6 @@
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\PUBLISH_XFILES.sql %LOGO%</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_STATUS_PAGE.sql %USER%</action>
 	  <action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\sql\XDB_REPOSITORY_INDEX.sql %DBA% %DBAPASSWORD% %TNSALIAS%</action>
-	  <action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\sql\XDB_VALIDATE_REPOSITORY_INDEX.sql</action>
 	  <action type="LAUNCH"></action>
 	</installation>
   <shortCuts>
