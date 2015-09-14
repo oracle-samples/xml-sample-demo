@@ -1,0 +1,128 @@
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by Mark D. Drake and Geoff Lee (Oracle XML Dev) -->
+<installerConfiguration>
+	<parameters>
+		<parameter name="%DEMONAME%"           value="Oracle XML DB Hands on Lab : Oracle Database 12c"/>
+		<parameter name="%PUBLICFOLDER%"       value="/publishedContent"/>
+		<parameter name="%DEMOCOMMON%"         value="%PUBLICFOLDER%/Hands-On-Labs/XMLDB"/>
+  	<parameter name="%DOCLIBRARY%"         value="%PUBLICFOLDER%/Hands-On-Labs/XMLDB"/>
+		<parameter name="%HOMEFOLDER%"         value="/home/%USER%"/>
+		<parameter name="%DEMOLOCAL%"          value="%HOMEFOLDER%/Hands-On-Labs/XMLDB"/>
+		<parameter name="%XFILES_SCHEMA%"      value="XFILES"/>
+		<parameter name="%DATA_STAGING_TABLE%" value="SAMPLE_DATASET_XMLDB_HOL"/>
+		<parameter name="%TABLE_NAME%"         value="PURCHASEORDER"/> 
+		<parameter name="%SCHEMAURL%"          value="http://localhost:80/publishedContent/HOL/xsd/purchaseOrder.xsd"/>
+		<parameter name="%HOL_BASE%"           value="$HOL_BASE"/>
+		<parameter name="%LABID%"              value="xmldb"/>
+		
+		<parameter name="enableHTTPTrace"      value="false"/>
+	</parameters>
+
+	<installation>
+		<action type="MAKEFOLDERS"/>
+    <action type="UNZIP"/>
+		<action type="COPYFILES"/>
+		<action type="CLONEFOLDERS"/>
+		<action type="CLONEFILES"/>
+
+		<action type="RUNSQL" user="%DBA%"  password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\grantPermissions.sql %USER%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createHomeFolder.sql</action>
+		<action type="RUNSQL" user="%DBA%"  password="%DBAPASSWORD%">"%HOL_BASE%\install\setupLab.sql" %USER% %PASSWORD%</action> -->
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">"%HOL_BASE%\install\resetLab.sql"</action> -->
+	 	<action type="SQLLDR"/>
+ 		
+	  <action type="UPLOAD"> 
+  		<action type="MKCOL" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<remote>%DEMOCOMMON%/xsd</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
+  			<mode>FORCE</mode>
+  			<local>%DEMODIRECTORY%\setup\xsd\purchaseOrder.xsd</local>
+  			<remote>%DEMOCOMMON%/xsd/purchaseOrder.xsd</remote>
+  		</action>
+  	</action>
+	</installation>
+
+	<unzip>
+		<archives>
+			<archive>
+				<source>%DEMODIRECTORY%\setup\sampleData\2015.zip</source>
+				<target>%HOL_BASE%\sampleData</target>
+		  </archive>
+	  </archives>
+	</unzip>
+	
+	<make>
+		<folders>
+			<folder>%HOL_BASE%</folder>
+			<folder>%HOL_BASE%\sampleData</folder>
+			<folder>%HOL_BASE%\sql</folder>
+			<folder>%HOL_BASE%\sqlldr</folder>
+			<folder>%HOL_BASE%\install</folder>
+		</folders>
+	</make>	
+
+	<copy>
+		<files>
+		</files>
+	</copy>
+
+	<clone>
+		<files>
+
+
+			<file>
+				<source>%DEMODIRECTORY%\hol\clone\resetLab.sh</source>
+				<target>$HOME\reset_%LABID%</target>
+			</file>
+			<file>
+				<source>%DEMODIRECTORY%\hol\clone\setupLab.sh</source>
+				<target>%HOL_BASE%\install\setupLab.sh</target>
+			</file>
+			<file>
+				<source>%DEMODIRECTORY%\hol\clone\setupLab.sql</source>
+				<target>%HOL_BASE%\install\setupLab.sql</target>
+			</file>
+
+			<file>
+				<source>%DEMODIRECTORY%\setup\clone\install\setupLab.sql</source>
+				<target>%HOL_BASE%\install\setupLab.sql</target>
+			</file>
+			<file>
+				<source>%DEMODIRECTORY%\setup\clone\sqlldr\DATA-STAGE-2015.ctl</source>
+				<target>%HOL_BASE%\install\%DATA_STAGING_TABLE%.ctl</target>
+			</file>
+			<file>
+				<source>%DEMODIRECTORY%\setup\clone\sqlldr\2015.dat</source>
+				<target>%HOL_BASE%\install\2015.dat</target>
+			</file>
+			<file>
+				<source>%DEMODIRECTORY%\setup\clone\sqlldr\loadPurchaseOrders.sh</source>
+				<target>%HOL_BASE%\sqlldr\loadPurchaseOrders.sh</target>
+			</file>
+			<file>
+				<source>%DEMODIRECTORY%\setup\clone\sqlldr\TABLE-NAME-2015.ctl</source>
+				<target>%HOL_BASE%\sqlldr\%TABLE_NAME%.ctl</target>
+			</file>
+			<file>
+				<source>%DEMODIRECTORY%\setup\clone\sqlldr\2015.dat</source>
+				<target>%HOL_BASE%\sqlldr\2015.dat</target>
+			</file>
+		</files>
+		<folders>
+			<folder>
+				<source>%DEMODIRECTORY%\setup\clone\sql</source>
+				<target>%HOL_BASE%\sql</target>
+			</folder>
+		</folders>
+	</clone>
+
+	<sqlldr>
+		<jobs>
+			<job type="dataLoad">
+			  <controlFile>%HOL_BASE%\install\%DATA_STAGING_TABLE%.ctl</controlFile>
+			</job>
+		</jobs>
+	</sqlldr>
+	
+</installerConfiguration>

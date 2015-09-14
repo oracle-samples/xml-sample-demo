@@ -11,15 +11,18 @@
 # * ================================================ 
 # */
 doInstall() {
-  echo "Installation Parameters for Name Value Pair Optimization."
-  echo "\$DBA         : $DBA"
-  echo "\$USER        : $USER"
-  echo "\$SERVER      : $SERVER"
-  echo "\$DEMOHOME    : $demohome"
-  echo "\$ORACLE_HOME : $ORACLE_HOME"
-  echo "\$ORACLE_SID  : $ORACLE_SID"
+  echo "Installation Parameters: Name Value Pair Optimization."
+  echo "\$DBA            : $DBA"
+  echo "\$USER           : $USER"
+  echo "\$SERVER         : $SERVER"
+  echo "\$DEMOHOME       : $demohome"
+  echo "\$ORACLE_HOME    : $ORACLE_HOME"
+  echo "\$ORACLE_SID     : $ORACLE_SID"
   spexe=$(which sqlplus | head -1)
   echo "sqlplus      : $spexe"
+  unset http_proxy
+  unset https_proxy
+  unset no_proxy
   sqlplus -L $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/verifyConnection.sql
   rc=$?
   echo "sqlplus $DBA:$rc"
@@ -62,7 +65,7 @@ doInstall() {
     fi
     exit 4
   fi
-  mkdir -p $demohome/$USER
+  mkdir -p "$demohome/$USER"
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/grantPermissions.sql $USER
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/createHomeFolder.sql
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/NVPairs" | head -1)
@@ -607,7 +610,7 @@ doInstall() {
       exit 6
     fi
   fi
-  sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|NVPAIR|g" -e "s|%DEMONAME%|Name Value Pair Optimization|g" -e "s|%LAUNCHPAD%|Name Value Pair Optimization|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/XMLDB\/NVPairs|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/XMLDB\/NVPairs|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i $demohome/install/configuration.xml
+  sed -e "s|%DEMODIRECTORY%|$demohome|g" -e "s|%DEMOFOLDERNAME%|NVPAIR|g" -e "s|%DEMONAME%|Name Value Pair Optimization|g" -e "s|%LAUNCHPAD%|Name Value Pair Optimization|g" -e "s|%SHORTCUTFOLDER%|$demohome\/$USER|g" -e "s|%PUBLICFOLDER%|\/publishedContent|g" -e "s|%DEMOCOMMON%|\/publishedContent\/demonstrations\/XMLDB\/NVPairs|g" -e "s|%HOMEFOLDER%|\/home\/%USER%|g" -e "s|%DEMOLOCAL%|\/home\/%USER%\/demonstrations\/XMLDB\/NVPairs|g" -e "s|%XFILES_SCHEMA%|XFILES|g" -e "s|enableHTTPTrace|false|g" -e "s|%ORACLEHOME%|$ORACLE_HOME|g" -e "s|%TNSALIAS%|$ORACLE_SID|g" -e "s|%HOSTNAME%|$HOSTNAME|g" -e "s|%HTTPPORT%|$HTTP|g" -e "s|%FTPPORT%|$FTP|g" -e "s|%DRIVELETTER%||g" -e "s|%DBA%|$DBA|g" -e "s|%DBAPASSWORD%|$DBAPWD|g" -e "s|%USER%|$USER|g" -e "s|%PASSWORD%|$USERPWD|g" -e "s|%SERVERURL%|$SERVER|g" -e "s|%DBCONNECTION%|$USER\/$USERPWD@$ORACLE_SID|g" -e "s|%SQLPLUS%|sqlplus|g" -e "s|\$USER|$USER|g" -e "s|\$SERVER|$SERVER|g" -i $demohome/install/configuration.xml
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/configuration.xml" | head -1)
   if [ $HttpStatus != "404" ] 
   then
