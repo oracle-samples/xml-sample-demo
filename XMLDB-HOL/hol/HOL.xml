@@ -20,14 +20,14 @@
 	<installation>
 		<action type="MAKEFOLDERS"/>
     <action type="UNZIP"/>
-		<action type="COPYFILES"/>
 		<action type="CLONEFOLDERS"/>
 		<action type="CLONEFILES"/>
+		<action type="COPYFILES"/>
 
 		<action type="RUNSQL" user="%DBA%"  password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\grantPermissions.sql %USER%</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createHomeFolder.sql</action>
-		<action type="RUNSQL" user="%DBA%"  password="%DBAPASSWORD%">"%HOL_BASE%\install\setupLab.sql" %USER% %PASSWORD%</action> -->
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">"%HOL_BASE%\install\resetLab.sql"</action> -->
+		<action type="RUNSQL" user="%DBA%"  password="%DBAPASSWORD%">"%HOL_BASE%\install\setupLab.sql" %USER% %PASSWORD%</action>
+		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">"%HOL_BASE%\install\resetLab.sql"</action>
 	 	<action type="SQLLDR"/>
  		
 	  <action type="UPLOAD"> 
@@ -64,12 +64,15 @@
 
 	<copy>
 		<files>
+			<file>
+				<source>$HOL_BASE\sql\0.0 resetLab.sql</source>
+				<target>$HOL_BASE\install\resetLab.sql</target>
+			</file>
 		</files>
 	</copy>
 
 	<clone>
 		<files>
-
 
 			<file>
 				<source>%DEMODIRECTORY%\hol\clone\resetLab.sh</source>
@@ -78,10 +81,6 @@
 			<file>
 				<source>%DEMODIRECTORY%\hol\clone\setupLab.sh</source>
 				<target>%HOL_BASE%\install\setupLab.sh</target>
-			</file>
-			<file>
-				<source>%DEMODIRECTORY%\hol\clone\setupLab.sql</source>
-				<target>%HOL_BASE%\install\setupLab.sql</target>
 			</file>
 
 			<file>
