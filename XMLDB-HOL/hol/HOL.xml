@@ -12,6 +12,7 @@
 		<parameter name="%TABLE_NAME%"         value="PURCHASEORDER"/> 
 		<parameter name="%SCHEMAURL%"          value="http://localhost:80/publishedContent/HOL/xsd/purchaseOrder.xsd"/>
 		<parameter name="%HOL_BASE%"           value="$HOL_BASE"/>
+		<parameter name="%HOL_ROOT%"           value="~/Desktop/Database_Track/XMLDB"/>
 		<parameter name="%LABID%"              value="xmldb"/>
 		
 		<parameter name="enableHTTPTrace"      value="false"/>
