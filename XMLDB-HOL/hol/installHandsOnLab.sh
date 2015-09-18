@@ -74,6 +74,7 @@ doInstall() {
   mkdir -p "$HOL_BASE/sql"
   mkdir -p "$HOL_BASE/sqlldr"
   mkdir -p "$HOL_BASE/install"
+  mkdir -p "$HOL_BASE/manual"
   echo "Unzipping \"$demohome/setup/sampleData/2015.zip\" into \"$HOL_BASE/sampleData\""
   unzip -o -qq "$demohome/setup/sampleData/2015.zip" -d "$HOL_BASE/sampleData"
   echo "Unzip Completed"

@@ -60,6 +60,7 @@
 			<folder>%HOL_BASE%\sql</folder>
 			<folder>%HOL_BASE%\sqlldr</folder>
 			<folder>%HOL_BASE%\install</folder>
+			<folder>%HOL_BASE%\manual</folder>
 		</folders>
 	</make>	
 
