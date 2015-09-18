@@ -29,7 +29,7 @@ declare
   
   cursor getXMLSchemas
   is
-  select QUAL_SCHEMA_URL, OWNER
+  select /*+ NO_XML_QUERY_REWRITE */ QUAL_SCHEMA_URL, OWNER
     from DBA_XML_SCHEMAS
    where XMLExists
          (
