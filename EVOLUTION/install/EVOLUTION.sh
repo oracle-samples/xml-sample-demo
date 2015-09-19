@@ -993,5 +993,8 @@ SERVER=${5}
 demohome="$(dirname "$(pwd)")"
 logfilename=$demohome/install/EVOLUTION.log
 echo "Log File : $logfilename"
-rm $logfilename
+if [ -f "$logfilename" ]
+then
+  rm $logfilename
+fi
 doInstall 2>&1 | tee -a $logfilename

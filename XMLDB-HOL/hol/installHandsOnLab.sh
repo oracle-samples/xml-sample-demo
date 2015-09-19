@@ -186,5 +186,8 @@ LABID="xmldb"
 demohome="$(dirname "$(pwd)")"
 logfilename=$demohome/hol/installHandsOnLab.log
 echo "Log File : $logfilename"
-rm $logfilename
+if [ -f "$logfilename" ]
+then
+  rm $logfilename
+fi
 doInstall 2>&1 | tee -a $logfilename
