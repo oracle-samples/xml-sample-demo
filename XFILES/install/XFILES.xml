@@ -783,6 +783,7 @@
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_STATUS_PAGE.sql %USER%</action>
 	  <action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\src\sql\XDB_REPOSITORY_INDEX.sql %DBA% %DBAPASSWORD% %TNSALIAS%</action>
 	  <action type="LAUNCH"></action>
+	  <action type="ORDS"></action>
 	</installation>
   <shortCuts>
   	<LAUNCH>
