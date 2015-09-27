@@ -12,17 +12,10 @@
 # */
 doInstall() {
   echo "ORDS Installation Parameters: Oracle XML DB XFiles application."
-  echo "\$DBA            : $DBA"
+  echo "\$ORDS_ROOT      : $ORDS_ROOT"
   echo "\$USER           : $USER"
   echo "\$SERVER         : $SERVER"
   echo "\$DEMOHOME       : $demohome"
-  echo "\$ORACLE_HOME    : $ORACLE_HOME"
-  echo "\$ORACLE_SID     : $ORACLE_SID"
-  spexe=$(which sqlplus | head -1)
-  echo "sqlplus      : $spexe"
-  unset http_proxy
-  unset https_proxy
-  unset no_proxy
   rm -rf "$ORDS_ROOT/home/$USER/src/"
   rc=$?
   echo "DELETE "$ORDS_ROOT/home/$USER/src/" : $rc" >> $logfilename
@@ -1762,30 +1755,28 @@ doInstall() {
     echo "Installation Failed: See $logfilename for details."
     exit 7
   fi
-mkdir -p "$ORDS_ROOT/home/$USER/icons/famfamfam"
-unzip "$ORDS_ROOT/home/$USER/src/famfamfam_silk_icons_v013.zip" -d "$ORDS_ROOT/home/$USER/icons/famfamfam" > "$ORDS_ROOT/home/$USER/icons/famfamfam_silk_icons_v013.log"
-mkdir -p "$ORDS_ROOT/home/$USER/Frameworks"
-unzip "$ORDS_ROOT/home/$USER/src/Xinha-0.96.1.zip" -d "$ORDS_ROOT/home/$USER/Frameworks" > "$ORDS_ROOT/home/$USER/Frameworks/Xinha-0.96.1.log"
-mkdir -p "$ORDS_ROOT/home/$USER/Frameworks"
-unzip "$ORDS_ROOT/home/$USER/src/bootstrap3-dialog-master.zip" -d "$ORDS_ROOT/home/$USER/Frameworks" > "$ORDS_ROOT/home/$USER/Frameworks/bootstrap3-dialog-master.log"
-mkdir -p "$ORDS_ROOT/home/$USER/Frameworks"
-unzip "$ORDS_ROOT/home/$USER/src/bootstrap-3.2.0-dist.zip" -d "$ORDS_ROOT/home/$USER/Frameworks" > "$ORDS_ROOT/home/$USER/Frameworks/bootstrap-3.2.0-dist.log"
-mkdir -p "$ORDS_ROOT/home/$USER/Frameworks/jquery-2.1.1"
-unzip "$ORDS_ROOT/home/$USER/src/jquery-2.1.1.min.zip" -d "$ORDS_ROOT/home/$USER/Frameworks/jquery-2.1.1" > "$ORDS_ROOT/home/$USER/Frameworks/jquery-2.1.1.min.log"
-mkdir -p "$ORDS_ROOT/home/$USER/Frameworks"
-unzip "$ORDS_ROOT/home/$USER/src/jssor.zip" -d "$ORDS_ROOT/home/$USER/Frameworks" > "$ORDS_ROOT/home/$USER/Frameworks/jssor.log"
+  mkdir -p "$ORDS_ROOT/home/$USER/icons/famfamfam"
+  unzip "$ORDS_ROOT/home/$USER/src/famfamfam_silk_icons_v013.zip" -d "$ORDS_ROOT/home/$USER/icons/famfamfam" > "$ORDS_ROOT/home/$USER/icons/famfamfam_silk_icons_v013.log"
+  mkdir -p "$ORDS_ROOT/home/$USER/Frameworks"
+  unzip "$ORDS_ROOT/home/$USER/src/Xinha-0.96.1.zip" -d "$ORDS_ROOT/home/$USER/Frameworks" > "$ORDS_ROOT/home/$USER/Frameworks/Xinha-0.96.1.log"
+  mkdir -p "$ORDS_ROOT/home/$USER/Frameworks"
+  unzip "$ORDS_ROOT/home/$USER/src/bootstrap3-dialog-master.zip" -d "$ORDS_ROOT/home/$USER/Frameworks" > "$ORDS_ROOT/home/$USER/Frameworks/bootstrap3-dialog-master.log"
+  mkdir -p "$ORDS_ROOT/home/$USER/Frameworks"
+  unzip "$ORDS_ROOT/home/$USER/src/bootstrap-3.2.0-dist.zip" -d "$ORDS_ROOT/home/$USER/Frameworks" > "$ORDS_ROOT/home/$USER/Frameworks/bootstrap-3.2.0-dist.log"
+  mkdir -p "$ORDS_ROOT/home/$USER/Frameworks/jquery-2.1.1"
+  unzip "$ORDS_ROOT/home/$USER/src/jquery-2.1.1.min.zip" -d "$ORDS_ROOT/home/$USER/Frameworks/jquery-2.1.1" > "$ORDS_ROOT/home/$USER/Frameworks/jquery-2.1.1.min.log"
+  mkdir -p "$ORDS_ROOT/home/$USER/Frameworks"
+  unzip "$ORDS_ROOT/home/$USER/src/jssor.zip" -d "$ORDS_ROOT/home/$USER/Frameworks" > "$ORDS_ROOT/home/$USER/Frameworks/jssor.log"
   shellscriptName="$demohome/XFILES_Application.sh"
   echo "Shell Script : $shellscriptName"
   echo "firefox $SERVER/XFILES"> $shellscriptName
   echo "Installation Complete. See $logfilename for details."
 }
-DBA=${1}
-DBAPWD=${2}
-USER=${3}
-USERPWD=${4}
-SERVER=${5}
+ORDS_ROOT=${1}
+USER=${2}
+SERVER=${3}
 demohome="$(dirname "$(pwd)")"
-logfilename=$demohome/ORDS/installHandsOnLab.log
+logfilename=$demohome/ORDS/install.log
 echo "Log File : $logfilename"
 if [ -f "$logfilename" ]
 then
