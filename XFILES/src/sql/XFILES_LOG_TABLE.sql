@@ -12,12 +12,53 @@
  *
  * ================================================
  */
-
+ 
+--
+-- Revert to Global Token Tables (Pre 12.2 Behavoir)
+--
+var XFILES_SET_EVENT    varchar2(120)
+var XFILES_CLEAR_EVENT  varchar2(120)
+--
+declare
+  V_XFILES_SET_EVENT    varchar2(120);
+  V_XFILES_CLEAR_EVENT  varchar2(120);
+begin
+$IF DBMS_DB_VERSION.VER_LE_11_1 $THEN
+  V_XFILES_SET_EVENT   := 'XFILES_DO_NOTHING.sql';
+  V_XFILES_CLEAR_EVENT := 'XFILES_DO_NOTHING.sql';
+$ELSIF DBMS_DB_VERSION.VER_LE_12_1 $THEN
+  V_XFILES_SET_EVENT   := 'XFILES_DO_NOTHING.sql';
+  V_XFILES_CLEAR_EVENT := 'XFILES_DO_NOTHING.sql';
+$ELSIF DBMS_DB_VERSION.VER_LE_12_2 $THEN
+  V_XFILES_SET_EVENT   := 'XFILES_SET_EVENT.sql 19054 1';
+  V_XFILES_CLEAR_EVENT := 'XFILES_CLEAR_EVENT.sql 19054';
+$ELSE
+  V_XFILES_SET_EVENT   := 'XFILES_DO_NOTHING.sql';
+  V_XFILES_CLEAR_EVENT := 'XFILES_DO_NOTHING.sql';
+$END
+  :XFILES_SET_EVENT   := V_XFILES_SET_EVENT;
+  :XFILES_CLEAR_EVENT := V_XFILES_CLEAR_EVENT;
+end;
+/
+undef XFILES_SET_EVENT 
+--
+column XFILES_SET_EVENT new_value XFILES_SET_EVENT 
+column XFILES_SET_EVENT new_value XFILES_SET_EVENT 
+--
+select :XFILES_SET_EVENT XFILES_SET_EVENT,
+       :XFILES_CLEAR_EVENT XFILES_CLEAR_EVENT
+  from dual
+/
+def XFILES_SET_EVENT
+def XFILES_CLEAR_EVENT
+--
 --
 -- ************************************************
 -- *           Table Creation                   *
 -- ************************************************
 --
+--
+@@&XFILES_SET_EVENT
 --
 declare
   table_exists exception;
@@ -35,6 +76,9 @@ exception
 end;
 /
 --
+@@&XFILES_CLEAR_EVENT
+--
+--
 -- ************************************************
 -- *           Index Creation                   *
 -- ************************************************
@@ -50,6 +94,32 @@ exception
     null;
 end;
 /
+var XFILES_LOG_TABLE_INDEX  varchar2(120)
+--
+declare
+  V_XFILES_LOG_TABLE_INDEX  varchar2(120);
+begin
+$IF DBMS_DB_VERSION.VER_LE_11_1 $THEN
+  V_XFILES_LOG_TABLE_INDEX := 'XFILES_LOG_TABLE_INDEX_11100.sql';
+$ELSIF DBMS_DB_VERSION.VER_LE_12_1 $THEN
+  V_XFILES_LOG_TABLE_INDEX := 'XFILES_LOG_TABLE_INDEX_11201.sql';
+$ELSIF DBMS_DB_VERSION.VER_LE_12_2 $THEN
+  V_XFILES_LOG_TABLE_INDEX := 'XFILES_LOG_TABLE_INDEX_11201.sql';
+$ELSE
+  V_XFILES_LOG_TABLE_INDEX := 'XFILES_LOG_TABLE_INDEX_ERROR.sql';
+$END
+ :XFILES_LOG_TABLE_INDEX := V_XFILES_LOG_TABLE_INDEX;
+end;
+/
+undef XFILES_LOG_TABLE_INDEX 
+--
+column XFILES_LOG_TABLE_INDEX new_value XFILES_LOG_TABLE_INDEX 
+--
+select :XFILES_LOG_TABLE_INDEX XFILES_LOG_TABLE_INDEX
+  from dual
+/
+def XFILES_LOG_TABLE_INDEX
+--
 @@&XFILES_LOG_TABLE_INDEX
 -- 
 -- Create the Parent Value Index on the PATH Table

@@ -196,7 +196,9 @@ begin
     end if;
   end if;
 
+  execute immediate 'alter session set events = ''19054 trace name context forever, level 1''';
   execute immediate 'create table "' || P_TABLE_NAME || '" of XMLType XMLType store as BINARY XML';
+  execute immediate 'alter session set events = ''19054 trace name context off''';
   execute immediate 'create index "' || P_INDEX_NAME || '" on "' || P_TABLE_NAME || '" (OBJECT_VALUE) indextype is xdb.XMLIndex';  
    
   if (P_UPLOAD_FOLDER is not NULL) then
