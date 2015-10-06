@@ -69,16 +69,16 @@ select :SET_CDB_SCRIPT SET_CDB_SCRIPT,
        :SET_PDB_SCRIPT SET_PDB_SCRIPT
   from dual
 /
-def set_CDB_SCRIPT
+def SET_CDB_SCRIPT
 def SET_PDB_SCRIPT
 --
-@@setContainerCDB
+@@&SET_CDB_SCRIPT
 --
 alter user anonymous account unlock
 /
 alter system set shared_servers = 25 scope = both
 /
-@@setContainerPDB
+@@&SET_PDB_SCRIPT
 --
 alter user anonymous account unlock
 /
