@@ -1,4 +1,3 @@
-
 /* ================================================  
  *    
  * Copyright (c) 2015 Oracle and/or its affiliates.  All rights reserved.
@@ -11,39 +10,5 @@
  *
  * ================================================ */
 
-set echo on
-spool configureContainer.log
---
-prompt "Please enter password for SYS/ as SYSDBA when prompted"
---
-@@connect.sql
---
-def TARGET_PDB = &1
---
-def DBA = &2
---
-def DBAPWD = &3
---
-def HTTP = &4
---
-def USERNAME = &5
---
-def USERPWD = &6 
---
 alter session set container = CDB$ROOT
 /
-alter user anonymous account unlock
-/
-alter system set shared_servers = 25 scope = both
-/
-alter session set container = &TARGET_PDB
-/
-alter user anonymous account unlock
-/
-grant connect, resource, SYSDBA, DBA to &DBA identified by &DBAPWD
-/
-call DBMS_XDB_CONFIG.setHttpPort(&HTTP)
-/
-alter user &USERNAME identified by &USERPWD account unlock
-/
-quit

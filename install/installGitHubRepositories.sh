@@ -41,7 +41,7 @@ doInstall() {
    unset http_proxy
    unset https_proxy
    unset no_proxy   
-   sqlplus /nolog @install/configureContainer $PDB $DBA $DBAPWD $HTTPPORT $DEMOUSER $DEMOPWD
+   sqlplus /nolog @install/configureDatabase $PDB $DBA $DBAPWD $HTTPPORT $DEMOUSER $DEMOPWD
    rm install/connect.sql
    export TWO_TASK=$PDB
    export ORACLE_SID=$PDB
