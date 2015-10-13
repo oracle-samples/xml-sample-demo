@@ -32,6 +32,9 @@ as
   procedure enableIndexes;
 
   NO_NAMESPACE constant VARCHAR2(256) := 'http://xmlns.oracle.com/xdb/noNamespace';
+   
+  C_PATHIDPARENT_INDEX constant VARCHAR2(256) := 'STANDARD_HASH("XDBPM"."XDBPM_XMLINDEX_SEARCH"."GETPATHIDPARENT"("PATHID"))';
+  C_PATHIDLENGTH_INDEX constant VARCHAR2(256) := '"XDBPM"."XDBPM_XMLINDEX_SEARCH"."GETPATHIDLENGTH"("PATHID")';
 
 end;
 /
@@ -99,7 +102,7 @@ as
            select ''' || NO_NAMESPACE || ''', null
              from dual
          ) an
-   where XDBPM.XDBPM_XMLINDEX_SEARCH.getPathIdParent(a.PATHID) =  :1
+   where ' || C_PATHIDPARENT_INDEX || ' =  :1
      and a.NAMESPACE = an.NAMESPACE';
 begin
   -- dbms_output.put_line(statement);
@@ -153,7 +156,7 @@ as
            select ''' || NO_NAMESPACE || ''', null
              from dual
          ) cn
-   where XDBPM.XDBPM_XMLINDEX_SEARCH.getPathIdParent(c.PATHID) =  :1
+   where ' || C_PATHIDPARENT_INDEX || ' =  :1
      and c.NAMESPACE = cn.NAMESPACE';
 begin
   -- dbms_output.put_line(statement);
@@ -256,19 +259,19 @@ as
 begin
      
   for idx in getFunctionalIndexes loop
-    if (IDX.COLUMN_EXPRESSION) = '"XDBPM"."XDBPM_XMLINDEX_SEARCH"."GETPATHIDPARENT"("PATHID")' then
+    if (IDX.COLUMN_EXPRESSION = C_PATHIDPARENT_INDEX) then
       v_pidp_index_name := idx.INDEX_NAME;
       v_pidp_index_owner := idx.INDEX_OWNER;
     end if;
 
-    if (IDX.COLUMN_EXPRESSION) = '"XDBPM"."XDBPM_XMLINDEX_SEARCH"."GETPATHIDLENGTH"("PATHID")' then
+    if (IDX.COLUMN_EXPRESSION) = C_PATHIDLENGTH_INDEX then
       v_pidl_index_name := idx.INDEX_NAME;
       v_pidl_index_owner := idx.INDEX_OWNER;
     end if;      
   end loop;
   
   if v_pidp_index_name is null then
-    execute immediate 'create index "' || SUBSTR(pathTableName,1,22) || '_PIDPIDX" on "' || pathTableName || '" ("XDBPM"."XDBPM_XMLINDEX_SEARCH"."GETPATHIDPARENT"("PATHID"))';
+    execute immediate 'create index "' || SUBSTR(pathTableName,1,22) || '_PIDPIDX" on "' || pathTableName || '" (' || C_PATHIDPARENT_INDEX || ')';
   else
     select FUNCIDX_STATUS
       into v_index_status
@@ -282,7 +285,7 @@ begin
   end if;
   
   if v_pidl_index_name is null then
-    execute immediate 'create index "' || SUBSTR(pathTableName,1,22) || '_PIDLIDX" on "' || pathTableName || '" ("XDBPM"."XDBPM_XMLINDEX_SEARCH"."GETPATHIDLENGTH"("PATHID"))';
+    execute immediate 'create index "' || SUBSTR(pathTableName,1,22) || '_PIDLIDX" on "' || pathTableName || '" (' || C_PATHIDLENGTH_INDEX || ')';
   else
     select FUNCIDX_STATUS
       into v_index_status
@@ -347,7 +350,7 @@ is
   statement VARCHAR2(4096) :=  
 'select distinct PATHID 
    from "' || pathTableOwner || '"."'|| pathTableName || '" 
-  where XDBPM.XDBPM_XMLINDEX_SEARCH.getPathidLength(PATHID) = 1';
+  where ' || C_PATHIDLENGTH_INDEX || ' = 1';
 
   getRootElementList sys_refcursor;
   
@@ -408,15 +411,15 @@ as
    where aie.INDEX_NAME = ai.INDEX_NAME
      and aie.INDEX_OWNER = ai.OWNER
      and FUNCIDX_STATUS = 'DISABLED';
-  -- where COLUMN_EXPRESSION = '"XDBPM"."XDBPM_XMLINDEX_SEARCH"."GETPATHIDPARENT"("PATHID")'
-  --    or COLUMN_EXPRESSION = '"XDBPM"."XDBPM_XMLINDEX_SEARCH"."GETPATHIDLENGTH"("PATHID")';
+  -- where COLUMN_EXPRESSION = C_PATHIDPARENT_INDEX
+  --    or COLUMN_EXPRESSION = C_PATHIDLENGTH_INDEX;
 
 begin
      
   for idx in getFunctionalIndexes loop
-    if (idx.COLUMN_EXPRESSION = '"XDBPM"."XDBPM_XMLINDEX_SEARCH"."GETPATHIDPARENT"("PATHID")')
+    if (idx.COLUMN_EXPRESSION = C_PATHIDPARENT_INDEX)
       or
-       (idx.COLUMN_EXPRESSION = '"XDBPM"."XDBPM_XMLINDEX_SEARCH"."GETPATHIDLENGTH"("PATHID")')
+       (idx.COLUMN_EXPRESSION = C_PATHIDLENGTH_INDEX)
     then
       dbms_output.put_line('Enabling Index "' || idx.INDEX_OWNER || '"."' || idx.INDEX_NAME || '"');
       execute immediate 'alter index "' || idx.INDEX_OWNER || '"."' || idx.INDEX_NAME || '" enable';
