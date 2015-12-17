@@ -20,6 +20,7 @@ var stylesheetURL;
 // Cache the current XSL to allow local sorting without refetching the XSL.
 
 var folderXSL;
+var dialogList = new Object;
                   
 var xfilesNamespaces ;
 var xfilesPrefixList = orawsvPrefixList;
@@ -78,7 +79,7 @@ function getCacheGuid(resource) {
 }
 
      
-function transformToHTML(target,resource,stylesheetURL) {
+function renderResourceAsHTML(target,resource,stylesheetURL) {
 	 
 	/*
 	**
@@ -86,9 +87,21 @@ function transformToHTML(target,resource,stylesheetURL) {
 	** Server Side. 
 	**
 	*/
-		 
-	var stylesheet = loadXSLDocument(stylesheetURL);
+	
+  // Remove any DIV objects that have been relocated outside of the outputWindow as a result of being used as a Bootstrap Modal Dialog.
+
+  if (typeof dialogList == 'object') {
+	  var openDialogList = Object.keys(dialogList);
+	  for (var i=0;i<openDialogList.length;i++) {
+	  	var dialogName = openDialogList[i];
+	    document.body.removeChild(document.getElementById(dialogName));
+	  }
+    dialogList = new Object;  
+	}
+ 
+	var stylesheet = loadXSLDocument(stylesheetURL);	
   xmlToHTML(target,resource,stylesheet);
+  loadScripts();
 
 }
 
@@ -620,8 +633,7 @@ function abortAccessDenied(module,e) {
 function displayResource(resource, outputWindow, stylesheetURL) {
 
   resourceURL = resource.selectNodes("/res:Resource/xfiles:ResourceStatus/xfiles:CurrentPath/@xfiles:EncodedPath",xfilesNamespaces).item(0).nodeValue;
-  transformToHTML(outputWindow,resource,stylesheetURL);
-  loadScripts();
+  renderResourceAsHTML(outputWindow,resource,stylesheetURL);
 
 }
 
@@ -750,10 +762,10 @@ function displayFolder(resource, outputWindow, stylesheetURL) {
 
   // Cache folderXSL to enable local sorting.
 
-	folderXSL = loadXSLDocument(stylesheetURL);
-  transformToHTML(outputWindow,resource,stylesheetURL);
-  loadScripts();
-  
+	folderXSL = loadXSLDocument(stylesheetURL);	   
+  renderResourceAsHTML(outputWindow,resource,stylesheetURL);
+
+ 
 }
 
 function processFolderREST(newResource, outputWindow, stylesheetURL) {
@@ -875,8 +887,7 @@ function doFolderJump(newFolderPath,newStylesheetURL) {
 function displayVersionHistory(resource, outputWindow, stylesheetURL) {
 
   resourceURL = resource.selectNodes("/res:Resource/xfiles:ResourceStatus/xfiles:CurrentPath/@xfiles:EncodedPath",xfilesNamespaces).item(0).nodeValue;
-  transformToHTML(outputWindow,resource,stylesheetURL);
-  loadScripts();
+  renderResourceAsHTML(outputWindow,resource,stylesheetURL);
   
 }
 

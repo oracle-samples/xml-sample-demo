@@ -105,7 +105,10 @@ function createFolder(newFolderPath, newFolderDescription, outputWindow) {
 
 }
 
-function createNewFolder(folderName, folderDescription) {
+function createNewFolder(folderNameControl, folderDescriptionControl) {
+
+	var folderName = document.getElementById(folderNameControl).value;
+	var folderDescription = document.getElementById(folderDescriptionControl).value;
 
   if (isEmptyString(folderName)) {
     showUserErrorMessage("Please enter name");
@@ -118,8 +121,8 @@ function createNewFolder(folderName, folderDescription) {
     document.getElementById("newFolderName").focus();
     return;
   }
-  
- 	closeModalDialog('newFolderDialog');
+
+  closeModalDialog('newFolderDialog');
   createFolder(resourceURL + "/" + folderName, folderDescription, document.getElementById("pageContent"));
   
 }
@@ -128,8 +131,7 @@ function openNewFolderDialog(evt) {
 
   document.getElementById("newFolderName").value = "";
   document.getElementById("newFolderDescription").value = "";
-
-	openModalDialog('newFolderDialog');
+  openModalDialog('newFolderDialog');
 
 }
 

@@ -2237,6 +2237,9 @@ function xfilesException(module,id,target,exception) {
 function openModalDialog(dialogName) {
 
   $('#' + dialogName).modal('show');
+  if (typeof dialogList == 'object') {
+  	dialogList[dialogName] = 1;
+ 	}
 
 }
 

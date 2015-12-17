@@ -109,7 +109,7 @@
 							<button id="btnCancelNewFolder" type="button" class="btn btn-default btn-med" data-dismiss="modal">
 								<span class="glyphicon glyphicon-ban-circle"/>
 							</button>
-							<button id="btnDoNewFolder" type="button" class="btn btn-default btn-med" onclick="createNewFolder(document.getElementById('newFolderName').value,document.getElementById('newFolderDescription').value);false;">
+							<button id="btnDoNewFolder" type="button" class="btn btn-default btn-med" onclick="createNewFolder('newFolderName','newFolderDescription');false;">
 								<span class="glyphicon glyphicon-save"/>
 							</button>
 						</div>

@@ -21,7 +21,7 @@ function loadContents() {
 
   try {
     var contentXML = loadXMLDocument(resourceURL);
-	  transformToHTML(document.getElementById('sourcearea'),contentXML,'/XFILES/common/xsl/formatDBURI.xsl');
+	  renderResourceAsHTML(document.getElementById('sourcearea'),contentXML,'/XFILES/common/xsl/formatDBURI.xsl');
   }
   catch (e) {
     if (e.status == "AccessDenied") {
