@@ -889,8 +889,8 @@ function webkitLoadXSLDocument(targetURL) {
 **     XHR.open("GET", url ,false);
 **     XHR.send(null);
 ** 	   if (XHR.status == 200) {
-**       var result = new xmlDocument(XHR.responseXML);
-**       result.loadedFromURL = targetURL;
+**       var result = new xmlDocument(XHR.responseXML,xmlDocument.ResponseXML);
+**       result.sourceURL = targetURL;
 **       return result;
 **     }
 **     else {
@@ -1011,7 +1011,7 @@ function getResourceXML(resourceURL, includeContent) {
     if (nodeList.length == 1) {
       var resource = new xmlDocument();
       var node = resource.appendChild(resource.importNode(nodeList.item(0),true))
-      resource.loadedFromURL = resourceURL;
+      resource.sourceURL = resourceURL;
       return resource;
     }
      
@@ -1296,29 +1296,33 @@ function prettyPrintRootFragment(xml, target) {
    }
 
 }
+  
+function appendHTML (html,target,appendMode) {
 
-function appendHTML (htmlContent,target,appendMode) {
-
-/*
-**
-** In IE the result of the resullt of the transform is HTML text : Display the result of the transform by appending it to innerHTML property of the targetNode.
-**
-** In Firefox and Chrome check if the type of the htmlContent.
-** If htmlContent is a string display the result of the transform by appending it to innerHTML property of the targetNode.
-** If htmlContent is a document fragment display the result of the transform by invoking the appendChild() method of the targetNode.
-**
-*/
-
+  /*
+  **
+  ** Display the html by appending it to the targetNode.
+  **
+  ** The appendMode parameter controls wether or not the html replaces the current content of the target
+  **
+  ** In IE the html is always a string so it appended to the innerHTML property of the target node.
+  **
+  ** In Firefox and Chrome check the type of the generated html.
+  ** If the html is an instance of string display it by appending it to innerHTML property of the target node.
+  ** If the html is an instance of document fragment display it by invoking the appendChild() method of the target node.
+  **
+  */
+  
   if ((!appendMode) || (appendMode == false)) {
     target.innerHTML = "";
   }
    
   if (useMSXML) {   
    	try {
-       target.innerHTML = target.innerHTML + htmlContent;
+       target.innerHTML = target.innerHTML + html;
     }
     catch (e) {
-      error = new xfilesException('common.appendHTML',10,xml.loadedFromURL,e);
+      error = new xfilesException('common.appendHTML',10,xml.sourceURL,e);
       error.setDescription("Error while appending to innerHTML of " + htmlContent.nodeName + " to " + target.nodeName + ".");
       throw error;   
     }
@@ -1326,27 +1330,31 @@ function appendHTML (htmlContent,target,appendMode) {
   else {
   // Manage errors related to appending invalid HTML with FireFox
     try {
-    	if (typeof htmlContent === "string") {
-       target.innerHTML = target.innerHTML + htmlContent;
+    	if (typeof html === "string") {
+       target.innerHTML = target.innerHTML + html;
       }
       else {
-        target.appendChild(htmlContent);
+        target.appendChild(html);
       }
     }
     catch (e) {
       error = new xfilesException('common.appendHTML',10,null,e);
       if (e.name == 'NS_ERROR_DOM_HIERARCHY_REQUEST_ERR') {
-        error.setDescription("NS_ERROR_DOM_HIERARCHY_REQUEST_ERR : Cannot append instance of " + htmlContent.nodeName + " to " + target.nodeName + ".");
+        error.setDescription("NS_ERROR_DOM_HIERARCHY_REQUEST_ERR : Cannot append instance of " + html.nodeName + " to " + target.nodeName + ".");
       }
       else {
-        error.setDescription("Generic Error while appending instance of " + htmlContent.nodeName + " to " + target.nodeName + ".");
+        error.setDescription("Generic Error while appending instance of " + html.nodeName + " to " + target.nodeName + ".");
       }
       throw error;   
     }
   }
 }
 
-function htmlFromContent(resourceURL,stylesheetURL) {
+function remoteTransformContent(resourceURL,xslPath) {
+
+  // Server-Side XSL Transformation of the content XML document. 
+  // Using REST enables server side based XSL transformation for anonymous users.
+  // Output is not necessarily well formed XML
   
   try {
       
@@ -1357,13 +1365,13 @@ function htmlFromContent(resourceURL,stylesheetURL) {
     else {
     	restURL += 'RestService/';
     }
-    restURL += 'XFILES.XFILES_REST_SERVICES.HTMLFROMCONTENT?P_RESOURCE_PATH=' + encodeURIComponent( resourceURL ) + '&P_XSL_PATH=' + encodeURIComponent(stylesheetURL)
+    restURL += 'XFILES.XFILES_REST_SERVICES.TRANSFORMCONTENTTOHTML?P_RESOURCE_PATH=' + encodeURIComponent( resourceURL ) + '&P_XSL_PATH=' + encodeURIComponent(xslPath)
 
  		var XHR = soapManager.createGetRequest(restURL,false);
  	  XHR.mozBackgroundRequest = true;
     XHR.send(null);
   	if (XHR.status != 200) {
-      error = new xfilesException('common.htmlFromContent',8, restURL, null);
+      error = new xfilesException('common.remoteTransformContent',8, restURL, null);
       error.setDescription(XHR.statusText);
       error.setNumber(XHR.statusText);
       throw error;
@@ -1371,100 +1379,247 @@ function htmlFromContent(resourceURL,stylesheetURL) {
     return XHR.responseText;
   }
   catch (e) {
-    error = new xfilesException('common.htmlFromContent',10, resource.loadedFromURL, e);
+    error = new xfilesException('common.remoteTransformContent',10, resource.sourceURL, e);
     throw error;    
   }
 }
 
-function contentAsHTML(target,xml,xsl,appendMode) {
-	  
-	/*
-	**
-	**	Use when the XML can be accessed using XDBURITYPE(xmlPath)
-  **
-	** Perform the Transformation and append to the target element. 
-	**
-	** appendMode controls wether or not the existing content of the target
-	** is replace by the result of the transformation
-	**
-  */
+function remoteTransformCache(guid,xslPath) {
 
-  var transformOutput
+  // Server-Side XSL Transformation of a document that has been cached on the server
+  // Using REST enables server side based XSL transformation for anonymous users.
+  // Output is not necessarily well formed XML
+  
+  // Legacy : htmlFromCache
   
   try {
-    transformOutput = xml.transformToHTML(xsl);
-  }
-  catch (e) {
-  	if (e.rootCauseBrowserXSL()) {
-	    transformOutput = htmlFromContent(xml.loadedFromURL,xsl.loadedFromURL);
-	  }
-	  else {
-      error = new xfilesException('common.contentAsHTML',9,xml.loadedFromURL,e);
-      error.setDescription('Error generating HTML via XSL transformation');
+      
+    var restURL = '/sys/servlets/XFILES/';
+  	if (isAuthenticatedUser()) {
+      restURL += 'Protected/';
+    }
+    else {
+    	restURL += 'RestService/';
+    }
+    restURL += 'XFILES.XFILES_REST_SERVICES.TRANSFORMCACHETOHTML?P_GUID=' + encodeURIComponent( guid ) + '&P_XSL_PATH=' + encodeURIComponent(xslPath)
+
+ 		var XHR = soapManager.createGetRequest(restURL,false);
+ 	  XHR.mozBackgroundRequest = true;
+    XHR.send(null);
+  	if (XHR.status != 200) {
+      error = new xfilesException('common.remoteTransformCache',8, restURL, null);
+      error.setDescription(XHR.statusText);
+      error.setNumber(XHR.status); 
       throw error;
     }
-  }
-  
-  try {
-    appendHTML(transformOutput,target,appendMode);
+    return XHR.responseText;
   }
   catch (e) {
-    error = new xfilesException('common.contentAsHTML',9,xml.loadedFromURL,e);
-    error.setDescription('Error appending HTML to target');
-    throw error;
+    error = new xfilesException('common.remoteTransformCache',10, resource.sourceURL, e);
+    throw error;    
   }
 }
 
-function remoteXML2XML(xml,xslPath) {
+function remoteTransformXMLTypeToXHTML(xml,xslPath) {
 
-    // Server-Side XSL Transformation
-    // Result is returned as a text node
+  // Server-Side XSL Transformation of an document that is not available on the server
+  // Result of the transformation is expected to be a valid XML document 
+  // Output of transformation is expected to be well formed XML
+  // Ouptut is returned as text node. 
 
-    var schema  = "XFILES";
-    var package = "XFILES_SOAP_SERVICES";
-    var method =  "TRANSFORMDOCUMENT1";
+  // Use SOAP since we need to send the document to be transformed.
+  // Since this requires a POST operation it cannot be enabled for anonynous since POST operations
+  // are not supported for anonymous users.
+
+  try {
+     
+	  if (isAuthenticatedUser()) {
+      var schema  = "XFILES";
+      var package = "XFILES_SOAP_SERVICES";
+      var method =  "TRANSFORMDOCUMENT1";
   
-    try {
- 
     	var mgr = soapManager.getRequestManager(schema,package,method);
      	var XHR = mgr.createPostRequest(false);
-  
+
   	  var parameters = new Object
     	parameters["P_XSL_PATH-VARCHAR2-IN"]   = xslPath;
-  
+ 
     	var xparameters = new Object;
   	  xparameters["P_XML_DOCUMENT-XMLTYPE-IN"]   = xml
   		
       mgr.sendSoapRequest(parameters,xparameters);   
-  
-      var soapResponse = mgr.getSoapResponse('common.remoteXML2XML');
-  
+ 
+      var soapResponse = mgr.getSoapResponse('common.remoteTransformXMLType');
+ 
    	  var namespaces = xfilesNamespaces
   	  namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
   	
       var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/tns:XMLTRANSFORM",namespaces);
       return nodeList.item(0).firstChild.nodeValue;
       // return nodeList.item(0).firstChild.nextSibling;
-   }
-   catch (e) {  
-      error = new xfilesException('common.remoteXML2XML',9, xslPath, e);
-      error.setDescription('Error invoking remote XSL Transformation via SOAP.');
+    }
+    else {
+      error = new xfilesException('common.remoteTransformXMLType',9, xslPath, e);
+      error.setDescription('Remote XSL Transformation only supported for authenticated users.');
       throw error;
-   }
+    }
+  }
+  catch (e) {  
+    error = new xfilesException('common.transformClientXML',9, xslPath, e);
+    error.setDescription('Error invoking remote XSL Transformation via SOAP.');
+    throw error;
+  }
 
 }
 
-function remoteXML2CDATA(xml,xslPath) {
 
-    // Server-Side XSL Transformation
-    // Result is returned as a CDATA section
-
-    var schema  = "XFILES";
-    var package = "XFILES_SOAP_SERVICES";
-    var method =  "TRANSFORMDOCUMENTTOHTML1";
+function transformToXHTML(xml,xsl) {
+	
+	/*
+	**
+	** Attempt a browser based transformation using the supplied XML and XSL.
+	** 
+	** If the browser based transformation fails attempt a server based transformation.
+	** The most common cause for failure is Chrome when the XSL makes use of the include directive
+	**
+	** If the XML comes from an XML DB Resource check to see if the resource has been cached. 
+	** Documents fetched using the XFILES_REPOSITORY_SERVICES package etc can be cached 
+	** on the server at the request of the client. Caching of Resource documents is typically 
+	** enabled in environments where browser based transformation is not reliable.
+	**
+	** If the Resource document has been cached pass the GUID to the cached Resource to the server
+	** If the Resource document was not cached pass the URL of the Resource to the server.
+	**
+	** If the XML was generated on the client or by DBNWS services then pass the entire XML to the server.
+  **
+  */
   
-    try {
- 
+  var html
+  
+  try {
+    html = xml.transformToHTML(xsl);
+  }
+  catch (e) {
+  	if (e.rootCauseBrowserXSL()) {
+      if (xml.isContent()) {
+      	// Document is content of an XDB Resource
+				html = remoteTransformContent(xml.sourceURL,xsl.sourceURL)
+		  }
+		  else {
+		  	if (xml.isCached()) {
+		  		html = remoteTransformCache(xml.getGUID(),xsl.sourceURL)
+		    }
+		  	else {
+		  		html = remoteTransformXMLTypeToXHTML(xml,xsl.sourceURL)
+		    }
+		  }
+  	}	  
+	  else {
+      error = new xfilesException('common.transformToXHTML',9,xml.sourceURL,e);
+      error.setDescription('Error generating HTML via XSL transformation');
+      throw error;
+    }
+  }
+  
+  return html;
+  
+}
+
+function transformXMLtoXHTML(xml,xsl,target,appendMode) {
+
+	/*
+	**
+	** Transformation the XML using the XSL and append to the target element. 
+	** Assume the output of any server based transformation operations will always be valid XHTML.
+	**
+  */
+
+  // Called from legacy functions
+  //    xmlToHTML(target,xml,xsl,appendMode)
+  //    documentToXML(target,xml,xsl,appendMode)
+  //    contentAsHTML(target,xml,xsl,appendMode)
+  
+  var html
+
+  try {
+    html = transformToXHTML(xml,xsl) 
+  }
+  catch (e) {
+    error = new xfilesException('common.transformXMLtoXHTML',9,xml.sourceURL,e);
+    error.setDescription('Error generating HTML via XSL transformation');
+    throw error;
+  }
+
+  try {
+    appendHTML(html,target,appendMode);
+  }
+  catch (e) {
+    error = new xfilesException('common.transformXMLtoXHTML',9,xml.sourceURL,e);
+    error.setDescription('Error appending HTML to target');
+    throw error;
+  }
+}  
+
+function xmlToHTML(target,xml,xsl,appendMode) {
+	
+	// Legacy entry point
+  
+  try {
+	  transformXMLtoXHTML(xml,xsl,target,appendMode);
+  }
+  catch (e) {
+    error = new xfilesException('common.xmlToHTML',9,xml.sourceURL,e);
+    error.setDescription('Error generating HTML');
+    throw error;
+  }
+}
+  
+function documentToXML(target,xml,xsl,appendMode) {
+	
+	// Legacy entry point
+  
+  try {
+	  transformXMLtoXHTML(xml,xsl,target,appendMode);
+  }
+  catch (e) {
+    error = new xfilesException('common.documentToXML',9,xml.sourceURL,e);
+    error.setDescription('Error generating HTML');
+    throw error;
+  }
+}
+
+function contentAsHTML(target,xml,xsl,appendMode) {
+	
+	// Legacy entry point
+  
+  try {
+	  transformXMLtoXHTML(xml,xsl,target,appendMode);
+  }
+  catch (e) {
+    error = new xfilesException('common.contentAsHTML',9,xml.sourceURL,e);
+    error.setDescription('Error generating HTML');
+    throw error;
+  }
+}
+  
+function remoteTransformXMLTypeToHTML(xml,xslPath) {
+
+  // Server-Side XSL Transformation of an document that is not available on the server
+  // Result of the transformation may not be a valid XML document 
+  // Result is returned as a CDATA section,
+
+
+  // Use SOAP since we need to send the document to be transformed.
+  // Since this requires a POST operation it cannot be enabled for anonynous since POST operations
+  // are not supported for anonymous users.
+
+  try {
+     
+	  if (isAuthenticatedUser()) {
+      var schema  = "XFILES";
+      var package = "XFILES_SOAP_SERVICES";
+      var method =  "TRANSFORMDOCUMENTTOHTML1";
+  
     	var mgr = soapManager.getRequestManager(schema,package,method);
      	var XHR = mgr.createPostRequest(false);
   
@@ -1495,205 +1650,109 @@ function remoteXML2CDATA(xml,xslPath) {
       
       var cdataSection = nodeList.item(0).firstChild.nodeValue;
       return cdataSection.substring(9,cdataSection.length-4);
-   }
-   catch (e) {  
-      error = new xfilesException('common.remoteXML2HTML',9, xslPath, e);
-      error.setDescription('Error invoking remote XSL Transformation via SOAP.');
-      throw error;
-   }
-
-}
-
-function htmlFromDocument(xml,stylesheetURL) {
-  
-  try {    
-  	if (isAuthenticatedUser()) {
-  		return remoteXML2CDATA(xml,stylesheetURL);
     }
     else {
-      error = new xfilesException('common.htmlFromDocument',9, xslPath, e);
+      error = new xfilesException('common.transformClientXMLRemote2',9, xslPath, e);
       error.setDescription('Remote XSL Transformation only supported for authenticated users.');
       throw error;
     }
   }
-  catch (e) {
-    error = new xfilesException('common.htmlFromDocument',10, xml.loadedFromURL, e);
-    throw error;    
+  catch (e) {  
+    error = new xfilesException('common.transformClientXMLRemote2',9, xslPath, e);
+    error.setDescription('Error invoking remote XSL Transformation via SOAP.');
+    throw error;
   }
 }
+
+function transformToHTML(xml,xsl) {
+	
+	/*
+	**
+	** Attempt a browser based transformation using the supplied XML and XSL.
+	** 
+	** If the browser based transformation fails attempt a server based transformation.
+	** The most common cause for failure is Chrome when the XSL makes use of the include directive
+	**
+	** If the XML comes from an XML DB Resource check to see if the resource has been cached. 
+	** Documents fetched using the XFILES_REPOSITORY_SERVICES package etc can be cached 
+	** on the server at the request of the client. Caching of Resource documents is typically 
+	** enabled in environments where browser based transformation is not reliable.
+	**
+	** If the Resource document has been cached pass the GUID to the cached Resource to the server
+	** If the Resource document was not cached pass the URL of the Resource to the server.
+	**
+	** If the XML was generated on the client or by DBNWS services then pass the entire XML to the server.
+  **
+  */
+  
+  var html
+  
+  try {
+    html = xml.transformToHTML(xsl);
+  }
+  catch (e) {
+  	if (e.rootCauseBrowserXSL()) {
+      html = remoteTransformXMLTypeToHTML(xml,xsl.sourceURL);
+  	}	  
+	  else {
+      error = new xfilesException('common.transformToHTML',9,xml.sourceURL,e);
+      error.setDescription('Error generating HTML via XSL transformation');
+      throw error;
+    }
+  }
+  
+  return html;
+  
+}
+
+function transformXMLtoHTML(xml,xsl,target,appendMode) {
+
+	/*
+	**
+	** Transformation the XML using the XSL and append to the target element. 
+	** Use when the output of any server based transformation operations will not be valid XHTML.
+	**
+  */
+
+  // Called from legacy functions
+  //    documentToHTML(target,xml,xsl,appendMode)
+  
+  var html
+
+  try {
+    html = transformToHTML(xml,xsl) 
+  }
+  catch (e) {
+    error = new xfilesException('common.transformXMLtoHTML',9,xml.sourceURL,e);
+    error.setDescription('Error generating HTML via XSL transformation');
+    throw error;
+  }
+
+  try {
+    appendHTML(html,target,appendMode);
+  }
+  catch (e) {
+    error = new xfilesException('common.transformXMLtoHTML',9,xml.sourceURL,e);
+    error.setDescription('Error appending HTML to target');
+    throw error;
+  }
+}  
 
 function documentToHTML(target,xml,xsl,appendMode) {
 	
-	/*
-	**
-	** Use when the XML to be transformed cannot be cached in the XFILES_RESULT_CACHE
-	** The primary use cade for this would be XML generated on the client or XML
-	** generated using the DBNWS SQL or XQUERY services. 
-  **
-	** Perform the Transformation and append to the target element. 
-	**
-	** appendMode controls wether or not the existing content of the target
-	** is replace by the result of the transformation
-	**
-  */
+	// Legacy entry point
   
-  var transformOutput
   
   try {
-    transformOutput = xml.transformToHTML(xsl);
+	  transformXMLtoHTML(xml,xsl,target,appendMode);
   }
   catch (e) {
-  	if (e.rootCauseBrowserXSL()) {
-	    transformOutput = htmlFromDocument(xml,xsl.loadedFromURL);
-	  }
-	  else {
-      error = new xfilesException('common.documentAsHTML',9,xml.loadedFromURL,e);
-      error.setDescription('Error generating HTML via XSL transformation');
-      throw error;
-    }
-  }
-  
-  try {
-    appendHTML(transformOutput,target,appendMode);
-  }
-  catch (e) {
-    error = new xfilesException('common.documentAsHTML',9,xml.loadedFromURL,e);
-    error.setDescription('Error appending HTML to target');
+    error = new xfilesException('common.contentAsHTML',9,xml.sourceURL,e);
+    error.setDescription('Error generating HTML');
     throw error;
   }
 }
 
-function xmlFromDocument(xml,stylesheetURL) {
-  
-  try {
-      
-    var restURL = '/sys/servlets/XFILES/';
-  	if (isAuthenticatedUser()) {
-  		return remoteXML2XML(xml,stylesheetURL);
-    }
-    else {
-      error = new xfilesException('common.xmlFromDocument',9, xslPath, e);
-      error.setDescription('Remote XSL Transformation only supported for authenticated users.');
-      throw error;
-    }
-  }
-  catch (e) {
-    error = new xfilesException('common.xmlFromDocument',10, resource.loadedFromURL, e);
-    throw error;    
-  }
-}
-
-function documentToXML(target,xml,xsl,appendMode) {
-	
-	/*
-	**
-	** Use when the XML to be transformed cannot be cached in the XFILES_RESULT_CACHE
-	** The primary use cade for this would be XML generated on the client or XML
-	** generated using the DBNWS SQL or XQUERY services. 
-  **
-	** Perform the Transformation and append to the target element. 
-	**
-	** appendMode controls wether or not the existing content of the target
-	** is replace by the result of the transformation
-	**
-  */
-  
-  var transformOutput
-  
-  try {
-    transformOutput = xml.transformToHTML(xsl);
-  }
-  catch (e) {
-  	if (e.rootCauseBrowserXSL()) {
-	    transformOutput = xmlFromDocument(xml,xsl.loadedFromURL);
-	  }
-	  else {
-      error = new xfilesException('common.documentAsXML',9,xml.loadedFromURL,e);
-      error.setDescription('Error generating HTML via XSL transformation');
-      throw error;
-    }
-  }
-  
-  try {
-    appendHTML(transformOutput,target,appendMode);
-  }
-  catch (e) {
-    error = new xfilesException('common.documentAsHTML',9,xml.loadedFromURL,e);
-    error.setDescription('Error appending HTML to target');
-    throw error;
-  }
-}
-
-function htmlFromCache(guid,stylesheetURL) {
-  
-  try {
-      
-    var restURL = '/sys/servlets/XFILES/';
-  	if (isAuthenticatedUser()) {
-      restURL += 'Protected/';
-    }
-    else {
-    	restURL += 'RestService/';
-    }
-    restURL += 'XFILES.XFILES_REST_SERVICES.HTMLFROMCACHE?P_GUID=' + encodeURIComponent( guid ) + '&P_XSL_PATH=' + encodeURIComponent(stylesheetURL)
-
- 		var XHR = soapManager.createGetRequest(restURL,false);
- 	  XHR.mozBackgroundRequest = true;
-    XHR.send(null);
-  	if (XHR.status != 200) {
-      error = new xfilesException('common.htmlFromCache',8, restURL, null);
-      error.setDescription(XHR.statusText);
-      error.setNumber(XHR.status); 
-      throw error;
-    }
-    return XHR.responseText;
-  }
-  catch (e) {
-    error = new xfilesException('common.htmlFromCache',10, resource.loadedFromURL, e);
-    throw error;    
-  }
-}
-
-function xmlToHTML(target,xml,xsl,appendMode) {
-	
-	/*
-	**
-	**	Use when the XML to be transformed has been cached in the XFILES_RESULT_CACHE
-  **
-	** Perform the Transformation and append to the target element. 
-	**
-	** appendMode controls wether or not the existing content of the target
-	** is replace by the result of the transformation
-	**
-  */
-  
-  var transformOutput
-  
-  try {
-    transformOutput = xml.transformToHTML(xsl);
-  }
-  catch (e) {
-  	if (e.rootCauseBrowserXSL()) {
-	  	var GUID = getCacheGuid(xml);
-	    transformOutput = htmlFromCache(GUID,xsl.loadedFromURL);
-	  }
-	  else {
-      error = new xfilesException('common.xmlToHTML',9,xml.loadedFromURL,e);
-      error.setDescription('Error generating HTML via XSL transformation');
-      throw error;
-    }
-  }
-
-  try {
-    appendHTML(transformOutput,target,appendMode);
-  }
-  catch (e) {
-    error = new xfilesException('common.xmlToHTML',9,xml.loadedFromURL,e);
-    error.setDescription('Error appending HTML to target');
-    throw error;
-  }
-}
-  
 function getParameter( name )
 {
   var regexS = "[\\?&]"+name+"=([^&#]*)";
@@ -2375,7 +2434,7 @@ var xfilesHandleException = function(module, e, target) {
     	if (e.id == 6) {
         if (e.xml) {
         	document.getElementById('errorTraceServer').style.display = "block";
-        	xmlToHTML(document.getElementById('errorTraceServerText'),e.xml,errStackXSL);
+        	transformXMLtoXHTML(e.xml,errStackXSL,document.getElementById('errorTraceServerText'));
       	}
       }
       else {
@@ -2587,7 +2646,7 @@ function exceptionToHTML (e,parent) {
   	if (e.xml) {
      	pre = document.createElement("pre");
     	wrapper.appendChild(pre);
-     	xmlToHTML(pre,e.xml,errStackXSL);
+     	transformXMLtoXHTML(e.xml,errStackXSL,pre);
     }
   }
   else {
@@ -2827,7 +2886,7 @@ function WsdlCache() {
     wsdlCache[target] = new Array(url,namespace,requestDocument,elementName);    
 
     target = "XDB.ORAWSV.XQUERY";
-    requestDocument = wsdl.transformToDocument(requestXSL);     
+    requestDocument = wsdl.transformToDocument(requestXSL);    
     requestDocument.selectNodes("/env:Envelope/env:Body/orawsv:query/orawsv:query_text",namespaces).item(0).setAttribute("type","XQUERY");
     wsdlCache[target] = new Array(url,namespace,requestDocument,elementName);    
   }

@@ -54,6 +54,7 @@ as
   procedure GETVERSIONHISTORY(P_RESOURCE_PATH IN VARCHAR2, P_TIMEZONE_OFFSET NUMBER DEFAULT 0, P_RESOURCE IN OUT XMLType);
   procedure getAclList(P_ACL_LIST OUT XMLType);
 
+  procedure cacheResult(P_RESOURCE IN OUT XMLTYPE);
 end;
 /
 show errors
@@ -1648,6 +1649,26 @@ procedure getPrivileges(P_RESOURCE_PATH IN VARCHAR2, P_PRIVILEGES IN OUT XMLTYPE
 as
 begin 
 	P_PRIVILEGES := DBMS_XDB.getPrivileges(P_RESOURCE_PATH);
+end;
+--
+procedure CACHERESULT(P_RESOURCE IN OUT XMLTYPE) 
+as
+  V_GUID RAW(16);
+begin
+	V_GUID := SYS_GUID();
+	select insertChildXML(
+	         P_RESOURCE,
+	         '/r:Resource/xfiles:xfilesParameters',
+	         'cacheGUID',
+	         xmlElement("cacheGUID",
+	           xmlAttributes(XFILES_CONSTANTS.NAMESPACE_XFILES as "xmlns"),
+	           V_GUID
+	         ),
+	         DBMS_XDB_CONSTANTS.NSPREFIX_RESOURCE_R || ' ' || XFILES_CONSTANTS.NSPREFIX_XFILES_XFILES
+	       )
+	  into P_RESOURCE
+	  from DUAL;
+	insert into XFILES_RESULT_CACHE values (SYSTIMESTAMP,sys_context('USERENV', 'CURRENT_SCHEMA'),P_RESOURCE,V_GUID);
 end;
 --
 begin

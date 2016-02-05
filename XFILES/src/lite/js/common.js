@@ -70,7 +70,7 @@ function getCacheGuid(resource) {
 	
 	var cacheGUID = resource.selectNodes("/res:Resource/xfiles:xfilesParameters/xfiles:cacheGUID",xfilesNamespaces).item(0)
 	if (cacheGUID == null) {
-    error = new xfilesException('common.getCacheGuid',12,resource.loadedFromURL, null);
+    error = new xfilesException('common.getCacheGuid',12,resource.sourceURL, null);
     error.setDescription('Unable to locate GUID');
     throw error;
   }
@@ -100,7 +100,7 @@ function renderResourceAsHTML(target,resource,stylesheetURL) {
 	}
  
 	var stylesheet = loadXSLDocument(stylesheetURL);	
-  xmlToHTML(target,resource,stylesheet);
+  transformXMLtoXHTML(resource,stylesheet,target);
   loadScripts();
 
 }
@@ -213,7 +213,7 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
    
    var self = this;
 
-   xmlToHTML(this.targetWindow,this.treeState,this.treeStateXSL);
+   transformXMLtoXHTML(this.treeState,this.treeStateXSL,this.targetWindow);
    
    function toggleChildren(parent,state) {
      for (i=0 ; i < parent.childNodes.length; i++) {
@@ -232,14 +232,14 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
    this.showChildren = function ( id ) { 
      node = self.treeState.selectNodes('//*[@id="' + id + '"]/@children',self.treeNamespaces).item(0);
      node.value = 'visible';
-     xmlToHTML(self.targetWindow,self.treeState,self.treeStateXSL);
+     transformXMLtoXHTML(self.treeState,self.treeStateXSL,self.targetWindow);
      raiseEvent(target,"click");
    }
 
    this.hideChildren = function ( id ) { 
      node = self.treeState.selectNodes('//*[@id="' + id + '"]/@children',self.treeNamespaces).item(0);
      node.value = 'hidden';
-     xmlToHTML(self.targetWindow,self.treeState,self.treeStateXSL);
+     transformXMLtoXHTML(self.treeState,self.treeStateXSL,self.targetWindow);
      raiseEvent(target,"click");
    }
 
@@ -291,7 +291,7 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
      	 }
      	 else {
      	 	 folderName = folderPath.substring(0,folderPath.indexOf("/"));
-     	 	 folderPath = folderPath.substring(folderPath.lastIndexOf("/") + 1);
+     	 	 folderPath = folderPath.substring(folderPath.indexOf("/") + 1);
        }
        targetNode =  new xmlElement( targetNode.selectNodes('*[@name="' + folderName + '"]',self.treeNamespaces).item(0));
   	 }
@@ -320,7 +320,7 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
        node.setAttribute('children','visible');
        node = node.parentNode;
      }
-     xmlToHTML(self.targetWindow,self.treeState,self.treeStateXSL);
+     transformXMLtoXHTML(self.treeState,self.treeStateXSL,self.targetWindow);
      raiseEvent(target,"click");
 
    }
@@ -328,7 +328,7 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
    this.makeClosed = function ( id ) { 
      node = self.treeState.selectNodes('//*[@isOpen="open"]',self.treeNamespaces).item(0);
      node.setAttribute('isOpen','closed');
-     xmlToHTML(self.targetWindow,self.treeState,self.treeStateXSL);
+     transformXMLtoXHTML(self.treeState,self.treeStateXSL,self.targetWindow);
      raiseEvent(target,"click");
    }
 }
@@ -580,7 +580,7 @@ function doSearch(searchType,searchTerms) {
   }
   
   if (action == 'XSD') {
-     window.location='/XFILES/lite/Resource.html?target=' + ('/XFILES/XMLSearch/xmlSchema/xmlSchemaList.xml') + '&stylesheet=' + escape('/XFILES/lite/xsl/XMLSchemaList.xsl') + '&includeContent=true';   
+     window.location='/XFILES/lite/Resource.html?target=' + ('/XFILES/XMLSearch/xmlSchema/xmlSchemaObjectList.xml') + '&stylesheet=' + escape('/XFILES/lite/xsl/XMLSchemaObjectList.xsl') + '&includeContent=true';   
   }
   
   if (action == 'XIDX') {
@@ -780,7 +780,7 @@ function processFolderREST(newResource, outputWindow, stylesheetURL) {
   		abortAccessDenied('common.processFolderREST',e);
     }
     else {
-      handleException('common.processFolderREST',e,newResource.loadedFromURL);
+      handleException('common.processFolderREST',e,newResource.sourceURL);
     }
   }
 

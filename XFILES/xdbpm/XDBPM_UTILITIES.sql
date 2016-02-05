@@ -1320,6 +1320,9 @@ show errors
 --
 alter package XDB.XDBPM_HELPER compile
 /
-alter session set current_schema = SYS
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
+alter SESSION SET CURRENT_SCHEMA = SYS
+/
+--
 --

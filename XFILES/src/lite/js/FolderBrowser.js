@@ -910,7 +910,7 @@ function doLocalSort(sortKey,sortOrder) {
     sortOrderValue.firstChild.nodeValue = sortOrder;
     if (cacheResult == 1) {
       if (isAuthenticatedUser()) {
-        var transformOutput = htmlFromDocument(resource,folderXSL.loadedFromURL);
+        var transformOutput = htmlFromDocument(resource,folderXSL.sourceURL);
         appendHTML(transformOutput,document.getElementById("pageContent"),false);
       }
       else {

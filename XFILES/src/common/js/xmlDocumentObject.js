@@ -13,20 +13,22 @@
  * ================================================
  */
 
-var nodeTypeElement   =  1;
-var nodeTypeAttribute =  2;
-var nodeTypeText      =  3;
-var nodeTypeCData     =  4;
-var nodeTypeEntityRef =  5;
-var nodeTypeEntity    =  6;
-var nodeTypePI        =  7;
-var nodeTypeComment   =  8;
-var nodeTypeDocument  =  9;
-var nodeTypeDTD       = 10;
-var nodeTypeDocFrag   = 11;
-var nodeTypeNotation  = 12;
+const nodeTypeElement   =  1;
+const nodeTypeAttribute =  2;
+const nodeTypeText      =  3;
+const nodeTypeCData     =  4;
+const nodeTypeEntityRef =  5;
+const nodeTypeEntity    =  6;
+const nodeTypePI        =  7;
+const nodeTypeComment   =  8;
+const nodeTypeDocument  =  9;
+const nodeTypeDTD       = 10;
+const nodeTypeDocFrag   = 11;
+const nodeTypeNotation  = 12;
 
 function namespaceManager(namespaces) {
+
+  const className = "XMLDocumentObject.namespaceManager";
 
   var ns = namespaces
   var nsList = rebuildNamespaceList();
@@ -42,12 +44,12 @@ function namespaceManager(namespaces) {
   this.resolveNamespace = function (prefix) { return ns[prefix] || null };
   this.getNamespaces = function () { return nsList };
   this.redefinePrefix = function (prefix, namespace) { ns[prefix] = namespace; nsList = rebuildNamespaceList(); }
-  this.getClassName = function() { return "XMLDocumentObject.namespaceManager"};
+  this.getClassName = function() { return className};
 }
 
 function xsltProcessor( xsl, target) {
 
-  var className = "XMLDocumentObject.xsltProcessor";
+  const className = "XMLDocumentObject.xsltProcessor";
 
   var processor;
   var engine;
@@ -70,14 +72,14 @@ function xsltProcessor( xsl, target) {
         self.processor.importStylesheet(xsl.baseDocument); 
       }
       else {
-        error = new xfilesException(className,9, self.stylesheet.loadedFromURL, null);
+        error = new xfilesException(className,9, self.stylesheet.sourceURL, null);
         error.setDescription('Browser does not support an XSLT Processor');
         throw error;
       }
     }
   }
   catch (e) {  
-    error = new xfilesException(className,9, self.stylesheet.loadedFromURL, e);
+    error = new xfilesException(className,9, self.stylesheet.sourceURL, e);
     error.setDescription('Error Instantiating XSLT Processor');
     throw error;
   }
@@ -93,7 +95,7 @@ function xsltProcessor( xsl, target) {
       return self.processor.transformToFragment(node,document);
     }
     catch (e) {  
-      error = new xfilesException(className + '.gecko2xml',9, self.stylesheet.loadedFromURL, e);
+      error = new xfilesException(className + '.gecko2xml',9, self.stylesheet.sourceURL, e);
       error.setDescription('[GECKO]Error in processor.transformToFragment().');
       throw error;
     }
@@ -101,10 +103,17 @@ function xsltProcessor( xsl, target) {
   
   function gecko2document(node) {
     try {
-      return self.processor.transformToDocument(node);
+    	var transformationResult = self.processor.transformToDocument(node);
+      if (transformationResult == null) {
+	      error = new xfilesException(className + '.gecko2document',9, self.stylesheet.sourceURL, null);
+  	    error.setDescription('Transformation resulted in empty document.');
+  	    error.setXML(self.stylesheet);
+    	  throw error;
+      }
+      return transformationResult;
     }
     catch (e) {  
-      error = new xfilesException(className + '.gecko2document',9, self.stylesheet.loadedFromURL, e);
+      error = new xfilesException(className + '.gecko2document',9, self.stylesheet.sourceURL, e);
       error.setDescription('[GECKO]Error in processor.transformToDocument().');
       throw error;
     }
@@ -146,7 +155,7 @@ function xsltProcessor( xsl, target) {
       
       // return remoteTransform(xml);
       
-      error = new xfilesException('xsltProcessor.toXML',8, self.stylesheet.loadedFromURL, null);
+      error = new xfilesException('xsltProcessor.toXML',8, self.stylesheet.sourceURL, null);
       error.setDescription('Your browser does not appear to implement client-side XSL Transformation correctly. For Chrome or Safari see "http://code.google.com/p/chromium/issues/detail?id=8441"');
       throw error;
     }
@@ -217,7 +226,7 @@ function xsltProcessor( xsl, target) {
   	  	result = this.processor.transformToFragment(node.baseDocument,document);
   		  if (result == null) {
           // Transformation Failed - Chrome Transform slipped through the cracks ?
-          error = new xfilesException(className + '.transformToHTML',17, self.stylesheet.loadedFromURL, null);
+          error = new xfilesException(className + '.transformToHTML',17, self.stylesheet.sourceURL, null);
           error.setDescription('Browser XSL Transformation Failure');
           throw error;     			 
 			  }
@@ -225,7 +234,7 @@ function xsltProcessor( xsl, target) {
       }
     }
     catch (e) {
-      error = new xfilesException(className + '.transformToHTML',9, self.stylesheet.loadedFromURL, e);
+      error = new xfilesException(className + '.transformToHTML',9, self.stylesheet.sourceURL, e);
       throw error;   
     }
 	}  	
@@ -235,7 +244,7 @@ function xsltProcessor( xsl, target) {
 
 function xmlNodeList(nl) {
 
-  var className = "XMLDocumentObject.xmlNodeList"
+  const  className = "XMLDocumentObject.xmlNodeList"
   var innerNodeList;
   var length;
   
@@ -260,7 +269,7 @@ function xmlNodeList(nl) {
 
 function xmlElement(element) {
   
-  var className = "XMLDocumentObject.xmlElement";
+  const className = "XMLDocumentObject.xmlElement";
  
   var baseElement;
   var self;
@@ -308,24 +317,50 @@ function xmlElement(element) {
   this.getClassName = function() { return className};
 }
 
-function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
+function xmlDocument(baseDocument,documentType,documentNamespaces) {
 
-  var className = "XMLDocumentObject.xmlDocument";
+  const className = "XMLDocumentObject.xmlDocument";
 
+  const MicrosoftDOM  = 1; // Microsoft FreeThreadedDOM ActiveX object
+  const NativeDOM     = 2; // Firefox Native DOM
+  const ResponseXML   = 3; // responseXML from XMLHTTP object
+  
+  const sourceLoad = 1 
+  const sourceParse = 2
+  const sourceConstructor = 3
+  
+  var innerNode;
+  var documentType;
+  var documentNamespaces;
+  var sourceURL;
+  var documentSource;
+  var onReadyStateChange;
+  
+  var resourcePrefixList = {
+        'res'    : 'http://xmlns.oracle.com/xdb/XDBResource.xsd',
+        'xfiles' : 'http://xmlns.oracle.com/xdb/xfiles'
+      };
+
+  var resourceNamespaces = new namespaceManager(resourcePrefixList);
+
+  var self = this;
+    
   function createNewDocument() {
+
+    self.documentSource = sourceConstructor;
 
     try {
       //code for Internet Explorer
       if (useMSXML) {
         self.baseDocument = new ActiveXObject(domImplementation); 
-        self.implementation = MicrosoftDOM;
+        self.documentType = MicrosoftDOM;
       }
       // code for gecko, Firefox, etc.
       else {
         if (document.implementation && document.implementation.createDocument) {
           self.baseDocument  = document.implementation.createDocument("","",null); 
           self.baseDocument.preserveWhiteSpace=false;
-          self.implementation = NativeDOM;
+          self.documentType = NativeDOM;
         }
         else {
           error = new xfilesException('xmlDocumentObject.newxmlDocument.createNewDocument',8, null, null);
@@ -341,10 +376,23 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
     }
   }
    
+  if (baseDocument) {
+    if (!useMSXML) {
+    	stripInsignificantWhitespace(baseDocument.documentElement);
+    }
+    this.baseDocument        = baseDocument;
+    this.documentSource      = sourceConstructor;
+    this.documentType        = documentType;
+    this.documentNamespaces  = documentNamespaces;
+  }
+  else {
+    createNewDocument();
+  }
+
   function checkParsing(module, xml) {
 
     if (xml == null) {
-      error = new xfilesException(self.getClassName() || '.checkParsing',4, self.loadedFromURL, null);
+      error = new xfilesException(self.getClassName() || '.checkParsing',4, self.sourceURL, null);
       error.setDescription('XML is null');
       throw error;
     }
@@ -354,11 +402,11 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
       	var error
       	if (xml.parseError.errorCode == -2147024891) {
       		// Access Denied
-          error = new xfilesException(module,1,self.loadedFromURL, null);
+          error = new xfilesException(module,1,self.sourceURL, null);
         }
         else {
         	// Other Parsing Errors
-          error = new xfilesException(module,2,self.loadedFromURL, null);
+          error = new xfilesException(module,2,self.sourceURL, null);
         }
         error.setDescription("[MSXML]XML Parsing error : " + xml.parseError.reason);
         error.setNumber(xml.parseError.errorCode);
@@ -369,21 +417,20 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
       if (xml.documentElement) {
         root = xml.documentElement;
         if (root.nodeName == 'parsererror')  {
-          error = new xfilesException(self.getClassName() || '.checkParsing',2,self.loadedFromURL, null);
+          error = new xfilesException(self.getClassName() || '.checkParsing',2,self.sourceURL, null);
 	        error.setDescription("[GECKO]XML Parsing Error");
           error.setXML(new xmlDocument(xml));
           throw error;
         }
       }
       else {
-        error = new xfilesException(self.getClassName() || '.checkParsing',4, self.loadedFromURL, null);
+        error = new xfilesException(self.getClassName() || '.checkParsing',4, self.sourceURL, null);
         error.setDescription('Unable to load Document');
         throw error;
       }
     }   
   }
   
-
   function msftConvertImplementation(incorrectVersion) {
      try {
        correctedVersion = new ActiveXObject(domImplementation); 
@@ -392,7 +439,7 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
        return correctedVersion.documentElement;
      }
      catch (e) {
-       error = new xfilesException(className + '.msftConvertImplementation',8, self.loadedFromURL, e);
+       error = new xfilesException(className + '.msftConvertImplementation',8, self.sourceURL, e);
        throw error;
      }
   }
@@ -448,7 +495,7 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
 
   }
   
-  function getProcessorFromCache(url,target) {
+  function getProcessorFromCache(url) {
     var processor = xslProcessorCache[url];
    	return processor;
   }
@@ -468,18 +515,18 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
           else {
          	  if (stylesheet.getClassName() == "XMLDocumentObject.xmlDocument") {
          	  	xsl = stylesheet;
-         	  	url = xsl.loadedFromURL;
+         	  	url = xsl.sourceURL;
          	  	processor = getProcessorFromCache(url,target);
   	        }
   	        else {
-              error = new xfilesException(self.getClassName() || '.getXSLProcessor',8, self.loadedFromURL, null);
+              error = new xfilesException(self.getClassName() || '.getXSLProcessor',8, self.sourceURL, null);
               error.setDescription('Cannot instantiate XSL Processor from ' + stylesheet.getClassName());
               throw error;
             }
   	      }
   	    }
   	    else {  	  	
-          error = new xfilesException(self.getClassName() || '.getXSLProcessor',8, self.loadedFromURL, null);
+          error = new xfilesException(self.getClassName() || '.getXSLProcessor',8, self.sourceURL, null);
           error.setDescription('Cannot instantiate XSL Processor from ' + typeof stylesheet);
           throw error;
   			}
@@ -501,39 +548,27 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
 	    return processor;		
 	  }
     catch (e)	{
-      error = new xfilesException(self.getClassName() || '.getXSLProcessor',8, self.loadedFromURL, e);
+      error = new xfilesException(self.getClassName() || '.getXSLProcessor',8, self.sourceURL, e);
       error.setDescription('Cannot instantiate XSL Processor from ' + typeof xsl);
       throw error;
     }
   	
   }
   
-  var innerNode;
-  var implementation;
-  var namespaceManager;
-  var loadedFromURL;
-  var onReadyStateChange;
-
-  var self = this;
-    
-  var MicrosoftDOM  = 1; // Microsoft FreeThreadedDOM ActiveX object
-  var NativeDOM     = 2; // Firefox Native DOM
-  var ResponseXML   = 3; // responseXML from XMLHTTP object
+  this.isContent = function () {
+  	return (self.documentSource == self.sourceLoad);
+  }
   
-  if (baseDocument) {
-    if (!useMSXML) {
-    	stripInsignificantWhitespace(baseDocument.documentElement);
-    }
-    this.baseDocument      = baseDocument;
-    this.implementation    = baseDocumentType;
-    this.namespaceManager  = namespaceManager;
+  this.isCached = function() {
+    return (self.selectNodes("/res:Resource/xfiles:xfilesParameters/xfiles:cacheGUID",self.resourceNamespaces).length == 1)
   }
-  else {
-    createNewDocument();
+  
+  this.getGUID = function() {
+    return self.selectNodes("/res:Resource/xfiles:xfilesParameters/xfiles:cacheGUID",self.resourceNamespaces).item(0).firstChild.nodeValue;
   }
-
-  this.setNamespaceManager = function ( namespaceManager ) {
-    self.namespaceManager = namespaceManager;
+  
+  this.setNamespaceManager = function ( documentNamespaces ) {
+    self.documentNamespaces = documentNamespaces;
   }
     
   this.serialize = function (node) {
@@ -551,7 +586,7 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
         return self.serialize(self.baseDocument)
       }
       else {
-        error = new xfilesException(className + '.serialize',8, self.loadedFromURL, null);
+        error = new xfilesException(className + '.serialize',8, self.sourceURL, null);
         error.setDescription('Cannont Serialize emtpy Document');
         throw error;
       }
@@ -559,13 +594,116 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
   }
 
   this.checkParsing = function () {
-  	checkParsing("xmlDocumentObject.xmlDocument.load",self.baseDocument);
+  	checkParsing(className + ".load",self.baseDocument);
+  }
+
+  function xhrLoad(url, asynchronousMode, cached) {
+  	
+  	// Implement XML.load function for Chrome / Safari ?
+  	
+	  var XHR = soapManager.createGetRequest(url,asynchronousMode);
+	  
+	  if (!cached) {
+		  XHR.setRequestHeader("Cache-Control", "no-cache");
+      XHR.setRequestHeader("Pragma", "no-cache");
+      XHR.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 1970 00:00:00 GMT");
+    }
+	 
+	  XHR.mozBackgroundRequest = true;
+	  if (asynchronousMode) {
+	    XHR.onreadystatechange = function () { 
+	    	if (XHR.readyState==4) {
+    		  var onLoadFunction = self.baseDocument.onload;
+    		  if (XHR.status != 200) {
+    		  	self.baseDocument = document.implementation.createDocument("","",null); 
+    		  	var parserError = self.baseDocument.createElement('parsererror');
+    		  	self.baseDocument.appendChild(parserError);
+    		  	var httpStatus = self.baseDocument.createElement('httpStatus');
+    		  	httpStatus.appendChild(self.baseDocument.createTextNode(XHR.status));
+    		  	var httpStatusText = self.baseDocument.createElement('httpStatus');
+    		  	httpStatusText.appendChild(self.baseDocument.createTextNode(XHR.statusText));
+    		  	var responseText = self.baseDocument.createElement("responseText")
+    		  	responseText.appendChild(self.baseDocument.createCDATASection(XHR.responseText));
+    		  	parserError.appendChild(httpStatus);
+    		  	parserError.appendChild(httpStatusText);
+    		  	parserError.appendChild(responseText);
+    		  }
+    		  else {
+        		if ((XHR.responseXML == null) && (XHR.responseText == "")) {
+        		  if (cached) {
+    					  xhrLoad(url,asynchronousMode,false)
+    					  return
+    					}
+    					else {
+        	      error = new xfilesException(className + '.xhrLoad[ASYNC]',7, url, null);
+                error.setDescription('[CHROME]Empty Content : HTTP Status = ' + XHR.status + " (" + XHR.statusText + ")");
+                throw error;
+    				  }
+    				}
+    				else {
+          		if (XHR.responseXML != null) {
+          		  self.baseDocument = XHR.responseXML; 
+          		}
+        	  	else {
+        		    self.baseDocument = new DOMParser().parseFromString(XHR.responseText,"text/xml");
+        		  }
+        		}
+            		if ((XHR.responseXML == null) && (XHR.responseText == "") && (cached)) {
+      	      xhrLoad(url, asynchronousMode, false);
+	          }
+ 	    		  if (XHR.responseXML != null) {
+ 	    		    self.baseDocument = XHR.responseXML; 
+ 	    		  }
+      		  else {
+      		 	  self.baseDocument = new DOMParser().parseFromString(XHR.responseText,"text/xml");
+      		  }
+    	  	}
+  	  	  onLoadFunction(); 
+	    	}
+	    };
+	  }
+	  
+    XHR.send(null);
+    
+    if (!asynchronousMode) {
+    	if (XHR.status == 200) {
+    		if ((XHR.responseXML == null) && (XHR.responseText == "")) {
+    		  if (cached) {
+					  xhrLoad(url,asynchronousMode,false)
+					  return
+					}
+					else {
+    	      error = new xfilesException(className + '.xhrLoad[SYNC]',7, url, null);
+            error.setDescription('[CHROME]Empty Content : HTTP Status = ' + XHR.status + " (" + XHR.statusText + ")");
+            throw error;
+				  }
+				}
+				else {
+      		if (XHR.responseXML != null) {
+      		  self.baseDocument = XHR.responseXML; 
+      		}
+    	  	else {
+    		    self.baseDocument = new DOMParser().parseFromString(XHR.responseText,"text/xml");
+    		  }
+    		}
+      }
+      else {
+	      error = new xfilesException(className + '.xhrLoad[SYNC]',7, url, null);
+        error.setDescription('[CHROME]Error Loading Document : HTTP Status = ' + XHR.status + " (" + XHR.statusText + ")");
+        throw error;
+      }
+    }
+    
+    return true;
+    
   }
 
   this.load = function(url, mode) {
 
+    self.sourceURL = url;
+    self.documentType = sourceLoad;
+
     try {
-      self.loadedFromURL = url;
       
       var asynchronousMode = false;
       if (typeof mode != "undefined") {
@@ -591,8 +729,8 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
           result = self.baseDocument.load(url);
         }
         catch (e) {
-    	    error = new xfilesException(className + '.load',8, url, null);
-	        error.setDescription('[MSXML] : Error Loading Document via XMLDOM.load()');
+    	    error = new xfilesException(className + '.load',7, url, e);
+	        error.setDescription('[MSXML]Error Loading Document via XMLDOM.load()');
   	      throw error;
   	    }
       }
@@ -602,62 +740,20 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
             result = self.baseDocument.load(url);
           }
           catch (e) {
-      	    error = new xfilesException(className + '.load',8, url, null);
-	          error.setDescription('[GECKO] : Error Loading Document via XMLDOM.load()');
+      	    error = new xfilesException(className + '.load',7, url, e);
+	          error.setDescription('[GECKO]Error Loading Document via XMLDOM.load()');
     	      throw error;
     	    }
         }
         else {
-        	// Implement XML.load function for Chrome / Safari ?
-      	  var XHR = soapManager.createGetRequest(url,asynchronousMode);
-      	  XHR.mozBackgroundRequest = true;
-      	  if (asynchronousMode) {
-      	    XHR.onreadystatechange = function () { 
-      	    	if (XHR.readyState==4) {
-    	    		  var onLoadFunction = self.baseDocument.onload;
-    	    		  if (XHR.status != 200) {
-    	    		  	self.baseDocument = document.implementation.createDocument("","",null); 
-    	    		  	var parserError = self.baseDocument.createElement('parsererror');
-    	    		  	self.baseDocument.appendChild(parserError);
-    	    		  	var httpStatus = self.baseDocument.createElement('httpStatus');
-    	    		  	httpStatus.appendChild(self.baseDocument.createTextNode(XHR.status));
-    	    		  	var httpStatusText = self.baseDocument.createElement('httpStatus');
-    	    		  	httpStatusText.appendChild(self.baseDocument.createTextNode(XHR.statusText));
-    	    		  	var responseText = self.baseDocument.createElement("responseText")
-    	    		  	responseText.appendChild(self.baseDocument.createCDATASection(XHR.responseText));
-    	    		  	parserError.appendChild(httpStatus);
-    	    		  	parserError.appendChild(httpStatusText);
-    	    		  	parserError.appendChild(responseText);
-    	    		  }
-    	    		  else {
-       	    		  if (XHR.responseXML != null) {
-       	    		    self.baseDocument = XHR.responseXML; 
-       	    		  }
-     	      		  else {
-     	      		 	  self.baseDocument = new DOMParser().parseFromString(XHR.responseText,"text/xml");
-     	      		  }
-     	    	  	}
-   	    	  	  onLoadFunction(); 
-      	    	}
-      	    };
-      	  }
-          XHR.send(null);
-          if (!asynchronousMode) {
-          	if (XHR.status == 200) {
-    	    		if (XHR.responseXML != null) {
-    	    		  self.baseDocument = XHR.responseXML; 
-    	    		}
-     	    		else {
-    	    		  self.baseDocument = new DOMParser().parseFromString(XHR.responseText,"text/xml");
-     	    		}
-            }
-            else {
-      	      error = new xfilesException(className + '.load',8, url, null);
-  	          error.setDescription('Error Loading Document : HTTP Status = ' + XHR.status + " (" + XHR.statusText + ")");
-    	        throw error;
-            }
+        	try {
+            result = xhrLoad(url, asynchronousMode, false);
           }
-          result = true;
+          catch (e) {
+    	      error = new xfilesException(className + '.load',7, url, e);
+            error.setDescription('[CHROME]Error Loading Document via XMLHTTPRequest()');
+  	        throw error;
+    	    }
         }
       }
       
@@ -673,25 +769,27 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
       else {
       	var parseError = null;
         if (useMSXML) {
-          parseError = new xfilesException(className + '.load',8, url, null)
+          parseError = new xfilesException(className + '.load',7, url, null)
           parseError.setDescription = '[MSXML]:parseError (' + self.baseDocument.parseError.reason + ')';
           parseError.setNumber = self.baseDocument.parseError.errorCode
         }
-	      error = new xfilesException(className + '.load',8, url, parseError);
+	      error = new xfilesException(className + '.load',7, url, parseError);
   	    error.setDescription('Error Loading Document');
     	  throw error;
       }
       
     }
     catch (e) {
-    	var parseError = null;
-      if (useMSXML) {
-        parseError = new xfilesException(className + '.load',8, url, null)
-        parseError.setDescription('[MSXML]:parseError (' + self.baseDocument.parseError.reason + ')');
-        parseError.setNumber(self.baseDocument.parseError.errorCode)
-      }
-      error = new xfilesException(className + '.load',8, url, parseError);
-      error.setDescription('Error Loading Document');
+      error = new xfilesException(className + '.load',7, url, e);
+      /* 
+      ** if (useMSXML) {
+      **   parseError.setDescription('[MSXML]:parseError (' + self.baseDocument.parseError.reason + ')');
+      **   parseError.setNumber(self.baseDocument.parseError.errorCode)
+      ** }
+      ** else {
+      **   error.setDescription('Error Loading Document');
+      ** }
+      */
       throw error;
     }
 
@@ -713,7 +811,7 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
       self.baseDocument.onreadystatechange = onReadyStateChangeFunction;
     }
     else {
-      error = new xfilesException(className + '.setOnReadyStateChange',8, self.loadedFromURL, null);
+      error = new xfilesException(className + '.setOnReadyStateChange',8, self.sourceURL, null);
       error.setDescription("[GECKO]onReadyStateFunction not implemented. Use onLoad() instead");
       throw error
     }
@@ -731,23 +829,25 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
   
   this.parse = function(xmlContent) {
 
-    self.loadedFromURL = 'text';
+    self.documentSource = sourceParse
+    self.sourceURL = 'text/xml';
+    
     try {
       if (useMSXML) {
         self.baseDocument.async = false;
         self.baseDocument.loadXML(xmlContent);
-        self.implementation = self.MicrosoftDOM
+        self.documentType = MicrosoftDOM
       }
       else {
         var oParser = new DOMParser();
         self.baseDocument = oParser.parseFromString(xmlContent,"text/xml");
-        self.implementation = self.NativeDOM;
+        self.documentType = NativeDOM;
         stripInsignificantWhitespace(self.baseDocument.documentElement);
       }
       checkParsing(className + '.parse',self.baseDocument);
     }
     catch (e) {  
-      error = new xfilesException(className + '.parse',8, self.loadedFromURL, e);
+      error = new xfilesException(className + '.parse',8, self.sourceURL, e);
       error.setDescription("Parsing Error");
       error.setContent(xmlContent);
       throw error
@@ -779,14 +879,14 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
           return self.baseDocument.importNode(msftConvertImplementation(node),deep);
         }
         else {
-          var error = new xfilesException(className + '.importNode',8, self.loadedFromURL, e);
+          var error = new xfilesException(className + '.importNode',8, self.sourceURL, e);
           error.setDescription("[MSXML]Import Node Error");
           error.setXML(node);
           throw error;
         }
       } 
       else {
-        var error = new xfilesException(className + '.importNode',8, self.loadedFromURL, e);
+        var error = new xfilesException(className + '.importNode',8, self.sourceURL, e);
         error.setDescription("[GECKO]Import Node Error");
         error.setXML(node);
         throw error;
@@ -801,12 +901,12 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
     catch (e) {
       var error;
       if (useMSXML) {
-        error = new xfilesException(className + '.appendChild',8, self.loadedFromURL, e);
+        error = new xfilesException(className + '.appendChild',8, self.sourceURL, e);
         error.setDescription("[MSXML]Append Child Error");
         error.setXML(node);
       }
       else {
-        error = new xfilesException(className + '.appendNode',8, self.loadedFromURL, e);
+        error = new xfilesException(className + '.appendNode',8, self.sourceURL, e);
         if (e.name == 'NS_ERROR_DOM_HIERARCHY_REQUEST_ERR') {
           error.setDescription("[GECKO]NS_ERROR_DOM_HIERARCHY_REQUEST_ERR : Cannot append instance of " + node + "[" + node.nodeName + "] to " + self.baseDocument + "[" + self.baseDocument.nodeName + "].");
         }
@@ -864,7 +964,7 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
           return self.baseDocument.createAttribute(name);
         }
       }
-      error = new xfilesException(className + '.createNode',8, self.loadedFromURL, null);
+      error = new xfilesException(className + '.createNode',8, self.sourceURL, null);
       error.setDescription("[GECKO]CreateNode for nodeType " + nodeType + " not (yet) implemented.");
       throw error;
     }
@@ -894,16 +994,16 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
 
     var nsResolver = namespaces;
     if (!nsResolver) {
-      nsResolver = self.namespaceManager;
+      nsResolver = self.documentNamespaces;
     }
 
     if (!node) {
       node = self.baseDocument;
     }
     
-    // alert(self.serialize(node));
-    // alert(self.namespaceManager.getNamespaces());
-    // alert(xpath);
+    // console.log(self.serialize(node));
+    // console.log(self.documentNamespaces.getNamespaces());
+    // console.log(xpath);
 
     if (useMSXML) {
       if (node.ownerDocument) {
@@ -968,7 +1068,7 @@ function xmlDocument(baseDocument,baseDocumentType,namespaceManager) {
       return processor.transformToHTML(this);   
     }
     catch (e) {
-  	  error = new xfilesException(className + '.transformToHTML',9, this.loadedFromURL, e);         
+  	  error = new xfilesException(className + '.transformToHTML',9, this.sourceURL, e);         
  	    throw error;                                                                      
     }
   } 
