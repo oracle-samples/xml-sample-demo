@@ -19,30 +19,10 @@
 
 <!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Mark Drake (Oracle XML DB) -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="http://www.w3.org/2001/XMLSchema" xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd" xmlns:xfiles="http://xmlns.oracle.com/xdb/xfiles" xmlns:xr="http://xmlns.oracle.com/xdb/XDBResource.xsd">
-	<xsl:output version="1.0" encoding="utf-8" omit-xml-declaration="no" indent="no" media-type="text/html" method="html"/>
+	<xsl:output version="5.0" encoding="utf-8" omit-xml-declaration="no" indent="no" media-type="text/html" method="html"/>
 	<xsl:include href="/XFILES/XMLSearch/xsl/common.xsl"/>
 	<xsl:template name="schemaSummary">
 		<div class="inputFormBorder" style="width:100%">
-			<div class="labelAndValue">
-				<span class="labelRight">Schema Location Hint</span>
-				<span style="display:inline-block;width:5px"/>
-				<input id="xmlSchema" name="xmlSchema" size="76" maxlength="700" type="text" disabled="disabled"/>
-			</div>
-			<span style="display:inline-block;width:5px"/>
-			<span class="labelAndValue">
-				<input id="columnName" name="columnName" type="hidden"/>
-				<span class="labelRight">Global Element</span>
-				<span style="display:inline-block;width:5px"/>
-				<input id="globalElement" name="globalElement" size="32" type="text" maxlength="256" disabled="disabled"/>
-			</span>
-			<span style="display:inline-block;width:5px"/>
-			<span class="labelAndValue">
-				<input id="columnName" name="columnName" type="hidden"/>
-				<span class="labelRight">Table Name</span>
-				<span style="display:inline-block;width:5px"/>
-				<input id="tableName" name="tableName" size="28" type="text" maxlength="32" disabled="disabled"/>
-			</span>
-			<span style="display:inline-block;width:5px"/>
 			<span class="labelAndValue">
 				<span class="labelRight">Table Owner</span>
 				<span style="display:inline-block;width:5px"/>
@@ -50,9 +30,33 @@
 			</span>
 			<span style="display:inline-block;width:5px"/>
 			<span class="labelAndValue">
+				<span class="labelRight">Table Name</span>
+				<span style="display:inline-block;width:5px"/>
+				<input id="tableName" name="tableName" size="28" type="text" maxlength="32" disabled="disabled"/>
+			</span>
+			<span style="display:inline-block;width:5px"/>
+			<span class="labelAndValue">
+				<span class="labelRight">Column Name</span>
+				<span style="display:inline-block;width:5px"/>
+				<input id="columnName" name="columnName" size="28" type="text" maxlength="32" disabled="disabled"/>
+			</span>
+		</div>
+		<div class="inputFormBorder" style="width:100%">
+			<span class="labelAndValue">
 				<span class="labelRight">Schema Owner</span>
 				<span style="display:inline-block;width:5px"/>
-				<input id="xmlSchemaOwner" class="xg" name="xmlSchemaOwner" size="16" type="text" maxlength="32" disabled="disabled"/>
+				<input id="schemaOwner" class="xg" name="schemaOwner" size="28" type="text" maxlength="32" disabled="disabled"/>
+			</span>
+			<span style="display:inline-block;width:5px"/>
+			<div class="labelAndValue">
+				<span class="labelRight">Schema Location Hint</span>
+				<span style="display:inline-block;width:5px"/>
+				<input id="schemaLocationHint" name="schemaLocationHint" size="76" maxlength="700" type="text" disabled="disabled"/>
+			</div>
+			<span class="labelAndValue">
+				<span class="labelRight">Element</span>
+				<span style="display:inline-block;width:5px"/>
+				<input id="elementName" name="elementName" size="32" type="text" maxlength="256" disabled="disabled"/>
 			</span>
 		</div>
 	</xsl:template>
