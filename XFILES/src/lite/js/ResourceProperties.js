@@ -37,7 +37,7 @@ function updatePickLists() {
 function processUpdate(mgr, outputWindow, closeFormWhenFinished) {
 
   try {
-    soapResponse = mgr.getSoapResponse('ResourceProperties.processProperties');
+    soapResponse = mgr.getSoapResponse('ResourceProperties.processUpdate');
 
    	var namespaces = xfilesNamespaces
 	  namespaces.redefinePrefix("tns",mgr.getServiceNamespace());

@@ -29,7 +29,7 @@ function displayXMLDocument(XHR, url, target) {
     else {
     	xml.baseDocument = new DOMParser().parseFromString(XHR.responseText,"text/xml");
     }
-    xml.loadeFromURL = url;
+    xml.sourceURL = url;
     
     var div = document.createElement("DIV");
     target.appendChild(div);

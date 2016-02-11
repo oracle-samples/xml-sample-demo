@@ -12,7 +12,7 @@
  * ================================================
  */
 
-﻿select xmlElement(
+select xmlElement(
          "部門",
          xmlAttributes( d.DEPARTMENT_ID as "部門ID"),
          xmlElement("部門名", d.DEPARTMENT_NAME),

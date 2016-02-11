@@ -17,7 +17,8 @@
 
 	<installation>
 		<action type="MAKEFOLDERS"/>
-
+		<action type="COPYFOLDERS"/>
+		
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\grantPermissions.sql %USER%</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createHomeFolder.sql</action>
 
@@ -67,47 +68,47 @@
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\sql\registerSchema.sql</local>
+  			<local>%DEMODIRECTORY%\%USER%\sql\registerSchema.sql</local>
   			<remote>%DEMOLOCAL%/sql/registerSchema.sql</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\sql\describeObjects.sql</local>
+  			<local>%DEMODIRECTORY%\%USER%\sql\describeObjects.sql</local>
   			<remote>%DEMOLOCAL%/sql/describeObjects.sql</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\sql\showSampleData.sql</local>
+  			<local>%DEMODIRECTORY%\%USER%\sql\showSampleData.sql</local>
   			<remote>%DEMOLOCAL%/sql/showSampleData.sql</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\sql\createDepartmentView.sql</local>
+  			<local>%DEMODIRECTORY%\%USER%\sql\createDepartmentView.sql</local>
   			<remote>%DEMOLOCAL%/sql/createDepartmentView.sql</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\sql\createEmployeeView.sql</local>
+  			<local>%DEMODIRECTORY%\%USER%\sql\createEmployeeView.sql</local>
   			<remote>%DEMOLOCAL%/sql/createEmployeeView.sql</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\sql\createIndexes.sql</local>
+  			<local>%DEMODIRECTORY%\%USER%\sql\createIndexes.sql</local>
   			<remote>%DEMOLOCAL%/sql/createIndexes.sql</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\sql\createStructuredIndex.sql</local>
+  			<local>%DEMODIRECTORY%\%USER%\sql\createStructuredIndex.sql</local>
   			<remote>%DEMOLOCAL%/sql/createStructuredIndex.sql</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\sql\indexOptimizedDepartmentView.sql</local>
+  			<local>%DEMODIRECTORY%\%USER%\sql\indexOptimizedDepartmentView.sql</local>
   			<remote>%DEMOLOCAL%/sql/indexOptimizedDepartmentView.sql</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\sql\indexOptimizedEmployeeView.sql</local>
+  			<local>%DEMODIRECTORY%\%USER%\sql\indexOptimizedEmployeeView.sql</local>
   			<remote>%DEMOLOCAL%/sql/indexOptimizedEmployeeView.sql</remote>
   		</action>
 
@@ -130,9 +131,21 @@
 	<make>
 		<folders>
 			<folder>%DEMODIRECTORY%\%USER%</folder>
+		  <folder>%DEMODIRECTORY%\%USER%\sql</folder>
 		</folders>
 	</make>	
+
+	<copy>
+		<files/>
+		<folders>
+			<folder>
+				<source>%DEMODIRECTORY%\setup\sql</source>
+				<target>%DEMODIRECTORY%\%USER%\sql</target>
+			</folder>
+		</folders>
+	</copy>
 	
+		
 	<shortCuts>
 		<SQL executionMode="local">
 			<defaults>

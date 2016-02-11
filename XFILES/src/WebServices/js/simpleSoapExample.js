@@ -136,7 +136,7 @@ function generateFormFromWSDL(response) {
 
    currentWSDL = new xmlDocument(response.responseXML);  
    prettyPrintXML(currentWSDL,'d_wsdl');
-   xmlToHTML(document.getElementById('d_inputForm'),currentWSDL,SimpleInputFormXSL);
+   transformXMLtoHTML(currentWSDL,SimpleInputFormXSL,document.getElementById('d_inputForm'))
 
 }
 
@@ -189,7 +189,7 @@ function init(target) {
     loadOracleWebServiceNamespaces();
   
     resourceXML = getResourceXML("/XFILES/WebServices");
-    xmlToHTML(target,resourceXML,WebServicesXSL);
+    transformXMLtoHTML(resourceXML,WebServicesXSL,target)
 
 	  setPageActive();
   } 

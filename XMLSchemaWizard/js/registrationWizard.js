@@ -12,6 +12,13 @@ var registrationConfiguration;
 var rcNamespace;
 var typeAnalysisInProgress = false;
 
+var globalElementListXSL 
+
+
+function loadGlobalElementListXSL() {
+  globalElementListXSL = loadXSLDocument("/XFILES/Applications/XMLSchemaWizard/xsl/globalElementList.xsl");
+}
+
 var currentSchema;
 
 function doNothing() {
@@ -31,6 +38,7 @@ function onPageLoaded() {
 
 	openModalDialog("registrationWizard");
 	loadFolderTree(xfilesNamespaces,document.getElementById('treeLoading'),document.getElementById('treeControl'))
+	loadGlobalElementListXSL();
 	showSelectFolder();
 }
 
@@ -138,8 +146,17 @@ function selectSchema() {
 
 function showSelectFolder() {
 	
-	$('#wizardSteps a[href="#step_selectSchema"]').tab('show')
+	$('#wizardSteps a[href="#wizardChooseFolder"]').tab('show')
 	
+}
+
+function showRootElements() {
+
+	$('#wizardSteps a[href="#wizardSelectElements"]').tab('show')
+  // doNext = processSchemas;
+  doNext = doNothing;
+  document.getElementById("btnNext").style.display="block";
+
 }
 
 function processOrderedSchemas() {
@@ -151,6 +168,7 @@ function processOrderedSchemas() {
 	  startTypeCompilation();
   }
 }
+
 
 function showOrderSchemas() {
 	
@@ -238,22 +256,77 @@ function showFileContent(path,target) {
 	
 }
 
-function displaySchemaList(mgr) {
+function displayGlobalElementList(mgr) {
+
+
+	try {
+		
+		var globalElementList = document.getElementById("globalElementList");
+  
+   	var soapResponse = mgr.getSoapResponse("registrationWizard.displayGlobalElementList");
+   	var namespaces = xfilesNamespaces
+	  namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
+
+    // showSourceCode(soapResponse);
+
+		var container = document.getElementById("globalElementList");	
+		container.innerHTML = "";
+
+    var resultSet = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN",namespaces);
+    if (resultSet.length > 0) {
+    	transformXMLtoXHTML(soapResponse,globalElementListXSL,container);
+    }
+    error = new xfilesException("registrationWizard.displayGlobalElementList",12,null, null);
+    error.setXML(soapResponse);
+    throw error;
+  } 
+  catch (e) {
+    handleException('registrationWizard.displayGlobalElementList',e,null);
+  }
+  
+}
+
+function listGlobalElements(repositoryPath) {
+
+	// showRootElements();
+
+	// var repositoryPath = targetFolderTree.getOpenFolder();
+
+  try {
+  	var schema  = "XFILES";
+    var package = "XFILES_XMLSCHEMA_WIZARD";
+    var method =  "GET_GLOBAL_ELEMENT_LIST";
+	
+	  var mgr = soapManager.getRequestManager(schema,package,method);
+    var XHR = mgr.createPostRequest();
+    XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displayGlobalElementList(mgr) } };
+  
+	  var parameters = new Object;
+  	
+	  parameters["P_XML_SCHEMA_FOLDER-VARCHAR2-IN"]  = repositoryPath;
+    mgr.sendSoapRequest(parameters);
+
+  } 
+  catch (e) {
+    handleException('registrationWizard.listGlobalElements',e,null);
+  }
+
+}
+
+function displaySchemaList(mgr,repositoryPath) {
 	
 	var schemaList = document.getElementById("schemaList");
   loadOptionList(mgr, schemaList, schemaList, false, false)
-  
+    
   if (schemaList.options.length > 0) {
-	  doNext = orderSchemas;  
-	  schemaList.style.display = "block"; 
+	  listGlobalElements(repositoryPath);
     document.getElementById("btnNext").style.display="block";
-    document.getElementById("schemaListContainer").style.display="block";
   }
   else {
     doNext = doNothing
-	  schemaList.style.display = "none";
+	  // schemaList.style.display = "none";
     document.getElementById("btnNext").style.display="none";
-    document.getElementById("schemaListContainer").style.display="none";
+    // document.getElementById("schemaListContainer").style.display="none";
   }
 }
 
@@ -261,16 +334,21 @@ function listXMLSchemas(repositoryPath) {
 
   try {
 
-  	 var sqlQuery = "select substr(ANY_PATH," + (repositoryPath.length + 2) + ") SCHEMA_PATH from RESOURCE_VIEW where under_path(res,'" + repositoryPath + "') = 1 and XMLExists('declare default element namespace \"http://xmlns.oracle.com/xdb/XDBResource.xsd\"; $R/Resource[ends-with(DisplayName,\".xsd\")]' passing RES as \"R\")";
-  	 
-	   var mgr = soapManager.getRequestManager("XDB","ORAWSV","SQL");
-     var XHR = mgr.createPostRequest();
-     XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displaySchemaList(mgr)}};
-     mgr.executeSQL(sqlQuery);
+		var pathOffset = repositoryPath.length;
+		if (pathOffset > 1) {
+		  pathOffset = pathOffset + 2;
+		}
 
+  	var sqlQuery = "select substr(ANY_PATH," + pathOffset + ") SCHEMA_PATH from RESOURCE_VIEW where under_path(res,'" + repositoryPath + "') = 1 and XMLExists('declare default element namespace \"http://xmlns.oracle.com/xdb/XDBResource.xsd\"; $R/Resource[ends-with(DisplayName,\".xsd\") and not(ends-with(DisplayName,\".xdb.xsd\"))]' passing RES as \"R\")";
+  	 
+	  var mgr = soapManager.getRequestManager("XDB","ORAWSV","SQL");
+    var XHR = mgr.createPostRequest();
+    XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displaySchemaList(mgr,repositoryPath)}};
+    mgr.executeSQL(sqlQuery);
+    
   } 
   catch (e) {
-    handleException('registrationWizard.doSchemaSearch',e,null);
+    handleException('registrationWizard.listXMLSchemas',e,null);
   }
  
 }

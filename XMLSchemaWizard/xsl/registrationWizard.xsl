@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="http://www.w3.org/2001/XMLSchema" xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd" xmlns:xfiles="http://xmlns.oracle.com/xdb/xfiles" xmlns:xr="http://xmlns.oracle.com/xdb/xfiles">
-	<xsl:output version="1.0" encoding="utf-8" omit-xml-declaration="no" indent="no" media-type="text/html" method="html"/>
+	<xsl:output version="5.0" encoding="utf-8" omit-xml-declaration="no" indent="no" media-type="text/html" method="html"/>
 	<xsl:include href="/XFILES/lite/xsl/common.xsl"/>
 	<xsl:template name="uploadArchive">
 		<div class="modal fade" id="uploadArchive" tabindex="-1" role="dialog" aria-labelledby="uploadArchiveTitle" aria-hidden="true">
@@ -47,7 +47,10 @@
 						<div class="tab-pane" id="Steps">
 							<ul class="nav nav-tabs" role="tablist" id="wizardSteps">
 								<li>
-									<a href="#step_selectSchema" role="tab" data-toggle="tab">Select Schema</a>
+									<a href="#wizardChooseFolder" role="tab" data-toggle="tab">Select Schema Folder</a>
+								</li>
+								<li>
+									<a href="#wizardSelectElements" role="tab" data-toggle="tab">Select Elements</a>
 								</li>
 								<li>
 									<a href="#step_orderSchemas" role="tab" data-toggle="tab">Order Schemas</a>
@@ -68,8 +71,8 @@
 						</div>
 						<br/>
 						<!-- Tab panes -->
-						<div class="tab-content">
-							<div class="tab-pane active" id="step_selectSchema">
+						<div class="tab-content" style="width:1000px;">
+							<div class="tab-pane active" id="wizardChooseFolder">
 								<div class="row">
 									<div class="well well-sm">
 										<p>
@@ -92,14 +95,30 @@
 										</div>
 									</div>
 								</div>
-								<div class="row" id="schemaListContainer" style="display:none">
-									<div class="well well-sm">
-										<p>
-											<xsl:text>Select the XML Schema that you wish to register</xsl:text>
-										</p>
-										<br/>
-										<select id="schemaList" size="10"/>
-										<br/>
+								<div class="row" id="schemaListContainer">
+									<div class="well well-sm collapse in" id="schemaListDiv">
+										<div class="pull-left">
+											<p>
+												<xsl:text>Choose XML Schema(s)</xsl:text>
+											</p>
+										</div>
+										<div class="pull-right">
+											<button data-target="#elementListDiv,#schemaListDiv" class="btn btn-default" data-toggle="collapse">Elements</button>
+										</div>
+										<div>
+											<select class="form-control" id="schemaList" size="10"/>
+										</div>
+									</div>
+									<div class="well well-sm collapse"  id="elementListDiv">
+										<div class="pull-left">
+											<p>
+												<xsl:text>Choose Global Elements(s)</xsl:text>
+											</p>
+										</div>
+										<div class="pull-right">
+											<button data-target="#elementListDiv,#schemaListDiv" class="btn btn-default" data-toggle="collapse">Schemas</button>
+										</div>
+										<div class="container" id="globalElementList" style="width:100%; height:200px; overflow:auto"/>
 									</div>
 								</div>
 							</div>

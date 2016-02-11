@@ -1,0 +1,16 @@
+<InstallList tnsalias="ORCL" host="localhost" http="80" ftp="21" driveLetter="O:" dba="MYDBA" dbaPassword="oracle" >
+	<!--
+	<Demo name="XFILES"           user="XFILES" password="XFILES"/>
+ 	<Demo name="ImageMetadata"    user="XDBEXT" password="XDBEXT"/>
+	<Demo name="XMLSchemaWizard"  user="XFILES" password="XFILES"/>
+	-->
+	<Demo name="EVOLUTION"        user="CLOUD"  password="oracle"/>
+	<Demo name="FULLTEXT-LITE"    user="CLOUD"  password="oracle"/>
+	<Demo name="GENERATION"       user="CLOUD"  password="oracle"/>
+	<Demo name="INTRODUCTION"     user="CLOUD"  password="oracle"/>
+	<Demo name="NVPAIR"           user="CLOUD"  password="oracle"/> 
+	<Demo name="PARTITIONING"     user="CLOUD"  password="oracle"/>
+	<Demo name="REPOSITORY"       user="CLOUD"  password="oracle"/>
+	<Demo name="XMLDB-HOL"        user="CLOUD"  password="oracle"/>
+	<Demo name="XQUERY"           user="CLOUD"  password="oracle"/>
+</InstallList>		

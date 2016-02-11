@@ -30,6 +30,7 @@ begin
   dbms_xdb.link(V_SOURCE_FOLDER || '/folder_link.png',               V_TARGET_FOLDER,   'repositoryRoot.png',DBMS_XDB.LINK_TYPE_WEAK);
 	dbms_xdb.link(V_SOURCE_FOLDER || '/house_go.png',                  V_TARGET_FOLDER,   'homeFolder.png',DBMS_XDB.LINK_TYPE_WEAK);
   dbms_xdb.link(V_SOURCE_FOLDER || '/find.png',                      V_TARGET_FOLDER,   'search.png',DBMS_XDB.LINK_TYPE_WEAK);
+  dbms_xdb.link(V_SOURCE_FOLDER || '/magnifier.png',                 V_TARGET_FOLDER,   'guidedSearch.png',DBMS_XDB.LINK_TYPE_WEAK);
   
   dbms_xdb.link(V_SOURCE_FOLDER || '/bullet_arrow_down.png',         V_TARGET_FOLDER,   'dsort.png',DBMS_XDB.LINK_TYPE_WEAK);
   dbms_xdb.link(V_SOURCE_FOLDER || '/bullet_arrow_up.png',           V_TARGET_FOLDER,   'asort.png',DBMS_XDB.LINK_TYPE_WEAK);

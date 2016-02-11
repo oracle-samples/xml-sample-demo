@@ -66,6 +66,8 @@ doInstall() {
     exit 4
   fi
   mkdir -p "$demohome/$USER"
+  mkdir -p "$demohome/$USER/sql"
+  cp -r "$demohome/setup/sql"/* "$demohome/$USER/sql"
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/grantPermissions.sql $USER
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/createHomeFolder.sql
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/NVPairs" | head -1)
@@ -362,7 +364,7 @@ doInstall() {
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/registerSchema.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/registerSchema.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/registerSchema.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/registerSchema.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
     echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/registerSchema.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
@@ -384,7 +386,7 @@ doInstall() {
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/describeObjects.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/describeObjects.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/describeObjects.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/describeObjects.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
     echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/describeObjects.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
@@ -406,7 +408,7 @@ doInstall() {
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/showSampleData.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/showSampleData.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/showSampleData.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/showSampleData.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
     echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/showSampleData.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
@@ -428,7 +430,7 @@ doInstall() {
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/createDepartmentView.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/createDepartmentView.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/createDepartmentView.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/createDepartmentView.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
     echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/createDepartmentView.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
@@ -450,7 +452,7 @@ doInstall() {
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/createEmployeeView.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/createEmployeeView.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/createEmployeeView.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/createEmployeeView.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
     echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/createEmployeeView.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
@@ -472,7 +474,7 @@ doInstall() {
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/createIndexes.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/createIndexes.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/createIndexes.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/createIndexes.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
     echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/createIndexes.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
@@ -494,7 +496,7 @@ doInstall() {
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/createStructuredIndex.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/createStructuredIndex.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/createStructuredIndex.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/createStructuredIndex.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
     echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/createStructuredIndex.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
@@ -516,7 +518,7 @@ doInstall() {
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/indexOptimizedDepartmentView.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/indexOptimizedDepartmentView.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/indexOptimizedDepartmentView.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/indexOptimizedDepartmentView.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
     echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/indexOptimizedDepartmentView.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
@@ -538,7 +540,7 @@ doInstall() {
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/sql/indexOptimizedEmployeeView.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/indexOptimizedEmployeeView.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/indexOptimizedEmployeeView.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/indexOptimizedEmployeeView.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
     echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/indexOptimizedEmployeeView.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."

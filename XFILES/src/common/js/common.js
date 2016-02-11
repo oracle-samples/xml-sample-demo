@@ -1500,7 +1500,7 @@ function transformToXHTML(xml,xsl) {
     html = xml.transformToHTML(xsl);
   }
   catch (e) {
-  	if (e.rootCauseBrowserXSL()) {
+  	if ((e.rootCauseBrowserXSL) && (e.rootCauseBrowserXSL())) {
       if (xml.isContent()) {
       	// Document is content of an XDB Resource
 				html = remoteTransformContent(xml.sourceURL,xsl.sourceURL)
@@ -1691,7 +1691,7 @@ function transformToHTML(xml,xsl) {
     html = xml.transformToHTML(xsl);
   }
   catch (e) {
-  	if (e.rootCauseBrowserXSL()) {
+  	if ((e.rootCauseBrowserXSL) && (e.rootCauseBrowserXSL()))  {
       html = remoteTransformXMLTypeToHTML(xml,xsl.sourceURL);
   	}	  
 	  else {

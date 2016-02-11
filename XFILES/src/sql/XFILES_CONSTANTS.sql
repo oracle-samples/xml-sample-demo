@@ -41,6 +41,7 @@ as
                                        
   C_DOCUMENT_XMLINDEX_LIST              constant VARCHAR2(700) := C_FOLDER_HOME           || '/configuration/xmlIndexList.xml';
   C_DOCUMENT_XMLSCHEMA_LIST             constant VARCHAR2(700) := C_FOLDER_HOME           || '/configuration/xmlSchemaList.xml';
+  C_DOCUMENT_XMLSCHEMA_OBJ_LIST         constant VARCHAR2(700) := C_FOLDER_HOME           || '/configuration/xmlSchemaObjectList.xml';
   
   C_FOLDER_RESCONFIG_INT                constant VARCHAR2(700) := C_FOLDER_HOME           || '/src/resConfig';
 
@@ -97,6 +98,7 @@ as
   
   function DOCUMENT_XMLINDEX_LIST       return VARCHAR2 deterministic;
   function DOCUMENT_XMLSCHEMA_LIST      return VARCHAR2 deterministic;
+  function DOCUMENT_XMLSCHEMA_OBJ_LIST  return VARCHAR2 deterministic;
 
   function FOLDER_LOGGING               return VARCHAR2 deterministic;
   function FOLDER_CURRENT_LOGGING       return VARCHAR2 deterministic;
@@ -293,6 +295,13 @@ return VARCHAR2 deterministic
 as 
 begin
   return C_DOCUMENT_XMLSCHEMA_LIST;
+end;
+--  
+function DOCUMENT_XMLSCHEMA_OBJ_LIST          
+return VARCHAR2 deterministic
+as 
+begin
+  return C_DOCUMENT_XMLSCHEMA_OBJ_LIST;
 end;
 --  
 function FOLDER_LOGGING

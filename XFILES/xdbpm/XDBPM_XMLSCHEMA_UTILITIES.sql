@@ -70,6 +70,8 @@ show errors
 --
 create or replace synonym XDB_XML_SCHEMA_UTILITIES for XDBPM_XMLSCHEMA_UTILITIES
 /
+grant execute on XDBPM_XMLSCHEMA_UTILITIES to public
+/
 create or replace package body XDBPM_XMLSCHEMA_UTILITIES
 as
   TYPE SCHEMA_URL_CACHE_T
@@ -757,5 +759,8 @@ end XDBPM_XMLSCHEMA_UTILITIES;
 /
 show errors
 --
-grant execute on XDBPM_XMLSCHEMA_UTILITIES to public
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
+alter SESSION SET CURRENT_SCHEMA = SYS
+/
+--

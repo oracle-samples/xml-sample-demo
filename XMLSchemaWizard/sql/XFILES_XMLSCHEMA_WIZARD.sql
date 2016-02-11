@@ -12,6 +12,7 @@ as
   
   function  UNPACK_ARCHIVE(P_ARCHIVE_PATH VARCHAR2) return NUMBER;
   function  ORDER_SCHEMAS(P_XML_SCHEMA_FOLDER VARCHAR2, P_ROOT_XML_SCHEMA VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2) return XMLTYPE;
+  function  GET_GLOBAL_ELEMENT_LIST(P_XML_SCHEMA_FOLDER VARCHAR2) return XMLTYPE;
   function  DO_TYPE_ANALYSIS(P_XML_SCHEMA_CONFIG IN OUT XMLTYPE, P_SCHEMA_LOCATION_HINT  VARCHAR2, P_OWNER VARCHAR2 DEFAULT USER) return BOOLEAN;
 
   function  CREATE_DELETE_SCHEMA_SCRIPT(P_XML_SCHEMA_CONFIGURATION XMLTYPE) return VARCHAR2;
@@ -88,6 +89,30 @@ begin
 exception
   when others then
     handleException('UNPACK_ARCHIVE',V_INIT,V_PARAMETERS);
+    raise;
+end;
+--
+function GET_GLOBAL_ELEMENT_LIST(P_XML_SCHEMA_FOLDER VARCHAR2) 
+return XMLTYPE
+as
+  V_PARAMETERS        XMLType;
+  V_INIT              TIMESTAMP WITH TIME ZONE := SYSTIMESTAMP;
+  V_CHARSET_ID        NUMBER(4);
+  V_RESULT            XMLTYPE;
+  
+begin
+  select xmlConcat(
+           xmlElement("folderPath",P_XML_SCHEMA_FOLDER)
+         )
+    into V_PARAMETERS
+    from dual;
+
+  V_RESULT := XDB_ORDER_XMLSCHEMAS.getGlobalElementList(P_XML_SCHEMA_FOLDER);
+  writeLogRecord('GET_GLOBAL_ELEMENT_LIST',V_INIT,V_PARAMETERS);
+  return V_RESULT;
+exception
+  when others then
+    handleException('GET_GLOBAL_ELEMENT_LIST',V_INIT,V_PARAMETERS);
     raise;
 end;
 --
