@@ -30,9 +30,11 @@ grant execute on XDBPM_DBMS_XDB_VERSION to XDBPM
 /
 grant execute on XDBPM_DBMS_XDBRESOURCE to XDBPM
 /
-grant execute on XDBPM_DBMS_XDBRESCONFIG to XDBPM
+grant execute on XDBPM_DBMS_RESCONFIG to XDBPM
 /
 grant execute on XDBPM_RV_HELPER to XDBPM
+/
+grant execute on XDBPM_RESCONFIG_HELPER to XDBPM
 /
 --
 alter session set current_schema = XDBPM

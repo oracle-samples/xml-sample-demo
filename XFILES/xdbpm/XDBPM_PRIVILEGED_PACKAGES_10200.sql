@@ -59,3 +59,24 @@ end;
 /
 show errors
 --
+create or replace package XDBPM_RESCONFIG_HELPER
+AUTHID &RIGHTS
+as
+  function getUploadFolderPath(P_TABLE_NAME VARCHAR2, P_OWNER VARCHAR2 DEFAULT USER) return VARCHAR2;
+end;
+/
+show errors
+--
+create or replace package body XDBPM_RESCONFIG_HELPER
+as
+function getUploadFolderPath(P_TABLE_NAME VARCHAR2, P_OWNER VARCHAR2 DEFAULT USER) 
+return VARCHAR2
+as
+begin
+  return XDB.XDBPM_RESCONFIG_HELPER.getUploadFolderPath(P_TABLE_NAME, P_OWNER); 
+end;
+--
+end;
+/
+show errors
+--

@@ -143,3 +143,41 @@ end;
 /
 show errors
 --
+create or replace package XDBPM_RESCONFIG_HELPER
+AUTHID &RIGHTS
+as
+  function getUploadFolderPath(P_TABLE_NAME VARCHAR2, P_OWNER VARCHAR2 DEFAULT USER) return VARCHAR2;
+end;
+/
+show errors
+--
+create or replace package body XDBPM_RESCONFIG_HELPER
+as
+function getUploadFolderPath(P_TABLE_NAME VARCHAR2, P_OWNER VARCHAR2 DEFAULT USER)
+return VARCHAR2
+as
+  V_UPLOAD_FOLDER_PATH VARCHAR2(700);
+begin
+  select ANY_PATH 
+    into V_UPLOAD_FOLDER_PATH
+	  from RESOURCE_VIEW rv, 
+	       XDB.XDB$RESCONFIG cfg,
+	       XDB.XDB$RESOURCE r,
+	       TABLE(r.XMLDATA.RCLIST.OID) rc
+	 where rv.RESID = r.OBJECT_ID
+	   and rc.COLUMN_VALUE = cfg.OBJECT_ID
+	   and XMLExists
+         (
+           'declare namespace rc = "http://xmlns.oracle.com/xdb/XDBResConfig.xsd"; (::)
+            declare namespace tu = "http:/xmlns.oracle.com/xdb/pm/tableUpload"; (::)
+            $RC/rc:ResConfig/rc:applicationData/tu:Target[tu:Owner=$OWNER and tu:Table=$TABLE]'
+            passing cfg.OBJECT_VALUE as "RC", P_OWNER as "OWNER", P_TABLE_NAME as "TABLE"
+         );
+         
+  return V_UPLOAD_FOLDER_PATH;
+end;
+--
+end;
+/
+show errors
+--

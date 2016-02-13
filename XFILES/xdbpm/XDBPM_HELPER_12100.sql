@@ -34,4 +34,5 @@ grant XDBADMIN to package XDBPM_DBMS_RESCONFIG
 /
 grant XDBADMIN to package XDBPM_RV_HELPER
 /
+grant XDBADMIN to package XDBPM_RESCONFIG_HELPER
 --
