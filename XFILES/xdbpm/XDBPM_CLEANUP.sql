@@ -170,15 +170,41 @@ declare
     from ALL_OBJECTS
    where OBJECT_NAME in
          (
-           'XMLROOT',
-           'XMLROOT_10103',
-           'XMLCDATA',
-           'XMLCDATA_10103'
-		  	 )
-		 and OBJECT_TYPE = 'FUNCTION'
+           'XDBPM_HELPER',              
+           'XDBPM_RESCONFIG',           
+           'XDBPM_RESCONFIG_HELPER',    
+           'XDBPM_RV_HELPER',           
+           'XDBPM_XDB',                 
+           'XDBPM_HELPER',              
+           'XDBPM_RESCONFIG',           
+           'XDBPM_RESCONFIG_HELPER',    
+           'XDBPM_RV_HELPER',           
+           'XDBPM_XDB'   
+ 		  	 )
+		 and OBJECT_TYPE = 'PACKAGE'
      and OWNER = 'XDB';
 begin
   for p in getPackages loop
+    execute immediate 'drop package "XDB"."' || p.OBJECT_NAME || '"';
+  end loop;
+end;
+/
+declare 
+  cursor getFunctions
+  is
+  select OBJECT_NAME
+    from ALL_OBJECTS
+   where OBJECT_NAME in
+         (
+           'XMLROOT',
+           'XMLROOT_10103',
+           'XMLCDATA',
+           'XMLCDATA_10103'              
+ 		  	 )
+		 and OBJECT_TYPE = 'FUNCTION'
+     and OWNER = 'XDB';
+begin
+  for p in getFunctions loop
     execute immediate 'drop function "XDB"."' || p.OBJECT_NAME || '"';
   end loop;
 end;

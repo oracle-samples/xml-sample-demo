@@ -258,7 +258,7 @@ procedure createDebugFolders
 as
   pragma autonomous_transaction;
 begin
-  XDB_HELPER.createDebugFolders(XDB_USERNAME.GET_USERNAME());
+  XDBPM_UTILITIES_PRIVATE.createDebugFolders(XDB_USERNAME.GET_USERNAME());
   commit;
 end;
 --

@@ -22,8 +22,6 @@ begin
   dbms_utility.compile_schema('XDBPM',TRUE);
 end;
 /
-alter package XDB.XDBPM_HELPER compile
-/
 set pages 100
 --
 select object_name, object_type, status 

@@ -13,13 +13,25 @@
  * ================================================
  */
 
-grant INHERIT ANY PRIVILEGES to XDBPM
+--
+alter session set current_schema = XDBPM
 /
-grant INHERIT PRIVILEGES on user SYS to XDBPM
+def RIGHTS=CURRENT_USER
+--
+def PACKAGE_PREFIX=XDB.DBMS_
+--
+@XDBPM_DBMS_XDB.sql
+--
+@XDBPM_PRIVILEGED_PACKAGES.sql
+--
+grant XDBADMIN to package XDBPM_DBMS_XDB
 /
-grant INHERIT PRIVILEGES on user SYSTEM to XDBPM
+grant XDBADMIN to package XDBPM_DBMS_XDB_VERSION
 /
-grant INHERIT PRIVILEGES on user XDB to XDBPM
+grant XDBADMIN to package XDBPM_DBMS_XDBRESOURCE
 /
-grant XDBADMIN to XDBPM with ADMIN OPTION
+grant XDBADMIN to package XDBPM_DBMS_RESCONFIG
 /
+grant XDBADMIN to package XDBPM_RV_HELPER
+/
+--

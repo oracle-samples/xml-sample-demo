@@ -52,6 +52,8 @@ show errors
 --
 create or replace synonym XDB_REGISTRATION_HELPER for XDBPM_REGISTRATION_HELPER
 /
+grant execute on XDBPM_REGISTRATION_HELPER to public
+/
 create or replace package body XDBPM_REGISTRATION_HELPER
 as
 function unpackArchive(P_ARCHIVE_PATH VARCHAR2)
@@ -327,5 +329,8 @@ end XDBPM_REGISTRATION_HELPER;
 /
 show errors
 --
-grant execute on XDBPM_REGISTRATION_HELPER to public
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
+alter SESSION SET CURRENT_SCHEMA = SYS
+/
+--

@@ -693,13 +693,13 @@ end;
 procedure createHomeFolder
 as
 begin
-  XDB_HELPER.createHomeFolder(XDB_USERNAME.GET_USERNAME());
+  XDBPM_UTILITIES_PRIVATE.createHomeFolder(XDB_USERNAME.GET_USERNAME());
 end;
 --
 procedure createPublicFolder
 as
 begin
-  XDB_HELPER.createPublicFolder(XDB_USERNAME.GET_USERNAME());
+  XDBPM_UTILITIES_PRIVATE.createPublicFolder(XDB_USERNAME.GET_USERNAME());
 end;
 --
 function getVersionsByPath(P_RESOURCE_PATH VARCHAR2)
@@ -772,7 +772,7 @@ end;
 procedure setPublicIndexPageContent
 as
 begin
-  XDB_HELPER.setPublicIndexPageContent(XDB_USERNAME.GET_USERNAME());
+  XDBPM_UTILITIES_PRIVATE.setPublicIndexPageContent(XDB_USERNAME.GET_USERNAME());
 end;
 --
 $IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
@@ -1318,11 +1318,8 @@ end XDBPM_UTILITIES;
 /
 show errors 
 --
-alter package XDB.XDBPM_HELPER compile
-/
 ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
 alter SESSION SET CURRENT_SCHEMA = SYS
 /
---
 --
