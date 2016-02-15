@@ -103,7 +103,7 @@
 											</p>
 										</div>
 										<div class="pull-right">
-											<button data-target="#elementListDiv,#schemaListDiv" class="btn btn-default" data-toggle="collapse" onclick="listGlobalElements()">Elements</button>
+											<button data-target="#elementListDiv,#schemaListDiv" class="btn btn-default" data-toggle="collapse">Elements</button>
 										</div>
 										<div>
 											<select class="form-control" id="schemaList" size="10"/>

@@ -18,6 +18,7 @@
 	<installation>
 		<action type="MAKEFOLDERS"/>
 		<action type="COPYFOLDERS"/>
+		<action type="COPYFILES"/>
 		
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\install\sql\grantPermissions.sql %USER%</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\install\sql\createHomeFolder.sql</action>
@@ -52,7 +53,7 @@
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%DBA%" password="%DBAPASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\xsd\NVPairXMLSchema.xsd</local>
+  			<local>%DEMODIRECTORY%\%USER%\xsd\NVPairXMLSchema.xsd</local>
   			<remote>%DEMOCOMMON%/xsd/NVPairXMLSchema.xsd</remote>
   		</action>
   		
@@ -63,7 +64,7 @@
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\setup\reset.sql</local>
+  			<local>%DEMODIRECTORY%\%USER%\sql\reset.sql</local>
   			<remote>%DEMOLOCAL%/sql/reset.sql</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
@@ -132,6 +133,7 @@
 		<folders>
 			<folder>%DEMODIRECTORY%\%USER%</folder>
 		  <folder>%DEMODIRECTORY%\%USER%\sql</folder>
+		  <folder>%DEMODIRECTORY%\%USER%\xsd</folder>
 		</folders>
 	</make>	
 
@@ -141,6 +143,10 @@
 			<folder>
 				<source>%DEMODIRECTORY%\setup\sql</source>
 				<target>%DEMODIRECTORY%\%USER%\sql</target>
+			</folder>
+			<folder>
+				<source>%DEMODIRECTORY%\setup\xsd</source>
+				<target>%DEMODIRECTORY%\%USER%\xsd</target>
 			</folder>
 		</folders>
 	</copy>

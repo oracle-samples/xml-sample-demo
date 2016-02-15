@@ -13,7 +13,7 @@
  */
 
 declare
-  V_XMLSCHEMA XMLTYPE := xdburitype('/publishedContent/demonstrations/NVPairs/xsd/NVPairXMLSchema.xsd').getXML();
+  V_XMLSCHEMA XMLTYPE := xdburitype('/publishedContent/demonstrations/XMLDB/NVPairs/xsd/NVPairXMLSchema.xsd').getXML();
 
 begin
 
@@ -53,4 +53,3 @@ insert into DATA_SET_TABLE
 select OBJECT_VALUE
   from EMPLOYEE_NVPAIR x
 /
-quit

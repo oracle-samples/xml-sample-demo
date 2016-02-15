@@ -80,3 +80,50 @@ end;
 /
 show errors
 --
+create or replace package XDBPM_UTILITIES_PRIVATE
+AUTHID &RIGHTS
+as
+  procedure createHomeFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
+  procedure createPublicFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
+  procedure setPublicIndexPageContent(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
+  procedure createDebugFolders(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
+end;
+/
+show errors
+--
+create or replace package body XDBPM_UTILITIES_PRIVATE
+as
+  procedure createHomeFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
+  procedure createPublicFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
+  procedure setPublicIndexPageContent(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
+  procedure createDebugFolders(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
+end;
+/
+procedure createHomeFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
+as
+begin
+	XDB.XDBPM_UTILITIES_PRIVATE.createHomeFolder(P_PRINCIPLE);
+end;
+--
+procedure createPublicFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
+as
+begin
+	XDB.XDBPM_UTILITIES_PRIVATE.createPublicFolder(P_PRINCIPLE);
+end;
+--
+procedure setPublicIndexPageContent(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
+as
+begin
+	XDB.XDBPM_UTILITIES_PRIVATE.setPublicIndexPageContent(P_PRINCIPLE);
+end;
+--
+procedure createDebugFolders(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
+as
+begin
+	XDB.XDBPM_UTILITIES_PRIVATE.createDebugFolders(P_PRINCIPLE);
+end;
+--
+end;
+/
+show errors
+--

@@ -67,7 +67,9 @@ doInstall() {
   fi
   mkdir -p "$demohome/$USER"
   mkdir -p "$demohome/$USER/sql"
+  mkdir -p "$demohome/$USER/xsd"
   cp -r "$demohome/setup/sql"/* "$demohome/$USER/sql"
+  cp -r "$demohome/setup/xsd"/* "$demohome/$USER/xsd"
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/install/sql/grantPermissions.sql $USER
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/install/sql/createHomeFolder.sql
   HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/publishedContent/demonstrations/XMLDB/NVPairs" | head -1)
@@ -254,7 +256,7 @@ doInstall() {
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xsd/NVPairXMLSchema.xsd" "$SERVER/publishedContent/demonstrations/XMLDB/NVPairs/xsd/NVPairXMLSchema.xsd" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $DBA:$DBAPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/xsd/NVPairXMLSchema.xsd" "$SERVER/publishedContent/demonstrations/XMLDB/NVPairs/xsd/NVPairXMLSchema.xsd" | head -1)
   if [ $HttpStatus != "201" ] 
   then
     echo "PUT \"$SERVER/publishedContent/demonstrations/XMLDB/NVPairs/xsd/NVPairXMLSchema.xsd\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
@@ -342,7 +344,7 @@ doInstall() {
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/setup/reset.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/reset.sql" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/$USER/sql/reset.sql" "$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/reset.sql" | head -1)
   if [ $HttpStatus != "201" ] 
   then
     echo "PUT \"$SERVER/home/$USER/demonstrations/XMLDB/NVPairs/sql/reset.sql\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
