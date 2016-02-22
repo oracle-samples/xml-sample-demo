@@ -1016,6 +1016,13 @@ function isErrorDialogOpen() {
 
 }
 
+function reportUploadError(module,repositoryPath,SQLCODE,SQLERRM) {
+  error = new xfilesException("XFILES.XFILES_DOCUMENT_UPLOAD.SINGLE_DOC_UPLOAD",12,repositoryPath);
+  error.setDescription(SQLERRM);
+  error.setNumber(SQLCODE);
+  handleException(module,error,repositoryPath);
+}
+
 var xfilesCloseCurrentForm = function() {
 	history.back();
 }

@@ -82,10 +82,36 @@ alter system set shared_servers = 25 scope = both
 --
 alter user anonymous account unlock
 /
+call DBMS_XDB_CONFIG.setHttpPort(&HTTP)
+/
 grant connect, resource, SYSDBA, DBA to &DBA identified by &DBAPWD
 /
-call DBMS_XDB_CONFIG.setHttpPort(&HTTP)
+grant connect, resource, unlimited tablespace to &USERNAME identified by &USERPWD
 /
 alter user &USERNAME identified by &USERPWD account unlock
 /
+var SET_MD5_SCRIPT VARCHAR2(120);
+--
+declare
+  V_SET_MD5_SCRIPT VARCHAR2(120);
+begin
+$IF DBMS_DB_VERSION.VER_LE_12_1 $THEN
+  V_SET_MD5_SCRIPT := 'doNothing.sql';
+$ELSE
+  V_SET_MD5_SCRIPT := 'enableDigest.sql';
+$END
+  :SET_MD5_SCRIPT := V_SET_MD5_SCRIPT;
+end;
+/
+undef SET_MD5_SCRIPT
+--
+column SET_MD5_SCRIPT new_value SET_MD5_SCRIPT 
+--
+select :SET_MD5_SCRIPT SET_MD5_SCRIPT
+  from dual
+/
+def SET_MD5_SCRIPT
+--
+@@&SET_MD5_SCRIPT
+--
 quit

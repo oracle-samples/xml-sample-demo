@@ -400,6 +400,8 @@ function SoapManager(manager) {
       error = new xfilesException(module,6,requestManager.getServiceLocation(),null);
       error.setDescription("Soap Fault");
       error.setXML(soapResponse);
+      error.setSQLErrCode(soapResponse.selectNodes("/soap:Envelope/soap:Body/soap:Fault/detail/oraerr:OracleErrors/oraerr:OracleError[2]/oraerr:ErrorNumber").item(0).firstChild.nodeValue);
+      error.setSQLErrMsg(soapResponse.selectNodes("/soap:Envelope/soap:Body/soap:Fault/detail/oraerr:OracleErrors/oraerr:OracleError[2]/oraerr:Message").item(0).firstChild.nodeValue);
       throw error;
     }
     
@@ -2127,11 +2129,17 @@ function xfilesException(module,id,target,exception) {
   this.lineNumber  = null;
   this.xml         = null;
   this.content     = null;
+  this.sqlErrCode  = null;
+  this.sqlErrMsg   = null;
   
   this.setDescription = function ( description )   { this.description = description };
   this.setNumber      = function ( number )        { this.number = number };
   this.setXML         = function ( xml )           { this.xml = xml };
   this.setContent     = function ( content )       { this.content = content };
+  this.setSQLErrCode  = function ( sqlErrCode )    { this.sqlErrCode = sqlErrCode };
+  this.setSQLErrMsg   = function ( sqlErrMsg )     { this.sqlErrMsg = sqlErrMsg };
+  	
+  this.isServerError = function() { return this.id == 6 }
   	
   if (exception) {
     if (useMSXML) {
@@ -2165,6 +2173,14 @@ function xfilesException(module,id,target,exception) {
   	  return (this.getBaseException().getErrorCode() == 17);
   	}
  	}
+ 	
+ 	this.getSQLErrCode = function () {
+ 	  return this.sqlErrCode
+ 	}
+ 	
+ 	this.getSQLErrMsg = function() {
+ 		return this.sqlErrMsg
+  }
 
   this.getBaseException = function () {
   	
