@@ -309,6 +309,7 @@ begin
          XDB_OUTPUT.writeLogFileEntry('Match Basis: "' || doc.MATCH_TYPE || '".');
          XDB_OUTPUT.writeLogFileEntry(SQLERRM);
          XDB_OUTPUT.writeLogFileEntry('--');   
+				 XDB_OUTPUT.logException();
          XDB_OUTPUT.flushLogFile();
          V_FAILED_COUNT := V_FAILED_COUNT + 1;
     end;     

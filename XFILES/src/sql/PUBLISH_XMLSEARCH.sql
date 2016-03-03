@@ -61,6 +61,33 @@ begin
 end;
 /
 --
+-- Create and Publish XMLSCHEMA_OBJECT List document
+--
+declare
+  XMLREF REF xmlType;
+  result boolean;
+  filename          varchar2(256) := 'xmlSchemaObjectList.xml';
+  folder            varchar2(256) := 'xmlSchema';
+  publicDirectory   varchar2(256) := XFILES_CONSTANTS.FOLDER_ROOT || '/XMLSearch';
+  publicLink        varchar2(256) := publicDirectory  || '/' || folder;
+  privateDirectory  varchar2(256) := XFILES_CONSTANTS.FOLDER_HOME || '/configuration/' || folder;
+  privateLink       varchar2(256) := privateDirectory || '/' || filename;
+begin
+  select ref(x) 
+    into xmlref
+    from XMLSCHEMA_OBJECT_LIST x;
+  xdb_utilities.mkdir(privateDirectory,TRUE);
+  if (dbms_xdb.existsResource(publicLink)) then
+    dbms_xdb.deleteResource(publicLink,DBMS_XDB.DELETE_FORCE);
+  end if;
+  if (dbms_xdb.existsResource(privateLink)) then
+    dbms_xdb.deleteResource(privateLink,DBMS_XDB.DELETE_FORCE);
+  end if;
+  result :=  dbms_xdb.createResource(privateLink,xmlref,false);
+  dbms_xdb.link(privateDirectory,publicDirectory,folder,DBMS_XDB.LINK_TYPE_WEAK);
+end;
+/
+--
 -- Create and Publish XMLINDEX List document
 --
 declare

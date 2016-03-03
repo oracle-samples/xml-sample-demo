@@ -18,7 +18,7 @@ function loadXMLSchemaXSL() {
   stylesheetURL = '/XFILES/XMLSearch/xsl/xmlSchema.xsl';
 }
 
-function invokeGetRootNodeMap(nodeMap, xmlSchema, xmlSchemaOwner, globalElement) {
+function invokeGetRootNodeMap(nodeMap, schemaLocationHint, schemaOwner, elementName) {
 
   var schema  = "XFILES";
   var package = "XFILES_SEARCH_SERVICES";
@@ -30,9 +30,9 @@ function invokeGetRootNodeMap(nodeMap, xmlSchema, xmlSchemaOwner, globalElement)
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processResponse(mgr, nodeMap, requestDate)}};
 
 	var parameters = new Object;
-	parameters["P_GLOBAL_ELEMENT-VARCHAR2-IN"] = globalElement
-	parameters["P_SCHEMA_OWNER-VARCHAR2-IN"]   = xmlSchemaOwner		
-	parameters["P_SCHEMA_URL-VARCHAR2-IN"]     = xmlSchema
+	parameters["P_GLOBAL_ELEMENT-VARCHAR2-IN"] = elementName
+	parameters["P_SCHEMA_OWNER-VARCHAR2-IN"]   = schemaOwner		
+	parameters["P_SCHEMA_URL-VARCHAR2-IN"]     = schemaLocationHint
 	
   mgr.sendSoapRequest(parameters);
   
@@ -83,17 +83,17 @@ function expandSubstitutionGroup(nodeMap, headID, id) {
   invokeGetSubstitutionGroup(nodeMap,headID,id);
 }
 
-function setDefaultTable(defaultTable, defaultTableSchema) {
+function setTableName(tableName, tableOwner, columnName) {
 
-  if (defaultTableSchema == 'XDB') {
-    if (defaultTable == 'XDB$RESOURCE') {
+  if (tableOwner == 'XDB') {
+    if (tableName == 'XDB$RESOURCE') {
       document.getElementById('columnName').value = 'RES';
       document.getElementById('tableName').value =  'RESOURCE_VIEW';
       document.getElementById('tableOwner').value = 'PUBLIC';
       return;
     }
     
-    if (defaultTable == 'XDB$SCHEMA') {
+    if (tableName == 'XDB$SCHEMA') {
       document.getElementById('columnName').value = 'SCHEMA';
       document.getElementById('tableName').value =  'ALL_XML_SCHEMAS';
       document.getElementById('tableOwner').value = 'PUBLIC';
@@ -101,9 +101,9 @@ function setDefaultTable(defaultTable, defaultTableSchema) {
     }    
   }
   
-  document.getElementById('columnName').value = 'OBJECT_VALUE';
-  document.getElementById('tableName').value =  defaultTable;
-  document.getElementById('tableOwner').value = defaultTableSchema;
+  document.getElementById('columnName').value = columnName;
+  document.getElementById('tableName').value =  tableName;
+  document.getElementById('tableOwner').value = tableOwner;
 
 }
 
@@ -138,16 +138,16 @@ function init(target) {
 function loadNodeMap() {
 
     documentNodeMap = new NodeMap( 'documentNodeMap' , loadXMLDocument('/XFILES/XMLSearch/xsl/searchTreeView.xsl'), 'treeView' );
-    invokeGetRootNodeMap(documentNodeMap, document.getElementById('xmlSchema').value, document.getElementById('xmlSchemaOwner').value, document.getElementById('globalElement').value);  
+    invokeGetRootNodeMap(documentNodeMap, document.getElementById('schemaLocationHint').value, document.getElementById('schemaOwner').value, document.getElementById('elementName').value);  
 
 }	
 function populateFormFields() {
 
-    document.getElementById('xmlSchema').value = unescape(getParameter("xmlSchema"));
-    document.getElementById('xmlSchemaOwner').value = getParameter("xmlSchemaOwner");
-    document.getElementById('globalElement').value = getParameter("globalElement");
+    document.getElementById('schemaLocationHint').value = unescape(getParameter("schemaLocationHint"));
+    document.getElementById('schemaOwner').value = getParameter("schemaOwner");
+    document.getElementById('elementName').value = getParameter("elementName");
   
-    setDefaultTable(getParameter("defaultTable"),getParameter("defaultTableSchema"));
+    setTableName(getParameter("tableName"),getParameter("tableOwner"),getParameter("columnName"));
 
 	 loadNodeMap();
 }

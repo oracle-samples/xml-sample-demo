@@ -15,123 +15,99 @@
 
 --
 create or replace view XMLSCHEMA_LIST of XMLTYPE
-with object id
-(
+with object id(
   'XMLSCHMEA_LIST'
 )
 as 
-select xmlelement
-       (
+select xmlElement(
          "schemaList",
-         (
-            xmlelement
-            (
-              "localSchemas",
-              ( 
-                select xmlagg
-                       (
-                         xmlelement
-                         (
-                           "localSchema",
-                           xmlelement("URL",SCHEMA_URL),
-                           xmlelement("OWNER",OWNER),
-                           xmlelement("schemaType",HIER_TYPE),
-                           xmlelement
-                           (
-                             "globalElements",
-                             xmlagg
-                             (
-                             	xmlElement
-                             	(
-                             	   "globalElement",
-                             	   xmlAttributes
-                             	   (
-                                     TABLE_NAME as "defaultTable",
-                                     TABLE_OWNER as "defaultTableOwner"
-                                   ),
-                                   ELEMENT_NAME
-                             	)
-                             )
-                           )   
-                         )
-                       )
-                  from all_xml_schemas, 
-                       XMLTable
-                       (
-                         xmlNamespaces
-                         (
-                           'http://www.w3.org/2001/XMLSchema' as "xs",
-                           'http://xmlns.oracle.com/xdb' as "xdb"
-                         ),
-                         '/xs:schema/xs:element[@xdb:defaultTable]'
-                         passing SCHEMA
-                         columns
-                         ELEMENT_NAME varchar2(256) path '@name',
-                         TABLE_NAME   varchar2(32)  path '@xdb:defaultTable',
-                         TABLE_OWNER  varchar2(32)  path '@xdb:defaultTableSchema'
-                       )
-                 where local = 'YES' 
-                   and TABLE_NAME  is not null
-                   and SCHEMA_URL != 'http://xmlns.oracle.com/xdb/xdbpm/XDBSchema.xsd'
-                   and SCHEMA_URL != 'http://xmlns.oracle.com/xdb/xdbpm/XDBResource.xsd'
-       	         group by OWNER, HIER_TYPE, SCHEMA_URL
-              )
-            )
+         ( 
+           select xmlElement(
+                    "localSchemas",
+                    xmlAgg(
+                      xmlElement(
+                        "localSchema",
+                        xmlElement("URL",SCHEMA_URL),
+                        xmlElement("OWNER",OWNER),
+                        xmlElement("schemaType",HIER_TYPE),
+                        xmlElement(
+                          "globalElements",
+                          xmlAgg(
+                            xmlElement(
+                              "globalElement",
+                         	    xmlAttributes(
+                                TABLE_NAME as "defaultTable",
+                                TABLE_OWNER as "defaultTableOwner"
+                              ),
+                              ELEMENT_NAME
+                            )
+                          )
+                        )   
+                      )
+                    )
+                  )
+             from all_xml_schemas, 
+                  XMLTable(
+                    xmlNamespaces(
+                      'http://www.w3.org/2001/XMLSchema' as "xs",
+                      'http://xmlns.oracle.com/xdb' as "xdb"
+                    ),
+                    '/xs:schema/xs:element[@xdb:defaultTable]'
+                    passing SCHEMA
+                    columns
+                      ELEMENT_NAME varchar2(256) path '@name',
+                      TABLE_NAME   varchar2(32)  path '@xdb:defaultTable',
+                      TABLE_OWNER  varchar2(32)  path '@xdb:defaultTableSchema'
+                  )
+            where local = 'YES' 
+              and TABLE_NAME  is not null
+              and SCHEMA_URL != 'http://xmlns.oracle.com/xdb/xdbpm/XDBSchema.xsd'
+              and SCHEMA_URL != 'http://xmlns.oracle.com/xdb/xdbpm/XDBResource.xsd'
+       	    group by OWNER, HIER_TYPE, SCHEMA_URL
          ),
          (
-            xmlelement
-            (
-              "globalSchemas",
-              (
-                select xmlagg
-                       (
-                         xmlelement
-                         (
-                           "globalSchema",
-                           xmlelement("URL",SCHEMA_URL),
-                           xmlelement("OWNER",OWNER),
-                           xmlelement("schemaType",HIER_TYPE),
-                           xmlelement
-                           (
-                             "globalElements",
-                             xmlagg
-                             (
-                             	xmlElement
-                             	(
-                             	   "globalElement",
-                             	   xmlAttributes
-                             	   (
-                                     TABLE_NAME as "defaultTable",
-                                     TABLE_OWNER as "defaultTableOwner"
-                                   ),
-                                   ELEMENT_NAME
-                             	)
-                             )
-                           )   
-                         )
-                       )
-                  from all_xml_schemas, 
-                       XMLTable
-                       (
-                         xmlNamespaces
-                         (
-                           'http://www.w3.org/2001/XMLSchema' as "xs",
-                           'http://xmlns.oracle.com/xdb' as "xdb"
-                         ),
-                         '/xs:schema/xs:element[@xdb:defaultTable]'
-                         passing SCHEMA
-                         columns
-                         ELEMENT_NAME varchar2(256) path '@name',
-                         TABLE_NAME   varchar2(32)  path '@xdb:defaultTable',
-                         TABLE_OWNER  varchar2(32)  path '@xdb:defaultTableSchema'
-                       )
-                 where local = 'NO' 
-                   and TABLE_NAME  is not null
-                   and SCHEMA_URL != 'http://xmlns.oracle.com/xdb/xdbpm/XDBSchema.xsd'
-                   and SCHEMA_URL != 'http://xmlns.oracle.com/xdb/xdbpm/XDBResource.xsd'
-       	         group by OWNER, HIER_TYPE, SCHEMA_URL
-              )
-            )
+           select xmlElement(
+                    "globalSchemas",
+                    xmlAgg(
+                      xmlElement(
+                        "globalSchema",
+                        xmlElement("URL",SCHEMA_URL),
+                        xmlElement("OWNER",OWNER),
+                        xmlElement("schemaType",HIER_TYPE),
+                        xmlElement(
+                          "globalElements",
+                          xmlAgg(
+                            xmlElement(
+                              "globalElement",
+                         	    xmlAttributes(
+                                TABLE_NAME as "defaultTable",
+                                TABLE_OWNER as "defaultTableOwner"
+                              ),
+                              ELEMENT_NAME
+                            )
+                          )
+                        )   
+                      )
+                    )
+                  )
+             from all_xml_schemas, 
+                  XMLTable(
+                    xmlNamespaces(
+                      'http://www.w3.org/2001/XMLSchema' as "xs",
+                      'http://xmlns.oracle.com/xdb' as "xdb"
+                    ),
+                    '/xs:schema/xs:element[@xdb:defaultTable]'
+                    passing SCHEMA
+                    columns
+                      ELEMENT_NAME varchar2(256) path '@name',
+                      TABLE_NAME   varchar2(32)  path '@xdb:defaultTable',
+                      TABLE_OWNER  varchar2(32)  path '@xdb:defaultTableSchema'
+                  )
+            where local = 'NO' 
+              and TABLE_NAME  is not null
+              and SCHEMA_URL != 'http://xmlns.oracle.com/xdb/xdbpm/XDBSchema.xsd'
+              and SCHEMA_URL != 'http://xmlns.oracle.com/xdb/xdbpm/XDBResource.xsd'
+       	    group by OWNER, HIER_TYPE, SCHEMA_URL
          )
        ) 
   from dual
@@ -145,4 +121,48 @@ end;
 grant select on XMLSCHEMA_LIST 
              to XFILES_USER
 /
---
+create or replace view XMLSCHEMA_OBJECT_LIST of XMLTYPE
+with object id(
+  'XMLSCHEMA_OBJECT_LIST'
+)
+as 
+select xmlElement(
+         "xmlObjectList",
+         xmlAttributes(SYS_CONTEXT ('USERENV', 'SESSION_USER') as "currentUser"),
+         xmlAgg(
+           xmlElement(
+             "xmlObject",
+             xmlElement("owner",TABLE_OWNER),
+             xmlElement("tableName",TABLE_NAME),
+             xmlElement("column",COLUMN_NAME),
+             xmlElement("schemaOwner",SCHEMA_OWNER),
+             xmlElement("schemaLocationHint",SCHEMA_URL),
+             xmlElement("elementName",ELEMENT_NAME),
+             xmlElement("schemaType",HIER_TYPE)
+           )
+         )
+       )
+  from (
+   select OWNER TABLE_OWNER, TABLE_NAME TABLE_NAME, 'OBJECT_VALUE' COLUMN_NAME, SCHEMA_OWNER, XMLSCHEMA SCHEMA_LOCATION_HINT, ELEMENT_NAME
+     from ALL_XML_TABLES 
+    where XMLSCHEMA is not NULL
+   union all
+   select OWNER, TABLE_NAME, COLUMN_NAME, SCHEMA_OWNER, XMLSCHEMA, ELEMENT_NAME
+     from ALL_XML_TAB_COLS
+    where XMLSCHEMA is not null
+       ) xo, ALL_XML_SCHEMAS axs
+ where SCHEMA_URL = SCHEMA_LOCATION_HINT
+   and OWNER      = SCHEMA_OWNER
+   and SCHEMA_URL != 'http://xmlns.oracle.com/xdb/xdbpm/XDBSchema.xsd'
+   and SCHEMA_URL != 'http://xmlns.oracle.com/xdb/xdbpm/XDBResource.xsd'
+ order by OWNER, SCHEMA_LOCATION_HINT, TABLE_OWNER, TABLE_NAME, ELEMENT_NAME, COLUMN_NAME
+/
+create or replace trigger XMLSCHEMA_OBJECT_LIST_DML
+instead of INSERT or UPDATE or DELETE on XMLSCHEMA_OBJECT_LIST
+begin
+ null;
+end;
+/
+grant select on XMLSCHEMA_OBJECT_LIST 
+             to XFILES_USER
+/

@@ -18,15 +18,30 @@ var dummy // Declaring a variable seems to help IE load the script correctly
 function onPageLoaded() {
 }
 
-function xmlSchemaSearch(xmlSchemaOwner,xmlSchemaURL,globalElement) {
+function xmlSchemaSearch(schemaOwner, schemaLocationHint, targetTableInfo) {
     
   target = '/XFILES/XMLSearch/xmlSchema.html';
-  var strings = globalElement.split('"');
-  target = target + '?xmlSchemaOwner=' + xmlSchemaOwner.value;
-  target = target + '&xmlSchema=' + xmlSchemaURL.value;
-  target = target + '&defaultTableSchema=' +  strings[1];
-  target = target + '&defaultTable=' +  strings[3];
-  target = target + '&globalElement=' + strings[5]
+  var strings = targetTableInfo.split('"');
+  target = target + '?tableOwner='         + strings[1];
+  target = target + '&tableName='          + strings[3];
+  target = target + '&columnName='         + 'OBJECT_VALUE';
+  target = target + '&schemaOwner='        + schemaOwner.value;
+  target = target + '&schemaLocationHint=' + schemaLocationHint.value;
+  target = target + '&elementName='        + strings[5]
+  
+  window.location.href = target
+
+}
+
+function xmlSchemaObjectSearch(tableOwner, tableName, columnName, schemaOwner, schemaLocationHint, elementName) {
+    
+  target = '/XFILES/XMLSearch/xmlSchema.html';
+  target = target + '?tableOwner='         + tableOwner;
+  target = target + '&tableName='          + tableName;
+  target = target + '&columnName='         + columnName;
+  target = target + '&schemaOwner='        + schemaOwner;
+  target = target + '&schemaLocationHint=' + schemaLocationHint;
+  target = target + '&elementName='        + elementName;
   
   window.location.href = target
 

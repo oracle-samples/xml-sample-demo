@@ -1,0 +1,171 @@
+set echo on
+spool testcase.log
+--
+set pages 0
+set lines 256
+set long  10000000
+set trimspool on
+--
+def USERNAME = '&1'
+--
+DEF TARGET_DIRECTORY = '&2'
+--
+def SCHEMA_ARCHIVE = '&3'
+--
+@&TARGET_DIRECTORY/setVariables
+--
+drop user &USERNAME cascade
+/
+grant create any directory, drop any directory, connect, resource, alter session, create view, unlimited tablespace to &USERNAME identified by &PASSWORD
+/
+alter user &USERNAME identified by &PASSWORD DIGEST ENABLE
+/
+grant XFILES_USER to &USERNAME
+/
+alter user &USERNAME default tablespace &USER_TABLESPACE temporary tablespace &TEMP_TABLESPACE
+/
+--
+VAR USERNAME VARCHAR2(128)
+--
+VAR PASSWORD VARCHAR2(128)
+--
+VAR USER_TABLESPACE VARCHAR2(128)
+--
+VAR TEMP_TABLESPACE VARCHAR2(128)
+--
+VAR TARGET_DIRECTORY VARCHAR2(1024)
+--
+VAR SCHEMA_ARCHIVE VARCHAR2(1024)
+--
+VAR DELETE_SCHEMAS VARCHAR2(5)
+--
+VAR CREATE_TABLES  VARCHAR2(5)
+--
+VAR LOAD_INSTANCES VARCHAR2(5)
+--
+VAR LOCAL VARCHAR2(5)
+--
+VAR BINARY_XML VARCHAR2(5)
+--
+VAR DISABLE_DOM_FIDELITY VARCHAR2(5)
+--
+VAR REPOSITORY_USAGE NUMBER
+--
+VAR REPOS_FOLDER VARCHAR2(4000)
+--
+VAR CONFIG_FILENAME VARCHAR2(4000)
+--
+VAR SCHEMA_FOLDER VARCHAR2(4000)
+--
+VAR TARGET_SCHEMA VARCHAR2(4000)
+--
+VAR ARCHIVE_NAME VARCHAR2(4000)
+--
+VAR SCHEMA_LOCATION_PREFIX VARCHAR2(700)
+--
+VAR SCRIPT_FILE_PATH VARCHAR2(700)
+--
+begin
+	:USERNAME               := '&USERNAME';
+	:PASSWORD               := '&PASSWORD';
+	:USER_TABLESPACE        := '&USER_TABLESPACE';
+	:TEMP_TABLESPACE        := '&TEMP_TABLESPACE';
+	:TARGET_DIRECTORY       := '&TARGET_DIRECTORY';
+	:SCHEMA_ARCHIVE         := '&SCHEMA_ARCHIVE';
+	:DELETE_SCHEMAS         := '&DELETE_SCHEMAS';
+	:CREATE_TABLES          := '&CREATE_TABLES';
+	:LOAD_INSTANCES         := '&LOAD_INSTANCES';
+	:LOCAL                  := '&LOCAL';
+	:BINARY_XML             := '&BINARY_XML';
+	:DISABLE_DOM_FIDELITY   := '&DISABLE_DOM_FIDELITY';
+	:REPOSITORY_USAGE       := &REPOSITORY_USAGE;
+	:SCHEMA_FOLDER          := '&SCHEMA_FOLDER';
+	:TARGET_SCHEMA          := '&TARGET_SCHEMA';
+	:SCHEMA_LOCATION_PREFIX := '&SCHEMA_LOCATION_PREFIX';
+end;
+/
+print	:USERNAME             
+print	:PASSWORD             
+print	:USER_TABLESPACE      
+print	:TEMP_TABLESPACE      
+print	:TARGET_DIRECTORY     
+print	:SCHEMA_ARCHIVE       
+print	:DELETE_SCHEMAS       
+print	:CREATE_TABLES        
+print	:LOAD_INSTANCES       
+print	:BINARY_XML           
+print	:REPOSITORY_USAGE     
+print	:DISABLE_DOM_FIDELITY 
+print :SCHEMA_FOLDER
+print :TARGET_SCHEMA
+print :SCHEMA_LOCATION_PREFIX
+--
+declare
+  V_ARCHIVE_FILE_NAME  VARCHAR2(700) := :SCHEMA_ARCHIVE;
+  V_TARGET_SCHEMA VARCHAR2(700);
+begin
+
+  if (INSTR(V_ARCHIVE_FILE_NAME,'/') > 0) then
+	  V_ARCHIVE_FILE_NAME := substr(V_ARCHIVE_FILE_NAME,instr(V_ARCHIVE_FILE_NAME,'/',-1)+1);
+  end if;
+
+  V_ARCHIVE_FILE_NAME := substr(V_ARCHIVE_FILE_NAME,1,instr(V_ARCHIVE_FILE_NAME,'.',-1)-1);
+
+  :REPOS_FOLDER := '/home/&USERNAME/' || V_ARCHIVE_FILE_NAME;
+  
+  if (:SCHEMA_FOLDER = '') OR (:SCHEMA_FOLDER IS NULL) then
+    :SCHEMA_FOLDER := :REPOS_FOLDER;
+  else
+    :SCHEMA_FOLDER := :REPOS_FOLDER || '/' || :SCHEMA_FOLDER;
+  end if;
+   
+ :ARCHIVE_NAME := V_ARCHIVE_FILE_NAME;
+end;
+/
+print :REPOS_FOLDER
+print :SCHEMA_FOLDER
+print :ARCHIVE_NAME
+--
+begin
+	if (DBMS_XDB.existsResource(:REPOS_FOLDER)) then
+	  DBMS_XDB.deleteResource(:REPOS_FOLDER,DBMS_XDB.DELETE_RECURSIVE);
+	end if;
+end;
+/
+commit
+/
+column ANY_PATH FORMAT A256
+column OUTPUT FORMAT A256
+set lines 256 pages 0 long 1000000
+--
+select ANY_PATH
+  from RESOURCE_VIEW
+ where under_path(RES,:REPOS_FOLDER) = 1
+/
+connect &USERNAME/&PASSWORD@&_CONNECT_IDENTIFIER
+
+create or replace directory &USERNAME as '&TARGET_DIRECTORY'
+/
+call XDB_UTILITIES.createHomeFolder()
+/
+declare
+  V_RESULT BOOLEAN;
+  V_PATH   VARCHAR2(700);
+begin
+  V_PATH := :REPOS_FOLDER || '/' || :SCHEMA_ARCHIVE;
+	XDB_UTILITIES.mkdir(:REPOS_FOLDER,TRUE);	
+	V_RESULT := DBMS_XDB.createResource(V_PATH,bfilename('&USERNAME',:SCHEMA_ARCHIVE));
+	commit;
+end;
+/
+begin
+  XDB_IMPORT_UTILITIES.UNZIP(:REPOS_FOLDER || '/' || :SCHEMA_ARCHIVE ,:REPOS_FOLDER,:REPOS_FOLDER || '/unzip_' || :SCHEMA_ARCHIVE ||' .log',XDB_CONSTANTS.RAISE_ERROR);
+end;
+/
+select ANY_PATH
+  from RESOURCE_VIEW
+ where under_path(RES,:REPOS_FOLDER) = 1
+/
+@&TARGET_DIRECTORY/registerSchema.sql
+--
+quit

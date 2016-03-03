@@ -44,6 +44,8 @@ create or replace synonym XDB_ANALYZE_XMLSCHEMA for XDBPM_ANALYZE_XMLSCHEMA
 /
 create or replace synonym XDB_ANALYZE_SCHEMA for XDBPM_ANALYZE_XMLSCHEMA
 /
+grant execute on XDBPM_ANALYZE_XMLSCHEMA to public
+/
 create or replace package body XDBPM_ANALYZE_XMLSCHEMA
 as
 --
@@ -1660,5 +1662,8 @@ end XDBPM_ANALYZE_XMLSCHEMA;
 /
 show errors
 --
-grant execute on XDBPM_ANALYZE_XMLSCHEMA to public
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
+alter SESSION SET CURRENT_SCHEMA = SYS
+/
+--

@@ -6,20 +6,14 @@ var schemaContainerPath;
 
 var rcPrefixList = { "rc"  :  "http://xmlns.oracle.com/xdb/pm/registrationConfiguration" };
 var	rcNamespace = new namespaceManager(rcPrefixList)
+
 var registrationConfiguration;
 
-
 var rcNamespace;
+
 var typeAnalysisInProgress = false;
 
 var globalElementListXSL 
-
-
-function loadGlobalElementListXSL() {
-  globalElementListXSL = loadXSLDocument("/XFILES/Applications/XMLSchemaWizard/xsl/globalElementList.xsl");
-}
-
-var currentSchema;
 
 function doNothing() {
 }
@@ -27,12 +21,65 @@ function doNothing() {
 var doNext = doNothing;
 var doPrev = doNothing;
 
-function reportUploadError(repositoryPath,SQLCODE,SQLERRM) {
-  error = new xfilesException("XFILES.XFILES_DOCUMENT_UPLOAD.SINGLE_DOC_UPLOAD",12,repositoryPath);
-  error.setDescription(SQLERRM);
-  error.setNumber(SQLCODE);
-  handleException('registrationWizard.submit',error,repositoryPath);
+function loadGlobalElementListXSL() {
+  globalElementListXSL = loadXSLDocument("/XFILES/Applications/XMLSchemaWizard/xsl/globalElementList.xsl");
 }
+
+function showSelectFolder() {
+	
+	$('#wizardSteps a[href="#wizardSelectSchemas"]').tab('show')
+
+  document.getElementById("btnNext").style.display="block";
+	doNext = verifySchemaSet;
+	
+}
+
+function showSchemaOrdering() {
+	
+	$('#wizardSteps a[href="#wizardConfigureSchemas"]').tab('show')
+
+  document.getElementById("btnNext").style.display="block";
+  doNext = showScriptOptions;
+
+}
+
+function showScriptOptions() {
+	
+	$('#wizardSteps a[href="#wizardScriptOptions"]').tab('show')
+
+  document.getElementById("btnNext").style.display="block";
+  doNext = generateScripts;
+
+}
+
+function showShowScripts() {
+	
+  $('#wizardSteps a[href="#wizardShowScript"]').tab('show')
+  
+  document.getElementById("btnNext").style.display="none";
+  doNext = doNothing;
+
+}
+
+
+function showTypeCompilation() {
+	
+	$('#wizardSteps a[href="#step_compileTypes"]').tab('show')
+
+  document.getElementById("btnNext").style.display="none";
+  doNext = doNothing;
+
+}
+
+function showTypeAnalysis() {
+	
+	$('#wizardSteps a[href="#step_analyzeTypes"]').tab('show')
+
+  document.getElementById("btnNext").style.display="none";
+  doNext = doNothing;
+  
+}
+
 
 function onPageLoaded() {
 
@@ -40,277 +87,7 @@ function onPageLoaded() {
 	loadFolderTree(xfilesNamespaces,document.getElementById('treeLoading'),document.getElementById('treeControl'))
 	loadGlobalElementListXSL();
 	showSelectFolder();
-}
-
-function changeStorageModel() {
 	
-	if (getRadioButtonValue("storageModel") == "OR") {
-	  document.getElementById("tab_compileTypes").style.display="block";
-	  document.getElementById("tab_analyzeTypes").style.display="block";
-  }
-  else {
-	  document.getElementById("tab_compileTypes").style.display="none";
-	  document.getElementById("tab_analyzeTypes").style.display="none";
-	}
-	
-}
-  	
-function getSchemaName(schemaLocationHint) {
-
-	var schemaName = schemaLocationHint;
-	var offset = schemaLocationHint.lastIndexOf('.xsd');
-	if (offset > -1) {
-		 schemaName = schemaName.substring(0,offset);
-	}
-	var offset = schemaLocationHint.lastIndexOf('/');
-	if (offset > -1) {
-		 schemaName = schemaName.substring(offset+1);
-	}
-  return schemaName;
-}
-
-function appendPaths(schemaLocationPrefix,localPath) {
-	
-	if (schemaLocationPrefix.length > 0) {
-    if (schemaLocationPrefix.indexOf("/") != schemaLocationPrefix.length) {
-  	  schemaLocationPrefix = schemaLocationPrefix + "/";
-    }
-  }
-  
-  if (localPath.indexOf("/") == 0) {
-    localPath = localPath.substring(1);
-  }
-
-  return schemaLocationPrefix + localPath;
-
-}
-
-function updateSchemaLocationHint() {
-
-  document.getElementById("schemaLocationHint").value = appendPaths(document.getElementById("schemaLocationPrefix").value,document.getElementById("schemaList").value);
-  registrationConfiguration.getDocumentElement().setAttribute('schemaLocationPrefix',document.getElementById("schemaLocationPrefix").value)
- 
-}
-
-function executeDeleteSchemaScript(mgr) {
-
-  try {
-   	var soapResponse = mgr.getSoapResponse("registrationWizard.executeDeleteSchemaScript");
-   	var namespaces = xfilesNamespaces
-	  namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
-
-    var resultSet = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN",namespaces);
-    if (resultSet.length > 0) {
-      var deleteScriptPath = resultSet.item(0).firstChild.nodeValue;
-      window.open('/XFILES/WebDemo/runtime.html?target=' + deleteScriptPath + '&stylesheet=/XFILES/WebDemo/xsl/runtime.xsl&includeContent=true','sqlWindow')
-   	  return;
-   	}
-  } catch (e) {
-    handleException('registrationWizard.executeDeleteSchemaScript',e,null);
-  }
-
-}
-
-function doDeleteSchemas() {
-
-  // Generate and run a Delete Script. Delete Schemas, Tables and Types.
-  
-  try {
- 
-  	var schema  = "XFILES";
-    var package = "XFILES_XMLSCHEMA_WIZARD";
-    var method =  "CREATE_DELETE_SCHEMA_SCRIPT";
-	
-  	var mgr = soapManager.getRequestManager(schema,package,method);
-  	var XHR = mgr.createPostRequest();
-    XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { executeDeleteSchemaScript(mgr) } };
-  
-  	var parameters = new Object;
-  	var xparameters = new Object;
-  	
-  	xparameters["P_XML_SCHEMA_CONFIGURATION-XMLTYPE-IN"]  = registrationConfiguration;
-
-    mgr.sendSoapRequest(parameters,xparameters);
-   
-  } 
-  catch (e) {
-    handleException('registrationWizard.orderSchemas',e,null);
-  } 
-}
-
-function selectSchema() {
-	
- 	showUserErrorMessage("Select the primary XML Schema. This is usually the XML schema that contains the definition of the root element");
-
-}
-
-function showSelectFolder() {
-	
-	$('#wizardSteps a[href="#wizardChooseFolder"]').tab('show')
-	
-}
-
-function showRootElements() {
-
-	$('#wizardSteps a[href="#wizardSelectElements"]').tab('show')
-  // doNext = processSchemas;
-  doNext = doNothing;
-  document.getElementById("btnNext").style.display="block";
-
-}
-
-function processOrderedSchemas() {
-
-  if (getRadioButtonValue("storageModel") == "CSX") {
-	  showGenerateScripts();
-  } 
-  else {
-	  startTypeCompilation();
-  }
-}
-
-
-function showOrderSchemas() {
-	
-	$('#wizardSteps a[href="#step_orderSchemas"]').tab('show')
-  doNext = processOrderedSchemas;
-  document.getElementById("btnNext").style.display="block";
-
-}
- 
-function showTypeCompilation() {
-	
-	$('#wizardSteps a[href="#step_compileTypes"]').tab('show')
-  doNext = doNothing;
-  document.getElementById("btnNext").style.display="none";
-
-}
-
-function showTypeAnalysis() {
-	
-	$('#wizardSteps a[href="#step_analyzeTypes"]').tab('show')
-  doNext = doNothing;
-  document.getElementById("btnNext").style.display="none";
-
-}
-
-function showGenerateScripts() {
-	
-	$('#wizardSteps a[href="#step_createScripts"]').tab('show')
-  
-  doNext = generateSchemaRegistrationScript;
-  document.getElementById("btnNext").style.display="block";
-
-}
-
-function showSchemaRegistrationScript() {
-	
-  $('#wizardSteps a[href="#step_reviewScripts"]').tab('show')
-  
-  doNext = doNothing;
-  document.getElementById("btnNext").style.display="none";
-
-}
-
-function getTargetNamespace(repositoryPath,schemaConfiguration) {
-
-  var nl =  schemaConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:SchemaInformation[rc:repositoryPath=\"" + repositoryPath + "\"]/rc:targetNamespace",rcNamespace)
-  return nl.item(0).firstChild.nodeValue;
-
-}
-
-function showFileContent(path,target) {
-	
-  try {
-
-    var logFileContent = getDocumentContent(path);
-
-    var logWindow = document.getElementById(target)
- 	  while (logWindow.hasChildNodes()){
-  	 	 logWindow.removeChild(logWindow.firstChild);
- 	  }
-     
-    /*
-    **
-    ** var mgr = soapManager.getRequestManager("XDB","ORAWSV","SQL");
-    ** var XHR = mgr.createPostRequest(false);
-    ** mgr.executeSQL("select xdburitype('" + logFileName + "').getClob() LOGFILECONTENT from dual");    
-    ** 
-	  ** var soapResponse = mgr.getSoapResponse("registrationWizard.showFileContent");
-    **
-   	** var namespaces = xfilesNamespaces
-	  ** namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
-    **
-    ** var resultSet = soapResponse.selectNodes(mgr.getOutputXPath() + "/orawsv:ROWSET/orawsv:ROW/orawsv:LOGFILECONTENT",namespaces );
-    ** var logFileContent = resultSet.item(0).firstChild.nodeValue;
-    **
-    */
-    
-    logWindow.appendChild(document.createTextNode(logFileContent));
-    logWindow.parentNode.scrollTop = logWindow.parentNode.scrollHeight;
-  }
-  catch (e) {
-   error = new xfilesException("registrationWizard.showFileContent",14,logFileName,e);
-   throw error;
-  }
-	
-}
-
-function displayGlobalElementList(mgr) {
-
-
-	try {
-		
-		var globalElementList = document.getElementById("globalElementList");
-  
-   	var soapResponse = mgr.getSoapResponse("registrationWizard.displayGlobalElementList");
-   	var namespaces = xfilesNamespaces
-	  namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
-
-    // showSourceCode(soapResponse);
-
-		var container = document.getElementById("globalElementList");	
-		container.innerHTML = "";
-
-    var resultSet = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN",namespaces);
-    if (resultSet.length > 0) {
-    	transformXMLtoXHTML(soapResponse,globalElementListXSL,container);
-    }
-    error = new xfilesException("registrationWizard.displayGlobalElementList",12,null, null);
-    error.setXML(soapResponse);
-    throw error;
-  } 
-  catch (e) {
-    handleException('registrationWizard.displayGlobalElementList',e,null);
-  }
-  
-}
-
-function listGlobalElements(repositoryPath) {
-
-	// showRootElements();
-
-	// var repositoryPath = targetFolderTree.getOpenFolder();
-
-  try {
-  	var schema  = "XFILES";
-    var package = "XFILES_XMLSCHEMA_WIZARD";
-    var method =  "GET_GLOBAL_ELEMENT_LIST";
-	
-	  var mgr = soapManager.getRequestManager(schema,package,method);
-    var XHR = mgr.createPostRequest();
-    XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displayGlobalElementList(mgr) } };
-  
-	  var parameters = new Object;
-  	
-	  parameters["P_XML_SCHEMA_FOLDER-VARCHAR2-IN"]  = repositoryPath;
-    mgr.sendSoapRequest(parameters);
-
-  } 
-  catch (e) {
-    handleException('registrationWizard.listGlobalElements',e,null);
-  }
-
 }
 
 function displaySchemaList(mgr,repositoryPath) {
@@ -319,14 +96,10 @@ function displaySchemaList(mgr,repositoryPath) {
   loadOptionList(mgr, schemaList, schemaList, false, false)
     
   if (schemaList.options.length > 0) {
-	  listGlobalElements(repositoryPath);
     document.getElementById("btnNext").style.display="block";
   }
   else {
-    doNext = doNothing
-	  // schemaList.style.display = "none";
     document.getElementById("btnNext").style.display="none";
-    // document.getElementById("schemaListContainer").style.display="none";
   }
 }
 
@@ -350,7 +123,6 @@ function listXMLSchemas(repositoryPath) {
   catch (e) {
     handleException('registrationWizard.listXMLSchemas',e,null);
   }
- 
 }
 
 function resetSchemaList() {
@@ -362,7 +134,6 @@ function resetSchemaList() {
    
 function searchCurrentFolder() {
 	
-  doNext = orderSchemas;   
 	var selectedFolder = targetFolderTree.getOpenFolder();
 	if (selectedFolder != null) {
 		if (targetFolder != selectedFolder) {
@@ -402,7 +173,6 @@ function displayUploadedSchemas(mgr,archivePath) {
   catch (e) {
     handleException('registrationWizard.displaySchemaList',e,null);
   }
-
 }
 
 function unzipSchemaArchive(repositoryPath) {
@@ -450,28 +220,25 @@ function chooseSchemaArchive() {
   	return
   }
  
-  // Processing will Continue in uploadSchemaArchive
+  // Processing in uploadSchemaArchive
   
   openModalDialog("uploadArchive")
- 
 }
 
-function populateSchemaList(selectControl,schemaList,schemaLocationPrefix) {
-
- 	while (selectControl.options.length > 0){
-		selectControl.remove(0)
- 	}
-    	
-  if (schemaList.length > 0) {
-	  for (var i=0;i< schemaList.length; i++) {
- 		  option = document.createElement("option");
-      selectControl.appendChild(option);  
-      var schemaLocationHint = appendPaths(schemaLocationPrefix,schemaList.item(i).firstChild.nodeValue);
-      var text = document.createTextNode(schemaLocationHint);
-      option.appendChild(text);
-      option.value = schemaLocationHint;
+function appendPath(schemaLocationPrefix,localPath) {
+	
+	if (schemaLocationPrefix.length > 0) {
+    if (schemaLocationPrefix.indexOf("/") != schemaLocationPrefix.length) {
+  	  schemaLocationPrefix = schemaLocationPrefix + "/";
     }
-  }    
+  }
+  
+  if (localPath.indexOf("/") == 0) {
+    localPath = localPath.substring(1);
+  }
+
+  return schemaLocationPrefix + localPath;
+
 }
 
 function populateElementList(selectControl,elementList) {
@@ -486,7 +253,7 @@ function populateElementList(selectControl,elementList) {
       selectControl.appendChild(option);  
       var tableDefinition = new xmlElement(elementList.item(i));
       var namespace = tableDefinition.selectNodes("rc:namespace",rcNamespace).item(0).firstChild.nodeValue;
-      var qname = tableDefinition.selectNodes("rc:globalElement",rcNamespace).item(0).firstChild.nodeValue;
+      var qname = tableDefinition.selectNodes("rc:name",rcNamespace).item(0).firstChild.nodeValue;
       if (namespace != "") {
         var qname = namespace + ":" + qname;
       }
@@ -497,9 +264,44 @@ function populateElementList(selectControl,elementList) {
   }    
 }
 
-function displaySchemaOrdering(mgr,rootSchemaPath) {
+function fixSchemaLocationHint(schemaLocationHint, repositoryFolder, schemaLocationPrefix) {
 	
-	showOrderSchemas();
+	if (schemaLocationPrefix == "") {
+		return schemaLocationHint
+  }
+  else {
+    if (schemaLocationHint.indexOf(repositoryFolder) == 0) {
+     	return appendPath(schemaLocationPrefix,schemaLocationHint.substring(repositoryFolder.length+1));
+    }
+    else {
+      return schemaLocationHint;
+    }
+  }
+}
+
+function populateSchemaList(selectControl,schemaList) {
+	
+  var schemaLocationPrefix = registrationConfiguration.getDocumentElement().getAttribute('schemaLocationPrefix')
+  var repositoryFolder = document.getElementById("repositoryFolderPath").value 
+
+ 	while (selectControl.options.length > 0){
+		selectControl.remove(0)
+ 	}
+    	
+  if (schemaList.length > 0) {
+	  for (var i=0;i< schemaList.length; i++) {
+ 		  option = document.createElement("option");
+      selectControl.appendChild(option);  
+      var schemaLocationHint = schemaList.item(i).firstChild.nodeValue
+      schemaLocationHint = fixSchemaLocationHint(schemaLocationHint, repositoryFolder, schemaLocationPrefix);
+      var text = document.createTextNode(schemaLocationHint);
+      option.appendChild(text);
+      option.value = i+1;
+    }
+  }    
+}
+
+function displaySchemaOrdering(mgr,rootSchemaPath) {
 		
   try {
    	var soapResponse = mgr.getSoapResponse("registrationWizard.displaySchemaOrdering");
@@ -511,30 +313,19 @@ function displaySchemaOrdering(mgr,rootSchemaPath) {
     var resultSet = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/rc:SchemaRegistrationConfiguration",namespaces);
     
     if (resultSet.length > 0) {
-    	
+
+    	showSchemaOrdering();	
 			registrationConfiguration = new xmlDocument();
     	registrationConfiguration.appendChild(registrationConfiguration.importNode(resultSet.item(0),true));  	
-
-      if (rootSchemaPath != "") {
-		    var targetNamespace = getTargetNamespace(rootSchemaPath,registrationConfiguration);
-  	    document.getElementById("targetNamespace").value = targetNamespace
-
-     	  var schemaLocationPrefix = targetNamespace
-	       // Code here to attempt to strip .xsd and XML Schema path from targetNamespace.
-	      if (schemaLocationPrefix.indexOf('.xsd') == (schemaLocationPrefix.length-4)) {
-		      schemaLocationPrefix = schemaLocationPrefix.substring(0,schemaLocationPrefix.length-4);
-        }
-        document.getElementById("schemaLocationPrefix").value = schemaLocationPrefix
-
-        updateSchemaLocationHint();
-      }
 
     	var selectControl = document.getElementById("orderedSchemaList");
     	var schemaList = registrationConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:SchemaInformation/rc:schemaLocationHint",rcNamespace);
     	populateSchemaList(selectControl,schemaList,"");
 
-    	var selectControl = document.getElementById("globalElementList");
-    	var globalElementList = registrationConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:Table",rcNamespace);
+    	$('#schemaLocationInfo').collapse({toggle: false})
+
+    	var selectControl = document.getElementById("generatedTableList");
+    	var globalElementList = registrationConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:elements/rc:element",rcNamespace);
     	populateElementList(selectControl,globalElementList);
 
     	return;
@@ -546,43 +337,79 @@ function displaySchemaOrdering(mgr,rootSchemaPath) {
     throw error;
   } 
   catch (e) {
-    handleException('registrationWizard.displaySchemaOrdering',e,null);
+  	if ((e.isServerError) && ((e.isServerError()) && (e.getSQLErrCode() == 'ORA-31001'))) {
+  		var errorMsg = e.getSQLErrMsg();
+  		var schemaLocation = errorMsg.substring(errorMsg.indexOf('"'));
+			showErrorMessage("Unable to resolve XML Schema : " + schemaLocation)
+	  }
+	  else {
+      handleException('registrationWizard.displaySchemaOrdering',e,null);
+    }
   }
-
 }
 
-function orderSchemas() {
+function processSchemaList(schemas) {
+
+  var schemaList = document.getElementById("schemaList");
+
+  for (var i=0; i<schemaList.length; i++) {
+    if (schemaList.options[i].selected) {
+      var schema = schemaList.options[i].value;
+      if (schemas.indexOf(schema) == -1) {
+        schemas.push(schema);
+      }
+    }
+  }
+  return schemas;  
+}
+
+function verifySchemaSet() {
 
 	/*
-	** Orders the schemas needed to successfully register the Selected Schema.
+	** Order the schemas needed to successfully register the chosen XML Schema(s)
 	**
 	*/
 
-  var rootSchema = document.getElementById("schemaList").value;
   var repositoryFolderPath = targetFolderTree.getOpenFolder();
-  document.getElementById("repositoryFolderPath").value = repositoryFolderPath
+	
+  var schemaList = [];
+  schemaList = processSchemaList(schemaList);
+   
+  document.getElementById("repositoryFolderPath").value = repositoryFolderPath;
   
-  var rootSchemaPath = "";
-  if (rootSchema != "") {
-  	rootSchemaPath = appendPaths(repositoryFolderPath,rootSchema);
+  var xmlSchemaList = new xmlDocument();
+  var schemas = xmlSchemaList.createElement("schemas");
+  xmlSchemaList.appendChild(schemas);
+  
+  for (var i=0; i<schemaList.length; i++) {
+  	var schema = xmlSchemaList.createElement("schema");
+    // var schemaPath = appendPath(repositoryFolderPath,schemaList[i]);
+    var schemaPath = schemaList[i];
+		var text   = xmlSchemaList.createTextNode(schemaPath);
+  	schema.appendChild(text);
+  	schemas.appendChild(schema);
   }
-  
+
+  document.getElementById("btnNext").style.display="none";
+   
   try {
  
   	var schema  = "XFILES";
     var package = "XFILES_XMLSCHEMA_WIZARD";
-    var method =  "ORDER_SCHEMAS";
+    var method =  "ORDER_SCHEMA_LIST";
 	
   	var mgr = soapManager.getRequestManager(schema,package,method);
   	var XHR = mgr.createPostRequest();
-    XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displaySchemaOrdering(mgr,rootSchemaPath) } };
+    XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displaySchemaOrdering(mgr,"") } };
   
   	var parameters = new Object;
-  	
   	parameters["P_XML_SCHEMA_FOLDER-VARCHAR2-IN"]  = repositoryFolderPath;
-  	parameters["P_ROOT_XML_SCHEMA-VARCHAR2-IN"]  = rootSchema;
   	parameters["P_SCHEMA_LOCATION_PREFIX-VARCHAR2-IN"]  = "";
-    mgr.sendSoapRequest(parameters);
+  	
+  	var xParameters = new Object;
+  	xParameters["P_XML_SCHEMAS-XMLTYPE-IN"]  = xmlSchemaList;
+
+    mgr.sendSoapRequest(parameters,xParameters);
    
   } 
   catch (e) {
@@ -590,14 +417,194 @@ function orderSchemas() {
   }
 }
 
-function startTypeCompilation() {
+function getRepositoryPath(schemaConfiguration,index) {
+
+  var nl = schemaConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:SchemaInformation[" + index + "]/rc:repositoryPath",rcNamespace)
+  return nl.item(0).firstChild.nodeValue;
+
+}
+
+function getSchemaLocationHint(schemaConfiguration,index) {
+
+  var nl = schemaConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:SchemaInformation[" + index + "]/rc:schemaLocationHint",rcNamespace)
+  return nl.item(0).firstChild.nodeValue;
+
+}
+
+function getTargetNamespace(schemaConfiguration,index) {
+
+  var nl = schemaConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:SchemaInformation[" + index + "]/rc:targetNamespace",rcNamespace)
+  return nl.item(0).firstChild.nodeValue;
+
+}
+
+function setSchemaLocationHint() {
 	
-  var selectControl = document.getElementById("unregisteredSchemaList");
-  var schemaList = registrationConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:SchemaInformation/rc:schemaLocationHint",rcNamespace);
-  var schemaLocationPrefix = document.getElementById("schemaLocationPrefix").value
-  populateSchemaList(selectControl,schemaList,schemaLocationPrefix);
-  showTypeCompilation();  
-	registerSchema(1);
+	 var repositoryFolder = document.getElementById("repositoryFolderPath").value
+
+   var schemaList = document.getElementById("orderedSchemaList");
+	 var absolutePath = schemaList.options[schemaList.selectedIndex].textContent;
+	 var relativePath = absolutePath.substring(repositoryFolder.length);
+	 var schemaLocationHint = appendPath(document.getElementById("schemaLocationPrefix").value,relativePath);
+   document.getElementById("schemaLocationHint").value = schemaLocationHint;
+   
+}
+
+function setSchemaLocationPrefix(targetNamespace) {
+
+		// Enable editing of Schema Location Hint.
+    // Code here to attempt to strip .xsd and XML Schema path from targetNamespace.
+    
+    var schemaLocationPrefix = targetNamespace
+
+    if (schemaLocationPrefix.indexOf('.xsd') == (schemaLocationPrefix.length-4)) {
+	    schemaLocationPrefix = schemaLocationPrefix.substring(0,schemaLocationPrefix.length-4);
+    }
+
+    document.getElementById("schemaLocationPrefix").value = schemaLocationPrefix
+    $('#schemaLocationInfo').collapse("show")    
+    setSchemaLocationHint();    
+
+}
+
+function updateSchemaLocationPrefix() {
+	
+	registrationConfiguration.getDocumentElement().setAttribute('schemaLocationPrefix',document.getElementById("schemaLocationPrefix").value)
+
+}
+
+function showSchemaDetails() {
+
+	var schemaList = document.getElementById("orderedSchemaList");
+	var index = schemaList.options[schemaList.selectedIndex].value
+	
+	var repositoryPath = getRepositoryPath(registrationConfiguration,index);
+	var schemaLocationHint = getSchemaLocationHint(registrationConfiguration,index)
+
+ 	var targetNamespace = getTargetNamespace(registrationConfiguration,index);
+  document.getElementById("targetNamespace").value = targetNamespace
+	
+	if (repositoryPath == schemaLocationHint) {
+		setSchemaLocationPrefix(targetNamespace)
+  }
+  else {
+  	$('#schemaLocationInfo').collapse("hide")
+  }
+	
+}
+
+function changeStorageModel() {
+	
+	if (getRadioButtonValue("xmlStorageModel") == "OR") {
+	  document.getElementById("tab_compileTypes").style.display="block";
+	  document.getElementById("tab_analyzeTypes").style.display="block";
+	  document.getElementById("domFidelityOption").style.display="block";
+	  document.getElementById("disableDOMFidelity").checked = false;
+	  doNext = startTypeCompilation;
+  }
+  else {
+	  document.getElementById("tab_compileTypes").style.display="none";
+	  document.getElementById("tab_analyzeTypes").style.display="none";
+	  document.getElementById("domFidelityOption").style.display="none";	  
+	  document.getElementById("disableDOMFidelity").checked = true;
+	  doNext = generateScripts;
+	}	
+}
+
+function showFileContent(path,target) {
+	
+  try {
+
+    var logFileContent = getDocumentContent(path);
+
+    var logWindow = document.getElementById(target)
+ 	  while (logWindow.hasChildNodes()){
+  	 	logWindow.removeChild(logWindow.firstChild);
+ 	  }
+         
+    logWindow.appendChild(document.createTextNode(logFileContent));
+    logWindow.parentNode.scrollTop = logWindow.parentNode.scrollHeight;
+  }
+  catch (e) {
+   error = new xfilesException("registrationWizard.showFileContent",14,path,e);
+   throw error;
+  }
+	
+}
+
+function displayRegistrationScript(mgr) {
+
+  try {
+   	var soapResponse = mgr.getSoapResponse("registrationWizard.displayRegistrationScript");
+   	var namespaces = xfilesNamespaces
+	  namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
+
+    var resultSet = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN",namespaces);
+    if (resultSet.length > 0) {
+		  showShowScripts();
+      var registrationScriptPath = resultSet.item(0).firstChild.nodeValue;
+      showFileContent(registrationScriptPath,'registrationScript');
+   	  return;
+   	}
+  } catch (e) {
+    handleException('registrationWizard.displayRegistrationScript',e,null);
+  }
+
+}
+
+function generateScripts() {
+
+  /*
+  ** FUNCTION CREATE_SCRIPT RETURNS VARCHAR2
+  ** Argument Name                  Type                    In/Out Default?
+  ** ------------------------------ ----------------------- ------ --------
+  ** P_XML_SCHEMA_CONFIGURATION     XMLTYPE                 IN
+  ** P_BINARY_XML                   BOOLEAN                 IN     DEFAULT
+  ** P_LOCAL                        BOOLEAN                 IN     DEFAULT
+  ** P_DISABLE_DOM_FIDELITY         BOOLEAN                 IN     DEFAULT
+  ** P_REPOSITORY_USAGE             VARCHAR2								IN     DEFAULT
+  ** P_GENERATE_TABLES              BOOLEAN                 IN     DEFAULT  
+  **
+  */
+
+  document.getElementById("btnNext").style.display="none";
+  
+  try {
+ 
+  	var schema  = "XFILES";
+    var package = "XFILES_XMLSCHEMA_WIZARD";
+    var method =  "CREATE_SCRIPT";
+	
+  	var mgr = soapManager.getRequestManager(schema,package,method);
+  	var XHR = mgr.createPostRequest();
+    XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displayRegistrationScript(mgr) } };
+  
+  	var parameters = new Object;
+  	parameters["P_BINARY_XML-BOOLEAN-IN"]            = booleanToNumber(getRadioButtonValue("xmlStorageModel") == "CSX");
+  	parameters["P_LOCAL-BOOLEAN-IN"]                 = booleanToNumber(getRadioButtonValue("schemaScope") == "LOCAL");
+  	parameters["P_REPOSITORY_USAGE-VARCHAR2-IN"]     = getRadioButtonValue("repositoryUsage");
+  	parameters["P_DISABLE_DOM_FIDELITY-BOOLEAN-IN"]  = booleanToNumber(document.getElementById("disableDOMFidelity").checked);
+  	parameters["P_DELETE_SCHEMAS-BOOLEAN-IN"]        = booleanToNumber(document.getElementById("deleteSchemas").checked);
+  	parameters["P_CREATE_TABLES-BOOLEAN-IN"]         = booleanToNumber(document.getElementById("createTables").checked);
+  	parameters["P_LOAD_INSTANCES-BOOLEAN-IN"]        = booleanToNumber(document.getElementById("loadInstances").checked);
+
+  	var xparameters = new Object;  	
+  	xparameters["P_XML_SCHEMA_CONFIGURATION-XMLTYPE-IN"]  = registrationConfiguration;
+
+    mgr.sendSoapRequest(parameters,xparameters);
+   
+  } 
+  catch (e) {
+    handleException('registrationWizard.startTypeAnalysis',e,null);
+  }
+		
+}
+
+function executeScript() {
+
+  var nl =  registrationConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:FileNames/rc:scriptFilename",rcNamespace)
+  var registrationScriptPath = nl.item(0).firstChild.nodeValue;
+  window.open('/XFILES/WebDemo/runtime.html?target=' + registrationScriptPath + '&stylesheet=/XFILES/WebDemo/xsl/runtime.xsl&includeContent=true','sqlWindow')
 
 }
 
@@ -607,7 +614,7 @@ function checkRegisterSchema(mgr, index, currentOption) {
    	var targetList = document.getElementById("registeredSchemaList");
    	targetList.add(currentOption);
     document.getElementById("currentSchema").value = "";
-    registerSchema(index);
+    processSchema(index+1);
   } 
   catch (e) {
     handleException('registrationWizard.checkRegisterSchema',e,null);
@@ -615,7 +622,7 @@ function checkRegisterSchema(mgr, index, currentOption) {
 
 }
 
-function registerSchema(index) {
+function registerSchema(schemaSettings, index) {
 	
   try {
  
@@ -637,65 +644,85 @@ function registerSchema(index) {
     **
     */
     
-    var schemaSettings = registrationConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:SchemaInformation[" + index + "]",rcNamespace);
-    
-    if (schemaSettings.length > 0) {
-      var sourceList         = document.getElementById("unregisteredSchemaList");
-      var targetList         = document.getElementById("registeredSchemaList");
-      var disableDomFidelity = document.getElementById("disableDOMFidelity").checked;
+    var sourceList         = document.getElementById("unregisteredSchemaList");
+    var targetList         = document.getElementById("registeredSchemaList");
+    var disableDomFidelity = document.getElementById("disableDOMFidelity").checked;
 
-      currentOption = sourceList.options[0];
-      sourceList.remove(0);
-      document.getElementById("currentSchema").value = currentOption.value;
+    currentOption = sourceList.options[0];
+    sourceList.remove(0);
+    document.getElementById("currentSchema").value = currentOption.textContent;
     
-    	var schemaSettings = new xmlElement(schemaSettings.item(0));      
-      var repositoryPath = schemaSettings.selectNodes("rc:repositoryPath",rcNamespace).item(0).firstChild.nodeValue;
-      var force          = schemaSettings.selectNodes("rc:force",rcNamespace).item(0).firstChild.nodeValue;
+    var repositoryPath = schemaSettings.selectNodes("rc:repositoryPath",rcNamespace).item(0).firstChild.nodeValue;
+    var force          = schemaSettings.selectNodes("rc:force",rcNamespace).item(0).firstChild.nodeValue;
         
-    	var mgr = soapManager.getRequestManager(schema,package,method);   	
-  	  var XHR = mgr.createPostRequest();  	  
-      XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { checkRegisterSchema(mgr, index + 1, currentOption ) } };
+  	var mgr = soapManager.getRequestManager(schema,package,method);   	
+	  var XHR = mgr.createPostRequest();  	  
+    XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { checkRegisterSchema(mgr, index, currentOption ) } };
 
-    	var parameters = new Object;
-  	  parameters["P_SCHEMA_LOCATION_HINT-VARCHAR2-IN"]  = currentOption.value;
-     	parameters["P_SCHEMA_PATH-VARCHAR2-IN"]  = repositoryPath
-    	parameters["P_FORCE-BOOLEAN-IN"]  = booleanToNumber(force);
-    	parameters["P_OWNER-VARCHAR2-IN"]  = httpUsername;
-    	parameters["P_DISABLE_DOM_FIDELITY-BOOLEAN-IN"]  = booleanToNumber(disableDomFidelity);
+  	var parameters = new Object;
+	  parameters["P_SCHEMA_LOCATION_HINT-VARCHAR2-IN"]  = currentOption.textContent;
+   	parameters["P_SCHEMA_PATH-VARCHAR2-IN"]  = repositoryPath
+  	parameters["P_FORCE-BOOLEAN-IN"]  = booleanToNumber(force);
+  	parameters["P_OWNER-VARCHAR2-IN"]  = httpUsername;
+  	parameters["P_DISABLE_DOM_FIDELITY-BOOLEAN-IN"]  = booleanToNumber(disableDomFidelity);
     	
-    	var xparameters = new Object;
+  	var xparameters = new Object;
     	
-      mgr.sendSoapRequest(parameters,xparameters);
-    }
-    else {
-      startTypeAnalysis();
-    } 
+    mgr.sendSoapRequest(parameters,xparameters);
   } 
   catch (e) {
     handleException('registrationWizard.registerSchema',e,null);
   }
 }
 
-function showTypeAnalysisLog(logFileName) {
+function processSchema(index) {
+	
+  try {     
+    var schemaSettings = registrationConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:SchemaInformation[" + index + "]",rcNamespace);
+    if (schemaSettings.length > 0) {
+	  	schemaSettings = new xmlElement(schemaSettings.item(0));      
+    	registerSchema(schemaSettings, index);
+    }
+    else {
+      startTypeAnalysis();
+    } 
+  } 
+  catch (e) {
+    handleException('registrationWizard.processSchema',e,null);
+  }
+}
 
-   showFileContent(logFilePath,'typeAnalysisLog');
+function startTypeCompilation() {
+	
+  var selectControl = document.getElementById("unregisteredSchemaList");
+  var schemaList = registrationConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:SchemaInformation/rc:schemaLocationHint",rcNamespace);
+  var schemaLocationPrefix = document.getElementById("schemaLocationPrefix").value
+  populateSchemaList(selectControl,schemaList,schemaLocationPrefix);
+  showTypeCompilation();  
+	processSchema(1);
 
 }
 
-function updateTypeAnalysisLog(logFilePath) {
+function updateTypeAnalysisLog(logFilePath,finished) {
 	
-  showTypeAnalysisLog(logFilePath);
+  showFileContent(logFilePath,'typeAnalysisLog');
+  
+  if (finished) {
+  	typeAnalysisInProgress = false;
+  }
 	
   if (typeAnalysisInProgress) {
-	  setTimeout(function(){updateTypeAnalysisLog(logFilePath)},5000);
+	  setTimeout(function(){updateTypeAnalysisLog(logFilePath,false)},5000);
+  }
+  else {
+	  doNext = generateScripts;
+  	document.getElementById("btnNext").style.display="block";
   }
 }
 
 function displayTypeAnalyis(mgr,logFilePath) {
 
-  typeAnalysisInProgress = false;
-  doNext = showGenerateScripts;
-  document.getElementById("btnNext").style.display="block";
+  updateTypeAnalysisLog(logFilePath,true);      
      
   try {
    	var soapResponse = mgr.getSoapResponse("registrationWizard.validateTypeAnalysis");
@@ -709,8 +736,6 @@ function displayTypeAnalyis(mgr,logFilePath) {
     if (resultSet.length > 0) {
  			registrationConfiguration = new xmlDocument();
     	registrationConfiguration.appendChild(registrationConfiguration.importNode(resultSet.item(0),true));  	
-      showTypeAnalysisLog(logFilePath);      
-      showGenerateScripts();
     }
     else {
       error = new xfilesException("registrationWizard.validateTypeAnalysis",12,null, null);
@@ -725,6 +750,20 @@ function displayTypeAnalyis(mgr,logFilePath) {
 	
 }
 
+function getSchemaName(schemaLocationHint) {
+
+	var schemaName = schemaLocationHint;
+	var offset = schemaLocationHint.lastIndexOf('.xsd');
+	if (offset > -1) {
+		 schemaName = schemaName.substring(0,offset);
+	}
+	var offset = schemaLocationHint.lastIndexOf('/');
+	if (offset > -1) {
+		 schemaName = schemaName.substring(offset+1);
+	}
+  return schemaName;
+}
+
 function startTypeAnalysis() {
 	
   showTypeAnalysis();
@@ -732,7 +771,8 @@ function startTypeAnalysis() {
 	var schemaLocationHint = document.getElementById("schemaLocationHint").value;
 	var schemaName = getSchemaName(schemaLocationHint);
 
-	var logFilePath = registrationConfiguration.getDocumentElement().getAttribute("typeOptimization");
+  var nl =  registrationConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:FileNames/rc:typeOptimizationLogFile",rcNamespace)
+  var logFilePath = nl.item(0).firstChild.nodeValue;
 	
   try {
  
@@ -764,8 +804,8 @@ function startTypeAnalysis() {
   	xparameters["P_XML_SCHEMA_CONFIG-XMLTYPE-INOUT"]  = registrationConfiguration;
  
     mgr.sendSoapRequest(parameters,xparameters);
-    typeAnalysisInProgress = true;   
-    setTimeout(function(){updateTypeAnalysisLog(logFilePath)},5000);
+    typeAnalysisInProgress = true;
+ 	  setTimeout(function(){updateTypeAnalysisLog(logFilePath,false)},5000);
   } 
   catch (e) {
     handleException('registrationWizard.startTypeAnalysis',e,null);
@@ -773,74 +813,4 @@ function startTypeAnalysis() {
 		
 }
 
-
-function executeRegisterSchemaScript() {
-
-  var nl =  registrationConfiguration.selectNodes("/rc:SchemaRegistrationConfiguration/rc:FileNames/rc:registrationScriptFile",rcNamespace)
-  var registrationScriptPath = nl.item(0).firstChild.nodeValue;
-  window.open('/XFILES/WebDemo/runtime.html?target=' + registrationScriptPath + '&stylesheet=/XFILES/WebDemo/xsl/runtime.xsl&includeContent=true','sqlWindow')
-
-}
-
-function displayRegistrationScript(mgr) {
-
-  try {
-   	var soapResponse = mgr.getSoapResponse("registrationWizard.displayRegistrationScript");
-   	var namespaces = xfilesNamespaces
-	  namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
-
-    var resultSet = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN",namespaces);
-    if (resultSet.length > 0) {
-      var registrationScriptPath = resultSet.item(0).firstChild.nodeValue;
-      showFileContent(registrationScriptPath,'registrationScript');
-   	  return;
-   	}
-  } catch (e) {
-    handleException('registrationWizard.displayRegistrationScript',e,null);
-  }
-
-}
   
-function generateSchemaRegistrationScript() {
-
-  /*
-  ** FUNCTION CREATE_REGISTER_SCHEMA_SCRIPT RETURNS VARCHAR2
-  ** Argument Name                  Type                    In/Out Default?
-  ** ------------------------------ ----------------------- ------ --------
-  ** P_XML_SCHEMA_CONFIGURATION     XMLTYPE                 IN
-  ** P_BINARY_XML                   BOOLEAN                 IN     DEFAULT
-  ** P_LOCAL                        BOOLEAN                 IN     DEFAULT
-  ** P_DISABLE_DOM_FIDELITY         BOOLEAN                 IN     DEFAULT
-  ** P_GENERATE_TABLES              BOOLEAN                 IN     DEFAULT  **
-  */
-  
-  showSchemaRegistrationScript();
-
-  try {
- 
-  	var schema  = "XFILES";
-    var package = "XFILES_XMLSCHEMA_WIZARD";
-    var method =  "CREATE_REGISTER_SCHEMA_SCRIPT";
-	
-  	var mgr = soapManager.getRequestManager(schema,package,method);
-  	var XHR = mgr.createPostRequest();
-    XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displayRegistrationScript(mgr) } };
-  
-  	var parameters = new Object;
-  	parameters["P_BINARY_XML-BOOLEAN-IN"]            = booleanToNumber(getRadioButtonValue("storageModel") == "CSX");
-  	parameters["P_LOCAL-BOOLEAN-IN"]                 = booleanToNumber(getRadioButtonValue("localSchema") == "LOCAL");
-  	parameters["P_DISABLE_DOM_FIDELITY-BOOLEAN-IN"]  = booleanToNumber(document.getElementById("disableDOMFidelity").checked);
-  	parameters["P_GENERATE_TABLES-BOOLEAN-IN"]       = booleanToNumber(document.getElementById("generateTables").checked);
-  	var xparameters = new Object;
-  	
-  	xparameters["P_XML_SCHEMA_CONFIGURATION-XMLTYPE-IN"]  = registrationConfiguration;
-
-    mgr.sendSoapRequest(parameters,xparameters);
-   
-  } 
-  catch (e) {
-    handleException('registrationWizard.startTypeAnalysis',e,null);
-  }
-		
-}
-

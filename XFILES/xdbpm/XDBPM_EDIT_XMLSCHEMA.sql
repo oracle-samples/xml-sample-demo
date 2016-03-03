@@ -13,11 +13,12 @@
  * ================================================
  */
 
-
 --
 -- XDBPM_EDIT_XMLSCHEMA should be created under XDBPM
 --
 alter session set current_schema = XDBPM
+/
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:TRUE'
 /
 --
 declare
@@ -64,6 +65,8 @@ as
   function  getGroupDefinitions(P_SCHEMA_FOLDER VARCHAR2) return XMLTYPE;
 
   procedure saveAnnotatedSchema(P_XML_SCHEMA_PATH VARCHAR2,P_XML_SCHEMA XMLTYPE,P_COMMENT VARCHAR2 DEFAULT NULL);
+
+  function appendPath(P_LEFT_EXPRESSION VARCHAR2, P_RIGHT_EXPRESSION VARCHAR2) return VARCHAR2;
   
   function  DIFF_XML_SCHEMAS(P_OLD_SCHEMA XMLTYPE, P_NEW_SCHEMA XMLTYPE) return XMLTYPE;
   function  generateAnnotationScript(P_SCHEMA_URL VARCHAR2, P_OWNER VARCHAR2) return CLOB;
@@ -382,6 +385,34 @@ begin
   
 end;
 --
+function appendPath(P_LEFT_EXPRESSION VARCHAR2, P_RIGHT_EXPRESSION VARCHAR2) 
+return VARCHAR2 
+as
+  V_LEFT_EXPRESSION VARCHAR2(4000) := P_LEFT_EXPRESSION;
+  V_RIGHT_EXPRESSION VARCHAR2(4000) := P_RIGHT_EXPRESSION;
+begin
+
+$IF $$DEBUG $THEN
+  XDB_OUTPUT.writeTraceFileEntry('AppendPath: P_LEFT_EXPRESSION="' || P_LEFT_EXPRESSION || '". P_RIGHT_EXPRESSION="' || P_RIGHT_EXPRESSION || '".' );
+$END
+
+	if instr(V_LEFT_EXPRESSION,'/',-1) = length(V_LEFT_EXPRESSION) then
+	  V_LEFT_EXPRESSION := SUBSTR(V_LEFT_EXPRESSION,1,LENGTH(V_LEFT_EXPRESSION)-1);
+	end if;
+
+	if instr(V_RIGHT_EXPRESSION,'/') = 1 then
+	  V_RIGHT_EXPRESSION := SUBSTR(V_RIGHT_EXPRESSION,2);
+	end if;
+
+$IF $$DEBUG $THEN
+  XDB_OUTPUT.writeTraceFileEntry('AppendPath: Path="' || V_LEFT_EXPRESSION || '/' || V_RIGHT_EXPRESSION || '".' );
+  XDB_OUTPUT.flushTraceFile();
+$END
+
+  return V_LEFT_EXPRESSION || '/' || V_RIGHT_EXPRESSION;
+
+end;
+--	
 procedure fixRelativeURLs(P_XML_SCHEMA in out XMLType, P_SCHEMA_LOCATION_HINT VARCHAR2)
 as
   cursor getImports is
@@ -459,7 +490,7 @@ begin
         end if; 
 
         if (V_TARGET_URL is not NULL) then
-          V_SCHEMA_LOCATION := V_TARGET_URL || '/' || V_SCHEMA_LOCATION;
+          V_SCHEMA_LOCATION := appendPath(V_TARGET_URL,V_SCHEMA_LOCATION);
         end if;
       end if;
     end if;
@@ -504,7 +535,7 @@ begin
       end if; 
 
       if (V_TARGET_URL is not NULL) then
-        V_SCHEMA_LOCATION := V_TARGET_URL || '/' || V_SCHEMA_LOCATION;
+        V_SCHEMA_LOCATION := appendPath(V_TARGET_URL,V_SCHEMA_LOCATION);
       end if;
 
       select updateXML
@@ -1667,10 +1698,17 @@ begin
 	return getGroupDefinitions();
 end;
 --
+begin
+	null;
+$IF $$DEBUG $THEN
+  XDB_OUTPUT.createTraceFile('/public/XDBPM_EDIT_XMLSCHEMA_' || to_char(SYSTIMESTAMP,'YYYY-MM-DD"T"HH24.MI.SSTZHTZM') || '.log',TRUE);
+$END
 end;
 /
 show errors
 --
-alter session set current_schema = SYS
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
+/
+alter SESSION SET CURRENT_SCHEMA = SYS
 /
 --

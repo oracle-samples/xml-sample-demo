@@ -20,60 +20,49 @@ with object id
   'XMLINDEX_LIST'
 )
 as 
-select xmlelement
-       (
+select xmlelement(
          "indexList",
          (
-           xmlelement
-           (
-             "localIndexes",
-             ( 
-               select xmlagg
-                      (
-                        xmlelement
-                        (
-                          "index",
-                          xmlElement("indexName", INDEX_NAME),
-                          xmlElement("tableName", uxi.TABLE_NAME),
-			                    xmlElement("owner", TABLE_OWNER),
-			                    xmlElement("pathTableName",PATH_TABLE_NAME),
-			                    xmlElement("uploadFolder",XDB_TABLE_UPLOAD.getUploadFolderPath(TABLE_NAME)),
-			                    xmlElement("Parameters",PARAMETERS),
-                          xmlElement("Asynchronous",ASYNC),
-                          xmlElement("StaleOperation",STALE),
-                          xmlElement("PendingRowTable",PEND_TABLE_NAME)
-                        )
+           select xmlelement(
+                    "localIndexes",
+                    xmlagg(
+                      xmlelement(
+                        "index",
+                        xmlElement("indexName", INDEX_NAME),
+                        xmlElement("tableName", uxi.TABLE_NAME),
+			                  xmlElement("owner", TABLE_OWNER),
+			                  xmlElement("pathTableName",PATH_TABLE_NAME),
+			                  xmlElement("uploadFolder",XDB_TABLE_UPLOAD.getUploadFolderPath(TABLE_NAME)),
+			                  xmlElement("Parameters",PARAMETERS),
+                        xmlElement("Asynchronous",ASYNC),
+                        xmlElement("StaleOperation",STALE),
+                        xmlElement("PendingRowTable",PEND_TABLE_NAME)
                       )
-                 from user_xml_indexes uxi 
-             )
-           )
+                    )
+                  )
+             from user_xml_indexes uxi 
          ),
          (
-           xmlelement
-           (
-             "globalIndexes",
-             (
-               select xmlagg
-                      (
-                        xmlelement
-                        (
-                          "index",
-                          xmlElement("indexName", INDEX_NAME),
-                          xmlElement("indexOwner", INDEX_OWNER),
-                 			    xmlElement("tableName", TABLE_NAME),
-			                    xmlElement("owner", TABLE_OWNER),
-			                    xmlElement("pathTableName",PATH_TABLE_NAME),
-			                    xmlElement("uploadFolder",XDB_TABLE_UPLOAD.getUploadFolderPath(TABLE_NAME,TABLE_OWNER)),
-			                    xmlElement("Parameters",PARAMETERS),
-                          xmlElement("Asynchronous",ASYNC),
-                          xmlElement("StaleOperation",STALE),
-                          xmlElement("PendingRowTable",PEND_TABLE_NAME)
-			                  )
-                      )
-                 from all_xml_indexes axi
-                where INDEX_OWNER <> USER
-             )
-           )
+           select xmlelement(
+                    "globalIndexes",
+                    xmlagg(
+                      xmlelement(
+                        "index",
+                        xmlElement("indexName", INDEX_NAME),
+                        xmlElement("indexOwner", INDEX_OWNER),
+                 			  xmlElement("tableName", TABLE_NAME),
+			                  xmlElement("owner", TABLE_OWNER),
+			                  xmlElement("pathTableName",PATH_TABLE_NAME),
+			                  xmlElement("uploadFolder",XDB_TABLE_UPLOAD.getUploadFolderPath(TABLE_NAME,TABLE_OWNER)),
+			                  xmlElement("Parameters",PARAMETERS),
+                        xmlElement("Asynchronous",ASYNC),
+                        xmlElement("StaleOperation",STALE),
+                        xmlElement("PendingRowTable",PEND_TABLE_NAME)
+			                )
+                    )
+                  )
+             from all_xml_indexes axi
+            where INDEX_OWNER <> USER
          )
        ) 
   from dual

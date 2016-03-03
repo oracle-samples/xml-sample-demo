@@ -11,12 +11,24 @@ authid CURRENT_USER
 as
   
   function  UNPACK_ARCHIVE(P_ARCHIVE_PATH VARCHAR2) return NUMBER;
-  function  ORDER_SCHEMAS(P_XML_SCHEMA_FOLDER VARCHAR2, P_ROOT_XML_SCHEMA VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2) return XMLTYPE;
+
+  function  ORDER_SCHEMA(P_XML_SCHEMA_FOLDER VARCHAR2, P_ROOT_XML_SCHEMA VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2 DEFAULT '') return XMLTYPE;
+  function  ORDER_SCHEMAS_IN_FOLDER(P_XML_SCHEMA_FOLDER VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2 DEFAULT '') return XMLTYPE;
+  function  ORDER_SCHEMA_LIST(P_XML_SCHEMA_FOLDER VARCHAR2, P_XML_SCHEMAS XMLTYPE, P_SCHEMA_LOCATION_PREFIX VARCHAR2 DEFAULT '')  return XMLTYPE;
+
   function  GET_GLOBAL_ELEMENT_LIST(P_XML_SCHEMA_FOLDER VARCHAR2) return XMLTYPE;
   function  DO_TYPE_ANALYSIS(P_XML_SCHEMA_CONFIG IN OUT XMLTYPE, P_SCHEMA_LOCATION_HINT  VARCHAR2, P_OWNER VARCHAR2 DEFAULT USER) return BOOLEAN;
 
-  function  CREATE_DELETE_SCHEMA_SCRIPT(P_XML_SCHEMA_CONFIGURATION XMLTYPE) return VARCHAR2;
-  function  CREATE_REGISTER_SCHEMA_SCRIPT(P_XML_SCHEMA_CONFIGURATION XMLTYPE, P_BINARY_XML BOOLEAN DEFAULT FALSE, P_LOCAL BOOLEAN DEFAULT TRUE, P_DISABLE_DOM_FIDELITY BOOLEAN DEFAULT TRUE, P_GENERATE_TABLES BOOLEAN DEFAULT FALSE) return VARCHAR2;
+  function  CREATE_SCRIPT(
+              P_XML_SCHEMA_CONFIGURATION XMLTYPE, 
+              P_BINARY_XML BOOLEAN DEFAULT FALSE, 
+              P_LOCAL BOOLEAN DEFAULT TRUE, 
+              P_DISABLE_DOM_FIDELITY BOOLEAN DEFAULT TRUE,  
+              P_REPOSITORY_USAGE VARCHAR2, 
+              P_DELETE_SCHEMAS BOOLEAN DEFAULT FALSE,
+              P_CREATE_TABLES BOOLEAN DEFAULT FALSE,
+              P_LOAD_INSTANCES BOOLEAN DEFAULT FALSE
+            ) return VARCHAR2;
 
   procedure REGISTER_SCHEMA(
               P_SCHEMA_LOCATION_HINT   VARCHAR2, 
@@ -116,7 +128,7 @@ exception
     raise;
 end;
 --
-function ORDER_SCHEMAS(P_XML_SCHEMA_FOLDER VARCHAR2, P_ROOT_XML_SCHEMA VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2) 
+function ORDER_SCHEMAS_IN_FOLDER(P_XML_SCHEMA_FOLDER VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2 DEFAULT '') 
 return XMLTYPE
 as
   V_PARAMETERS        XMLType;
@@ -126,14 +138,77 @@ as
   
 begin
   select xmlConcat(
-           xmlElement("xmlSchema",P_ROOT_XML_SCHEMA),
            xmlElement("folderPath",P_XML_SCHEMA_FOLDER),
-           xmlElement("schemaLocationHint",P_SCHEMA_LOCATION_PREFIX)
+           xmlElement("schemaLocationPrefix",P_SCHEMA_LOCATION_PREFIX)
          )
     into V_PARAMETERS
     from dual;
 
-  V_RESULT := XDB_ORDER_XMLSCHEMAS.createSchemaOrderingDocument(P_XML_SCHEMA_FOLDER,P_XML_SCHEMA_FOLDER,P_ROOT_XML_SCHEMA,P_SCHEMA_LOCATION_PREFIX);
+  V_RESULT := XDB_ORDER_XMLSCHEMAS.createSchemaOrderingDocument(P_XML_SCHEMA_FOLDER, P_XML_SCHEMA_FOLDER, XDB.XDB$STRING_LIST_T(), P_SCHEMA_LOCATION_PREFIX);
+  writeLogRecord('ORDER_SCHEMAS',V_INIT,V_PARAMETERS);
+  return V_RESULT;
+exception
+  when others then
+    handleException('ORDER_SCHEMAS',V_INIT,V_PARAMETERS);
+    raise;
+end;
+--
+function ORDER_SCHEMA_LIST(P_XML_SCHEMA_FOLDER VARCHAR2, P_XML_SCHEMAS XMLTYPE, P_SCHEMA_LOCATION_PREFIX VARCHAR2  DEFAULT '') 
+return XMLTYPE
+as
+  V_PARAMETERS        XMLType;
+  V_INIT              TIMESTAMP WITH TIME ZONE := SYSTIMESTAMP;
+  V_CHARSET_ID        NUMBER(4);
+  V_RESULT            XMLTYPE;
+  
+  V_XMLSCHEMA_PATHS   XDB.XDB$STRING_LIST_T :=  XDB.XDB$STRING_LIST_T();
+begin
+  select xmlConcat(
+           xmlElement("folderPath",P_XML_SCHEMA_FOLDER),
+           xmlElement("xmlSchemas",P_XML_SCHEMAS),
+           xmlElement("schemaLocationPrefix",P_SCHEMA_LOCATION_PREFIX)           
+         )
+    into V_PARAMETERS
+    from dual;
+
+  select FOLDER_PATH 
+    BULK COLLECT into V_XMLSCHEMA_PATHS
+    from XMLTABLE(
+         '/schemas/schema'
+         passing P_XML_SCHEMAS
+         columns
+           FOLDER_PATH VARCHAR2(4000) PATH 'text()'
+         );
+        
+  V_RESULT := XDB_ORDER_XMLSCHEMAS.createSchemaOrderingDocument(P_XML_SCHEMA_FOLDER, P_XML_SCHEMA_FOLDER, V_XMLSCHEMA_PATHS, P_SCHEMA_LOCATION_PREFIX);
+  writeLogRecord('ORDER_SCHEMAS',V_INIT,V_PARAMETERS);
+  return V_RESULT;
+exception
+  when others then
+    handleException('ORDER_SCHEMAS',V_INIT,V_PARAMETERS);
+    raise;
+end;
+--
+function ORDER_SCHEMA(P_XML_SCHEMA_FOLDER VARCHAR2, P_ROOT_XML_SCHEMA VARCHAR2, P_SCHEMA_LOCATION_PREFIX VARCHAR2  DEFAULT '') 
+return XMLTYPE
+as
+  V_PARAMETERS        XMLType;
+  V_INIT              TIMESTAMP WITH TIME ZONE := SYSTIMESTAMP;
+  V_CHARSET_ID        NUMBER(4);
+  V_RESULT            XMLTYPE;
+  
+  V_XMLSCHEMA_PATHS   XDB.XDB$STRING_LIST_T :=  XDB.XDB$STRING_LIST_T();
+begin
+  select xmlConcat(
+           xmlElement("folderPath",P_XML_SCHEMA_FOLDER),
+           xmlElement("xmlSchema",P_ROOT_XML_SCHEMA),
+           xmlElement("schemaLocationPrefix",P_SCHEMA_LOCATION_PREFIX)           
+         )
+    into V_PARAMETERS
+    from dual;
+
+  V_XMLSCHEMA_PATHS(1) := P_ROOT_XML_SCHEMA;
+  V_RESULT := XDB_ORDER_XMLSCHEMAS.createSchemaOrderingDocument(P_XML_SCHEMA_FOLDER,P_XML_SCHEMA_FOLDER,V_XMLSCHEMA_PATHS,P_SCHEMA_LOCATION_PREFIX);
   writeLogRecord('ORDER_SCHEMAS',V_INIT,V_PARAMETERS);
   return V_RESULT;
 exception
@@ -234,76 +309,93 @@ exception
     raise;
 end;
 --
-function  CREATE_DELETE_SCHEMA_SCRIPT(P_XML_SCHEMA_CONFIGURATION XMLTYPE)
+function  CREATE_SCRIPT(
+            P_XML_SCHEMA_CONFIGURATION XMLTYPE, 
+            P_BINARY_XML BOOLEAN DEFAULT FALSE, 
+            P_LOCAL BOOLEAN DEFAULT TRUE, 
+            P_DISABLE_DOM_FIDELITY BOOLEAN DEFAULT TRUE,  
+            P_REPOSITORY_USAGE VARCHAR2, 
+            P_DELETE_SCHEMAS BOOLEAN DEFAULT FALSE,
+            P_CREATE_TABLES BOOLEAN DEFAULT FALSE,
+            P_LOAD_INSTANCES BOOLEAN DEFAULT FALSE
+          )
 return VARCHAR2
 as
   V_PARAMETERS        XMLType;
   V_INIT              TIMESTAMP WITH TIME ZONE := SYSTIMESTAMP;
-  V_RESULT            VARCHAR2(700);
-begin
-	 select xmlElement("xmlSchemaCOnfiguration",P_XML_SCHEMA_CONFIGURATION)
-    into V_PARAMETERS
-    from dual;
-
-  V_RESULT := XDB_OPTIMIZE_XMLSCHEMA.createDeleteSchemaScript(P_XML_SCHEMA_CONFIGURATION);
-  writeLogRecord('CREATE_DELETE_SCHEMA_SCRIPT',V_INIT,V_PARAMETERS);
-	return V_RESULT;
-exception
-  when others then
-    handleException('CREATE_DELETE_SCHEMA_SCRIPT',V_INIT,V_PARAMETERS);
-    raise;
-end;
---
-function  CREATE_REGISTER_SCHEMA_SCRIPT(P_XML_SCHEMA_CONFIGURATION XMLTYPE, P_BINARY_XML BOOLEAN DEFAULT FALSE, P_LOCAL BOOLEAN DEFAULT TRUE, P_DISABLE_DOM_FIDELITY BOOLEAN DEFAULT TRUE, P_GENERATE_TABLES BOOLEAN DEFAULT FALSE)
-return VARCHAR2
-as
-  V_PARAMETERS        XMLType;
-  V_INIT              TIMESTAMP WITH TIME ZONE := SYSTIMESTAMP;
-  V_RESULT            VARCHAR2(700);
+  
+  V_ENABLE_HEIRARCHY  NUMBER;
+  V_SCRIPT_FILENAME   VARCHAR2(700);
+  
 begin
 	 select xmlConcat(
 	          xmlElement("xmlSchemaCOnfiguration",P_XML_SCHEMA_CONFIGURATION),
 	          xmlElement("binaryXML",XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_BINARY_XML)),
 	          xmlElement("localSchema",XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_LOCAL)),
 	          xmlElement("disableDOMFidelity",XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_DISABLE_DOM_FIDELITY)),
-	          xmlElement("generateTables",XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_GENERATE_TABLES))
+	          xmlElement("repositoryUsage",P_REPOSITORY_USAGE),
+	          xmlElement("deleteSchemas",XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_DELETE_SCHEMAS)),
+	          xmlElement("createTables",XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_CREATE_TABLES)),
+	          xmlElement("loadInstances",XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_LOAD_INSTANCES))
 	       )
     into V_PARAMETERS
     from dual;
 
- if (P_BINARY_XML) then
+  if (P_REPOSITORY_USAGE = 'DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE') then
+    V_ENABLE_HEIRARCHY := DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE;
+  end if;
+ 
+  if (P_REPOSITORY_USAGE = 'DBMS_XMLSCHEMA.ENABLE_HIERARCHY_CONTENTS') then
+    V_ENABLE_HEIRARCHY := DBMS_XMLSCHEMA.ENABLE_HIERARCHY_CONTENTS;
+  end if;
+
+  if (P_REPOSITORY_USAGE = 'DBMS_XMLSCHEMA.ENABLE_HIERARCHY_RESMETADATA') then
+    V_ENABLE_HEIRARCHY := DBMS_XMLSCHEMA.ENABLE_HIERARCHY_RESMETADATA;
+  end if;
+
+  if (P_BINARY_XML) then
     XDB_OPTIMIZE_XMLSCHEMA.setSchemaRegistrationOptions(
                              P_LOCAL            => P_LOCAL
                             ,P_GENTYPES         => FALSE 
                             ,P_GENTABLES        => FALSE 
                             ,P_OWNER            => USER 
-                            ,P_ENABLE_HIERARCHY => DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE
+                            ,P_ENABLE_HIERARCHY => V_ENABLE_HEIRARCHY
                             ,P_OPTIONS          => DBMS_XMLSCHEMA.REGISTER_BINARYXML
     );
   else
     XDB_OPTIMIZE_XMLSCHEMA.setSchemaRegistrationOptions(
-                             P_LOCAL            => P_LOCAL 
-                            ,P_GENTYPES         => TRUE
-                            ,P_GENTABLES        => TRUE 
-                            ,P_OWNER            => USER 
-                            ,P_ENABLE_HIERARCHY => DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE
-                            ,P_OPTIONS          => 0
+                             P_LOCAL                 => P_LOCAL 
+                            ,P_GENTYPES              => TRUE
+                            ,P_GENTABLES             => TRUE 
+                            ,P_OWNER                 => USER 
+                            ,P_ENABLE_HIERARCHY      => V_ENABLE_HEIRARCHY
+                            ,P_OPTIONS               => 0
     );
+
     XDB_OPTIMIZE_XMLSCHEMA.setRegistrationScriptOptions(
-                             P_DISABLE_DOM_FIDELITY  => P_DISABLE_DOM_FIDELITY 
-            );
+      P_DISABLE_DOM_FIDELITY  => P_DISABLE_DOM_FIDELITY 
+    );
+
   end if;           
 
-
-  V_RESULT := XDB_OPTIMIZE_XMLSCHEMA.createSchemaRegistrationScript(P_XML_SCHEMA_CONFIGURATION);
+  V_SCRIPT_FILENAME := XDB_OPTIMIZE_SCHEMA.createScriptFile(P_XML_SCHEMA_CONFIGURATION);
   
-  if (P_GENERATE_TABLES) then
-    XDB_OPTIMIZE_SCHEMA.appendTableCreationScript(P_XML_SCHEMA_CONFIGURATION);
-    XDB_OPTIMIZE_SCHEMA.appendFileUploadScript(P_XML_SCHEMA_CONFIGURATION);
+  if (P_DELETE_SCHEMAS) then
+	  V_SCRIPT_FILENAME := XDB_OPTIMIZE_SCHEMA.appendDeleteSchemaScript(P_XML_SCHEMA_CONFIGURATION);
+  end if;
+  
+  V_SCRIPT_FILENAME := XDB_OPTIMIZE_XMLSCHEMA.appendRegisterSchemaScript(P_XML_SCHEMA_CONFIGURATION);
+
+  if ((P_REPOSITORY_USAGE = 'DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE') and (P_CREATE_TABLES)) then  
+    V_SCRIPT_FILENAME := XDB_OPTIMIZE_SCHEMA.appendCreateTablesScript(P_XML_SCHEMA_CONFIGURATION);
+  end if;
+
+	if (P_LOAD_INSTANCES) then
+    V_SCRIPT_FILENAME := XDB_OPTIMIZE_SCHEMA.appendLoadInstancesScript(P_XML_SCHEMA_CONFIGURATION);
   end if;
 
   writeLogRecord('CREATE_REGISTER_SCHEMA_SCRIPT',V_INIT,V_PARAMETERS);
-	return V_RESULT;
+	return V_SCRIPT_FILENAME;
 exception
   when others then
     handleException('CREATE_REGISTER_SCHEMA_SCRIPT',V_INIT,V_PARAMETERS);

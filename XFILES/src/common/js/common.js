@@ -400,8 +400,11 @@ function SoapManager(manager) {
       error = new xfilesException(module,6,requestManager.getServiceLocation(),null);
       error.setDescription("Soap Fault");
       error.setXML(soapResponse);
-      error.setSQLErrCode(soapResponse.selectNodes("/soap:Envelope/soap:Body/soap:Fault/detail/oraerr:OracleErrors/oraerr:OracleError[2]/oraerr:ErrorNumber").item(0).firstChild.nodeValue);
-      error.setSQLErrMsg(soapResponse.selectNodes("/soap:Envelope/soap:Body/soap:Fault/detail/oraerr:OracleErrors/oraerr:OracleError[2]/oraerr:Message").item(0).firstChild.nodeValue);
+      var nl = soapResponse.selectNodes("/soap:Envelope/soap:Body/soap:Fault/detail/oraerr:OracleErrors/oraerr:OracleError[2]");
+      if (nl.length > 0) {
+        error.setSQLErrCode(soapResponse.selectNodes("/soap:Envelope/soap:Body/soap:Fault/detail/oraerr:OracleErrors/oraerr:OracleError[2]/oraerr:ErrorNumber").item(0).firstChild.nodeValue);
+        error.setSQLErrMsg(soapResponse.selectNodes("/soap:Envelope/soap:Body/soap:Fault/detail/oraerr:OracleErrors/oraerr:OracleError[2]/oraerr:Message").item(0).firstChild.nodeValue);
+      }
       throw error;
     }
     

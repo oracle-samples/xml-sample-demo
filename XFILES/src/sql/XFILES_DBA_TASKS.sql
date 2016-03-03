@@ -156,6 +156,7 @@ declare
 
   XMLINDEX_LIST                VARCHAR2(700) := XFILES_HOME || '/configuration/xmlIndex/xmlIndexList.xml';
   XMLSCHEMA_LIST               VARCHAR2(700) := XFILES_HOME || '/configuration/xmlSchema/xmlSchemaList.xml';
+  XMLSCHEMA_OBJ_LIST           VARCHAR2(700) := XFILES_HOME || '/configuration/xmlSchema/xmlSchemaObjectList.xml';
                              
   V_RESULT                     BOOLEAN;
   V_COUNTER                    NUMBER;
@@ -266,6 +267,13 @@ begin
     XDB_OUTPUT.writeLogFileEntry('Delete: ' || XMLSCHEMA_LIST);
     XDB_OUTPUT.flushLogFile();
     dbms_xdb.deleteResource(XMLSCHEMA_LIST,DBMS_XDB.DELETE_FORCE);
+  end if ;
+  commit;
+
+	if DBMS_XDB.existsResource(XMLSCHEMA_OBJ_LIST) then
+    XDB_OUTPUT.writeLogFileEntry('Delete: ' || XMLSCHEMA_OBJ_LIST);
+    XDB_OUTPUT.flushLogFile();
+    dbms_xdb.deleteResource(XMLSCHEMA_OBJ_LIST,DBMS_XDB.DELETE_FORCE);
   end if ;
   commit;
 

@@ -1464,7 +1464,7 @@ function displayDocumentIdList(nodeMap,soapResponse,rowset,outputTarget,elapsedT
   rowset.setAttribute("TableOwner", document.getElementById('tableOwner').value);
   rowset.setAttribute("nodeMapName",nodeMap.getNodeMap().getDocumentElement().getAttribute("nodeMapName"));
 
-  documentToXML(outputTarget,soapResponse,DocumentIdListXSL)
+  transformXMLtoHTML(soapResponse,DocumentIdListXSL,outputTarget)
   return;
    
 }
@@ -1485,7 +1485,7 @@ function displayUniqueKeyList(nodeMap,soapResponse,rowset,outputTarget,elapsedTi
   rowset.setAttribute("TableOwner", document.getElementById('tableOwner').value);
   rowset.setAttribute("nodeMapName",nodeMap.getObjectName());
 
-  documentToXML(outputTarget,soapResponse,UniqueKeyListXSL)
+  transformXMLtoHTML(soapResponse,UniqueKeyListXSL,outputTarget)
   return;
     
 }
@@ -1493,7 +1493,7 @@ function displayUniqueKeyList(nodeMap,soapResponse,rowset,outputTarget,elapsedTi
 function displayResourceList(nodeMap,soapResponse,rowset,outputTarget,elapsedTime) {
 
   rowset.setAttribute("nodeMapName",nodeMap.getObjectName());
-  documentToXML(outputTarget,soapResponse,ResourceListXSL)
+  transformXMLtoHTML(soapResponse,ResourceListXSL,outputTarget)
 
 }
 

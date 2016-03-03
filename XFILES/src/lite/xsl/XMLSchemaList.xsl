@@ -16,9 +16,8 @@
  */
 
 -->
-
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:n1="http://www.w3.org/2001/XMLSchema" xmlns:r="http://xmlns.oracle.com/xdb/XDBResource.xsd" xmlns:xfiles="http://xmlns.oracle.com/xdb/xfiles" xmlns:xr="http://xmlns.oracle.com/xdb/xfiles">
-	<xsl:output version="1.0" encoding="utf-8" omit-xml-declaration="no" indent="no" media-type="text/html" method="html"/>
+	<xsl:output version="5.0" encoding="utf-8" omit-xml-declaration="no" indent="no" media-type="text/html" method="html"/>
 	<xsl:include href="/XFILES/lite/xsl/common.xsl"/>
 	<xsl:template name="printGlobalElements">
 		<xsl:param name="index"/>
@@ -51,18 +50,11 @@
 							<xsl:value-of select="schemaType"/>
 						</td>
 						<td class="withBorder">
-							<input type="hidden">
-								<xsl:attribute name="id"><xsl:value-of select="concat($schemaType,'SchemaOwner.',position())"/></xsl:attribute>
-								<xsl:attribute name="value"><xsl:value-of select="OWNER"/></xsl:attribute>
-							</input>
-							<input type="hidden">
-								<xsl:attribute name="id"><xsl:value-of select="concat($schemaType,'SchemaURL.',position())"/></xsl:attribute>
-								<xsl:attribute name="value"><xsl:value-of select="URL"/></xsl:attribute>
-							</input>
 							<a href="#" class="undecoratedLink">
 								<xsl:attribute name="title"><xsl:text>Query XML Schema "</xsl:text><xsl:value-of select="URL"/><xsl:text>".</xsl:text></xsl:attribute>
-								<xsl:attribute name="onclick"><xsl:value-of select="concat('xmlSchemaSearch(document.getElementById(&quot;',$schemaType,'SchemaOwner.',position(),'&quot;),document.getElementById(&quot;',$schemaType,'SchemaURL.',position(),'&quot;),document.getElementById(&quot;',$schemaType,'ElementList.',position(),'&quot;).value);return false')"/></xsl:attribute>
-								<img src="/XFILES/lib/icons/search.png" alt="Search" border="0" align="absmiddle" width="16" height="16"/>
+								<xsl:attribute name="onclick"><xsl:text>xmlSchemaSearch('</xsl:text><xsl:value-of select="OWNER"/><xsl:text>','</xsl:text><xsl:value-of select="URL"/><xsl:text>',document.getElementById('</xsl:text><xsl:value-of select="concat($schemaType,'ElementList.',position())"/><xsl:text>'.value);return false</xsl:text></xsl:attribute>
+								<span style="display:inline-block;width:5px"/>
+								<img src="/XFILES/lib/icons/guidedSearch.png" alt="Search" border="0" align="absmiddle" width="16" height="16"/>
 								<span style="display:inline-block;width:5px"/>
 								<xsl:value-of select="URL"/>
 							</a>

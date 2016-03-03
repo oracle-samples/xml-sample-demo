@@ -22,7 +22,7 @@ def PACKAGE_PREFIX=XDB.DBMS_
 --
 @@XDBPM_DBMS_XDB.sql
 --
-@@XDBPM_ADMIN_PACKAGES.sql
+@@XDBPM_XDBADMIN_PACKAGES.sql
 --
 grant execute on XDBPM_DBMS_XDB to XDBPM
 /
@@ -35,6 +35,8 @@ grant execute on XDBPM_DBMS_RESCONFIG to XDBPM
 grant execute on XDBPM_RV_HELPER to XDBPM
 /
 grant execute on XDBPM_RESCONFIG_HELPER to XDBPM
+/
+grant execute on XDBPM_UTILITIES_PRIVATE to XDBPM
 /
 --
 alter session set current_schema = XDBPM
