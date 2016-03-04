@@ -162,6 +162,8 @@ begin
   XDB_IMPORT_UTILITIES.UNZIP(:REPOS_FOLDER || '/' || :SCHEMA_ARCHIVE ,:REPOS_FOLDER,:REPOS_FOLDER || '/unzip_' || :SCHEMA_ARCHIVE ||' .log',XDB_CONSTANTS.RAISE_ERROR);
 end;
 /
+commit
+/
 select ANY_PATH
   from RESOURCE_VIEW
  where under_path(RES,:REPOS_FOLDER) = 1

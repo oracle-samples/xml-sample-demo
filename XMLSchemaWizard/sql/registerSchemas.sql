@@ -66,36 +66,36 @@ VAR SCHEMA_LOCATION_PREFIX VARCHAR2(700)
 VAR SCRIPT_FILE_PATH VARCHAR2(700)
 --
 begin
-	:USERNAME               := '&USERNAME';
-	:PASSWORD               := '&PASSWORD';
-	:USER_TABLESPACE        := '&USER_TABLESPACE';
-	:TEMP_TABLESPACE        := '&TEMP_TABLESPACE';
-	:TARGET_DIRECTORY       := '&TARGET_DIRECTORY';
-	:SCHEMA_ARCHIVE         := '&SCHEMA_ARCHIVE';
-	:DELETE_SCHEMAS         := '&DELETE_SCHEMAS';
-	:CREATE_TABLES          := '&CREATE_TABLES';
-	:LOAD_INSTANCES         := '&LOAD_INSTANCES';
-	:LOCAL                  := '&LOCAL';
-	:BINARY_XML             := '&BINARY_XML';
-	:DISABLE_DOM_FIDELITY   := '&DISABLE_DOM_FIDELITY';
-	:REPOSITORY_USAGE       := &REPOSITORY_USAGE;
-	:SCHEMA_FOLDER          := '&SCHEMA_FOLDER';
-	:TARGET_SCHEMA          := '&TARGET_SCHEMA';
-	:SCHEMA_LOCATION_PREFIX := '&SCHEMA_LOCATION_PREFIX';
+  :USERNAME               := '&USERNAME';
+  :PASSWORD               := '&PASSWORD';
+  :USER_TABLESPACE        := '&USER_TABLESPACE';
+  :TEMP_TABLESPACE        := '&TEMP_TABLESPACE';
+  :TARGET_DIRECTORY       := '&TARGET_DIRECTORY';
+  :SCHEMA_ARCHIVE         := '&SCHEMA_ARCHIVE';
+  :DELETE_SCHEMAS         := '&DELETE_SCHEMAS';
+  :CREATE_TABLES          := '&CREATE_TABLES';
+  :LOAD_INSTANCES         := '&LOAD_INSTANCES';
+  :LOCAL                  := '&LOCAL';
+  :BINARY_XML             := '&BINARY_XML';
+  :DISABLE_DOM_FIDELITY   := '&DISABLE_DOM_FIDELITY';
+  :REPOSITORY_USAGE       := &REPOSITORY_USAGE;
+  :SCHEMA_FOLDER          := '&SCHEMA_FOLDER';
+  :TARGET_SCHEMA          := '&TARGET_SCHEMA';
+  :SCHEMA_LOCATION_PREFIX := '&SCHEMA_LOCATION_PREFIX';
 end;
 /
-print	:USERNAME             
-print	:PASSWORD             
-print	:USER_TABLESPACE      
-print	:TEMP_TABLESPACE      
-print	:TARGET_DIRECTORY     
-print	:SCHEMA_ARCHIVE       
-print	:DELETE_SCHEMAS       
-print	:CREATE_TABLES        
-print	:LOAD_INSTANCES       
-print	:BINARY_XML           
-print	:REPOSITORY_USAGE     
-print	:DISABLE_DOM_FIDELITY 
+print :USERNAME             
+print :PASSWORD             
+print :USER_TABLESPACE      
+print :TEMP_TABLESPACE      
+print :TARGET_DIRECTORY     
+print :SCHEMA_ARCHIVE       
+print :DELETE_SCHEMAS       
+print :CREATE_TABLES        
+print :LOAD_INSTANCES       
+print :BINARY_XML           
+print :REPOSITORY_USAGE     
+print :DISABLE_DOM_FIDELITY 
 print :SCHEMA_FOLDER
 print :TARGET_SCHEMA
 print :SCHEMA_LOCATION_PREFIX
@@ -106,7 +106,7 @@ declare
 begin
 
   if (INSTR(V_ARCHIVE_FILE_NAME,'/') > 0) then
-	  V_ARCHIVE_FILE_NAME := substr(V_ARCHIVE_FILE_NAME,instr(V_ARCHIVE_FILE_NAME,'/',-1)+1);
+    V_ARCHIVE_FILE_NAME := substr(V_ARCHIVE_FILE_NAME,instr(V_ARCHIVE_FILE_NAME,'/',-1)+1);
   end if;
 
   V_ARCHIVE_FILE_NAME := substr(V_ARCHIVE_FILE_NAME,1,instr(V_ARCHIVE_FILE_NAME,'.',-1)-1);
@@ -127,9 +127,9 @@ print :SCHEMA_FOLDER
 print :ARCHIVE_NAME
 --
 begin
-	if (DBMS_XDB.existsResource(:REPOS_FOLDER)) then
-	  DBMS_XDB.deleteResource(:REPOS_FOLDER,DBMS_XDB.DELETE_RECURSIVE);
-	end if;
+  if (DBMS_XDB.existsResource(:REPOS_FOLDER)) then
+    DBMS_XDB.deleteResource(:REPOS_FOLDER,DBMS_XDB.DELETE_RECURSIVE);
+  end if;
 end;
 /
 commit
@@ -153,9 +153,9 @@ declare
   V_PATH   VARCHAR2(700);
 begin
   V_PATH := :REPOS_FOLDER || '/' || :SCHEMA_ARCHIVE;
-	XDB_UTILITIES.mkdir(:REPOS_FOLDER,TRUE);	
-	V_RESULT := DBMS_XDB.createResource(V_PATH,bfilename('&USERNAME',:SCHEMA_ARCHIVE));
-	commit;
+  XDB_UTILITIES.mkdir(:REPOS_FOLDER,TRUE);  
+  V_RESULT := DBMS_XDB.createResource(V_PATH,bfilename('&USERNAME',:SCHEMA_ARCHIVE));
+  commit;
 end;
 /
 begin
@@ -185,8 +185,8 @@ declare
   C_SQLTYPE_MAPPINGS VARCHAR2(4000) := 
 '<xdbpm:SQLTypeMappings xmlns:xdbpm="http://xmlns.oracle.com/xdb/xdbpm">
   <xdbpm:SQLTypeMapping>            
-	 <xdbpm:xsdType>dateTime</xdbpm:xsdType>
-	 <xdbpm:SQLType>TIMESTAMP WITH TIME ZONE</xdbpm:SQLType>
+   <xdbpm:xsdType>dateTime</xdbpm:xsdType>
+   <xdbpm:SQLType>TIMESTAMP WITH TIME ZONE</xdbpm:SQLType>
   </xdbpm:SQLTypeMapping>            
 </xdbpm:SQLTypeMappings>';
 
@@ -220,8 +220,6 @@ begin
   if (XDB_DOM_UTILITIES.VARCHAR_TO_BOOLEAN(:BINARY_XML)) then
     XDB_OPTIMIZE_XMLSCHEMA.setSchemaRegistrationOptions(
                              P_LOCAL            => XDB_DOM_UTILITIES.VARCHAR_TO_BOOLEAN(:LOCAL)
-                            ,P_GENTYPES         => FALSE 
-                            ,P_GENTABLES        => FALSE 
                             ,P_OWNER            => USER 
                             ,P_ENABLE_HIERARCHY => :REPOSITORY_USAGE
                             ,P_OPTIONS          => DBMS_XMLSCHEMA.REGISTER_BINARYXML
@@ -243,9 +241,9 @@ begin
     
       XDB_EDIT_XMLSCHEMA.setSQLTypeMappings(G_SQLTYPE_MAPPINGS);
     
-  		XDB_EDIT_XMLSCHEMA.fixRelativeURLs(V_XML_SCHEMA,s.SCHEMA_LOCATION_HINT);
-   	  XDB_EDIT_XMLSCHEMA.removeAppInfo(V_XML_SCHEMA);
-    	XDB_EDIT_XMLSCHEMA.applySQLTypeMappings(V_XML_SCHEMA);
+      XDB_EDIT_XMLSCHEMA.fixRelativeURLs(V_XML_SCHEMA,s.SCHEMA_LOCATION_HINT);
+      XDB_EDIT_XMLSCHEMA.removeAppInfo(V_XML_SCHEMA);
+      XDB_EDIT_XMLSCHEMA.applySQLTypeMappings(V_XML_SCHEMA);
 
       DBMS_XMLSCHEMA_ANNOTATE.printWarnings(FALSE);
       DBMS_XMLSCHEMA_ANNOTATE.disableDefaultTableCreation(V_XML_SCHEMA);
@@ -269,12 +267,10 @@ begin
     end loop;
   
   
-	  V_RESULT := XDB_OPTIMIZE_XMLSCHEMA.doTypeAnalysis(V_XML_SCHEMA_CONFIGURATION,:SCHEMA_LOCATION_PREFIX,USER);
+    V_RESULT := XDB_OPTIMIZE_XMLSCHEMA.doTypeAnalysis(V_XML_SCHEMA_CONFIGURATION,:SCHEMA_LOCATION_PREFIX,USER);
     IF (V_RESULT) then
       XDB_OPTIMIZE_XMLSCHEMA.setSchemaRegistrationOptions(
                                P_LOCAL                 => XDB_DOM_UTILITIES.VARCHAR_TO_BOOLEAN(:LOCAL)
-                              ,P_GENTYPES              => TRUE
-                              ,P_GENTABLES             => TRUE 
                               ,P_OWNER                 => USER 
                               ,P_ENABLE_HIERARCHY      => :REPOSITORY_USAGE
                               ,P_OPTIONS               => 0
@@ -289,7 +285,7 @@ begin
   V_SCRIPT_NAME := XDB_OPTIMIZE_SCHEMA.createScriptFile(V_XML_SCHEMA_CONFIGURATION);
   
   if (XDB_DOM_UTILITIES.VARCHAR_TO_BOOLEAN(:DELETE_SCHEMAS)) then
-	  V_SCRIPT_NAME := XDB_OPTIMIZE_SCHEMA.appendDeleteSchemaScript(V_XML_SCHEMA_CONFIGURATION);
+    V_SCRIPT_NAME := XDB_OPTIMIZE_SCHEMA.appendDeleteSchemaScript(V_XML_SCHEMA_CONFIGURATION);
   end if;
   
   V_SCRIPT_NAME := XDB_OPTIMIZE_XMLSCHEMA.appendRegisterSchemaScript(V_XML_SCHEMA_CONFIGURATION);
@@ -298,7 +294,7 @@ begin
     V_SCRIPT_NAME := XDB_OPTIMIZE_SCHEMA.appendCreateTablesScript(V_XML_SCHEMA_CONFIGURATION);
   end if;
 
-	if (XDB_DOM_UTILITIES.VARCHAR_TO_BOOLEAN(:LOAD_INSTANCES)) then
+  if (XDB_DOM_UTILITIES.VARCHAR_TO_BOOLEAN(:LOAD_INSTANCES)) then
     V_SCRIPT_NAME := XDB_OPTIMIZE_SCHEMA.appendLoadInstancesScript(V_XML_SCHEMA_CONFIGURATION);
   end if;
   :SCRIPT_FILE_PATH := V_SCRIPT_NAME;

@@ -18,6 +18,37 @@ set echo on
 --
 set serveroutput on
 --
+var XDBPM_STATUS VARCHAR2(120)
+--
+declare
+  V_XDBPM_STATUS VARCHAR2(120);
+begin
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
+  V_XDBPM_STATUS := 'XDBPM_STATUS_10200.sql';
+$ELSIF DBMS_DB_VERSION.VER_LE_11_1 $THEN
+  V_XDBPM_STATUS := 'XDBPM_STATUS_10200.sql';
+$ELSIF DBMS_DB_VERSION.VER_LE_11_2 $THEN
+  V_XDBPM_STATUS := 'XDBPM_STATUS_10200.sql';
+$ELSE 
+  V_XDBPM_STATUS := 'doNothing.sql';
+$END
+  :XDBPM_STATUS := V_XDBPM_STATUS;
+end;
+/
+undef V_XDBPM_STATUS
+--
+column XDBPM_STATUS new_value XDBPM_STATUS
+--
+select :XDBPM_STATUS XDBPM_STATUS 
+  from dual
+/
+select '&XDBPM_STATUS'
+  from DUAL
+/
+set define on
+--
+@@&XDBPM_STATUS
+/
 begin
   dbms_utility.compile_schema('XDBPM',TRUE);
 end;

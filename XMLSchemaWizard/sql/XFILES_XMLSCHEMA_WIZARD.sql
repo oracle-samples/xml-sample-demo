@@ -356,8 +356,6 @@ begin
   if (P_BINARY_XML) then
     XDB_OPTIMIZE_XMLSCHEMA.setSchemaRegistrationOptions(
                              P_LOCAL            => P_LOCAL
-                            ,P_GENTYPES         => FALSE 
-                            ,P_GENTABLES        => FALSE 
                             ,P_OWNER            => USER 
                             ,P_ENABLE_HIERARCHY => V_ENABLE_HEIRARCHY
                             ,P_OPTIONS          => DBMS_XMLSCHEMA.REGISTER_BINARYXML
@@ -365,8 +363,6 @@ begin
   else
     XDB_OPTIMIZE_XMLSCHEMA.setSchemaRegistrationOptions(
                              P_LOCAL                 => P_LOCAL 
-                            ,P_GENTYPES              => TRUE
-                            ,P_GENTABLES             => TRUE 
                             ,P_OWNER                 => USER 
                             ,P_ENABLE_HIERARCHY      => V_ENABLE_HEIRARCHY
                             ,P_OPTIONS               => 0

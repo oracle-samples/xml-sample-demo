@@ -153,13 +153,18 @@ show errors
 create or replace package XDBPM_RESCONFIG_HELPER
 AUTHID &RIGHTS
 as
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
+$ELSE
   function getUploadFolderPath(P_TABLE_NAME VARCHAR2, P_OWNER VARCHAR2 DEFAULT USER) return VARCHAR2;
+$END
 end;
 /
 show errors
 --
 create or replace package body XDBPM_RESCONFIG_HELPER
 as
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
+$ELSE
 function getUploadFolderPath(P_TABLE_NAME VARCHAR2, P_OWNER VARCHAR2 DEFAULT USER)
 return VARCHAR2
 as
@@ -183,6 +188,7 @@ begin
          
   return V_UPLOAD_FOLDER_PATH;
 end;
+$END
 --
 end;
 /
@@ -206,6 +212,16 @@ set define off
 create or replace package body XDBPM_UTILITIES_PRIVATE
 as
 --
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
+procedure doChangeOwner(P_RESOURCE_PATH VARCHAR2, P_NEW_OWNER VARCHAR2)
+as
+  res BOOLEAN;
+begin
+  update resource_view
+         set res = updateXml(res,'/Resource/Owner/text()',P_NEW_OWNER)
+  where equals_path(res,P_RESOURCE_PATH) = 1;
+end;
+$END
 procedure changeOwner(P_RESOURCE_PATH VARCHAR2, P_OWNER VARCHAR2, P_RECURSIVE BOOLEAN default false)
 as
 

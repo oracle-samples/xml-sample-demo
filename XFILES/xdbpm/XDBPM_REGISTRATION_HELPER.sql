@@ -270,11 +270,10 @@ begin
   	    select case 
          	       WHEN doc.NAMESPACE is NULL THEN
           	        XMLQUERY(
-          	          '$NEWDOC := $DOC modify (
+          	          'copy $NEWDOC := $DOC modify (
           	                 	           let $ROOT := $NEWDOC/*
           	                 	           return (
-            	                             delete nodes $ROOT/@xsi:noNamespaceSchemaLocation,
-            	                             insert node attribute xsi:noNamespaceSchemaLocation {$SLH) into $ROOT
+          	                 	             replace value of node $ROOT/@xsi:noNamespaceSchemaLocation with $SLH
           	                             )
           	                           )
           	           return $NEWDOC'
@@ -284,11 +283,10 @@ begin
           	       )
           	     ELSE 
          	        XMLQUERY(
-          	          '$NEWDOC := $DOC modify (
+          	          'copy $NEWDOC := $DOC modify (
           	                 	           let $ROOT := $NEWDOC/*
           	                 	           return (
-          	                               delete nodes $ROOT/@xsi:schemaLocation,
-          	                               insert node attribute xsi:schemaLocation {$SLH) into $ROOT
+          	                 	             replace value of node $ROOT/@xsi:schemaLocation with $SLH
           	                             )
           	                           )
           	           return $NEWDOC'

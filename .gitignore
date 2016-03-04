@@ -2,3 +2,7 @@
 *.lck
 /.data
 XFILES/xdbpm/.data/xdbpm/00000000/00000000.jdb
+XFILES/xdbpm/XDBPM_SOURCE_FILES.dat
+XFILES/xdbpm/XDBPM_SOURCE_FILES.bad
+*.bak
+*.log

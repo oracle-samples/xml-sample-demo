@@ -18,7 +18,7 @@
 --
 alter session set current_schema = XDBPM
 /
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:TRUE'
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
 --
 set define on
@@ -428,9 +428,16 @@ as
   V_XIL_INDEX            PLS_INTEGER;
   V_DSL_INDEX            PLS_INTEGER;
 
-$IF DBMS_DB_VERSION.VER_LE_11_2 $THEN
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
   -- Workaround for problem with using XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR directly in the select statement below  
   V_FORCE                VARCHAR2(5) :=  XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_FORCE);
+$ELSIF DBMS_DB_VERSION.VER_LE_11_1 $THEN
+  -- Workaround for problem with using XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR directly in the select statement below  
+  V_FORCE                VARCHAR2(5) :=  XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_FORCE);
+$ELSIF DBMS_DB_VERSION.VER_LE_11_2 $THEN
+  -- Workaround for problem with using XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR directly in the select statement below  
+  V_FORCE                VARCHAR2(5) :=  XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_FORCE);
+$ELSE 
 $END
 
 begin
@@ -460,9 +467,13 @@ $END
            xmlElement(
              "force",
              xmlAttributes('http://xmlns.oracle.com/xdb/pm/registrationConfiguration' as "xmlns"),
-$IF DBMS_DB_VERSION.VER_LE_11_2 $THEN
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
              V_FORCE
-$ELSE        
+$ELSIF DBMS_DB_VERSION.VER_LE_11_1 $THEN
+             V_FORCE
+$ELSIF DBMS_DB_VERSION.VER_LE_11_2 $THEN
+             V_FORCE
+$ELSE 
              XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_FORCE)
 $END
            )

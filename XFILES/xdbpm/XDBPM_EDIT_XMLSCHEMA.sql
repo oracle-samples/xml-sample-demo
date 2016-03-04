@@ -18,7 +18,7 @@
 --
 alter session set current_schema = XDBPM
 /
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:TRUE'
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
 --
 declare
