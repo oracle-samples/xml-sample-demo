@@ -460,7 +460,7 @@ function stripPathInformation(filename) {
     return filename;
 }
  
-function uploadToFolder(targetFolder, fileControlName, callback) {
+function uploadToFolder(targetFolder, fileControlId, callback) {
 
 /*
     <form id="uploadImageForm" name="upload" action="/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.SINGLE_DOC_UPLOAD" method="post" enctype="multipart/form-data">
@@ -476,7 +476,7 @@ function uploadToFolder(targetFolder, fileControlName, callback) {
 		</form>	
 */
 
-  var fileControl = document.getElementById(fileControlName)
+  var fileControl = document.getElementById(fileControlId)
   var formData = new FormData();
 
   formData.append('TARGET_FOLDER',targetFolder);
@@ -493,6 +493,28 @@ function uploadToFolder(targetFolder, fileControlName, callback) {
   XHR.onreadystatechange = function() { 
    	                          if( XHR.readyState==4 ) { 
    	                          	validateUploadToFolder(XHR,repositoryPath,callback);
+   	                          } 
+   	                        };
+  XHR.send(formData);
+
+}	
+
+function loadLocalXMLFile(fileControlId, callback) {
+
+  var fileControl = document.getElementById(fileControlId)
+  var formData = new FormData();
+
+  if (fileControl.files[0].type != 'text/xml') {
+  	showUserErrorMessage("Please select file of type \"text/xml\", not \"" + fileControl.files[0].type + "\".");
+  	return
+  }
+
+  formData.append(fileControl.name,fileControl.files[0]);
+
+  var XHR = soapManager.createPostRequest('/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.VIEW_LOCAL_XML',true);
+  XHR.onreadystatechange = function() { 
+   	                          if( XHR.readyState==4 ) { 
+   	                          	callback(XHR);
    	                          } 
    	                        };
   XHR.send(formData);

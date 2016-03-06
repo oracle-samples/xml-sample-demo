@@ -97,6 +97,7 @@ as
   procedure UPLOAD(TARGET_FOLDER VARCHAR2, ON_SUCCESS_REDIRECT VARCHAR2, ON_FAILURE_REDIRECT VARCHAR2, DUPLICATE_POLICY OWA.VC_ARR, FILE OWA.VC_ARR, RESOURCE_NAME OWA.VC_ARR, DESCRIPTION OWA.VC_ARR, LANGUAGE VARCHAR2, CHARACTER_SET VARCHAR2);
   procedure SINGLE_DOC_UPLOAD(TARGET_FOLDER VARCHAR2, ON_SUCCESS_REDIRECT VARCHAR2, ON_FAILURE_REDIRECT VARCHAR2, DUPLICATE_POLICY VARCHAR2, FILE VARCHAR2, RESOURCE_NAME VARCHAR2, DESCRIPTION VARCHAR2, LANGUAGE VARCHAR2, CHARACTER_SET VARCHAR2);
   procedure XMLHTTPREQUEST_DOC_UPLOAD(TARGET_FOLDER VARCHAR2, FILE VARCHAR2, RESOURCE_NAME VARCHAR2, DUPLICATE_POLICY VARCHAR2, DESCRIPTION VARCHAR2, LANGUAGE VARCHAR2, CHARACTER_SET VARCHAR2);
+  procedure VIEW_LOCAL_XML(LOCAL_FILE VARCHAR2);
 end;
 /
 show errors
@@ -172,28 +173,23 @@ begin
 	    from DUAL;
   end loop;
 
-  select xmlConcat
-         (
+  select xmlConcat(
            xmlElement("TargetFolder",TARGET_FOLDER),
            xmlElement("OnSuccess",ON_SUCCESS_REDIRECT),
            xmlElement("OnFailure",ON_FAILURE_REDIRECT),
-           xmlElement
-           (
+           xmlElement(
              "File",
              ( select XMLAGG(COLUMN_VALUE) from TABLE(V_FILE_LIST))
            ),
-           xmlElement
-           (
+           xmlElement(
              "DuplicatePolicy",
              ( select XMLAGG(COLUMN_VALUE) from TABLE(V_DUPLICATE_POLICY_LIST))
            ),
-           xmlElement
-           (
+           xmlElement(
              "ResourceName",
              ( select XMLAGG(COLUMN_VALUE) from TABLE(V_RESOURCE_NAME_LIST))
            ),
-           xmlElement
-           (
+           xmlElement (
              "Description",
              ( select XMLAGG(COLUMN_VALUE) from TABLE(V_DESCRIPTION_LIST))
            ),
@@ -276,8 +272,7 @@ as
   V_RESPONSE_HTML         VARCHAR2(32000);
   V_CONTENT_SIZE          NUMBER;
 begin
- select xmlConcat
-         (
+ select xmlConcat(
            xmlElement("TargetFolder",TARGET_FOLDER),
            xmlElement("OnSuccess",ON_SUCCESS_REDIRECT),
            xmlElement("OnFailure",ON_FAILURE_REDIRECT),
@@ -344,7 +339,6 @@ end;
 --
 procedure XMLHTTPREQUEST_DOC_UPLOAD(TARGET_FOLDER VARCHAR2, FILE VARCHAR2, RESOURCE_NAME VARCHAR2, DUPLICATE_POLICY VARCHAR2, DESCRIPTION VARCHAR2, LANGUAGE VARCHAR2, CHARACTER_SET VARCHAR2)
 as  
-  V_REDIRECT_URL          VARCHAR2(1024);
   V_RESULT                BOOLEAN;
   V_CONTENT               BLOB;
   V_PARAMETERS            XMLType;
@@ -356,8 +350,7 @@ as
   V_RESPONSE_HTML         VARCHAR2(32000);
   V_CONTENT_SIZE          NUMBER;
 begin
- select xmlConcat
-         (
+  select xmlConcat(
            xmlElement("TargetFolder",TARGET_FOLDER),
            xmlElement("File",FILE),
            xmlElement("DuplicatePolicy",DUPLICATE_POLICY),
@@ -391,13 +384,13 @@ begin
     delete from &XFILES_SCHEMA..DOCUMENT_UPLOAD_TABLE
      where NAME = FILE;
 
-    writeLogRecord('SINGLE_DOC_UPLOAD',V_INIT,V_PARAMETERS);
+    writeLogRecord('XMLHTTPREQUEST_DOC_UPLOAD',V_INIT,V_PARAMETERS);
     V_RESPONSE_HTML := '{ "path" : "' || V_RESOURCE_PATH || '", "status" : 1}';
    
   exception
     when others then
       V_RESPONSE_HTML := '{ "path" : "' || V_RESOURCE_PATH || '", "status" : -1, "SQLError" : ' || SQLCODE || ', "SQLErrorMessage" : "' || SQLERRM  || '"}';
-      handleException('SINGLE_DOC_UPLOAD',V_INIT,V_PARAMETERS);
+      handleException('XMLHTTPREQUEST_DOC_UPLOAD',V_INIT,V_PARAMETERS);
   end;
 
 	OWA_UTIL.MIME_HEADER('application/json',FALSE);
@@ -406,6 +399,59 @@ begin
   owa_util.http_header_close;
   htp.prn(V_RESPONSE_HTML);
   htp.flush();
+
+end;
+--
+procedure VIEW_LOCAL_XML(LOCAL_FILE VARCHAR2)
+as  
+  V_PARAMETERS            XMLType;
+  V_INIT                  TIMESTAMP WITH TIME ZONE := SYSTIMESTAMP;
+
+  V_CONTENT               CLOB;
+  V_CONTENT_SIZE          NUMBER;
+  V_BUFFER                VARCHAR2(8192) ;
+  V_OFFSET                BINARY_INTEGER := 1;
+  V_AMOUNT                BINARY_INTEGER := 4096;    
+begin
+  select xmlElement("File",LOCAL_FILE)
+    into V_PARAMETERS
+    from dual;
+
+	begin
+		
+   	select XMLSERIALIZE(DOCUMENT XMLTYPE(BLOB_CONTENT,nls_charset_id('AL32UTF8')) AS CLOB)
+   	  into V_CONTENT
+	    from &XFILES_SCHEMA..DOCUMENT_UPLOAD_TABLE
+	   where NAME = LOCAL_FILE;
+	    
+    delete from &XFILES_SCHEMA..DOCUMENT_UPLOAD_TABLE
+     where NAME = LOCAL_FILE;
+
+    writeLogRecord('VIEW_LOCAL_XML',V_INIT,V_PARAMETERS);   
+  exception
+    when others then
+      V_CONTENT := '{ "Name" : "' || LOCAL_FILE || '", "status" : -1, "SQLError" : ' || SQLCODE || ', "SQLErrorMessage" : "' || SQLERRM  || '"}';
+      handleException('VIEW_LOCAL_XML',V_INIT,V_PARAMETERS);
+  end;
+
+	OWA_UTIL.MIME_HEADER('text/xml',FALSE);
+	V_CONTENT_SIZE := dbms_lob.getlength(V_CONTENT);
+  htp.p('Content-Length: ' || V_CONTENT_SIZE);
+  owa_util.http_header_close;
+
+  loop
+    begin
+    	DBMS_LOB.read(V_CONTENT,V_AMOUNT,V_OFFSET,V_BUFFER);
+    	V_OFFSET := V_OFFSET + V_AMOUNT;
+    	V_AMOUNT := 4000;
+      htp.prn(V_BUFFER);
+    exception
+      when NO_DATA_FOUND then
+        exit;
+    end;
+  end loop;    	
+  htp.flush();
+  DBMS_LOB.FREETEMPORARY(V_CONTENT);
 
 end;
 --

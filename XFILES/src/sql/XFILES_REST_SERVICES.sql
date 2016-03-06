@@ -84,32 +84,6 @@ begin
   htp.flush();
 end;
 --	
-procedure writeServletOutputStream_X(P_CONTENT IN OUT CLOB,P_CONTENT_TYPE VARCHAR2)
-as
-  V_BUFFER         VARCHAR2(8000) ;
-  V_OFFSET         BINARY_INTEGER := 1;
-  V_AMOUNT         BINARY_INTEGER := 4196;
-  V_BYTES_COPIED   BINARY_INTEGER := 0;
-  V_CONTENT_SIZE   BINARY_INTEGER := 0;
-begin
-	OWA_UTIL.MIME_HEADER(P_CONTENT_TYPE,FALSE);
-	V_CONTENT_SIZE := DBMS_LOB.getLength(P_CONTENT);
-  htp.p('Content-Length: ' || V_CONTENT_SIZE);
-  owa_util.http_header_close;
-	while (V_OFFSET < V_CONTENT_SIZE) loop
-	  V_BUFFER := DBMS_LOB.SUBSTR(P_CONTENT,V_AMOUNT,V_OFFSET);
-    V_BYTES_COPIED := LENGTHB(V_BUFFER);
-    IF (V_OFFSET + V_BYTES_COPIED) > V_CONTENT_SIZE THEN
-      V_BUFFER := SUBSTR(V_BUFFER,1,(V_CONTENT_SIZE - V_OFFSET)+1);
-      V_BYTES_COPIED := LENGTH(V_BUFFER);
-    end if;
-    htp.prn(V_BUFFER);
-    V_OFFSET := V_OFFSET + V_BYTES_COPIED;
-  end loop;
-  htp.flush();
-  DBMS_LOB.FREETEMPORARY(P_CONTENT);
-end;
---	
 procedure writeServletOutputStream(P_CONTENT IN OUT CLOB,P_CONTENT_TYPE VARCHAR2)
 as
   V_BUFFER         VARCHAR2(8192) ;

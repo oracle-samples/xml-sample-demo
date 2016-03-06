@@ -15,6 +15,8 @@ var typeAnalysisInProgress = false;
 
 var globalElementListXSL 
 
+var missingXMLSchema
+
 function doNothing() {
 }
 
@@ -34,6 +36,14 @@ function showSelectFolder() {
 	
 }
 
+function showLocateMissingSchema(missingSchemaLocationHint) {
+	
+	$('#wizardSteps a[href="#step_locateSchema"]').tab('show')
+  document.getElementById("missingSchemaLocation").value = missingSchemaLocationHint.substring(1,missingSchemaLocationHint.length-1)
+  document.getElementById("btnNext").style.display="block";
+	doNext = verifySchemaSet;
+	
+}
 function showSchemaOrdering() {
 	
 	$('#wizardSteps a[href="#wizardConfigureSchemas"]').tab('show')
@@ -60,7 +70,6 @@ function showShowScripts() {
   doNext = doNothing;
 
 }
-
 
 function showTypeCompilation() {
 	
@@ -340,7 +349,15 @@ function displaySchemaOrdering(mgr,rootSchemaPath) {
   	if ((e.isServerError) && ((e.isServerError()) && (e.getSQLErrCode() == 'ORA-31001'))) {
   		var errorMsg = e.getSQLErrMsg();
   		var schemaLocation = errorMsg.substring(errorMsg.indexOf('"'));
-			showErrorMessage("Unable to resolve XML Schema : " + schemaLocation)
+			// showErrorMessage("Unable to resolve XML Schema : " + schemaLocation)
+  	  BootstrapDialog.confirm(
+  	    'Cannot resolve ' + schemaLocation + '. Would you like to search for it ?', 
+  	    function(result){
+          if (result) {
+            showLocateMissingSchema(schemaLocation);
+          }
+        }
+      );
 	  }
 	  else {
       handleException('registrationWizard.displaySchemaOrdering',e,null);
@@ -369,6 +386,8 @@ function verifySchemaSet() {
 	** Order the schemas needed to successfully register the chosen XML Schema(s)
 	**
 	*/
+	
+	$('#wizardSteps a[href="#wizardSelectSchemas"]').tab('show')
 
   var repositoryFolderPath = targetFolderTree.getOpenFolder();
 	
@@ -496,15 +515,11 @@ function showSchemaDetails() {
 function changeStorageModel() {
 	
 	if (getRadioButtonValue("xmlStorageModel") == "OR") {
-	  document.getElementById("tab_compileTypes").style.display="block";
-	  document.getElementById("tab_analyzeTypes").style.display="block";
 	  document.getElementById("domFidelityOption").style.display="block";
 	  document.getElementById("disableDOMFidelity").checked = false;
 	  doNext = startTypeCompilation;
   }
   else {
-	  document.getElementById("tab_compileTypes").style.display="none";
-	  document.getElementById("tab_analyzeTypes").style.display="none";
 	  document.getElementById("domFidelityOption").style.display="none";	  
 	  document.getElementById("disableDOMFidelity").checked = true;
 	  doNext = generateScripts;
@@ -813,4 +828,65 @@ function startTypeAnalysis() {
 		
 }
 
-  
+function loadSchemaLocationHint() {
+	
+	try {
+  	missingXMLSchema = new xmlDocument();
+	  missingXMLSchema.load(document.getElementById("missingSchemaLocation").value);
+    prettyPrintXML(missingXMLSchema,document.getElementById('viewXMLSchema'));
+  }
+  catch (e) {
+    handleException('registrationWizard.loadSchemaLocationHint',e,null);
+	}  	
+  	
+}
+
+function displayLocalFile(XHR) {
+	
+ try {
+  	missingXMLSchema = new xmlDocument(XHR.responseXML);
+    prettyPrintXML(missingXMLSchema,document.getElementById('viewXMLSchema')); 		
+  } 
+  catch (e) {
+    handleException('registrationWizard.displayLocalFile',e,null);
+  }
+
+}
+
+function viewLocalFile() {
+
+  try {
+  	loadLocalXMLFile("localFile",displayLocalFile);
+  }
+  catch (e) {
+    handleException('registrationWizard.viewLocalFile',e,null);
+	}  	
+}
+
+function saveXMLSchema() {
+	
+	var repositoryFolderPath = targetFolderTree.getOpenFolder();
+	var schemaName = document.getElementById("missingSchemaLocation").value
+	if (schemaName.indexOf('/') > 0) {
+		schemaName = schemaName.substring(schemaName.lastIndexOf('/')+1);
+	}
+  if (schemaName.lastIndexOf('.xsd') != (schemaName.length-4)) {
+	  schemaName = schemaName + '.xsd';
+	}
+	
+  try {
+  	var XHR = new XMLHttpRequest();
+    var URL = appendPath(repositoryFolderPath,schemaName);
+    XHR.open ("PUT", URL, true);
+    XHR.setRequestHeader("Content-type","text/xml");
+    XHR.onreadystatechange= function() { 
+                              if (XHR.readyState==4) { 
+                              	verifySchemaSet();
+                              } 
+                            };
+    XHR.send(missingXMLSchema.serialize());
+  }
+  catch (e) {
+    handleException('registrationWizard.saveXMLSchema',e,null);
+	}   	 
+}

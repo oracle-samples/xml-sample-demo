@@ -8,7 +8,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<div>
-							<button type="button" class="close" data-dismiss="modal">
+							<button class="close"  type="button" data-dismiss="modal">
 								<span aria-hidden="true">&#215;</span>
 								<span class="sr-only">Close</span>
 							</button>
@@ -19,7 +19,7 @@
 						<input id="FILE" name="FILE" title="FILE" type="file"/>
 					</div>
 					<div class="modal-footer">
-						<button id="btnDoUploadFiles" type="button" class="btn btn-default btn-med" onclick="uploadSchemaArchive();">
+						<button class="btn btn-default btn-med" id="btnDoUploadFiles" type="button"  onclick="uploadSchemaArchive();">
 							<span class="glyphicon glyphicon-save"/>
 						</button>
 					</div>
@@ -53,7 +53,13 @@
 									<a href="#wizardConfigureSchemas" role="tab" data-toggle="tab">Configure Schemas</a>
 								</li>
 								<li>
+									<a href="#wizardConfigureSchemas" role="tab" data-toggle="tab">Configure Schemas</a>
+								</li>
+								<li>
 									<a href="#wizardScriptOptions" role="tab" data-toggle="tab">Script Options Scripts</a>
+								</li>
+								<li>
+									<a href="#wizardShowScript" role="tab" data-toggle="tab">Review Scripts</a>
 								</li>
 								<li style="display:none" id="tab_compileTypes">
 									<a href="#step_compileTypes" role="tab" data-toggle="tab">Compile Types</a>
@@ -61,8 +67,8 @@
 								<li style="display:none" id="tab_analyzeTypes">
 									<a href="#step_analyzeTypes" role="tab" data-toggle="tab">Analyze Types</a>
 								</li>
-								<li>
-									<a href="#wizardShowScript" role="tab" data-toggle="tab">Review Scripts</a>
+								<li style="display:none" id="tab_locateSchema">
+									<a href="#step_locateSchema" role="tab" data-toggle="tab">Locate Schema</a>
 								</li>
 							</ul>
 						</div>
@@ -76,7 +82,7 @@
 											<xsl:text>Click a folder to see the avabilable XML Schemas or upload a Zip Archive containing the XML schemas to be processed.</xsl:text>
 										</p>
 										<div class="pull-right">
-											<button onclick="chooseSchemaArchive()">Upload</button>
+											<button class="btn btn-default btn-med" onclick="chooseSchemaArchive()">Upload</button>
 										</div>
 										<div class="pull-left" style="white-space:nowrap; text-align:center;font-family:Arial,Helvetica,Geneva,sans-serif;font-size:10pt;color:#000000;font-weight:normal;" id="treeLoading">
 											<div>
@@ -100,7 +106,7 @@
 											</p>
 										</div>
 										<div class="pull-right">
-											<button data-target="#elementListDiv,#schemaListDiv" class="btn btn-default" data-toggle="collapse" onclick="listGlobalElements()">Elements</button>
+											<button class="btn btn-default btn-med" data-target="#elementListDiv,#schemaListDiv" data-toggle="collapse" onclick="listGlobalElements()">Elements</button>
 										</div>
 										<div>
 											<select class="form-control" id="schemaList" size="10" multiple="multiple"/>
@@ -114,7 +120,7 @@
 											</p>
 										</div>
 										<div class="pull-right">
-											<button data-target="#elementListDiv,#schemaListDiv" class="btn btn-default" data-toggle="collapse">Schemas</button>
+											<button class="btn btn-default btn-med" data-target="#elementListDiv,#schemaListDiv" data-toggle="collapse">Schemas</button>
 										</div>
 										<div class="container" id="globalElementList" style="width:980px; height:200px; overflow:auto"/>
 									</div>
@@ -122,21 +128,27 @@
 							</div>
 							<div class="tab-pane" id="wizardConfigureSchemas">
 								<div class="row">
-									<div class="form-group">
-										<label for="repositoryFolderPath">Repository Folder </label>
-										<input class="form-control" id="repositoryFolderPath" type="text" size="40" disabled="disabled"/>
+									<div class="well well-sm" style="width:980px">
+										<div class="form-group">
+											<label for="repositoryFolderPath">Repository Folder </label>
+											<input class="form-control" id="repositoryFolderPath" type="text" size="40" disabled="disabled"/>
+										</div>
 									</div>
 								</div>
 								<div class="row">
-									<div class="form-group">
-										<label for="orderedSchemaList">Schema List (Ordered) </label>
-										<select class="form-control" id="orderedSchemaList" size="8" onclick="showSchemaDetails();return false"/>
+									<div class="well well-sm" style="width:980px">
+										<div class="form-group">
+											<label for="orderedSchemaList">Schema List (Ordered) </label>
+											<select class="form-control" id="orderedSchemaList" size="8" onclick="showSchemaDetails();return false"/>
+										</div>
 									</div>
 								</div>
 								<div class="row">
-									<div class="form-group">
-										<label for="targetNamespace">Target Namespace </label>
-										<input class="form-control" id="targetNamespace" type="text" size="40" disabled="disabled"/>
+									<div class="well well-sm" style="width:980px">
+										<div class="form-group">
+											<label for="targetNamespace">Target Namespace </label>
+											<input class="form-control" id="targetNamespace" type="text" size="40" disabled="disabled"/>
+										</div>
 									</div>
 								</div>
 								<div class="row">
@@ -145,7 +157,7 @@
 										<div class="input-group">
 											<input class="form-control" id="schemaLocationPrefix" type="text" size="80" oninput="setSchemaLocationHint()"/>
 											<span class="input-group-btn">
-												<button class="btn btn-default" onclick="updateSchemaLocationPrefix()" type="button">
+												<button class="btn btn-default btn-med" onclick="updateSchemaLocationPrefix()" type="button">
 													<span class="glyphicon glyphicon-cog"/>
 												</button>
 											</span>
@@ -197,14 +209,70 @@
 									</div>
 									<div class="well well-sm" style="width:980px">
 										<div class="form-group">
-											<input type="checkbox" id="deleteSchemas" checked="checked"/>Delete Schemas
-											<input type="checkbox" id="createTables" checked="checked"/>Create Tables
-											<input type="checkbox" id="loadInstances" checked="checked"/>Load Instances
+											<input type="checkbox-inline" id="deleteSchemas" checked="checked"/>Delete Schemas
+											<input type="checkbox-inline" id="createTables" checked="checked"/>Create Tables
+											<input type="checkbox-inline" id="loadInstances" checked="checked"/>Load Instances
 										</div>
 										<div class="form-group">
 											<label for="generatedTableList">Tables</label>
 											<select class="form-control" id="generatedTableList" size="10" onclick="return false"/>
 										</div>
+									</div>
+								</div>
+							</div>
+							<div class="tab-pane" id="wizardShowScript">
+								<div class="row">
+									<div class="well well-sm" style="width:980px">
+										<span>
+											<pre class="pre-scrollable" id="registrationScript"/>
+										</span>
+									</div>
+								</div>
+								<div class="row">
+									<div class="btn-grp">
+										<button class="btn btn-default btn-med btn-primary" id="runScript" type="button" onclick="executeScript();false">Run Script</button>
+									</div>
+								</div>
+							</div>
+							<div class="tab-pane" id="step_locateSchema">
+								<div class="row">
+									<div class="well well-sm" style="width:980px">
+										<p>
+											<xsl:text>Locate Missing Schema</xsl:text>
+										</p>
+									</div>
+								</div>
+								<div class="row">
+									<div class="well well-sm" style="width:980px">
+										<label for="missingSchemaLocation">Resolve URL</label>
+										<div class="input-group">
+											<input class="form-control" id="missingSchemaLocation" type="text" size="80"  disabled="disabled"/>
+											<span class="input-group-btn">
+												<button class="btn btn-default btn-med" onclick="loadSchemaLocationHint()" type="button">
+													<span class="glyphicon glyphicon-cog"/>
+												</button>
+											</span>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="well well-sm" style="width:980px">
+										<label for="localFile">Load local file</label>
+										<div class="input-group">
+											<input class="form-control"  id="localFile" name="LOCAL_FILE" title="FILE" type="file"/>
+											<span class="input-group-btn">
+												<button class="btn btn-default btn-med" onclick="viewLocalFile()" type="button">
+													<span class="glyphicon glyphicon-cog"/>
+												</button>
+											</span>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="well well-sm" style="width:980px" id="xmlSchema">
+										<div style="height:200px; overflow:auto;white-space:nowrap; text-align:left;font-family:Arial,Helvetica,Geneva,sans-serif;font-size:10pt;color:#000000;font-weight:normal;" id="viewXMLSchema"/>
+										<br/>
+										<button class="btn btn-default btn-med" onclick="saveXMLSchema()">Save Schema</button>
 									</div>
 								</div>
 							</div>
@@ -228,20 +296,6 @@
 								<span>
 									<pre class="pre-scrollable" id="typeAnalysisLog"/>
 								</span>
-							</div>
-							<div class="tab-pane" id="wizardShowScript">
-								<div class="row">
-									<div class="well well-sm" style="width:980px">
-										<span>
-											<pre class="pre-scrollable" id="registrationScript"/>
-										</span>
-									</div>
-								</div>
-								<div class="row">
-									<div class="btn-grp">
-										<button class="btn btn-default btn-med btn-primary" id="runScript" type="button" onclick="executeScript();false">Run Script</button>
-									</div>
-								</div>
 							</div>
 						</div>
 					</div>

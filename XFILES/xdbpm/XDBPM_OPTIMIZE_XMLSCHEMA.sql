@@ -18,7 +18,7 @@
 --
 alter session set current_schema = XDBPM
 /
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:TRUE'
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
 --
 set define on
@@ -329,12 +329,6 @@ as
 --
 
   G_LOCAL                    BOOLEAN := TRUE;
-
-  G_GENTYPES                 BOOLEAN := TRUE;
-
-
-  G_GENTABLES                BOOLEAN := FALSE;
-
   G_OWNER                    VARCHAR2(32) := NULL;
   G_OPTIONS                  BINARY_INTEGER :=NULL;
   G_ENABLE_HIERARCHY         BINARY_INTEGER := NULL;
@@ -353,14 +347,6 @@ begin
 	G_OWNER            := P_OWNER;
 	G_ENABLE_HIERARCHY := P_ENABLE_HIERARCHY;
 	G_OPTIONS          := P_OPTIONS;
---
--- GENTABLES is TRUE for DBMS_XMLSCHEMA.ENABLE_HIERARCHY_CONTENT and DBMS_XMLSCHEMA.ENABLE_HIERARCHY_RESMETADATA
---
-	if (P_ENABLE_HIERARCHY = DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE) then
-	  G_GENTABLES := FALSE;
-	else
-	  G_GENTABLES := TRUE;
-	end if;	
 end;
 --
 procedure setRegistrationScriptOptions(
@@ -504,7 +490,8 @@ as
   V_EVENTS                   VARCHAR2(32000);
   V_OPTIONS                  VARCHAR2(64);
   V_ENABLE_HIERARCHY_OPTION  VARCHAR2(64);
-  V_GENTABLES                BOOLEAN;
+  V_GENTYPES                 BOOLEAN := FALSE;
+  V_GENTABLES                BOOLEAN := FALSE;
   V_SCHEMA_LOCATION_HINT     VARCHAR2(700);
 begin
 
@@ -599,13 +586,27 @@ $END
       DBMS_LOB.APPEND(V_SCRIPT,s.ANNOTATIONS);
     end if;
     
-    V_GENTABLES := G_GENTABLES;
-    if (not G_GENTABLES) then
-      V_BUFFER := '  DBMS_XMLSCHEMA_ANNOTATE.disableDefaultTableCreation(V_XML_SCHEMA);' || C_BLANK_LINE;
-      DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
-      V_GENTABLES := TRUE;
-   end if;
-
+    --
+    -- GENTABLES is TRUE for DBMS_XMLSCHEMA.ENABLE_HIERARCHY_CONTENT and DBMS_XMLSCHEMA.ENABLE_HIERARCHY_RESMETADATA
+    --
+	  if (G_ENABLE_HIERARCHY = DBMS_XMLSCHEMA.ENABLE_HIERARCHY_NONE) then
+      if (G_OPTIONS = DBMS_XMLSCHEMA.REGISTER_BINARYXML) then
+  	    V_GENTABLES := FALSE;
+  	  else
+        V_BUFFER := '  DBMS_XMLSCHEMA_ANNOTATE.disableDefaultTableCreation(V_XML_SCHEMA);' || C_BLANK_LINE;
+        DBMS_LOB.WRITEAPPEND(V_SCRIPT,LENGTH(V_BUFFER),V_BUFFER);
+        V_GENTABLES := TRUE;
+      end if;
+	  else
+	    V_GENTABLES := TRUE;
+	  end if;	
+  
+    if (G_OPTIONS = DBMS_XMLSCHEMA.REGISTER_BINARYXML) then
+    	V_GENTYPES := FALSE;
+    else
+    	V_GENTYPES := TRUE;
+    end if;
+   
     V_BUFFER := '  XDB_EDIT_XMLSCHEMA.saveAnnotatedSchema(V_NEW_SCHEMA_PATH, V_XML_SCHEMA);' || C_BLANK_LINE
              || '  commit;' || C_BLANK_LINE
              || 'end;' || C_NEW_LINE
@@ -621,7 +622,7 @@ $END
              || '    SCHEMAURL       => V_SCHEMA_LOCATION_HINT' || C_NEW_LINE
              || '   ,SCHEMADOC       => V_XML_SCHEMA' || C_NEW_LINE
              || '   ,LOCAL           => '   || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(G_LOCAL) || C_NEW_LINE
-             || '   ,GENTYPES        => '   || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(G_GENTYPES) || C_NEW_LINE
+             || '   ,GENTYPES        => '   || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(V_GENTYPES) || C_NEW_LINE
              || '   ,GENTABLES       => '   || XDB_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(V_GENTABLES) || C_NEW_LINE
              || '   ,FORCE           => '   || UPPER(s.FORCE_OPTION) || C_NEW_LINE
              || '   ,OWNER           => ''' || G_OWNER || '''' || C_NEW_LINE
