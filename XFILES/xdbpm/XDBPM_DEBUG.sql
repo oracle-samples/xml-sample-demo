@@ -21,8 +21,6 @@ alter session set current_schema = XDBPM
 create or replace package XDBPM_DEBUG
 authid CURRENT_USER
 as
-  C_WRITE_TO_TRACE_FILE constant binary_integer := 1;
-
   C_OPEN_QUERY_REWRITE      CONSTANT VARCHAR2(4000) := '<xdbpm:XQUERY_REWRITE xmlns:xdbpm="http://xmlns.oracle.com/xdbpm" timestamp="%TIMESTAMP%">';
   C_CLOSE_QUERY_REWRITE     CONSTANT VARCHAR2(4000) := '</xdbpm:XQUERY_REWRITE>';
   C_BEGIN_XQUERY_DIAGNOSTIC CONSTANT VARCHAR2(128) := 'XML Performance Diagnosis:';
@@ -78,11 +76,34 @@ as
   G_DEBUG_FILE    VARCHAR2(700) := XDB_CONSTANTS.FOLDER_USER_DEBUG || '/logFiles/' || to_char(systimestamp,'YYYY-MM-DD') || '.' || lpad(XDBPM_HELPER.getSessionID(),6,'0') || '.' || lpad(G_DEBUG_SEQUENCE_ID,6,'0') || '.txt';
 
 --
+function getTraceFileFromView
+return CLOB
+as
+  V_TRACE_FILE_NAME     VARCHAR2(64) := lower(XDBPM_HELPER.getTraceFileName());
+  V_TRACE_FILE_CONTENTS CLOB;
+  
+  cursor getTraceFileContent(C_TRACE_FILE_NAME VARCHAR2)
+  is
+  select PAYLOAD
+    from V$DIAG_TRACE_FILE_CONTENTS
+   order by LINE_NUMBER;
+begin
+	DBMS_LOB.createTemporary(V_TRACE_FILE_CONTENTS,FALSE,DBMS_LOB.SESSION);
+	for l in getTraceFileContent(V_TRACE_FILE_NAME) loop
+	  DBMS_LOB.writeAppend(V_TRACE_FILE_CONTENTS,length(l.PAYLOAD),l.PAYLOAD);
+  end loop;
+	return V_TRACE_FILE_CONTENTS;
+end;
+
 function getTraceFileContents
 return CLOB
 as
 begin
-	return XDBPM_HELPER.getTraceFileContents();
+	if (XDBPM_SYSDBA_HELPER.hasTraceFileAccess()) then
+	  return XDBPM_HELPER.getTraceFileContents();
+	else
+	  return getTraceFileFromView();
+	end if;
 exception
   when FILE_NOT_FOUND then
     return 'Trace File  "' || XDBPM_HELPER.getTraceFileName() || '" not found.';
@@ -93,7 +114,7 @@ as
   V_TRACE_FILE CLOB;
 begin
   begin
-    V_TRACE_FILE := XDBPM_HELPER.getTraceFileContents();
+    V_TRACE_FILE := getTraceFileContents();
     G_CURRENT_OFFSET := DBMS_LOB.getLength(V_TRACE_FILE);
     DBMS_LOB.freeTemporary(V_TRACE_FILE);
   exception
@@ -105,8 +126,7 @@ end;
 procedure writeToTraceFile(P_COMMENT VARCHAR2)
 as
 begin
-  sys.dbms_system.KSDWRT(C_WRITE_TO_TRACE_FILE,P_COMMENT);
-  sys.dbms_system.KSDFLS();
+  XDBPM_SYSDBA_HELPER.writeToTraceFile(P_COMMENT);
 end;
 --  
 procedure writeMarker(P_MARKER VARCHAR2)
@@ -143,9 +163,9 @@ begin
 	  G_CURRENT_OFFSET := 1;
 	end if;
   execute immediate 'alter session set events =''19021 trace name context off''';
-  sys.dbms_system.KSDFLS();
+  XDBPM_SYSDBA_HELPER.flushTraceFile();
 
-  V_TRACE_FILE := XDBPM_HELPER.getTraceFileContents();
+  V_TRACE_FILE := getTraceFileContents();
   V_TRACE_FILE_SIZE := DBMS_LOB.getLength(V_TRACE_FILE);
   if (V_TRACE_FILE_SIZE > G_CURRENT_OFFSET) then
     dbms_lob.createTemporary(V_XQUERY_TRACE,TRUE,dbms_lob.session);
@@ -169,7 +189,7 @@ begin
 	  G_CURRENT_OFFSET := 1;
 	end if;
 	
-  V_TRACE_FILE := XDBPM_HELPER.getTraceFileContents();
+  V_TRACE_FILE := getTraceFileContents();
   V_START_OFFSET := dbms_lob.instr(V_TRACE_FILE,C_BEGIN_XQUERY_DIAGNOSTIC,G_CURRENT_OFFSET);
 
   if (V_START_OFFSET > 0) then
@@ -223,7 +243,7 @@ begin
   V_OPEN_QUERY_REWRITE := substr(V_OPEN_QUERY_REWRITE,1,length(V_OPEN_QUERY_REWRITE)-1);
 
   dbms_lob.createTemporary(V_STATEMENT_TEXT,TRUE,dbms_lob.session);
-  V_TRACE_FILE := XDBPM_HELPER.getTraceFileContents();
+  V_TRACE_FILE := getTraceFileContents();
   V_START_OFFSET := dbms_lob.instr(V_TRACE_FILE,V_OPEN_QUERY_REWRITE);
   V_END_OFFSET := dbms_lob.instr(V_TRACE_FILE,C_CLOSE_QUERY_REWRITE,V_START_OFFSET) + length(C_CLOSE_QUERY_REWRITE);
   dbms_lob.copy(V_STATEMENT_TEXT,V_TRACE_FILE,V_END_OFFSET - V_START_OFFSET,1,V_START_OFFSET);
@@ -343,7 +363,7 @@ as
   V_TRACE_FILE_PATH     VARCHAR2(255);
   V_TRACE_FILE_CONTENTS CLOB;
 begin
-  V_TRACE_FILE_CONTENTS := XDBPM_HELPER.getTraceFileContents();
+  V_TRACE_FILE_CONTENTS := getTraceFileContents();
   V_TRACE_FILE_PATH := TRACE_FOLDER || '/' || XDBPM_HELPER.getTraceFileName();
   if (dbms_xdb.existsResource(V_TRACE_FILE_PATH)) then
     dbms_xdb.deleteResource(V_TRACE_FILE_PATH);

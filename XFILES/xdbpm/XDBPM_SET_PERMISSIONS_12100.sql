@@ -13,13 +13,7 @@
  * ================================================
  */
 
-grant INHERIT ANY PRIVILEGES to XDBPM
-/
-grant INHERIT PRIVILEGES on user SYS to XDBPM
-/
-grant INHERIT PRIVILEGES on user SYSTEM to XDBPM
-/
-grant INHERIT PRIVILEGES on user XDB to XDBPM
-/
 grant XDBADMIN to XDBPM with ADMIN OPTION
+/
+grant INHERIT ANY PRIVILEGES to XDBPM
 /

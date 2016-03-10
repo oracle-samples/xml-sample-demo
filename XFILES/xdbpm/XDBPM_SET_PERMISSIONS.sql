@@ -24,32 +24,6 @@ grant UNLIMITED TABLESPACE to XDBPM
 /
 grant SELECT ANY DICTIONARY to XDBPM
 /
-grant execute on SYS.DBMS_SYSTEM to XDBPM
-/
---
--- Explicit grants on XDB Owned objects. Requires use of USER SYSTEM or SYSDBA connection.
--- WITH GRANT OPTION is explicitly not provided to ROLE DBA on these objects.
---
-grant all on XDB.XDB$RESOURCE       to XDBPM
-/
-grant all on XDB.XDB$NLOCKS         to XDBPM
-/
-grant all on XDB.XDB$CHECKOUTS      to XDBPM
-/
-grant all on XDB.XDB$ROOT_INFO      to XDBPM
-/
-grant all on XDB.XDB$SCHEMA         to XDBPM
-/
-grant all on XDB.XDB$COMPLEX_TYPE   to XDBPM
-/
-grant all on XDB.XDB$ELEMENT        to XDBPM
-/
-grant all on XDB.XDB$ANY            to XDBPM
-/
-grant all on XDB.XDB$ATTRIBUTE      to XDBPM
-/
-grant all on XDB.XDB$ANYATTR        to XDBPM
-/
 set define on
 --
 @@&XDBPM_12100_PERMISSIONS

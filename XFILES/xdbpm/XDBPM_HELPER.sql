@@ -80,6 +80,36 @@ grant execute on DECODED_REFERENCE_T to public
 /
 set define on
 --
+var XDBPM_SYSDBA_HELPER VARCHAR2(120)
+--
+begin
+  select 'XDBPM_SYSDBA_HELPER.sql' 
+    into :XDBPM_SYSDBA_HELPER
+    from ALL_TAB_PRIVS
+   where TABLE_NAME = 'DBMS_SYSTEM'
+     and TABLE_SCHEMA = 'SYS'
+     and GRANTEE = 'SYSTEM';
+exception
+  when NO_DATA_FOUND then
+    :XDBPM_SYSDBA_HELPER := 'XDBPM_NO_SYSDBA_HELPER.sql';
+  when others then
+    RAISE;
+end;
+/
+undef XDBPM_SYSDBA_HELPER
+--
+column XDBPM_SYSDBA_HELPER new_value XDBPM_SYSDBA_HELPER
+--
+select :XDBPM_SYSDBA_HELPER XDBPM_SYSDBA_HELPER 
+  from dual
+/
+select '&XDBPM_SYSDBA_HELPER'
+  from DUAL
+/
+set define on
+--
+@@&XDBPM_SYSDBA_HELPER
+--
 create or replace package XDBPM_HELPER
 AUTHID DEFINER
 as
@@ -224,7 +254,7 @@ as
   V_TRACE_FILE_CONTENTS       CLOB;
 begin
   dbms_lob.createTemporary(V_TRACE_FILE_CONTENTS,TRUE,dbms_lob.session);
-	sys.dbms_system.KSDFLS;
+  XDBPM_SYSDBA_HELPER.flushTraceFile();
   V_TRACE_FILE_CONTENTS := xdb_utilities.getFileContent(getTraceFileHandle(P_SESSION_ID));
   return V_TRACE_FILE_CONTENTS;
 end;
@@ -239,76 +269,37 @@ end;
 procedure resetLobLocator(P_RESID RAW)
 is
 begin
-  update XDB.XDB$RESOURCE r
-     set r.XMLDATA.XMLLOB = empty_blob()
-   where OBJECT_ID = P_RESID
-     and r.XMLDATA.XMLLOB is null;
+  XDBPM_SYSDBA_HELPER.resetLobLocator(P_RESID);
 end;
 --
 procedure setBinaryContent(P_RESID RAW, P_SCHEMA_OID RAW, P_BINARY_ELEMENT_ID NUMBER)
 is
 begin
-  -- dbms_output.put_line('Creating Binary Content');
-  update XDB.XDB$RESOURCE r
-     set r.XMLDATA.XMLLOB = empty_blob(),
-         r.XMLDATA.SCHOID = P_SCHEMA_OID,
-         r.XMLDATA.ELNUM  = P_BINARY_ELEMENT_ID
-   where OBJECT_ID = P_RESID
-     and r.XMLDATA.XMLLOB is null;
+	XDBPM_SYSDBA_HELPER.setBinaryContent(P_RESID, P_SCHEMA_OID, P_BINARY_ELEMENT_ID);
 end;
 --
 procedure setTextContent(P_RESID RAW, P_SCHEMA_OID RAW, P_TEXT_ELEMENT_ID NUMBER)
 is
 begin
-  -- dbms_output.put_line('Creating Text Content');
-  update XDB.XDB$RESOURCE r
-     set r.XMLDATA.XMLLOB = empty_blob(),
-         r.XMLDATA.SCHOID = P_SCHEMA_OID,
-         r.XMLDATA.ELNUM  = P_TEXT_ELEMENT_ID
-   where OBJECT_ID = P_RESID
-     and r.XMLDATA.XMLLOB is null;
+	XDBPM_SYSDBA_HELPER.setTextContent(P_RESID, P_SCHEMA_OID, P_TEXT_ELEMENT_ID);
 end;
 --
 procedure setXMLContent(P_RESID RAW)
 is
 begin
-  -- dbms_output.put_line('Creating NSB XML Content');
-  update XDB.XDB$RESOURCE r
-     set r.XMLDATA.XMLLOB = empty_blob(),
-         r.XMLDATA.SCHOID = NULL,
-         r.XMLDATA.ELNUM  = NULL
-   where OBJECT_ID = P_RESID
-     and r.XMLDATA.XMLLOB is null;
+	XDBPM_SYSDBA_HELPER.setXMLContent(P_RESID);
 end;
 --
 procedure setXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE)
 is
 begin
-  -- dbms_output.put_line('Creating SB XML Content');
-  -- dbms_output.put_line('xdb_helper.setSBXMLContent() : P_RESID             = ' || P_RESID);
-  -- dbms_output.put_line('xdb_helper.setSBXMLContent() : P_XMLREF            = ' || P_XMLREF);
-  -- dbms_output.put_line('xdb_helper.setSBXMLContent() : P_SCHEMA_OID        = ' || P_SCHEMA_OID);
-  -- dbms_output.put_line('xdb_helper.setSBXMLContent() : P_GLOBAL_ELEMENT_ID = ' || P_GLOBAL_ELEMENT_ID);
-  update XDB.XDB$RESOURCE r
-     set r.XMLDATA.xmlref = P_XMLREF
-   where OBJECT_ID = P_RESID
-     and r.XMLDATA.XMLLOB is null;
+	XDBPM_SYSDBA_HELPER.setXMLContent(P_RESID, P_XMLREF);
 end;
 --
 procedure setSBXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE, P_SCHEMA_OID RAW, P_GLOBAL_ELEMENT_ID NUMBER)
 is
 begin
-  -- dbms_output.put_line('Creating SB XML Content');
-  -- dbms_output.put_line('xdb_helper.setSBXMLContent() : P_RESID             = ' || P_RESID);
-  -- dbms_output.put_line('xdb_helper.setSBXMLContent() : P_XMLREF            = ' || P_XMLREF);
-  -- dbms_output.put_line('xdb_helper.setSBXMLContent() : P_SCHEMA_OID        = ' || P_SCHEMA_OID);
-  -- dbms_output.put_line('xdb_helper.setSBXMLContent() : P_GLOBAL_ELEMENT_ID = ' || P_GLOBAL_ELEMENT_ID);
-  update XDB.XDB$RESOURCE r
-     set r.XMLDATA.xmlref = P_XMLREF,
-         r.XMLDATA.SCHOID = P_SCHEMA_OID,
-         r.XMLDATA.ELNUM  = P_GLOBAL_ELEMENT_ID
-   where OBJECT_ID = P_RESID
-     and r.XMLDATA.XMLLOB is null;
+	XDBPM_SYSDBA_HELPER.setSBXMLContent(P_RESID, P_XMLREF, P_SCHEMA_OID, P_GLOBAL_ELEMENT_ID);
 end;
 --
 function isCheckedOutByRESID(P_RESOID RAW)
@@ -325,16 +316,11 @@ exception
     return FALSE;
 end;
 --
-function getXMLReferenceByResID(P_RESOID RAW)
+function getXMLReferenceByResID(P_RESOID RAW) 
 return REF XMLType
 as
-  V_XMLREF REF XMLType;
 begin
-  select r.XMLDATA.XMLREF 
-    into V_XMLREF
-    from XDB.XDB$RESOURCE r 
-   where OBJECT_ID = P_RESOID;
-  return V_XMLREF;
+  return XDBPM_SYSDBA_HELPER.getXMLReferenceByResID(P_RESOID);
 end;
 --
 function getXMLReference(P_PATH VARCHAR2)
@@ -342,12 +328,7 @@ return REF XMLType
 as
   V_XMLREF REF XMLType;
 begin
-  select r.XMLDATA.XMLREF 
-    into V_XMLREF
-    from XDB.XDB$RESOURCE r, RESOURCE_VIEW
-   where RESID = OBJECT_ID
-     and equals_path(RES,P_PATH) = 1;
-  return V_XMLREF;
+	return XDBPM_SYSDBA_HELPER.getXMLReference(P_PATH); 
 end;
 --
 function decodeXMLReference(P_XMLREF REF XMLTYPE) 
@@ -403,33 +384,8 @@ begin
 	return;
 end;
 --
-procedure createTraceFileDirectory
---
--- Create a SQL Directory object pointing at the user trace directory. Enables access to Trace Files via the BFILE constructor.
---
-as
-  pragma autonomous_transaction;
-  V_USER_TRACE_LOCATION VARCHAR2(512);
-  V_STATEMENT           VARCHAR2(256);
-  V_DBNAME              VARCHAR2(256);
 begin
-$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN  
-  execute immediate 'select VALUE from SYS.V_$PARAMETER where NAME = ''user_dump_dest''' into V_USER_TRACE_LOCATION;
-$ELSIF DBMS_DB_VERSION.VER_LE_11_1 $THEN
-  execute immediate 'select VALUE from SYS.V_$PARAMETER where NAME = ''user_dump_dest''' into V_USER_TRACE_LOCATION;
-$ELSIF DBMS_DB_VERSION.VER_LE_11_2 $THEN
-  execute immediate 'select VALUE from SYS.V_$PARAMETER where NAME = ''user_dump_dest''' into V_USER_TRACE_LOCATION;
-$ELSE
-  execute immediate 'select VALUE from V$DIAG_INFO where NAME = ''Diag Trace''' into V_USER_TRACE_LOCATION;
-$END
-  dbms_output.put_line(V_USER_TRACE_LOCATION);
-  V_STATEMENT := 'create or replace directory ORACLE_TRACE_DIRECTORY as ''' || V_USER_TRACE_LOCATION || '''';
-  execute immediate V_STATEMENT;
-  rollback;
-end;
---
-begin
-	createTraceFileDirectory;
+	XDBPM_SYSDBA_HELPER.createTraceFileDirectory;
 $IF $$DEBUG $THEN
   XDB_OUTPUT.createTraceFile('/public/XDBPM_TRACE_FILE.log',TRUE);
 $END

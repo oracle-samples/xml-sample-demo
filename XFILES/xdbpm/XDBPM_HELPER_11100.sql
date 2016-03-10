@@ -84,8 +84,7 @@ begin
    
    V_NEW_OIDLIST := substr(V_OLD_OIDLIST,1,2) || V_OIDCNT_CHAR || V_NEW_OIDLIST;
    
-   update XDB.XDB$ROOT_INFO
-      set RCLIST = hexToRaw(V_NEW_OIDLIST);
+   XDBPM_SYSDBA_HELPER.updateRootInfoRCList(V_NEW_OIDLIST);
    
 end;
 --

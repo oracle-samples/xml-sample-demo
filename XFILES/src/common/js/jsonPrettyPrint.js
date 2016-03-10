@@ -204,11 +204,11 @@ function JSONPrettyPrinter() {
     expandedObject = document.createElement(containerType);
     objectContainer.appendChild(expandedObject);
     expandedObject.className = myContentModel;
-    // expandedObject.display = "inline-block";
+    // expandedObject.style.display = "inline-block";
   
     if (multilineLayout) {
       expandedObject.className = "complexContent";
-      expandedObject.display = "block";
+      expandedObject.style.display = "block";
     	// Add a collapsed object before the open object
     	collapsedObject = document.createElement("SPAN");
       objectContainer.insertBefore(collapsedObject,expandedObject);

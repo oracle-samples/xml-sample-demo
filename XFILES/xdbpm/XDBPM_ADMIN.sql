@@ -29,10 +29,10 @@ as
     FUNCTION DIGEST_AUTHENTICATION return number deterministic;
     FUNCTION CUSTOM_AUTHENTICATION return number deterministic;
     
-    PROCEDURE RESET_AUTHENTICATION(P_AUTHENTICATION NUMBER DEFAULT C_DIGEST_AUTHENTICATION);
-    procedure RELEASE_DAV_LOCKS;
-    procedure SET_DIGEST;
-    procedure SET_BASIC;
+    PROCEDURE resetAuthentication(P_AUTHENTICATION NUMBER DEFAULT C_DIGEST_AUTHENTICATION);
+    procedure releaseDavLocks;
+    procedure setDigest;
+    procedure setBasic;
  
 end;
 /
@@ -65,7 +65,7 @@ begin
   return C_CUSTOM_AUTHENTICATION;
 end;
 --
-PROCEDURE RESET_AUTHENTICATION(P_AUTHENTICATION NUMBER DEFAULT C_DIGEST_AUTHENTICATION)
+PROCEDURE resetAuthentication(P_AUTHENTICATION NUMBER DEFAULT C_DIGEST_AUTHENTICATION)
 as
   V_CONFIG  XMLTYPE := dbms_xdb.cfg_get();
   V_SNIPPET XMLTYPE;
@@ -134,25 +134,22 @@ begin
 
 end;
 --
-procedure RELEASE_DAV_LOCKS
+procedure releaseDavLocks
 as
 begin 
-    delete from XDB.XDB$NLOCKS;
-    update XDB.XDB$RESOURCE r
-    set r.XMLDATA.LOCKS = null
-    where r.XMLDATA.LOCKS is not null;
+    XDBPM_SYSDBA_HELPER.releaseDavLocks;
 end; 
 --
-procedure SET_DIGEST 
+procedure setDigest 
 as 
 begin
-	 RESET_AUTHENTICATION(DIGEST_AUTHENTICATION);
+	 resetAuthentication(DIGEST_AUTHENTICATION);
 end;
 --
-procedure SET_BASIC
+procedure setBasic
 as 
 begin
-	 RESET_AUTHENTICATION(BASIC_AUTHENTICATION);
+	 resetAuthentication(BASIC_AUTHENTICATION);
 end;
 --
 end;

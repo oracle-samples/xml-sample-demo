@@ -13,7 +13,6 @@
  * ================================================
  */
 
---
 alter session set current_schema = XDBPM
 /
 def RIGHTS=CURRENT_USER
@@ -24,18 +23,17 @@ def PACKAGE_PREFIX=XDB.DBMS_
 --
 @@XDBPM_XDBADMIN_PACKAGES.sql
 --
-grant XDBADMIN to package XDBPM_DBMS_XDB
+grant CREATE SESSION to XDBPM
 /
-grant XDBADMIN to package XDBPM_DBMS_XDB_VERSION
-/
-grant XDBADMIN to package XDBPM_DBMS_XDBRESOURCE
-/
-grant XDBADMIN to package XDBPM_DBMS_RESCONFIG
-/
-grant XDBADMIN to package XDBPM_RV_HELPER
-/
-grant XDBADMIN to package XDBPM_RESCONFIG_HELPER
-/
-grant XDBADMIN to package XDBPM_UTILITIES_PRIVATE
+alter user XDBPM identified by XDBPM account unlock
 /
 --
+host SQLPLUS XDBPM/XDBPM@&_CONNECT_IDENTIFIER @"&SCRIPT_LOCATION/XDBPM_GRANT_XDBADMIN.sql" 
+--
+alter user XDBPM identified by XDBPM account lock
+/
+revoke CREATE SESSION from XDBPM
+/
+--
+get &SCRIPT_LOCATION/XDBPM_GRANT_XDBADMIN.log
+.

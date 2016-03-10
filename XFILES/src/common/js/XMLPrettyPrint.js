@@ -247,7 +247,7 @@ function XMLPrettyPrinter() {
     var expandedCDATA = document.createElement('SPAN');
     cdataSection.appendChild(expandedCDATA);
     expandedCDATA.className = "complexContent";
-    expandedCDATA.display = "block";
+    expandedCDATA.style.display = "block";
 
     addToggleControl(expandedCDATA,'/XFILES/lib/icons/xml_visible_children.png','Hide Text');
 
@@ -417,11 +417,11 @@ function XMLPrettyPrinter() {
     expandedElement = document.createElement(containerType);
     elementContainer.appendChild(expandedElement);
     expandedElement.className = "simpleContent";
-    expandedElement.display = "inline-block";
+    expandedElement.style.display = "inline-block";
 
     if(!simpleContent && !mixedContent)  {
       expandedElement.className = "complexContent";
-      expandedElement.display = "block";
+      expandedElement.style.display = "block";
     	// Add a collapsed object before the open object
     	collapsedElement = document.createElement("SPAN");
       elementContainer.insertBefore(collapsedElement,expandedElement);
