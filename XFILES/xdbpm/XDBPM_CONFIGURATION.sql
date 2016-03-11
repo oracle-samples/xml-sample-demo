@@ -25,9 +25,6 @@ select d.NAME, p.VALUE "SERVICE_NAME", i.HOST_NAME, n.VALUE "DB_CHARACTERSET"
 /
 show errors
 --
-grant select on DATABASE_SUMMARY to public
-/
---
 create or replace package XDBPM_CONFIGURATION
 AUTHID CURRENT_USER
 as

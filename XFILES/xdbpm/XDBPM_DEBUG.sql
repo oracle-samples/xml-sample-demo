@@ -99,7 +99,7 @@ function getTraceFileContents
 return CLOB
 as
 begin
-	if (XDBPM_SYSDBA_HELPER.hasTraceFileAccess()) then
+	if (XDBPM_SYSDBA_INTERNAL.hasTraceFileAccess()) then
 	  return XDBPM_HELPER.getTraceFileContents();
 	else
 	  return getTraceFileFromView();
@@ -126,7 +126,7 @@ end;
 procedure writeToTraceFile(P_COMMENT VARCHAR2)
 as
 begin
-  XDBPM_SYSDBA_HELPER.writeToTraceFile(P_COMMENT);
+  XDBPM_SYSDBA_INTERNAL.writeToTraceFile(P_COMMENT);
 end;
 --  
 procedure writeMarker(P_MARKER VARCHAR2)
@@ -163,7 +163,7 @@ begin
 	  G_CURRENT_OFFSET := 1;
 	end if;
   execute immediate 'alter session set events =''19021 trace name context off''';
-  XDBPM_SYSDBA_HELPER.flushTraceFile();
+  XDBPM_SYSDBA_INTERNAL.flushTraceFile();
 
   V_TRACE_FILE := getTraceFileContents();
   V_TRACE_FILE_SIZE := DBMS_LOB.getLength(V_TRACE_FILE);

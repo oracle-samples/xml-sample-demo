@@ -366,19 +366,31 @@ end;
 procedure setBinaryContent(P_RESID RAW)
 is
 begin
-  XDBPM_INTERNAL.setBinaryContent(P_RESID);
+  XDBPM_SYSDBA_INTERNAL.setBinaryContent(P_RESID,XDBPM_RESOURCE_SCHEMA_INFO.RESOURCE_SCHEMA_OID,XDBPM_RESOURCE_SCHEMA_INFO.BINARY_ELEMENT_ID);
 end;
 --
 procedure setTextContent(P_RESID RAW)
 is
 begin
-  XDBPM_INTERNAL.setTextContent(P_RESID);
+  XDBPM_SYSDBA_INTERNAL.setTextContent(P_RESID,XDBPM_RESOURCE_SCHEMA_INFO.RESOURCE_SCHEMA_OID,XDBPM_RESOURCE_SCHEMA_INFO.BINARY_ELEMENT_ID);
 end;
 --
 procedure setXMLContent(P_RESID RAW)
 is
 begin
-  XDBPM_INTERNAL.setXMLContent(P_RESID);
+  XDBPM_SYSDBA_INTERNAL.setXMLContent(P_RESID);
+end;
+--
+procedure setXMLContent(P_RESID RAW,P_XML_REFERENCE REF XMLTYPE)
+as
+begin
+  XDBPM_SYSDBA_INTERNAL.setXMLContent(P_RESID ,P_XML_REFERENCE);
+end;
+--
+procedure setSBXMLContent(P_RESID RAW, P_XML_REFERENCE REF XMLTYPE)
+as
+begin
+	XDBPM_SYSDBA_INTERNAL.setSBXMLContent(P_RESID,P_XML_REFERENCE,G_TARGET_SCHEMA_OID,G_GLOBAL_ELEMENT_ID);        
 end;
 --
 procedure createPrinciples(P_XML_RESOURCE XMLType )
@@ -964,12 +976,12 @@ exception
   when NO_DATA_FOUND then
  	  if (P_SCHEMA_ELEMENT is not null) then
       getTargetSchemaInfo(P_SCHEMA_ELEMENT);
-      xdb_helper.setSBXMLContent(dbms_xdb.getRESOID(P_RESOURCE_PATH),P_XML_REFERENCE,G_TARGET_SCHEMA_OID,G_GLOBAL_ELEMENT_ID);        
+      setSBXMLContent(dbms_xdb.getRESOID(P_RESOURCE_PATH),P_XML_REFERENCE);        
     else
        --
        -- Resource was created using a REF XMLTYPE and the MAKEREF variant of DBMS_XDB.createResource
        --
-      xdb_helper.setXMLContent(dbms_xdb.getRESOID(P_RESOURCE_PATH),P_XML_REFERENCE);
+      setXMLContent(dbms_xdb.getRESOID(P_RESOURCE_PATH),P_XML_REFERENCE);
     end if;
     return 1;
 

@@ -17,13 +17,8 @@
 alter session set current_schema = XDBPM
 /
 --
-create or replace package XDBPM_SYSDBA_HELPER
+create or replace package XDBPM_SYSDBA_INTERNAL
 as
-  procedure writeToTraceFile(P_COMMENT VARCHAR2);
-  procedure flushTraceFile;
-
-  function getXMLReference(P_PATH VARCHAR2) return REF XMLType;
-  function getXMLReferenceByResID(P_RESOID RAW) return REF XMLType;
 
   procedure resetLobLocator(P_RESID RAW);
   procedure setBinaryContent(P_RESID RAW, P_SCHEMA_OID RAW, P_BINARY_ELEMENT_ID NUMBER);
@@ -33,18 +28,18 @@ as
   procedure setSBXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE, P_SCHEMA_OID RAW, P_GLOBAL_ELEMENT_ID NUMBER);
 
   procedure releaseDavLocks;
-  procedure updateRootInfoRCList(P_NEW_OIDLIST VARCHAR2);
-  
+  procedure updateRootInfoRCList(P_NEW_OIDLIST VARCHAR2);  
   procedure cleanupSchema(P_OWNER VARCHAR2);
   
   function hasTraceFileAccess return BOOLEAN;
-  procedure createTraceFileDirectory;
+  procedure writeToTraceFile(P_COMMENT VARCHAR2);
+  procedure flushTraceFile;
 
 end;
 /
 show errors
 --
-create or replace package body XDBPM_SYSDBA_HELPER
+create or replace package body XDBPM_SYSDBA_INTERNAL
 as
 --
   UNIMPLEMENTED_FEATURE EXCEPTION;
@@ -62,20 +57,6 @@ begin
   NULL;
 end;
 --  
-function getXMLReferenceByResID(P_RESOID RAW)
-return REF XMLType
-as
-begin
-  raise UNIMPLEMENTED_FEATURE;
-end;
---
-function getXMLReference(P_PATH VARCHAR2)
-return REF XMLType
-as
-begin
-  raise UNIMPLEMENTED_FEATURE;
-end;
---
 procedure resetLobLocator(P_RESID RAW)
 as
 begin
@@ -135,12 +116,6 @@ return BOOLEAN
 as
 begin
 	return FALSE;
-end;
---
-procedure createTraceFileDirectory
-as
-begin
-  raise UNIMPLEMENTED_FEATURE;
 end;
 --
 end;

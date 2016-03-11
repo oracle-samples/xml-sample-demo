@@ -14,25 +14,25 @@
  */
 
 --
--- XDBPM_INTERNAL should be created under XDBPM
+-- XDBPM_RESOURCE_SCHEMA_INFO should be created under XDBPM
 --
 alter session set current_schema = XDBPM
 /
-create or replace package XDBPM_INTERNAL
+create or replace package XDBPM_RESOURCE_SCHEMA_INFO
 authid CURRENT_USER
 as
   function hasBinaryContent(P_CONTENT_ID NUMBER) return BOOLEAN;
-  function hasTextContent(P_CONTENT_ID NUMBER) return BOOLEAN;
+  function hasTextContent(P_CONTENT_ID NUMBER) return BOOLEAN;  
 
-  procedure resetLobLocator(P_RESID RAW);
-  procedure setTextContent(P_RESID RAW);
-  procedure setBinaryContent(P_RESID RAW);
-  procedure setXMLContent(P_RESID RAW);
+  function RESOURCE_SCHEMA_OID return RAW;
+  function TEXT_ELEMENT_ID return NUMBER;
+  function BINARY_ELEMENT_ID return NUMBER;
+  
 end;
 /
 show errors
 --
-create or replace package body XDBPM_INTERNAL
+create or replace package body XDBPM_RESOURCE_SCHEMA_INFO
 as
 --
   G_RESOURCE_SCHEMA_OID RAW(16);
@@ -40,7 +40,7 @@ as
   G_BINARY_ELEMENT_ID   NUMBER(16);
   
 --
-procedure getResourceSchemaInfo
+procedure getSchemaInfo
 as
 begin
   select object_id,
@@ -77,32 +77,29 @@ begin
 	return (P_CONTENT_ID = G_TEXT_ELEMENT_ID);
 end;
 --
-procedure resetLobLocator(P_RESID RAW)
+function RESOURCE_SCHEMA_OID
+return RAW
 as
 begin
-  xdb_helper.resetLobLocator(P_RESID);
+  return G_RESOURCE_SCHEMA_OID;
 end;
 --
-procedure setBinaryContent(P_RESID RAW)
+function TEXT_ELEMENT_ID 
+return NUMBER
 as
 begin
-  xdb_helper.setBinaryContent(P_RESID, G_RESOURCE_SCHEMA_OID, G_BINARY_ELEMENT_ID);
+  return G_TEXT_ELEMENT_ID;
 end;
 --
-procedure setTextContent(P_RESID RAW)
+function BINARY_ELEMENT_ID 
+return NUMBER
 as
 begin
-  xdb_helper.setTextContent(P_RESID, G_RESOURCE_SCHEMA_OID, G_TEXT_ELEMENT_ID);
-end;
---
-procedure setXMLContent(P_RESID RAW)
-as
-begin
-  xdb_helper.setXMLContent(P_RESID);
+  return G_BINARY_ELEMENT_ID;
 end;
 --
 begin
-  getResourceSchemaInfo;
+	getSchemaInfo();
 end;
 /
 show errors

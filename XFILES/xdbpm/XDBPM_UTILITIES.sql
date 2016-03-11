@@ -1155,7 +1155,7 @@ $END
     end if;
   else
 		if (V_LOB_LOCATOR is NULL) then    
-      XDBPM_INTERNAL.resetLobLocator(V_RESID);
+      XDBPM_SYSDBA_INTERNAL.resetLobLocator(V_RESID);
     end if;
 
     update RESOURCE_VIEW

@@ -121,7 +121,7 @@ end;
 procedure cleanupSchema(P_OWNER VARCHAR2)
 as
 begin
-	XDBPM_SYSDBA_HELPER.cleanupSchema(P_OWNER);
+	XDBPM_SYSDBA_INTERNAL.cleanupSchema(P_OWNER);
 end;
 --
 function processNestedTable(currentLevel in out number, currentNode in out XMLType, query SYS_REFCURSOR)

@@ -137,7 +137,7 @@ end;
 procedure releaseDavLocks
 as
 begin 
-    XDBPM_SYSDBA_HELPER.releaseDavLocks;
+    XDBPM_SYSDBA_INTERNAL.releaseDavLocks;
 end; 
 --
 procedure setDigest 

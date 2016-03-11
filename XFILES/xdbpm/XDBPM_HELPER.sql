@@ -80,40 +80,40 @@ grant execute on DECODED_REFERENCE_T to public
 /
 set define on
 --
-var XDBPM_SYSDBA_HELPER VARCHAR2(120)
+var XDBPM_SYSDBA_INTERNAL VARCHAR2(120)
 --
 begin
-  select 'XDBPM_SYSDBA_HELPER.sql' 
-    into :XDBPM_SYSDBA_HELPER
+  select 'XDBPM_SYSDBA_SYSDBA.sql' 
+    into :XDBPM_SYSDBA_INTERNAL
     from ALL_TAB_PRIVS
    where TABLE_NAME = 'DBMS_SYSTEM'
      and TABLE_SCHEMA = 'SYS'
      and GRANTEE = 'SYSTEM';
 exception
   when NO_DATA_FOUND then
-    :XDBPM_SYSDBA_HELPER := 'XDBPM_NO_SYSDBA_HELPER.sql';
+    :XDBPM_SYSDBA_INTERNAL := 'XDBPM_SYSDBA_DBAONLY.sql';
   when others then
     RAISE;
 end;
 /
-undef XDBPM_SYSDBA_HELPER
+undef XDBPM_SYSDBA_INTERNAL
 --
-column XDBPM_SYSDBA_HELPER new_value XDBPM_SYSDBA_HELPER
+column XDBPM_SYSDBA_INTERNAL new_value XDBPM_SYSDBA_INTERNAL
 --
-select :XDBPM_SYSDBA_HELPER XDBPM_SYSDBA_HELPER 
+select :XDBPM_SYSDBA_INTERNAL XDBPM_SYSDBA_INTERNAL 
   from dual
 /
-select '&XDBPM_SYSDBA_HELPER'
+select '&XDBPM_SYSDBA_INTERNAL'
   from DUAL
 /
 set define on
 --
-@@&XDBPM_SYSDBA_HELPER
+@@&XDBPM_SYSDBA_INTERNAL
 --
 create or replace package XDBPM_HELPER
 AUTHID DEFINER
 as
-
+--
   TYPE RESOURCE_EXPORT_ROW_T
   is record (
      RESID           RAW(16),
@@ -154,13 +154,6 @@ as
   function getTraceFileContents return CLOB;
   function getTraceFileContents(P_SESSION_ID NUMBER) return CLOB;
     
-  procedure resetLobLocator(P_RESID RAW);
-  procedure setBinaryContent(P_RESID RAW, P_SCHEMA_OID RAW, P_BINARY_ELEMENT_ID NUMBER);
-  procedure setTextContent(P_RESID RAW, P_SCHEMA_OID RAW, P_TEXT_ELEMENT_ID NUMBER);
-  procedure setXMLContent(P_RESID RAW);
-  procedure setXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE);
-  procedure setSBXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE, P_SCHEMA_OID RAW, P_GLOBAL_ELEMENT_ID NUMBER);
-
   function getVersionDetails(P_RESID RAW) return RESOURCE_EXPORT_TABLE_T pipelined;      
 --    
 end XDBPM_HELPER;
@@ -254,7 +247,7 @@ as
   V_TRACE_FILE_CONTENTS       CLOB;
 begin
   dbms_lob.createTemporary(V_TRACE_FILE_CONTENTS,TRUE,dbms_lob.session);
-  XDBPM_SYSDBA_HELPER.flushTraceFile();
+  XDBPM_SYSDBA_INTERNAL.flushTraceFile();
   V_TRACE_FILE_CONTENTS := xdb_utilities.getFileContent(getTraceFileHandle(P_SESSION_ID));
   return V_TRACE_FILE_CONTENTS;
 end;
@@ -264,42 +257,6 @@ return CLOB
 as
 begin
 	return getTraceFileContents(getSessionId());
-end;
---
-procedure resetLobLocator(P_RESID RAW)
-is
-begin
-  XDBPM_SYSDBA_HELPER.resetLobLocator(P_RESID);
-end;
---
-procedure setBinaryContent(P_RESID RAW, P_SCHEMA_OID RAW, P_BINARY_ELEMENT_ID NUMBER)
-is
-begin
-	XDBPM_SYSDBA_HELPER.setBinaryContent(P_RESID, P_SCHEMA_OID, P_BINARY_ELEMENT_ID);
-end;
---
-procedure setTextContent(P_RESID RAW, P_SCHEMA_OID RAW, P_TEXT_ELEMENT_ID NUMBER)
-is
-begin
-	XDBPM_SYSDBA_HELPER.setTextContent(P_RESID, P_SCHEMA_OID, P_TEXT_ELEMENT_ID);
-end;
---
-procedure setXMLContent(P_RESID RAW)
-is
-begin
-	XDBPM_SYSDBA_HELPER.setXMLContent(P_RESID);
-end;
---
-procedure setXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE)
-is
-begin
-	XDBPM_SYSDBA_HELPER.setXMLContent(P_RESID, P_XMLREF);
-end;
---
-procedure setSBXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE, P_SCHEMA_OID RAW, P_GLOBAL_ELEMENT_ID NUMBER)
-is
-begin
-	XDBPM_SYSDBA_HELPER.setSBXMLContent(P_RESID, P_XMLREF, P_SCHEMA_OID, P_GLOBAL_ELEMENT_ID);
 end;
 --
 function isCheckedOutByRESID(P_RESOID RAW)
@@ -316,11 +273,16 @@ exception
     return FALSE;
 end;
 --
-function getXMLReferenceByResID(P_RESOID RAW) 
+function getXMLReferenceByResID(P_RESOID RAW)
 return REF XMLType
 as
+  V_XMLREF REF XMLType;
 begin
-  return XDBPM_SYSDBA_HELPER.getXMLReferenceByResID(P_RESOID);
+  select r.XMLDATA.XMLREF 
+    into V_XMLREF
+    from XDB.XDB$RESOURCE r 
+   where OBJECT_ID = P_RESOID;
+  return V_XMLREF;
 end;
 --
 function getXMLReference(P_PATH VARCHAR2)
@@ -328,7 +290,12 @@ return REF XMLType
 as
   V_XMLREF REF XMLType;
 begin
-	return XDBPM_SYSDBA_HELPER.getXMLReference(P_PATH); 
+  select r.XMLDATA.XMLREF 
+    into V_XMLREF
+    from XDB.XDB$RESOURCE r, RESOURCE_VIEW
+   where RESID = OBJECT_ID
+     and equals_path(RES,P_PATH) = 1;
+  return V_XMLREF;
 end;
 --
 function decodeXMLReference(P_XMLREF REF XMLTYPE) 
@@ -384,8 +351,35 @@ begin
 	return;
 end;
 --
+procedure createTraceFileDirectory
+--
+-- Create a SQL Directory object pointing at the user trace directory. Enables access to Trace Files via the BFILE constructor.
+--
+as
+  pragma autonomous_transaction;
+  V_USER_TRACE_LOCATION VARCHAR2(512);
+  V_STATEMENT           VARCHAR2(256);
+  V_DBNAME              VARCHAR2(256);
 begin
-	XDBPM_SYSDBA_HELPER.createTraceFileDirectory;
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN  
+  execute immediate 'select VALUE from SYS.V_$PARAMETER where NAME = ''user_dump_dest''' into V_USER_TRACE_LOCATION;
+$ELSIF DBMS_DB_VERSION.VER_LE_11_1 $THEN
+  execute immediate 'select VALUE from SYS.V_$PARAMETER where NAME = ''user_dump_dest''' into V_USER_TRACE_LOCATION;
+$ELSIF DBMS_DB_VERSION.VER_LE_11_2 $THEN
+  execute immediate 'select VALUE from SYS.V_$PARAMETER where NAME = ''user_dump_dest''' into V_USER_TRACE_LOCATION;
+$ELSE
+  execute immediate 'select VALUE from V$DIAG_INFO where NAME = ''Diag Trace''' into V_USER_TRACE_LOCATION;
+$END
+  dbms_output.put_line(V_USER_TRACE_LOCATION);
+  V_STATEMENT := 'create or replace directory ORACLE_TRACE_DIRECTORY as ''' || V_USER_TRACE_LOCATION || '''';
+  execute immediate V_STATEMENT;
+  rollback;
+end;
+--
+begin
+	if (XDBPM_SYSDBA_INTERNAL.hasTraceFileAccess) then
+	  createTraceFileDirectory();
+	end if;
 $IF $$DEBUG $THEN
   XDB_OUTPUT.createTraceFile('/public/XDBPM_TRACE_FILE.log',TRUE);
 $END
@@ -436,7 +430,7 @@ end;
 begin
 	NULL;
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.createTraceFile('/public/XDBPM_TRACE_FILE.log',TRUE);
+  XDB_OUTPUT.createTraceFile('/public/XDBPM_PACKAGE_TRACE.log',TRUE);
 $END
 end;
 /

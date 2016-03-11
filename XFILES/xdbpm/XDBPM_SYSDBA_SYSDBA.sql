@@ -42,21 +42,15 @@ grant update on XDB.XDB$RESOURCE       to XDBPM
 /
 grant delete on XDB.XDB$NLOCKS         to XDBPM
 /
--- grant all on XDB.XDB$CHECKOUTS      to XDBPM
--- /
 grant update on XDB.XDB$ROOT_INFO      to XDBPM
 /
-create or replace package XDBPM_SYSDBA_HELPER
+create or replace package XDBPM_SYSDBA_INTERNAL
+authid DEFINER
 as
   C_WRITE_TO_TRACE_FILE constant binary_integer := 1;
 
-  procedure writeToTraceFile(P_COMMENT VARCHAR2);
-  procedure flushTraceFile;
-
-  function getXMLReference(P_PATH VARCHAR2) return REF XMLType;
-  function getXMLReferenceByResID(P_RESOID RAW) return REF XMLType;
-  
   procedure resetLobLocator(P_RESID RAW);
+  
   procedure setBinaryContent(P_RESID RAW, P_SCHEMA_OID RAW, P_BINARY_ELEMENT_ID NUMBER);
   procedure setTextContent(P_RESID RAW, P_SCHEMA_OID RAW, P_TEXT_ELEMENT_ID NUMBER);
   procedure setXMLContent(P_RESID RAW);
@@ -69,13 +63,14 @@ as
   procedure cleanupSchema(P_OWNER VARCHAR2);
   
   function hasTraceFileAccess return BOOLEAN;
-  procedure createTraceFileDirectory;
+  procedure writeToTraceFile(P_COMMENT VARCHAR2);
+  procedure flushTraceFile;
 
 end;
 /
 show errors
 --
-create or replace package body XDBPM_SYSDBA_HELPER
+create or replace package body XDBPM_SYSDBA_INTERNAL
 as
 --
 procedure flushTraceFile
@@ -91,32 +86,10 @@ begin
   sys.dbms_system.KSDFLS();
 end;
 --  
-function getXMLReferenceByResID(P_RESOID RAW)
-return REF XMLType
-as
-  V_XMLREF REF XMLType;
-begin
-  select r.XMLDATA.XMLREF 
-    into V_XMLREF
-    from XDB.XDB$RESOURCE r 
-   where OBJECT_ID = P_RESOID;
-  return V_XMLREF;
-end;
---
-function getXMLReference(P_PATH VARCHAR2)
-return REF XMLType
-as
-  V_XMLREF REF XMLType;
-begin
-  select r.XMLDATA.XMLREF 
-    into V_XMLREF
-    from XDB.XDB$RESOURCE r, RESOURCE_VIEW
-   where RESID = OBJECT_ID
-     and equals_path(RES,P_PATH) = 1;
-  return V_XMLREF;
-end;
---
 procedure resetLobLocator(P_RESID RAW)
+--
+-- Used by XDB_UTILTIES.updateContent() if it detects that the LOB Locator is NULL when updating a resource.
+--
 is
 begin
   update XDB.XDB$RESOURCE r
@@ -126,6 +99,9 @@ begin
 end;
 --
 procedure setBinaryContent(P_RESID RAW, P_SCHEMA_OID RAW, P_BINARY_ELEMENT_ID NUMBER)
+--
+-- Used by XDBPM_IMPORT_UTILITIES
+--
 is
 begin
   update XDB.XDB$RESOURCE r
@@ -137,6 +113,9 @@ begin
 end;
 --
 procedure setTextContent(P_RESID RAW, P_SCHEMA_OID RAW, P_TEXT_ELEMENT_ID NUMBER)
+--
+-- Used by XDBPM_IMPORT_UTILITIES
+--
 is
 begin
   update XDB.XDB$RESOURCE r
@@ -148,6 +127,9 @@ begin
 end;
 --
 procedure setXMLContent(P_RESID RAW)
+--
+-- Used by XDBPM_IMPORT_UTILITIES
+--
 is
 begin
   update XDB.XDB$RESOURCE r
@@ -159,6 +141,9 @@ begin
 end;
 --
 procedure setXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE)
+--
+-- Used by XDBPM_IMPORT_UTILITIES
+--
 is
 begin
   update XDB.XDB$RESOURCE r
@@ -168,6 +153,9 @@ begin
 end;
 --
 procedure setSBXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE, P_SCHEMA_OID RAW, P_GLOBAL_ELEMENT_ID NUMBER)
+--
+-- Used by XDBPM_IMPORT_UTILITIES
+--
 is
 begin
   update XDB.XDB$RESOURCE r
@@ -287,31 +275,6 @@ return BOOLEAN
 as
 begin
 	return TRUE;
-end;
---
-procedure createTraceFileDirectory
---
--- Create a SQL Directory object pointing at the user trace directory. Enables access to Trace Files via the BFILE constructor.
---
-as
-  pragma autonomous_transaction;
-  V_USER_TRACE_LOCATION VARCHAR2(512);
-  V_STATEMENT           VARCHAR2(256);
-  V_DBNAME              VARCHAR2(256);
-begin
-$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN  
-  execute immediate 'select VALUE from SYS.V_$PARAMETER where NAME = ''user_dump_dest''' into V_USER_TRACE_LOCATION;
-$ELSIF DBMS_DB_VERSION.VER_LE_11_1 $THEN
-  execute immediate 'select VALUE from SYS.V_$PARAMETER where NAME = ''user_dump_dest''' into V_USER_TRACE_LOCATION;
-$ELSIF DBMS_DB_VERSION.VER_LE_11_2 $THEN
-  execute immediate 'select VALUE from SYS.V_$PARAMETER where NAME = ''user_dump_dest''' into V_USER_TRACE_LOCATION;
-$ELSE
-  execute immediate 'select VALUE from V$DIAG_INFO where NAME = ''Diag Trace''' into V_USER_TRACE_LOCATION;
-$END
-  dbms_output.put_line(V_USER_TRACE_LOCATION);
-  V_STATEMENT := 'create or replace directory ORACLE_TRACE_DIRECTORY as ''' || V_USER_TRACE_LOCATION || '''';
-  execute immediate V_STATEMENT;
-  rollback;
 end;
 --
 end;
