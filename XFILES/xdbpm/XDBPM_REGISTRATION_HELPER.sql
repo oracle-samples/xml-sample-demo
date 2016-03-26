@@ -18,8 +18,6 @@
 --
 alter session set current_schema = XDBPM
 /
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 --
 set define on
 --
@@ -328,8 +326,6 @@ end XDBPM_REGISTRATION_HELPER;
 /
 show errors
 --
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 alter SESSION SET CURRENT_SCHEMA = SYS
 /
 --

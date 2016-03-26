@@ -21,6 +21,7 @@
 */
 
 --
+--
 create or replace package XDBPM_RV_HELPER
 AUTHID &RIGHTS
 as
@@ -200,7 +201,8 @@ as
   procedure createHomeFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
   procedure createPublicFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
   procedure setPublicIndexPageContent(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
-  procedure createDebugFolders(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
+  
+  procedure createDebugFolders(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME); 
 end;
 /
 show errors
@@ -212,16 +214,18 @@ set define off
 create or replace package body XDBPM_UTILITIES_PRIVATE
 as
 --
-$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
-procedure doChangeOwner(P_RESOURCE_PATH VARCHAR2, P_NEW_OWNER VARCHAR2)
+procedure changeOwnerInternal(P_RESOURCE_PATH VARCHAR2, P_NEW_OWNER VARCHAR2)
 as
   res BOOLEAN;
 begin
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
   update resource_view
          set res = updateXml(res,'/Resource/Owner/text()',P_NEW_OWNER)
   where equals_path(res,P_RESOURCE_PATH) = 1;
-end;
+$ELSE
+  XDBPM_DBMS_XDB.changeOwner(P_RESOURCE_PATH,P_NEW_OWNER,TRUE);
 $END
+end;
 procedure changeOwner(P_RESOURCE_PATH VARCHAR2, P_OWNER VARCHAR2, P_RECURSIVE BOOLEAN default false)
 as
 
@@ -248,35 +252,25 @@ as
    V_NEW_RESOURCE_ID RAW(16);
 begin
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('XDBPM_UTILITIES_PRIVATE.changeOwner() : Processing ' || P_RESOURCE_PATH);
-  XDB_OUTPUT.writeTraceFileEntry('XDBPM_UTILITIES_PRIVATE.changeOwner() : Recursive ' || XDBPM_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_RECURSIVE));
-  XDB_OUTPUT.flushTraceFile();
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.changeOwner(): Processing ' || P_RESOURCE_PATH);
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.changeOwner(): Recursive ' || XDBPM_DOM_UTILITIES.BOOLEAN_TO_VARCHAR(P_RECURSIVE));
 $END
 
   for d in getTargetDocument loop
 $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeTraceFileEntry('XDBPM_UTILITIES_PRIVATE.changeOwner() : Versioned ' || d.IS_VERSIONED);
-    XDB_OUTPUT.writeTraceFileEntry('XDBPM_UTILITIES_PRIVATE.changeOwner() : Folder ' || d.IS_FOLDER);
-    XDB_OUTPUT.flushTraceFile();
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.changeOwner(): Versioned ' || d.IS_VERSIONED);
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.changeOwner(): Folder ' || d.IS_FOLDER);
 $END
     V_IS_FOLDER := d.IS_FOLDER = 1;
     if (d.IS_VERSIONED = 0) then
-$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
-      doChangeOwner(P_RESOURCE_PATH,P_OWNER);
-$ELSE
-      XDBPM_DBMS_XDB.changeOwner(P_RESOURCE_PATH,P_OWNER);
-$END
+      changeOwnerInternal(P_RESOURCE_PATH,P_OWNER);
       commit;
     else
       V_IS_CHECKED_OUT := XDBPM_DBMS_XDB_VERSION.isCheckedOut(P_RESOURCE_PATH);
       if (not V_IS_CHECKED_OUT) then
         XDBPM_DBMS_XDB_VERSION.checkout(P_RESOURCE_PATH);
       end if;
-$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
-      doChangeOwner(P_RESOURCE_PATH,P_OWNER);
-$ELSE
-      XDBPM_DBMS_XDB.changeOwner(P_RESOURCE_PATH,P_OWNER);
-$END
+      changeOwnerInternal(P_RESOURCE_PATH,P_OWNER);
       commit;
       if (not V_IS_CHECKED_OUT) then
         V_NEW_RESOURCE_ID  := XDBPM_DBMS_XDB_VERSION.checkin(P_RESOURCE_PATH);
@@ -286,30 +280,21 @@ $END
     
   if (V_IS_FOLDER and P_RECURSIVE) then
 $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeTraceFileEntry('XDBPM_UTILITIES_PRIVATE.changeOwner() : Processing Children ');
-    XDB_OUTPUT.flushTraceFile();
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.changeOwner(): Processing Children ');
 $END
 
     for c in findChildren loop
       -- xdb_debug.writeDebug('XDBPM_HELPER.changeOwner() : Processing ' || c.ANY_PATH);
       -- dbms_output.put_line('XDBPM_HELPER.changeOwner() : Processing ' || c.ANY_PATH);
       if (c.IS_VERSIONED = 0) then
-$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
-        doChangeOwner(c.ANY_PATH,P_OWNER);
-$ELSE
-        XDBPM_DBMS_XDB.changeOwner(c.ANY_PATH,P_OWNER);
-$END
+        changeOwnerInternal(P_RESOURCE_PATH,P_OWNER);
         commit;
       else
         V_IS_CHECKED_OUT := XDBPM_DBMS_XDB_VERSION.isCheckedOut(c.ANY_PATH);
         if (not V_IS_CHECKED_OUT) then
           XDBPM_DBMS_XDB_VERSION.checkout(c.ANY_PATH);
         end if;
-$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
-        doChangeOwner(c.ANY_PATH,P_OWNER);
-$ELSE
-        XDBPM_DBMS_XDB.changeOwner(c.ANY_PATH,P_OWNER);
-$END
+
         commit;
         if (not V_IS_CHECKED_OUT) then
           V_NEW_RESOURCE_ID  := XDBPM_DBMS_XDB_VERSION.checkin(c.ANY_PATH);
@@ -373,18 +358,80 @@ end;
 --  
 $END
 --
+procedure createLoggingFolders(P_PRINCIPLE VARCHAR2)
+as
+  V_TARGET_FOLDER VARCHAR2(700);
+begin
+  --
+  -- Check User's Logging Folders
+  -- Create if Necessary otherwise check owner and acl.
+  -- Ensure the Logging Folders are protected with the ALL to Owner / Nothing to Others ACL
+  --
+
+	-- Logging Folder
+	
+	V_TARGET_FOLDER := XDBPM_CONSTANTS.FOLDER_USER_LOGGING(P_PRINCIPLE);
+
+  if (not XDBPM_DBMS_XDB.existsResource(V_TARGET_FOLDER)) then
+    createFolder(V_TARGET_FOLDER,P_PRINCIPLE,XDBPM_CONSTANTS.ACL_ALL_OWNER);
+    setComment(V_TARGET_FOLDER,'Debug and Trace files for user : ' || P_PRINCIPLE);
+  end if;
+
+  XDBPM_DBMS_XDB.setAcl(V_TARGET_FOLDER,XDBPM_CONSTANTS.ACL_ALL_OWNER);
+  commit;
+  
+  --
+  -- Debug Folder
+  --
+
+	V_TARGET_FOLDER := XDBPM_CONSTANTS.FOLDER_USER_DEBUG(P_PRINCIPLE);
+  
+  if (not XDBPM_DBMS_XDB.existsResource(V_TARGET_FOLDER)) then
+    createFolder(V_TARGET_FOLDER,P_PRINCIPLE,XDBPM_CONSTANTS.ACL_ALL_OWNER);
+    setComment(V_TARGET_FOLDER,'Debugging files for user : ' || P_PRINCIPLE);
+  end if;
+
+  XDBPM_DBMS_XDB.setAcl(V_TARGET_FOLDER,XDBPM_CONSTANTS.ACL_ALL_OWNER);
+  commit;
+
+  --
+  -- Trace Folder if necessary
+  --
+
+	V_TARGET_FOLDER := XDBPM_CONSTANTS.FOLDER_USER_TRACE(P_PRINCIPLE);
+  
+  if (not XDBPM_DBMS_XDB.existsResource(V_TARGET_FOLDER)) then
+    createFolder(V_TARGET_FOLDER,P_PRINCIPLE,XDBPM_CONSTANTS.ACL_ALL_OWNER);
+    setComment(V_TARGET_FOLDER,'Debugging files for user : ' || P_PRINCIPLE);
+  end if;
+  
+  XDBPM_DBMS_XDB.setAcl(V_TARGET_FOLDER,XDBPM_CONSTANTS.ACL_ALL_OWNER);
+  commit;
+
+  -- Ensure Ownership of all Logging Folders.
+  
+	V_TARGET_FOLDER := XDBPM_CONSTANTS.FOLDER_USER_LOGGING(P_PRINCIPLE);
+  changeOwner(V_TARGET_FOLDER,P_PRINCIPLE,TRUE);
+  commit;
+end;
+--
 procedure createHomeFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
 as
-  V_PRINCIPLE_NAME   VARCHAR2(32) := upper(P_PRINCIPLE);
-  V_TARGET_FOLDER    VARCHAR2(700) := XDB_CONSTANTS.FOLDER_HOME || '/'  || V_PRINCIPLE_NAME;
+  V_PRINCIPLE   VARCHAR2(32) := upper(P_PRINCIPLE);
+  V_TARGET_FOLDER    VARCHAR2(700) := XDB_CONSTANTS.FOLDER_USER_HOME(P_PRINCIPLE);
   V_RESULT           BOOLEAN;
 begin
-    
   --
   -- Create the Global Home Folder if necessary
   --
+$IF $$DEBUG $THEN
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.createHomeFolder() : Principle "' || V_PRINCIPLE ||'".');
+$END
 
   if (not XDBPM_DBMS_XDB.existsResource(XDB_CONSTANTS.FOLDER_HOME)) then
+$IF $$DEBUG $THEN
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.createHomeFolder() : Creating Folder "' || XDB_CONSTANTS.FOLDER_HOME ||'".');
+$END
     createFolder(XDB_CONSTANTS.FOLDER_HOME,'SYS','/sys/acls/bootstrap_acl.xml');
     setComment(XDB_CONSTANTS.FOLDER_HOME,'Container for all home folders.');
   end if;
@@ -394,22 +441,32 @@ begin
   --
 
   if (not XDBPM_DBMS_XDB.existsResource(V_TARGET_FOLDER)) then
-    createFolder(V_TARGET_FOLDER,V_PRINCIPLE_NAME,'/sys/acls/all_owner_acl.xml');
-    setComment(V_TARGET_FOLDER,'Home folder for user : ' || V_PRINCIPLE_NAME);
+$IF $$DEBUG $THEN
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.createHomeFolder() : Creating Folder "' || V_TARGET_FOLDER ||'".');
+$END
+    createFolder(V_TARGET_FOLDER,V_PRINCIPLE,XDBPM_CONSTANTS.ACL_ALL_OWNER);
+    setComment(V_TARGET_FOLDER,'Home folder for user : ' || V_PRINCIPLE);
   end if;
+
   
   --
   -- Ensure the User's Home Folder is protected with the ALL to Owner / Nothing to Others ACL
   --
 
-  XDBPM_DBMS_XDB.setAcl(V_TARGET_FOLDER,'/sys/acls/all_owner_acl.xml');
+$IF $$DEBUG $THEN
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.createHomeFolder() : Setting ACL.');
+$END
+  XDBPM_DBMS_XDB.setAcl(V_TARGET_FOLDER,XDBPM_CONSTANTS.ACL_ALL_OWNER);
 
+  createLoggingFolders(V_PRINCIPLE);
   --
   -- Ensure the User owns their Home folder and all of its content
   --
 
-  -- dbms_output.put_line('createHomeFolder() : Changing ownership of all documents contained ' || V_TARGET_FOLDER);
-  changeOwner(V_TARGET_FOLDER, V_PRINCIPLE_NAME, true);
+$IF $$DEBUG $THEN
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.createHomeFolder() : Setting owner "' || V_PRINCIPLE || '".');
+$END
+  changeOwner(V_TARGET_FOLDER, V_PRINCIPLE, true);
   
 end;
 --
@@ -473,11 +530,11 @@ end;
 --
 procedure createPublicFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
 as
-  V_PRINCIPLE_NAME    VARCHAR2(32)  := upper(P_PRINCIPLE);
-  V_HOME_FOLDER       VARCHAR2(700) := XDB_CONSTANTS.FOLDER_HOME || '/'  || V_PRINCIPLE_NAME;
+  V_PRINCIPLE    VARCHAR2(32)  := upper(P_PRINCIPLE);
+  V_HOME_FOLDER       VARCHAR2(700) := XDB_CONSTANTS.FOLDER_HOME || '/'  || V_PRINCIPLE;
   V_PUBLIC_FOLDER     VARCHAR2(700) := V_HOME_FOLDER || '/publishedContent';
-  V_PUBLIC_URL        VARCHAR2(700) := '/XFILES/' || V_PRINCIPLE_NAME;
-  V_PUBLISHED_FOLDER  VARCHAR2(700) := XDB_CONSTANTS.FOLDER_PUBLIC || '/'  || V_PRINCIPLE_NAME;
+  V_PUBLIC_URL        VARCHAR2(700) := '/XFILES/' || V_PRINCIPLE;
+  V_PUBLISHED_FOLDER  VARCHAR2(700) := XDB_CONSTANTS.FOLDER_PUBLIC || '/'  || V_PRINCIPLE;
   V_INDEX_PAGE        VARCHAR2(700) := V_PUBLIC_FOLDER || '/index.html';
   V_RESULT            BOOLEAN;
   V_INDEX_PAGE_XHTML  CLOB; 
@@ -486,7 +543,7 @@ begin
   -- Ensure the user has a home folder.
 
   if not XDBPM_DBMS_XDB.existsResource(V_HOME_FOLDER) then
-    createHomeFolder(V_PRINCIPLE_NAME); 
+    createHomeFolder(V_PRINCIPLE); 
   end if;
   
   --
@@ -501,8 +558,8 @@ begin
   -- Create a 'Public' folder for the specified user
    
   if (not XDBPM_DBMS_XDB.existsResource(V_PUBLIC_FOLDER)) then
-    createFolder(V_PUBLIC_FOLDER,V_PRINCIPLE_NAME,'/sys/acls/bootstrap_acl.xml');
-    setComment(V_PUBLIC_FOLDER,'Public folder for user : ' || V_PRINCIPLE_NAME);
+    createFolder(V_PUBLIC_FOLDER,V_PRINCIPLE,'/sys/acls/bootstrap_acl.xml');
+    setComment(V_PUBLIC_FOLDER,'Public folder for user : ' || V_PRINCIPLE);
   end if;
 
   --
@@ -517,13 +574,13 @@ begin
     XDBPM_DBMS_XDB.deleteResource(V_INDEX_PAGE,DBMS_XDB.DELETE_RECURSIVE_FORCE);
   end if;
  
-  V_RESULT := XDBPM_DBMS_XDB.createResource(V_INDEX_PAGE,getPublicIndexPageContent(V_PRINCIPLE_NAME));
+  V_RESULT := XDBPM_DBMS_XDB.createResource(V_INDEX_PAGE,getPublicIndexPageContent(V_PRINCIPLE));
 
   --
   -- Ensure the User owns their Public folder and all of its content
   --
 
-  changeOwner(V_PUBLIC_FOLDER, V_PRINCIPLE_NAME, true);
+  changeOwner(V_PUBLIC_FOLDER, V_PRINCIPLE, true);
 
   -- Publish the public Folder 
   
@@ -531,7 +588,7 @@ begin
     XDBPM_DBMS_XDB.deleteResource(V_PUBLISHED_FOLDER,DBMS_XDB.DELETE_RECURSIVE_FORCE);
   end if;
  
-  XDBPM_DBMS_XDB.link(V_PUBLIC_FOLDER,XDB_CONSTANTS.FOLDER_PUBLIC,V_PRINCIPLE_NAME);
+  XDBPM_DBMS_XDB.link(V_PUBLIC_FOLDER,XDB_CONSTANTS.FOLDER_PUBLIC,V_PRINCIPLE);
 
 end;
 --
@@ -553,54 +610,19 @@ end;
 --
 procedure createDebugFolders(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
 as
-  V_PRINCIPLE_NAME   VARCHAR2(32) := upper(P_PRINCIPLE);
-  V_DEBUG_FOLDER     VARCHAR2(700) := XDB_CONSTANTS.FOLDER_DEBUG || '/'  || V_PRINCIPLE_NAME;
-  V_TRACE_FOLDER     VARCHAR2(700) := V_DEBUG_FOLDER || '/traceFiles';
-  V_LOG_FOLDER       VARCHAR2(700) := V_DEBUG_FOLDER || '/logFiles';
+  V_PRINCIPLE   VARCHAR2(32) := upper(P_PRINCIPLE);
   V_RESULT           BOOLEAN;
 begin
     
-  --
-  -- Create the Global Debug Folder if necessary
-  --
-
-  if (not XDBPM_DBMS_XDB.existsResource(XDB_CONSTANTS.FOLDER_DEBUG)) then
-    createFolder(XDB_CONSTANTS.FOLDER_DEBUG,'SYS','/sys/acls/bootstrap_acl.xml');
-    setComment(XDB_CONSTANTS.FOLDER_DEBUG,'Container for all debugging and trace files.');
+  if (not XDBPM_DBMS_XDB.existsResource(XDB_CONSTANTS.FOLDER_USER_HOME(V_PRINCIPLE))) then
+    createHomeFolder(V_PRINCIPLE);
+    createPublicFolder(V_PRINCIPLE);
+  else 
+    createLoggingFolders(V_PRINCIPLE);   
   end if;
    
-  --
-  -- Create the User's Debug Folder if necessary
-  -- Ensure the User owns their Home folder and all of its content
-  -- Ensure the User's Debug Folder is protected with the ALL to Owner / Nothing to Others ACL
-  --
-
-  if (not XDBPM_DBMS_XDB.existsResource(V_DEBUG_FOLDER)) then
-    createFolder(V_DEBUG_FOLDER,V_PRINCIPLE_NAME,'/sys/acls/all_owner_acl.xml');
-    setComment(V_DEBUG_FOLDER,'Logging and Trace files for user : ' || V_PRINCIPLE_NAME);
-  else
-    changeOwner(V_DEBUG_FOLDER,V_PRINCIPLE_NAME,TRUE);
-  end if;
-  
-  XDBPM_DBMS_XDB.setAcl(V_DEBUG_FOLDER,'/sys/acls/all_owner_acl.xml');
-
-  if (not XDBPM_DBMS_XDB.existsResource(V_TRACE_FOLDER)) then
-    createFolder(V_TRACE_FOLDER,V_PRINCIPLE_NAME,'/sys/acls/all_owner_acl.xml');
-    setComment(V_TRACE_FOLDER,'Trace files for user : ' || V_PRINCIPLE_NAME);
-  end if;
-  
-  if (not XDBPM_DBMS_XDB.existsResource(V_LOG_FOLDER)) then
-    createFolder(V_LOG_FOLDER,V_PRINCIPLE_NAME,'/sys/acls/all_owner_acl.xml');
-    setComment(V_LOG_FOLDER,'Application Log files for user : ' || V_PRINCIPLE_NAME);
-  end if;
-  
 end;
 --
-begin
-	NULL;
-$IF $$DEBUG $THEN
-  XDB_OUTPUT.createTraceFile('/public/XDBPM_TRACE_FILE.log',TRUE);
-$END
 end;
 /
 set define on

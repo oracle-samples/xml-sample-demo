@@ -18,8 +18,6 @@
 --
 alter session set current_schema = XDBPM
 /
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 --
 set define on
 --
@@ -166,7 +164,7 @@ as
 begin
 
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeLogFileEntry('  Processing Include and Import nodes',TRUE);
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.getDependantList():  Processing Include and Import nodes');
 $END
 
 	for i in getSchemaLocationList(P_XML_SCHEMA)loop
@@ -175,7 +173,7 @@ $END
   end loop;
 
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeLogFileEntry('    Referenced Schema count  = ' || V_SCHEMA_LOCATION_LIST.count(),TRUE);
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.getDependantList():    Referenced Schema count  = ' || V_SCHEMA_LOCATION_LIST.count());
 $END
 
   return V_SCHEMA_LOCATION_LIST;
@@ -214,12 +212,12 @@ begin
   --
   
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeLogFileEntry('Checking XML Schema : "' || P_XML_SCHEMA_PATH|| '".',TRUE);
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.addSchema(): Checking XML Schema : "' || P_XML_SCHEMA_PATH|| '".');
 $END
 
   for s in schemaRegistered loop
 $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeLogFileEntry('  Schema already Registered.',TRUE);
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.addSchema():  Schema already Registered.');
 $END
     return;
   end loop;
@@ -227,7 +225,7 @@ $END
   for i in 1..P_XMLSCHEMA_INFORMATION_LIST.count() loop
     if ((P_XML_SCHEMA_PATH = P_XMLSCHEMA_INFORMATION_LIST(i).REPOSITORY_PATH) or (P_XML_SCHEMA_PATH = P_XMLSCHEMA_INFORMATION_LIST(i).SCHEMA_LOCATION_HINT))then
 $IF $$DEBUG $THEN
-      XDB_OUTPUT.writeLogFileEntry('  Schema already Processed.',TRUE);
+      XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.addSchema():  Schema already Processed.');
 $END
       return;
     end if;
@@ -315,10 +313,10 @@ procedure dumpRequiredSchemaList(P_XMLSCHEMA_INFORMATION_LIST XMLSCHEMA_INFORMAT
 as
 begin
 	for i in P_XMLSCHEMA_INFORMATION_LIST.FIRST..P_XMLSCHEMA_INFORMATION_LIST.LAST LOOP
-    XDB_OUTPUT.writeLogFileEntry('Schema "' || P_XMLSCHEMA_INFORMATION_LIST(i).SCHEMA_LOCATION_HINT || '".',TRUE);
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.dumpRequiredSchemaList(): Schema "' || P_XMLSCHEMA_INFORMATION_LIST(i).SCHEMA_LOCATION_HINT || '".');
 	  if (P_XMLSCHEMA_INFORMATION_LIST(i).DEPENDENT_SCHEMA_LIST.count() > 0) THEN
     	for j in P_XMLSCHEMA_INFORMATION_LIST(i).DEPENDENT_SCHEMA_LIST.FIRST..P_XMLSCHEMA_INFORMATION_LIST(i).DEPENDENT_SCHEMA_LIST.LAST  LOOP
-        XDB_OUTPUT.writeLogFileEntry('--> "' || P_XMLSCHEMA_INFORMATION_LIST(i).DEPENDENT_SCHEMA_LIST(j) || '".',TRUE);
+        XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '--> "' || P_XMLSCHEMA_INFORMATION_LIST(i).DEPENDENT_SCHEMA_LIST(j) || '".');
 	    end loop;
 	  end if;
   end loop;
@@ -443,7 +441,7 @@ $END
 begin
 	
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeLogFileEntry('Processing Schema : "' || P_CURRENT_SCHEMA.SCHEMA_LOCATION_HINT ||'"',TRUE);
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.prcoessSchema(): "' || P_CURRENT_SCHEMA.SCHEMA_LOCATION_HINT ||'"',TRUE);
 $END
 
   select xmlElement(
@@ -954,8 +952,6 @@ end XDBPM_ORDER_XMLSCHEMAS;
 /
 show errors
 --
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 alter SESSION SET CURRENT_SCHEMA = SYS
 /
 --

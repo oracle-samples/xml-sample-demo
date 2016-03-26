@@ -27,12 +27,12 @@ as
   C_LINE_03  constant VARCHAR2(128) := '  V_CONTENT BLOB;' || CHR(13) || CHR(10);
   C_LINE_04  constant VARCHAR2(128) := '  V_RESOURCE VARCHAR2(1024) := ';
   C_LINE_05  constant VARCHAR2(128) := 'begin' || CHR(13) || CHR(10);
-  C_LINE_06  constant VARCHAR2(128) := '  if (DBMS_XDB.EXISTSRESOURCE(V_RESOURCE)) then' || CHR(13) || CHR(10);
-  C_LINE_07  constant VARCHAR2(128) := '    DBMS_XDB.DELETERESOURCE(V_RESOURCE);' || CHR(13) || CHR(10);
+  C_LINE_06  constant VARCHAR2(128) := '  if (DBMS_XDB.existsResource(V_RESOURCE)) then' || CHR(13) || CHR(10);
+  C_LINE_07  constant VARCHAR2(128) := '    DBMS_XDB.deleteResource(V_RESOURCE);' || CHR(13) || CHR(10);
   C_LINE_08  constant VARCHAR2(128) := '  end if;' || CHR(13) || CHR(10);
   C_LINE_09  constant VARCHAR2(128) := '  DBMS_LOB.CREATETEMPORARY(V_CONTENT,TRUE);' || CHR(13) || CHR(10);
   C_LINE_10  constant VARCHAR2(128) := '  DBMS_LOB.APPEND(V_CONTENT,HEXTORAW(';
-  C_LINE_11  constant VARCHAR2(128) := '  V_RESULT := DBMS_XDB.CREATERESOURCE(V_RESOURCE,V_CONTENT);' || CHR(13) || CHR(10);
+  C_LINE_11  constant VARCHAR2(128) := '  V_RESULT := DBMS_XDB.createResource(V_RESOURCE,V_CONTENT);' || CHR(13) || CHR(10);
   C_LINE_12  constant VARCHAR2(128) := '  DBMS_LOB.FREETEMPORARY(V_CONTENT);' || CHR(13) || CHR(10);
   C_LINE_13  constant VARCHAR2(128) := '  COMMIT;' || CHR(13) || CHR(10);
   C_LINE_14  constant VARCHAR2(128) := 'end;' || CHR(13) || CHR(10);
@@ -533,7 +533,7 @@ begin
   select deleteXML(V_RESOURCE_XML,'/r:Resource/r:Parents',XDB_NAMESPACES.RESOURCE_PREFIX_R) into V_RESOURCE_XML from dual;
   select deleteXML(V_RESOURCE_XML,'/r:Resource/@VersionID',XDB_NAMESPACES.RESOURCE_PREFIX_R)  into V_RESOURCE_XML from dual;    
 
-  if (dbms_xdb.existsResource(P_RESOURCE_PATH)) then
+  if (DBMS_XDB.existsResource(P_RESOURCE_PATH)) then
     begin
       select 1
         into V_RESULT
@@ -750,7 +750,7 @@ $END
     
       V_RESULT := importVersionedResource(P_RESOURCE_PATH,V_RESOURCE_XML,V_SCHEMA_ELEMENT);
       if (V_ACL_PATH is not null) then
-        dbms_xdb.setAcl(P_RESOURCE_PATH,V_ACL_PATH); 
+        DBMS_XDB.setAcl(P_RESOURCE_PATH,V_ACL_PATH); 
       end if;    
       patchModificationStatus(P_RESOURCE_PATH,V_RESOURCE_XML);
       
@@ -764,14 +764,14 @@ $END
         return C_RESOURCE_UNCHANGED;
       end if;
 
-      if (dbms_xdb.existsResource(P_RESOURCE_PATH)) then
+      if (DBMS_XDB.existsResource(P_RESOURCE_PATH)) then
       
         if (G_DUPLICATE_POLICY = XDB_CONSTANTS.OVERWRITE) then
           --
           -- Duplicate Policy is OVERWRITE : Update of the existing resource document
           --
           XDB_IMPORT_UTILITIES.updateResource(P_RESOURCE_PATH,V_RESOURCE_XML);        
-          dbms_xdb.setAcl(P_RESOURCE_PATH,V_ACL_PATH); 
+          DBMS_XDB.setAcl(P_RESOURCE_PATH,V_ACL_PATH); 
           patchModificationStatus(P_RESOURCE_PATH,V_RESOURCE_XML);
           return C_RESOURCE_UPDATED;
         end if;
@@ -782,7 +782,7 @@ $END
           --
           V_RESOURCE_ID := dbms_xdb_version.makeVersioned(P_RESOURCE_PATH);
           V_RESULT := importVersionedResource(P_RESOURCE_PATH,V_RESOURCE_XML,V_SCHEMA_ELEMENT);
-          dbms_xdb.setAcl(P_RESOURCE_PATH,V_ACL_PATH); 
+          DBMS_XDB.setAcl(P_RESOURCE_PATH,V_ACL_PATH); 
           patchModificationStatus(P_RESOURCE_PATH,V_RESOURCE_XML);
           return C_RESOURCE_NEW_VERSION;
         end if;
@@ -792,7 +792,7 @@ $END
       --
       insert into RESOURCE_VIEW (ANY_PATH, RES) values (P_RESOURCE_PATH, V_RESOURCE_XML);     
       createEmptyContent(P_RESOURCE_PATH,V_RESOURCE_XML,V_SCHEMA_ELEMENT);
-      dbms_xdb.setAcl(P_RESOURCE_PATH,V_ACL_PATH); 
+      DBMS_XDB.setAcl(P_RESOURCE_PATH,V_ACL_PATH); 
       patchModificationStatus(P_RESOURCE_PATH,V_RESOURCE_XML);
       return C_RESOURCE_CREATED;
     end if;
@@ -830,7 +830,7 @@ is
 begin
   for r in getResources loop
     begin
-      select dbms_lob.getLength(xdburitype(dbms_xdb.createOidPath(r.RESID)).getBlob())
+      select dbms_lob.getLength(xdburitype(DBMS_XDB.createOidPath(r.RESID)).getBlob())
         into V_CONTENT_SIZE
         from dual;
     exception
@@ -847,7 +847,7 @@ as
   V_RESULT       NUMBER := C_RESOURCE_UNCHANGED;
   V_DATE_CREATED TIMESTAMP;
 begin
-  if (dbms_xdb.existsResource(P_RESOURCE_PATH)) then
+  if (DBMS_XDB.existsResource(P_RESOURCE_PATH)) then
   
     -- Folder exists
 
@@ -976,12 +976,12 @@ exception
   when NO_DATA_FOUND then
  	  if (P_SCHEMA_ELEMENT is not null) then
       getTargetSchemaInfo(P_SCHEMA_ELEMENT);
-      setSBXMLContent(dbms_xdb.getRESOID(P_RESOURCE_PATH),P_XML_REFERENCE);        
+      setSBXMLContent(DBMS_XDB.getRESOID(P_RESOURCE_PATH),P_XML_REFERENCE);        
     else
        --
        -- Resource was created using a REF XMLTYPE and the MAKEREF variant of DBMS_XDB.createResource
        --
-      setXMLContent(dbms_xdb.getRESOID(P_RESOURCE_PATH),P_XML_REFERENCE);
+      setXMLContent(DBMS_XDB.getRESOID(P_RESOURCE_PATH),P_XML_REFERENCE);
     end if;
     return 1;
 
@@ -1103,7 +1103,7 @@ begin
            and equals_path(l.RES,V_LINK_PATH) = 1 
            and equals_path(t.RES,V_LINK_TARGET) = 1;
            
-         dbms_xdb.deleteResource(V_LINK_PATH);         
+         DBMS_XDB.deleteResource(V_LINK_PATH);         
          V_RESULT := C_RESOURCE_UPDATED;
       exception
         when no_data_found then 
@@ -1127,7 +1127,7 @@ $IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
          and existsNode(res,'/Resource[RefCount > 1]') = 1
     end if;
   end if;
-  dbms_xdb.link(V_LINK_TARGET,V_LINK_FOLDER,V_LINK_NAME);
+  DBMS_XDB.link(V_LINK_TARGET,V_LINK_FOLDER,V_LINK_NAME);
 $ELSE
       --
       -- Add Support for Weak links in 11.1.x. and later
@@ -1144,7 +1144,7 @@ $ELSE
     V_XDB_LINK_TYPE := DBMS_XDB.LINK_TYPE_WEAK;
   end if;
 
-  dbms_xdb.link(V_LINK_TARGET,V_LINK_FOLDER,V_LINK_NAME,V_XDB_LINK_TYPE);
+  DBMS_XDB.link(V_LINK_TARGET,V_LINK_FOLDER,V_LINK_NAME,V_XDB_LINK_TYPE);
 $END
 
   return V_RESULT;

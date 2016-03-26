@@ -18,8 +18,6 @@
 --
 alter session set current_schema = XDBPM
 /
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 create or replace type RESOURCE_ID_TABLE
 as table of RAW(16)
 /
@@ -201,8 +199,7 @@ is
       DBMS_LOB.trim(P_CONTENT,0);
     end if;
     DBMS_LOB.fileopen(targetFile, DBMS_LOB.file_readonly);
-    DBMS_LOB.loadBlobfromFile
-    (
+    DBMS_LOB.loadBlobfromFile(
        P_CONTENT,
        targetFile,
        DBMS_LOB.getLength(targetFile),
@@ -259,8 +256,7 @@ is
       DBMS_LOB.trim(P_CONTENT,0);
     end if;
     DBMS_LOB.fileopen(targetFile, DBMS_LOB.file_readonly);
-    DBMS_LOB.loadClobfromFile
-    (
+    DBMS_LOB.loadClobfromFile(
        P_CONTENT,
        targetFile,
        DBMS_LOB.getLength(targetFile),
@@ -381,20 +377,20 @@ begin
           
       if (OPERATION != LOAD_XML_TABLE) then
         REPLACE_FILE    := (REPLACE_MODE and (f.REPLACE <> 'false')) or (f.REPLACE = 'true');
-        if (REPLACE_FILE and dbms_xdb.existsResource(TARGET_RESOURCE)) then
+        if (REPLACE_FILE and DBMS_XDB.existsResource(TARGET_RESOURCE)) then
           DBMS_XDB.deleteResource(TARGET_RESOURCE);
         end if;
  
         if (OPERATION = LOAD_ANY_RESOURCE or OPERATION = LOAD_BINARY_RESOURCE) then
-          res := dbms_xdb.createResource(TARGET_RESOURCE,bfilename(P_DIRECTORY,F.FILENAME));
+          res := DBMS_XDB.createResource(TARGET_RESOURCE,bfilename(P_DIRECTORY,F.FILENAME));
         end if;
        
         if (OPERATION = LOAD_CLOB_RESOURCE) then 
-           res := dbms_xdb.createResource(TARGET_RESOURCE,bfilename(P_DIRECTORY,F.FILENAME),NLS_CHARSET_ID(FILE_ENCODING));
+           res := DBMS_XDB.createResource(TARGET_RESOURCE,bfilename(P_DIRECTORY,F.FILENAME),NLS_CHARSET_ID(FILE_ENCODING));
         end if;
 
         if (OPERATION = LOAD_XML_RESOURCE) then
-          res := dbms_xdb.createResource(TARGET_RESOURCE,xmltype(bfilename(P_DIRECTORY,F.FILENAME),nls_charset_id(FILE_ENCODING)));
+          res := DBMS_XDB.createResource(TARGET_RESOURCE,xmltype(bfilename(P_DIRECTORY,F.FILENAME),nls_charset_id(FILE_ENCODING)));
         end if;
         
       else
@@ -469,12 +465,12 @@ as
   parentFolderPath varchar2(256);
   result boolean;
 begin
-  if (not dbms_xdb.existsResource(P_FOLDER_PATH)) then
+  if (not DBMS_XDB.existsResource(P_FOLDER_PATH)) then
     if instr(P_FOLDER_PATH,pathSeperator,-1) > 1 then
       parentFolderPath := substr(P_FOLDER_PATH,1,instr(P_FOLDER_PATH,pathSeperator,-1)-1);    
       createFolderTree(parentFolderPath);
     end if;
-    result := dbms_xdb.createFolder(P_FOLDER_PATH);
+    result := DBMS_XDB.createFolder(P_FOLDER_PATH);
   end if;
 end;
 --
@@ -482,11 +478,11 @@ procedure mkdir(P_FOLDER_PATH varchar2,force boolean default false)
 as
   res boolean;
 begin
-  if (not dbms_xdb.existsResource(P_FOLDER_PATH)) then
+  if (not DBMS_XDB.existsResource(P_FOLDER_PATH)) then
     if (force) then
       createFolderTree(P_FOLDER_PATH);
     else
-      res := dbms_xdb.createFolder(P_FOLDER_PATH);
+      res := DBMS_XDB.createFolder(P_FOLDER_PATH);
     end if;
   end if;
 end;
@@ -518,11 +514,11 @@ begin
      if (folder.REFCOUNT = 1 ) then
        deleteFolderTree(folder.path);
      else
-       dbms_xdb.deleteResource(folder.path);
+       DBMS_XDB.deleteResource(folder.path);
      end if;
    end loop;
 
-   dbms_xdb.deleteResource(P_FOLDER_PATH);
+   DBMS_XDB.deleteResource(P_FOLDER_PATH);
 end;
 --
 procedure rmdir(P_FOLDER_PATH varchar2,force boolean default FALSE)
@@ -531,7 +527,7 @@ begin
   if (force) then
     deleteFolderTree(P_FOLDER_PATH);
   else
-    dbms_xdb.deleteResource(P_FOLDER_PATH);
+    DBMS_XDB.deleteResource(P_FOLDER_PATH);
   end if;
 end;
 --
@@ -939,7 +935,7 @@ begin
   
 /*
   elem := dbms_xmldom.makeElement(dbms_xmldom.appendChild(dbms_xmldom.makeNode(root),dbms_xmldom.makeNode(dbms_xmldom.createElement(doc,'ResourceID', XDB_NAMESPACES.RESOURCE_EVENT_NAMESPACE)))); 
-  text := dbms_xmldom.makeText(dbms_xmldom.appendChild(dbms_xmldom.makeNode(elem),dbms_xmldom.makeNode(dbms_xmldom.createTextNode(doc,dbms_xdb.getResOID(resourcePath)))));
+  text := dbms_xmldom.makeText(dbms_xmldom.appendChild(dbms_xmldom.makeNode(elem),dbms_xmldom.makeNode(dbms_xmldom.createTextNode(doc,DBMS_XDB.getResOID(resourcePath)))));
 */
   
   -- Append Old Resource details to Payload
@@ -1113,31 +1109,24 @@ begin
    
 $IF $$DEBUG $THEN
 
-  XDB_OUTPUT.createTraceFile('/public/XDB_UTILITIES.log',TRUE);
-
-  if (P_CONTENT_BLOB is not NULL) then
-    XDB_OUTPUT.writeTraceFileEntry('BLOB based update. Length ' || DBMS_LOB.getLength(P_CONTENT_BLOB));
-    XDB_OUTPUT.flushTraceFile();
-  end if;
-
-  if (P_CONTENT_CLOB is not NULL) then
-    XDB_OUTPUT.writeTraceFileEntry('CLOB based update. Length ' || DBMS_LOB.getLength(P_CONTENT_CLOB));
-    XDB_OUTPUT.flushTraceFile();
-  end if;
-  
-  if (P_CONTENT_XML is not NULL) then
-    XDB_OUTPUT.writeTraceFileEntry('XML based update');
-    XDB_OUTPUT.flushTraceFile();
-  end if;
-
   if (V_LOB_LOCATOR is NULL) then
-    XDB_OUTPUT.writeTraceFileEntry('Lob Locator is NULL' );
-    XDB_OUTPUT.flushTraceFile();
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.UPDATECONTENT_IMPL(): Current Lob Locator is NULL',TRUE);
   end if;
   
   if (V_XMLREF is null) then
-    XDB_OUTPUT.writeTraceFileEntry('XMLRef is NULL' );
-    XDB_OUTPUT.flushTraceFile();
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.UPDATECONTENT_IMPL(): Current XMLRef is NULL',TRUE);
+  end if;
+
+  if (P_CONTENT_BLOB is not NULL) then
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.UPDATECONTENT_IMPL(): Revised content is BLOB. Length ' || DBMS_LOB.getLength(P_CONTENT_BLOB),TRUE);
+  end if;
+
+  if (P_CONTENT_CLOB is not NULL) then
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.UPDATECONTENT_IMPL(): Revised content is CLOB. Length ' || DBMS_LOB.getLength(P_CONTENT_CLOB),TRUE);
+  end if;
+  
+  if (P_CONTENT_XML is not NULL) then
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || '.UPDATECONTENT_IMPL(): Revised content is XML.',TRUE);
   end if;
   
 $END 
@@ -1318,8 +1307,6 @@ end XDBPM_UTILITIES;
 /
 show errors 
 --
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 alter SESSION SET CURRENT_SCHEMA = SYS
 /
 --

@@ -18,8 +18,6 @@
 --
 alter session set current_schema = XDBPM
 /
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 --
 declare
   cursor getSequence
@@ -393,7 +391,7 @@ as
 begin
 
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('AppendPath: P_LEFT_EXPRESSION="' || P_LEFT_EXPRESSION || '". P_RIGHT_EXPRESSION="' || P_RIGHT_EXPRESSION || '".' );
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'.appendPath(): P_LEFT_EXPRESSION="' || P_LEFT_EXPRESSION || '". P_RIGHT_EXPRESSION="' || P_RIGHT_EXPRESSION || '".',TRUE);
 $END
 
 	if instr(V_LEFT_EXPRESSION,'/',-1) = length(V_LEFT_EXPRESSION) then
@@ -405,8 +403,7 @@ $END
 	end if;
 
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('AppendPath: Path="' || V_LEFT_EXPRESSION || '/' || V_RIGHT_EXPRESSION || '".' );
-  XDB_OUTPUT.flushTraceFile();
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'appendPath():: Path="' || V_LEFT_EXPRESSION || '/' || V_RIGHT_EXPRESSION || '".',TRUE);
 $END
 
   return V_LEFT_EXPRESSION || '/' || V_RIGHT_EXPRESSION;
@@ -1698,17 +1695,10 @@ begin
 	return getGroupDefinitions();
 end;
 --
-begin
-	null;
-$IF $$DEBUG $THEN
-  XDB_OUTPUT.createTraceFile('/public/XDBPM_EDIT_XMLSCHEMA_' || to_char(SYSTIMESTAMP,'YYYY-MM-DD"T"HH24.MI.SSTZHTZM') || '.log',TRUE);
-$END
 end;
 /
 show errors
 --
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 alter SESSION SET CURRENT_SCHEMA = SYS
 /
 --

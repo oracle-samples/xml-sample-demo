@@ -174,7 +174,7 @@ begin
                          where equals_path(res,V_RESCONFIG_PATH) = 1
                       );
    else
-     V_RESULT := dbms_xdb.createResource(V_RESCONFIG_PATH,V_RESCONFIG.getClobVal());
+     V_RESULT := DBMS_XDB.createResource(V_RESCONFIG_PATH,V_RESCONFIG.getClobVal());
    end if;
    
    dbms_resconfig.addResConfig(V_DOCUMENT_FOLDER_PATH,V_RESCONFIG_PATH,null);

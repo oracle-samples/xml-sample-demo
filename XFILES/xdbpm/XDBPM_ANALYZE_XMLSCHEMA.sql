@@ -18,8 +18,6 @@
 --
 alter session set current_schema = XDBPM
 /
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 set define on
 --
 create or replace package XDBPM_ANALYZE_XMLSCHEMA
@@ -133,7 +131,7 @@ as
 begin
 
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('Processing SQLType  : "' || SUBTYPE_OWNER || '.' || SUBTYPE || '".' );
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'Processing SQLType  : "' || SUBTYPE_OWNER || '.' || SUBTYPE || '".' );
 $END
     
   STORAGE_MODEL := makeElement(ATTR_NAME);
@@ -204,7 +202,7 @@ as
 begin     
 
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('getLocalAttributes() : Processing Attributes of "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '"');
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'getLocalAttributes() : Processing Attributes of "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '"',TRUE);
 $END
 
   V_ATTRIBUTE_LIST          := makeElement('Attributes');
@@ -214,7 +212,7 @@ $END
   for ATTR in FIND_CHILD_ATTRS loop
 
 $IF $$DEBUG $THEN
-   XDB_OUTPUT.writeTraceFileEntry('getLocalAttributes() : Processing Attribute "' || ATTR.ATTR_NAME || '".  TYPE = "' || ATTR.ATTR_TYPE_OWNER || '"."' || ATTR.ATTR_TYPE_NAME || '"');
+   XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'getLocalAttributes() : Processing Attribute "' || ATTR.ATTR_NAME || '".  TYPE = "' || ATTR.ATTR_TYPE_OWNER || '"."' || ATTR.ATTR_TYPE_NAME || '"',TRUE);
 $END
   
     -- Finding Element / Attribute Name could be tricky. Use SQLName
@@ -234,7 +232,7 @@ $END
          and OWNER = ATTR.ATTR_TYPE_OWNER;
 
 $IF $$DEBUG $THEN
-     XDB_OUTPUT.writeTraceFileEntry('Adding "' || ATTR.ATTR_NAME || '". Collection of "' || ATTR.ATTR_TYPE_OWNER || '"."' || ATTR.ATTR_TYPE_NAME || '".');
+     XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'Adding "' || ATTR.ATTR_NAME || '". Collection of "' || ATTR.ATTR_TYPE_OWNER || '"."' || ATTR.ATTR_TYPE_NAME || '".',TRUE);
 $END
       -- Attribute is a Collection Type. 
       -- Assume Collection will be managed as a NESTED TABLE
@@ -355,7 +353,7 @@ $END
   V_ATTR      := DBMS_XMLDOM.SETATTRIBUTENODE(V_ATTRIBUTE_LIST_ROOT,V_ATTR);
 
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('getLocalAttributes() : Local Attributes Processed.');
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'getLocalAttributes() : Local Attributes Processed.',TRUE);
 $END
 
   return V_ATTRIBUTE_LIST;
@@ -409,7 +407,7 @@ as
 begin
 
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('getSubTypes() : Processing Subtypes of "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '"');
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'getSubTypes() : Processing Subtypes of "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '"',TRUE);
 $END
 
   V_SUBTYPE_LIST          := makeElement('SubTypeDefinitions');
@@ -423,7 +421,7 @@ $END
     V_SUBTYPES_EXIST  := TRUE;
 
 $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeTraceFileEntry('getSubTypes() : Processing Subtype : "' || t.OWNER || '"."' || t.TYPE_NAME || '"');
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'getSubTypes() : Processing Subtype : "' || t.OWNER || '"."' || t.TYPE_NAME || '"',TRUE);
 $END
         
     V_TYPE_DEFINITION            := makeElement(t.TYPE_NAME);
@@ -492,12 +490,12 @@ $END
     V_ATTR      := DBMS_XMLDOM.SETATTRIBUTENODE(V_SUBTYPE_LIST_ROOT,V_ATTR);
 
 $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeTraceFileEntry('getLocalAttributes() : SubType Processing complete.');
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'getLocalAttributes() : SubType Processing complete.',TRUE);
 $END
     return V_SUBTYPE_LIST;
   else
 $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeTraceFileEntry('getLocalAttributes() : No SubTypes found.');
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'getLocalAttributes() : No SubTypes found.',TRUE);
 $END
     return NULL;
   end if;
@@ -509,7 +507,7 @@ return XMLType
 as
 begin
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('Processing Super Type : "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '"');
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'Processing Super Type : "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '"',TRUE);
 $END
   return findStorageModel(P_TYPE_NAME, P_TYPE_OWNER,'NO');
 end;
@@ -556,7 +554,7 @@ as
 begin
 
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('getStorageModel() : Processing "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '"');
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'getStorageModel() : Processing "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '"',TRUE);
 $END
   
   V_TYPE_DEFINITION := makeElement(P_TYPE_NAME);
@@ -599,7 +597,7 @@ $END
   if (V_SUPERTYPE_NAME is not null) then
 
 $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeTraceFileEntry('getStorageModel() : Processing Supertypes of "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '"');
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'getStorageModel() : Processing Supertypes of "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '"',TRUE);
 $END
 
     V_ATTR      := DBMS_XMLDOM.CREATEATTRIBUTE(V_DOCUMENT,'SQLParentType');
@@ -615,7 +613,7 @@ $END
     V_SUPERTYPE_DEFINITION := findSuperTypeModel(V_SUPERTYPE_NAME, V_SUPERTYPE_OWNER);
     
 $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeTraceFileEntry(dbms_lob.substr(V_SUPERTYPE_DEFINITION.getClobVal(),1000,1));
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||dbms_lob.substr(V_SUPERTYPE_DEFINITION.getClobVal(),1000,1),TRUE);
 $END
     
     V_SUPERTYPE_DOCUMENT   := DBMS_XMLDOM.NEWDOMDOCUMENT(V_SUPERTYPE_DEFINITION);
@@ -628,7 +626,7 @@ $END
     DBMS_XMLDOM.FREEDOCUMENT(V_SUPERTYPE_DOCUMENT);
 
 $IF $$DEBUG $THEN
-   XDB_OUTPUT.writeTraceFileEntry('getStorageModel() : Supertype Processing Complete.');
+   XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'getStorageModel() : Supertype Processing Complete.',TRUE);
 $END
     
   end if;
@@ -670,7 +668,7 @@ $END
 
   -- Cache the type definition.
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('Cached Storage Model for "' || P_TYPE_OWNER || '.' || P_TYPE_NAME || '".');
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'Cached Storage Model for "' || P_TYPE_OWNER || '.' || P_TYPE_NAME || '".',TRUE);
 $END
   insert into XDBPM.STORAGE_MODEL_CACHE (TYPE_NAME, TYPE_OWNER, EXTENDED_DEFINITION, STORAGE_MODEL) VALUES (P_TYPE_NAME, P_TYPE_OWNER, P_INCLUDE_SUBTYPES, V_TYPE_DEFINITION);
     
@@ -695,7 +693,7 @@ as
 begin
 
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('findStorageModel() [' || G_DEPTH_COUNT || '] : Processing "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '".' );
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'findStorageModel() [' || G_DEPTH_COUNT || '] : Processing "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '".' ,TRUE);
 $END
                 
   begin
@@ -707,7 +705,7 @@ $END
        and EXTENDED_DEFINITION = P_INCLUDE_SUBTYPES;
 
 $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeTraceFileEntry('Resolved Storage Model from cache.');
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'Resolved Storage Model from cache.',TRUE);
 $END
        
   exception
@@ -724,7 +722,7 @@ $END
   V_ATTRIBUTE_COUNT        := DBMS_XMLDOM.GETATTRIBUTE(V_STORAGE_MODEL_ROOT,'columns');
   
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('findStorageModel : Attribute Count for "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '" = ' || V_ATTRIBUTE_COUNT || '.' );
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'findStorageModel : Attribute Count for "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '" = ' || V_ATTRIBUTE_COUNT || '.' ,TRUE);
 $END
 
   return V_STORAGE_MODEL;
@@ -750,7 +748,7 @@ as
 begin
 	
 $IF $$DEBUG $THEN
- 	XDB_OUTPUT.writeTraceFileEntry('"' || P_GLOBAL_OBJECT_NAME || '" mapped to "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '".');
+ 	XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'"' || P_GLOBAL_OBJECT_NAME || '" mapped to "' || P_TYPE_OWNER || '"."' || P_TYPE_NAME || '".',TRUE);
 $END
 
   V_STORAGE_MODEL := makeElement(P_GLOBAL_OBJECT_NAME);
@@ -795,7 +793,7 @@ begin
  G_DEPTH_COUNT := 0;
  	
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('Processing "' || P_GLOBAL_OBJECT_NAME || '".');
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'Processing "' || P_GLOBAL_OBJECT_NAME || '".',TRUE);
 $END
 
   begin 
@@ -862,13 +860,13 @@ $END
   COMMIT;
 
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('Processing Complete "' || P_GLOBAL_OBJECT_NAME || '".',TRUE);
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'Processing Complete "' || P_GLOBAL_OBJECT_NAME || '".',TRUE);
 $END  
   return V_RESULT;
 exception
   when no_data_found then
 $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeTraceFileEntry('Unable to find SQLType mapping for complexType : "' || USER || '"."' || P_GLOBAL_OBJECT_NAME || '".',TRUE );
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'Unable to find SQLType mapping for complexType : "' || USER || '"."' || P_GLOBAL_OBJECT_NAME || '".',TRUE );
 $END  
     rollback;
     return null; 
@@ -963,13 +961,13 @@ $END
   COMMIT;
 
 $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeTraceFileEntry('Processing Complete "' || P_GLOBAL_OBJECT_NAME || '".',TRUE);
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'Processing Complete "' || P_GLOBAL_OBJECT_NAME || '".',TRUE);
 $END  
   return V_RESULT;
 exception
   when no_data_found then
 $IF $$DEBUG $THEN
-    XDB_OUTPUT.writeTraceFileEntry('Unable to find SQLType mapping for complexType : "' || USER || '"."' || P_GLOBAL_OBJECT_NAME || '".',TRUE);
+    XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'Unable to find SQLType mapping for complexType : "' || USER || '"."' || P_GLOBAL_OBJECT_NAME || '".',TRUE);
 $END  
     rollback;
     return null; 
@@ -1005,7 +1003,7 @@ as
 begin
 
 $IF $$DEBUG $THEN
-  XDB_OUTPUT.writeTraceFileEntry('Processing Attribute ' || ATTR_NAME || ' of ' || TARGET_TYPE_OWNER || '.' || TARGET_TYPE_NAME );
+  XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT ||'Processing Attribute ' || ATTR_NAME || ' of ' || TARGET_TYPE_OWNER || '.' || TARGET_TYPE_NAME );
 $END
   
   ATTR_DETAIL := makeElement(ATTR_NAME);
@@ -1662,8 +1660,6 @@ end XDBPM_ANALYZE_XMLSCHEMA;
 /
 show errors
 --
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 alter SESSION SET CURRENT_SCHEMA = SYS
 /
 --

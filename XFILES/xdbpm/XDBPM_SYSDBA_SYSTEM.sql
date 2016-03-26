@@ -12,28 +12,24 @@
  * ================================================
  */
 
-grant INHERIT PRIVILEGES on user SYS to XDBPM
-/
 grant INHERIT PRIVILEGES on user SYSTEM to XDBPM
 /
-grant INHERIT PRIVILEGES on user XDB to XDBPM
-/
-grant execute on SYS.DBMS_SYSTEM to XDBPM
-/
+-- grant execute on SYS.DBMS_SYSTEM to XDBPM
+-- /
 alter session set current_schema = XDBPM
 /
-grant delete on XDB.XDB$SCHEMA         to XDBPM
-/
-grant delete on XDB.XDB$COMPLEX_TYPE   to XDBPM
-/
-grant delete on XDB.XDB$ELEMENT        to XDBPM
-/
-grant delete on XDB.XDB$ANY            to XDBPM
-/
-grant delete on XDB.XDB$ATTRIBUTE      to XDBPM
-/
-grant delete on XDB.XDB$ANYATTR        to XDBPM
-/
+-- grant delete on XDB.XDB$SCHEMA         to XDBPM
+-- /
+-- grant delete on XDB.XDB$COMPLEX_TYPE   to XDBPM
+-- /
+-- grant delete on XDB.XDB$ELEMENT        to XDBPM
+-- /
+-- grant delete on XDB.XDB$ANY            to XDBPM
+-- /
+-- grant delete on XDB.XDB$ATTRIBUTE      to XDBPM
+-- /
+-- grant delete on XDB.XDB$ANYATTR        to XDBPM
+-- /
 --
 -- Explicit grants on XDB Owned objects. Requires use of USER SYSTEM or SYSDBA connection.
 -- WITH GRANT OPTION is explicitly not provided to ROLE DBA on these objects.
@@ -42,5 +38,5 @@ grant update on XDB.XDB$RESOURCE       to XDBPM
 /
 grant delete on XDB.XDB$NLOCKS         to XDBPM
 /
-grant update on XDB.XDB$ROOT_INFO      to XDBPM
-/
+-- grant update on XDB.XDB$ROOT_INFO      to XDBPM
+-- /

@@ -64,8 +64,6 @@ set define on
 --
 alter session set current_schema = XDBPM
 /
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 
 create or replace type DECODED_REFERENCE_T
 as object  (
@@ -80,20 +78,23 @@ grant execute on DECODED_REFERENCE_T to public
 /
 set define on
 --
+@XDBPM_CHECK_PERMISSIONS
+--
 var XDBPM_SYSDBA_INTERNAL VARCHAR2(120)
 --
+declare
+  V_XDBPM_SYSDBA_INTERNAL VARCHAR2(120);
 begin
-  select 'XDBPM_SYSDBA_SYSDBA.sql' 
-    into :XDBPM_SYSDBA_INTERNAL
-    from ALL_TAB_PRIVS
-   where TABLE_NAME = 'DBMS_SYSTEM'
-     and TABLE_SCHEMA = 'SYS'
-     and GRANTEE = 'SYSTEM';
-exception
-  when NO_DATA_FOUND then
-    :XDBPM_SYSDBA_INTERNAL := 'XDBPM_SYSDBA_DBAONLY.sql';
-  when others then
-    RAISE;
+$IF XDBPM.XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN
+  V_XDBPM_SYSDBA_INTERNAL := 'XDBPM_SYSDBA_SYSDBA.sql';
+$ELSIF XDBPM.XDBPM_INSTALLER_PERMISSIONS.IS_SYSTEM $THEN
+  V_XDBPM_SYSDBA_INTERNAL := 'XDBPM_SYSDBA_SYSTEM.sql';
+$ELSIF XDBPM.XDBPM_INSTALLER_PERMISSIONS.HAS_DBA $THEN
+  V_XDBPM_SYSDBA_INTERNAL := 'XDBPM_DO_NOTHING.sql';
+$ELSE
+  V_XDBPM_SYSDBA_INTERNAL := 'XDBPM_DO_NOTHING.sql';
+$END
+  :XDBPM_SYSDBA_INTERNAL := V_XDBPM_SYSDBA_INTERNAL;
 end;
 /
 undef XDBPM_SYSDBA_INTERNAL
@@ -108,12 +109,302 @@ select '&XDBPM_SYSDBA_INTERNAL'
 /
 set define on
 --
+create or replace package XDBPM_INTERNAL_CONSTANTS
+AUTHID DEFINER
+as
+	function getTraceFileId return VARCHAR2;
+end;
+/
+show errors
+--
+create or replace package body XDBPM_INTERNAL_CONSTANTS
+as
+--
+function getTraceFileId
+return VARCHAR2
+--
+-- Return the current session id used in trace file names...
+--
+as
+  V_TRACE_ID VARCHAR2(32);
+begin
+  select p.spid ||   nvl2(p.traceid,  '_' || p.traceid, null )
+    into V_TRACE_ID
+    from v$process p
+    join v$session s
+      on p.addr = s.paddr
+   where s.audsid=sys_context('userenv','sessionid');
+   
+  return V_TRACE_ID;
+end;
+--
+end;
+/
+show errors
+--
 @@&XDBPM_SYSDBA_INTERNAL
+--
+create or replace package XDBPM_SYSDBA_INTERNAL
+as
+  C_WRITE_TO_TRACE_FILE constant binary_integer := 1;
+
+  procedure resetLobLocator(P_RESID RAW);
+  procedure setBinaryContent(P_RESID RAW, P_SCHEMA_OID RAW, P_BINARY_ELEMENT_ID NUMBER);
+  procedure setTextContent(P_RESID RAW, P_SCHEMA_OID RAW, P_TEXT_ELEMENT_ID NUMBER);
+  procedure setXMLContent(P_RESID RAW);
+  procedure setXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE);
+  procedure setSBXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE, P_SCHEMA_OID RAW, P_GLOBAL_ELEMENT_ID NUMBER);
+
+  procedure releaseDavLocks;
+  procedure updateRootInfoRCList(P_NEW_OIDLIST VARCHAR2);  
+  procedure cleanupSchema(P_OWNER VARCHAR2);
+  
+  procedure writeToTraceFile(P_COMMENT VARCHAR2);
+  procedure flushTraceFile;
+
+end;
+/
+show errors
+--
+create or replace package body XDBPM_SYSDBA_INTERNAL
+as
+--
+  UNIMPLEMENTED_FEATURE EXCEPTION;
+  PRAGMA EXCEPTION_INIT(UNIMPLEMENTED_FEATURE , -03001 );  
+--
+procedure flushTraceFile
+as
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+  sys.dbms_system.KSDFLS;
+$ELSE
+  NULL;
+$END
+end;
+--
+procedure writeToTraceFile(P_COMMENT VARCHAR2)
+as
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+  sys.dbms_system.KSDWRT(C_WRITE_TO_TRACE_FILE,P_COMMENT);
+  sys.dbms_system.KSDFLS();
+$ELSE
+  NULL;
+$END
+end;
+--  
+procedure resetLobLocator(P_RESID RAW)
+as
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+  update XDB.XDB$RESOURCE r
+     set r.XMLDATA.XMLLOB = empty_blob()
+   where OBJECT_ID = P_RESID
+     and r.XMLDATA.XMLLOB is null;
+$ELSE
+  raise UNIMPLEMENTED_FEATURE;
+$END
+end;
+--
+procedure setBinaryContent(P_RESID RAW, P_SCHEMA_OID RAW, P_BINARY_ELEMENT_ID NUMBER)
+as
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+  update XDB.XDB$RESOURCE r
+     set r.XMLDATA.XMLLOB = empty_blob(),
+         r.XMLDATA.SCHOID = P_SCHEMA_OID,
+         r.XMLDATA.ELNUM  = P_BINARY_ELEMENT_ID
+   where OBJECT_ID = P_RESID
+     and r.XMLDATA.XMLLOB is null;
+$ELSE
+  raise UNIMPLEMENTED_FEATURE;
+$END
+end;
+--
+procedure setTextContent(P_RESID RAW, P_SCHEMA_OID RAW, P_TEXT_ELEMENT_ID NUMBER)
+as
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+  update XDB.XDB$RESOURCE r
+     set r.XMLDATA.XMLLOB = empty_blob(),
+         r.XMLDATA.SCHOID = P_SCHEMA_OID,
+         r.XMLDATA.ELNUM  = P_TEXT_ELEMENT_ID
+   where OBJECT_ID = P_RESID
+     and r.XMLDATA.XMLLOB is null;
+$ELSE
+  raise UNIMPLEMENTED_FEATURE;
+$END
+end;
+--
+procedure setXMLContent(P_RESID RAW)
+as
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+  update XDB.XDB$RESOURCE r
+     set r.XMLDATA.XMLLOB = empty_blob(),
+         r.XMLDATA.SCHOID = NULL,
+         r.XMLDATA.ELNUM  = NULL
+   where OBJECT_ID = P_RESID
+     and r.XMLDATA.XMLLOB is null;
+$ELSE
+  raise UNIMPLEMENTED_FEATURE;
+$END
+end;
+--
+procedure setXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE)
+as
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+  update XDB.XDB$RESOURCE r
+     set r.XMLDATA.xmlref = P_XMLREF
+   where OBJECT_ID = P_RESID
+     and r.XMLDATA.XMLLOB is null;
+$ELSE
+  raise UNIMPLEMENTED_FEATURE;
+$END
+end;
+--
+procedure setSBXMLContent(P_RESID RAW, P_XMLREF REF XMLTYPE, P_SCHEMA_OID RAW, P_GLOBAL_ELEMENT_ID NUMBER)
+as
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+  update XDB.XDB$RESOURCE r
+     set r.XMLDATA.xmlref = P_XMLREF,
+         r.XMLDATA.SCHOID = P_SCHEMA_OID,
+         r.XMLDATA.ELNUM  = P_GLOBAL_ELEMENT_ID
+   where OBJECT_ID = P_RESID
+     and r.XMLDATA.XMLLOB is null;
+$ELSE
+  raise UNIMPLEMENTED_FEATURE;
+$END
+end;
+--
+procedure releaseDavLocks
+as
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+    delete from XDB.XDB$NLOCKS;
+    update XDB.XDB$RESOURCE r
+    set r.XMLDATA.LOCKS = null
+    where r.XMLDATA.LOCKS is not null;
+$ELSE
+  raise UNIMPLEMENTED_FEATURE;
+$END
+end;
+--
+procedure updateRootInfoRCList(P_NEW_OIDLIST VARCHAR2)
+as
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+  update XDB.XDB$ROOT_INFO
+ 	   set RCLIST = hexToRaw(P_NEW_OIDLIST);
+$ELSE
+  raise UNIMPLEMENTED_FEATURE;
+$END
+end;
+--
+procedure cleanupSchema(P_OWNER VARCHAR2)
+as
+  V_OBJECT_COUNT number;
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+  select count(*) 
+    into V_OBJECT_COUNT
+    from ALL_USERS
+   where USERNAME = P_OWNER;
+   
+  if (V_OBJECT_COUNT > 0) then
+    RAISE_APPLICATION_ERROR( -20000, 'User "' || P_OWNER || '" exists. XML Schema clean up only valid for dropped users.');
+  end if;
+
+  select count(*) 
+    into V_OBJECT_COUNT
+    from XDB.XDB$SCHEMA x
+   where x.XMLDATA.SCHEMA_OWNER = P_OWNER;
+  
+  if (V_OBJECT_COUNT > 0) then
+    delete 
+      from XDB.XDB$SCHEMA x
+     where x.XMLDATA.SCHEMA_OWNER = P_OWNER;
+     commit;
+  end if;
+    
+  select count(*) 
+    into V_OBJECT_COUNT
+    from XDB.XDB$COMPLEX_TYPE x
+   where x.XMLDATA.SQLSCHEMA = P_OWNER;
+  
+  if (V_OBJECT_COUNT > 0) then
+    delete 
+      from XDB.XDB$COMPLEX_TYPE x
+     where x.XMLDATA.SQLSCHEMA = P_OWNER;
+     commit;
+  end if;
+
+  select count(*) 
+    into V_OBJECT_COUNT
+    from XDB.XDB$ELEMENT x
+   where x.XMLDATA.PROPERTY.SQLSCHEMA = P_OWNER;
+  
+  if (V_OBJECT_COUNT > 0) then
+    delete 
+      from XDB.XDB$ELEMENT x
+     where x.XMLDATA.PROPERTY.SQLSCHEMA = P_OWNER;
+     commit;
+  end if;
+
+  select count(*) 
+    into V_OBJECT_COUNT
+    from XDB.XDB$ATTRIBUTE x
+   where x.XMLDATA.SQLSCHEMA = P_OWNER;
+  
+  if (V_OBJECT_COUNT > 0) then
+    delete 
+      from XDB.XDB$ATTRIBUTE x
+     where x.XMLDATA.SQLSCHEMA = P_OWNER;
+     commit;
+  end if;
+
+  select count(*) 
+    into V_OBJECT_COUNT
+    from XDB.XDB$ANYATTR x
+   where x.XMLDATA.PROPERTY.SQLSCHEMA = P_OWNER;
+  
+  if (V_OBJECT_COUNT > 0) then
+    delete 
+      from XDB.XDB$ANYATTR x
+     where x.XMLDATA.PROPERTY.SQLSCHEMA = P_OWNER;
+     commit;
+  end if;
+
+  select count(*) 
+    into V_OBJECT_COUNT
+    from XDB.XDB$ANY x
+   where x.XMLDATA.PROPERTY.SQLSCHEMA = P_OWNER;
+  
+  if (V_OBJECT_COUNT > 0) then
+    delete 
+      from XDB.XDB$ANY x
+     where x.XMLDATA.PROPERTY.SQLSCHEMA = P_OWNER;
+     commit;
+  end if;
+
+$ELSE
+  raise UNIMPLEMENTED_FEATURE;
+$END
+end;
+--
+end;
+/
+show errors
 --
 create or replace package XDBPM_HELPER
 AUTHID DEFINER
 as
 --
+  C_ORACLE_TRACE_DIRECTORY CONSTANT VARCHAR2(128) := 'ORACLE_TRACE_DIRECTORY';
+  C_PACKAGE_TRACE_LOGFILE  CONSTANT  VARCHAR2(128) := '/public/XDBPM_PACKAGE_TRACE_' || XDBPM_INTERNAL_CONSTANTS.getTraceFileId() || '.log';
+  
   TYPE RESOURCE_EXPORT_ROW_T
   is record (
      RESID           RAW(16),
@@ -141,18 +432,14 @@ as
   
   function  isCheckedOutByResID(P_RESOID RAW) return BOOLEAN;
 
-
   function  getXMLReference(P_PATH VARCHAR2) return REF XMLType;
   function  getXMLReferenceByResID(P_RESOID RAW) return REF XMLType;
   function  decodeXMLReference(P_XMLREF REF XMLTYPE) return DECODED_REFERENCE_TABLE_T pipelined;  
 
   function getComplexType(P_PROP_NUMBER NUMBER, P_SCHEMA_NAMESPACE_MAPPINGS VARCHAR2) return XMLType;
   
-  function getSessionId return NUMBER;
   function getTraceFileName return VARCHAR2;
-  function getTraceFileName(P_SESSION_ID NUMBER) return VARCHAR2;
   function getTraceFileContents return CLOB;
-  function getTraceFileContents(P_SESSION_ID NUMBER) return CLOB;
     
   function getVersionDetails(P_RESID RAW) return RESOURCE_EXPORT_TABLE_T pipelined;      
 --    
@@ -169,6 +456,12 @@ set define off
 --
 create or replace package body XDBPM_HELPER
 as
+--
+  FILE_NOT_FOUND        EXCEPTION;
+  PRAGMA EXCEPTION_INIT(FILE_NOT_FOUND, -22288);
+
+  DIRECTORY_NOT_FOUND   EXCEPTION;
+  PRAGMA EXCEPTION_INIT(DIRECTORY_NOT_FOUND, -22285);
 --
 function getComplexType(P_PROP_NUMBER NUMBER, P_SCHEMA_NAMESPACE_MAPPINGS VARCHAR2) 
 return XMLType
@@ -187,76 +480,74 @@ begin
    return V_COMPLEX_TYPE;
 end;
 --
-function getSessionID
-return NUMBER
---
--- Return the current session id
---
-as
-  V_PID NUMBER(6);
-begin
-  select SPID
-    into V_PID
-    from SYS.V_$PROCESS p, SYS.V_$SESSION s
-   where p.ADDR = s.PADDR
-     and s.SID =  (select SID from SYS.V_$MYSTAT where ROWNUM = 1);
-   return V_PID;
-end;
---
-function getTraceFileName(P_SESSION_ID NUMBER)
+function getTraceFileName
 return VARCHAR2
 --
 -- Return the trace file name for the specified session id
 --
 as
-  V_GLOBAL_NAME     VARCHAR2(1024);
-  V_SID             VARCHAR2(8);
-  V_TRACE_FILE_NAME VARCHAR2(32);
+  V_TRACE_FILE_NAME VARCHAR2(32) := XDBPM_INTERNAL_CONSTANTS.getTraceFileId();
 begin
-  select db_name.value  || '_ora_' ||  v$process.spid ||   nvl2(v$process.traceid,  '_' || v$process.traceid, null )   || '.trc'
+  select p.value  || '_ora_' || V_TRACE_FILE_NAME  || '.trc'
     into V_TRACE_FILE_NAME
-    from v$parameter db_name
-   cross join v$process 
-         join v$session 
-           on v$process.addr = v$session.paddr
-   where db_name.name  = 'db_name'        
-     and v$session.audsid=sys_context('userenv','sessionid');
+    from v$parameter p
+   where p.name  = 'db_name';        
+     
   return V_TRACE_FILE_NAME;
 end;
 --
-function getTraceFileName
-return VARCHAR2
-as
-begin
-	return getTraceFileName(getSessionID());
-end;
---
-function getTraceFileHandle(P_SESSION_ID NUMBER)
+function getTraceFileHandle
 return bfile
 as
   pragma autonomous_transaction;
   V_TRACE_FILE_NAME VARCHAR2(256);
 begin
-  V_TRACE_FILE_NAME := getTraceFileName(P_SESSION_ID);
-  return bfilename('ORACLE_TRACE_DIRECTORY',V_TRACE_FILE_NAME);
+  V_TRACE_FILE_NAME := getTraceFileName();
+  return bfilename(C_ORACLE_TRACE_DIRECTORY,V_TRACE_FILE_NAME);
 end;
 --
-function getTraceFileContents(P_SESSION_ID NUMBER)
+function getTraceFileFromView
 return CLOB
 as
-  V_TRACE_FILE_CONTENTS       CLOB;
+  V_TRACE_FILE_NAME     VARCHAR2(64) := lower(getTraceFileName());
+  V_TRACE_FILE_CONTENTS CLOB;
+  
+  cursor getTraceFileContent(C_TRACE_FILE_NAME VARCHAR2)
+  is
+  select PAYLOAD
+    from V$DIAG_TRACE_FILE_CONTENTS
+   order by LINE_NUMBER;
 begin
-  dbms_lob.createTemporary(V_TRACE_FILE_CONTENTS,TRUE,dbms_lob.session);
-  XDBPM_SYSDBA_INTERNAL.flushTraceFile();
-  V_TRACE_FILE_CONTENTS := xdb_utilities.getFileContent(getTraceFileHandle(P_SESSION_ID));
-  return V_TRACE_FILE_CONTENTS;
+	DBMS_LOB.createTemporary(V_TRACE_FILE_CONTENTS,FALSE,DBMS_LOB.SESSION);
+	for l in getTraceFileContent(V_TRACE_FILE_NAME) loop
+	  DBMS_LOB.writeAppend(V_TRACE_FILE_CONTENTS,length(l.PAYLOAD),l.PAYLOAD);
+  end loop;
+  
+  if (DBMS_LOB.getLength(V_TRACE_FILE_CONTENTS) = 0) then
+    V_TRACE_FILE_CONTENTS := 'No content found for Trace File  "' || V_TRACE_FILE_NAME || '".';
+  end if;
+  
+	return V_TRACE_FILE_CONTENTS;
 end;
 --
 function getTraceFileContents
 return CLOB
 as
+  V_TRACE_FILE_CONTENTS       CLOB;
 begin
-	return getTraceFileContents(getSessionId());
+	begin
+    dbms_lob.createTemporary(V_TRACE_FILE_CONTENTS,TRUE,dbms_lob.session);
+    XDBPM_SYSDBA_INTERNAL.flushTraceFile();
+    V_TRACE_FILE_CONTENTS := xdb_utilities.getFileContent(getTraceFileHandle());
+  exception
+    when DIRECTORY_NOT_FOUND then
+      V_TRACE_FILE_CONTENTS := getTraceFileFromView();
+    when FILE_NOT_FOUND then
+      V_TRACE_FILE_CONTENTS := getTraceFileFromView();
+    when OTHERS then
+      RAISE;
+  end;
+  return V_TRACE_FILE_CONTENTS;
 end;
 --
 function isCheckedOutByRESID(P_RESOID RAW)
@@ -351,15 +642,10 @@ begin
 	return;
 end;
 --
-procedure createTraceFileDirectory
---
--- Create a SQL Directory object pointing at the user trace directory. Enables access to Trace Files via the BFILE constructor.
---
+function getTraceFileDirectoryLocation
+return VARCHAR2
 as
-  pragma autonomous_transaction;
   V_USER_TRACE_LOCATION VARCHAR2(512);
-  V_STATEMENT           VARCHAR2(256);
-  V_DBNAME              VARCHAR2(256);
 begin
 $IF DBMS_DB_VERSION.VER_LE_10_2 $THEN  
   execute immediate 'select VALUE from SYS.V_$PARAMETER where NAME = ''user_dump_dest''' into V_USER_TRACE_LOCATION;
@@ -370,19 +656,46 @@ $ELSIF DBMS_DB_VERSION.VER_LE_11_2 $THEN
 $ELSE
   execute immediate 'select VALUE from V$DIAG_INFO where NAME = ''Diag Trace''' into V_USER_TRACE_LOCATION;
 $END
-  dbms_output.put_line(V_USER_TRACE_LOCATION);
-  V_STATEMENT := 'create or replace directory ORACLE_TRACE_DIRECTORY as ''' || V_USER_TRACE_LOCATION || '''';
+  return V_USER_TRACE_LOCATION;
+end;
+--
+procedure createTraceFileDirectory
+--
+-- Create a SQL Directory object pointing at the user trace directory. Enables access to Trace Files via the BFILE constructor.
+--
+as
+  pragma autonomous_transaction;
+  V_STATEMENT           VARCHAR2(256);
+  V_DBNAME              VARCHAR2(256);
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_CREATE_DIRECTORY $THEN	
+  V_STATEMENT := 'create or replace directory ' || C_ORACLE_TRACE_DIRECTORY || ' as ''' || getTraceFileDirectoryLocation() || '''';
   execute immediate V_STATEMENT;
   rollback;
+$ELSE
+  NULL;
+$END
+end;
+--
+procedure checkTraceFileDirectory
+as
+  V_DIRECTORY_PATH VARCHAR2(4000);
+begin
+	begin
+  	select DIRECTORY_PATH
+	    into V_DIRECTORY_PATH
+	    from ALL_DIRECTORIES
+	   where DIRECTORY_NAME = XDBPM_HELPER.C_ORACLE_TRACE_DIRECTORY;
+	 exception
+	   when NO_DATA_FOUND then
+	     createTraceFileDirectory();
+	   when OTHERS then
+	     RAISE;
+	 end;
 end;
 --
 begin
-	if (XDBPM_SYSDBA_INTERNAL.hasTraceFileAccess) then
-	  createTraceFileDirectory();
-	end if;
-$IF $$DEBUG $THEN
-  XDB_OUTPUT.createTraceFile('/public/XDBPM_TRACE_FILE.log',TRUE);
-$END
+	checkTraceFileDirectory();
 end XDBPM_HELPER;
 /
 show errors
@@ -427,17 +740,9 @@ begin
   end if;
 end;
 --
-begin
-	NULL;
-$IF $$DEBUG $THEN
-  XDB_OUTPUT.createTraceFile('/public/XDBPM_PACKAGE_TRACE.log',TRUE);
-$END
 end;
-/
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
 alter session set current_schema = SYS
 /
 show errors
 --
-

@@ -67,7 +67,7 @@ end;
 --
 PROCEDURE resetAuthentication(P_AUTHENTICATION NUMBER DEFAULT C_DIGEST_AUTHENTICATION)
 as
-  V_CONFIG  XMLTYPE := dbms_xdb.cfg_get();
+  V_CONFIG  XMLTYPE := DBMS_XDB.cfg_get();
   V_SNIPPET XMLTYPE;
 begin
 
@@ -130,7 +130,7 @@ begin
 
   end if;
 
-  dbms_xdb.cfg_update(V_CONFIG);
+  DBMS_XDB.cfg_update(V_CONFIG);
 
 end;
 --

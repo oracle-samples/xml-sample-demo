@@ -18,8 +18,6 @@
 --
 alter session set current_schema = XDBPM
 /
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 --
 set define on
 --
@@ -2381,8 +2379,8 @@ as
 begin
 
 $IF $$DEBUG $THEN
-   XDB_OUTPUT.writeTraceFileEntry('P_XML_SCHEMA_CONFIGURATION',TRUE);
-   XDB_OUTPUT.writeTraceFileEntry(P_XML_SCHEMA_CONFIGURATION,TRUE);
+   XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || 'P_XML_SCHEMA_CONFIGURATION',TRUE);
+   XDB_OUTPUT.writeDebugFileEntry(P_XML_SCHEMA_CONFIGURATION,TRUE);
 $END
 
 	for i in G_SCHEMA_ANNOTATION_CACHE.first .. G_SCHEMA_ANNOTATION_CACHE.last loop
@@ -2397,10 +2395,10 @@ $END
         from dual;
 
 $IF $$DEBUG $THEN
-      XDB_OUTPUT.writeTraceFileEntry('Adding Annotations to /SchemaRegistrationConfiguration/SchemaInformation[' || i || ']',TRUE);
-      XDB_OUTPUT.writeTraceFileEntry('Schema Location Hint: "' || G_SCHEMA_ANNOTATION_CACHE(i).SCHEMA_LOCATION_HINT || '"',TRUE);
-      XDB_OUTPUT.writeTraceFileEntry('Annotations : ',TRUE);
-      XDB_OUTPUT.writeTraceFileEntry(V_ANNOTATIONS,TRUE);
+      XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || 'Adding Annotations to /SchemaRegistrationConfiguration/SchemaInformation[' || i || ']');
+      XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || 'Schema Location Hint: "' || G_SCHEMA_ANNOTATION_CACHE(i).SCHEMA_LOCATION_HINT || '"');
+      XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || 'Annotations : ');
+      XDB_OUTPUT.writeDebugFileEntry(V_ANNOTATIONS);
 $END
 
       select insertChildXML(
@@ -2437,8 +2435,8 @@ $END
   end loop;
 
 $IF $$DEBUG $THEN
-   XDB_OUTPUT.writeTraceFileEntry('P_XML_SCHEMA_CONFIGURATION',TRUE);
-   XDB_OUTPUT.writeTraceFileEntry(P_XML_SCHEMA_CONFIGURATION,TRUE);
+   XDB_OUTPUT.writeDebugFileEntry($$PLSQL_UNIT || 'P_XML_SCHEMA_CONFIGURATION',TRUE);
+   XDB_OUTPUT.writeDebugFileEntry(P_XML_SCHEMA_CONFIGURATION,TRUE);
 $END
 
 end;
@@ -2634,15 +2632,10 @@ end;
 --
 begin
 	G_EVENT_LIST := EVENT_LIST_T();
-  $IF $$DEBUG $THEN
-    XDB_OUTPUT.createTraceFile('/public/XDB_OPTIMIZE_XMLSCHEMA_' || to_char(SYSTIMESTAMP,'YYYY-MM-DD"T"HH24.MI.SSTZHTZM') || '.log');
-  $END
 end XDBPM_OPTIMIZE_XMLSCHEMA;
 /
 show errors
 --
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
-/
 alter SESSION SET CURRENT_SCHEMA = SYS
 /
 --

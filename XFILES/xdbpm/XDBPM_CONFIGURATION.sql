@@ -78,7 +78,7 @@ as
   V_SUMMARY XMLType;
   V_DUMMY XMLType;
 begin
-  select dbms_xdb.cfg_get()
+  select DBMS_XDB.cfg_get()
   into V_DUMMY
   from dual;
 
@@ -134,7 +134,7 @@ begin
            )
          )
   into V_SUMMARY
-  from DATABASE_SUMMARY x, (select dbms_xdb.cfg_get() config from dual);
+  from DATABASE_SUMMARY x, (select DBMS_XDB.cfg_get() config from dual);
   V_SUMMARY := XMLType(V_SUMMARY.getClobVal());
   return V_SUMMARY;
 end;
@@ -150,7 +150,7 @@ as
   V_XMLREF ref XMLType;
 begin
    begin
-     dbms_xdb.deleteResource(V_TARGET_RESOURCE,dbms_xdb.DELETE_FORCE);
+     DBMS_XDB.deleteResource(V_TARGET_RESOURCE,DBMS_XDB.DELETE_FORCE);
    exception
      when resource_not_found then
        null;
@@ -160,9 +160,9 @@ begin
    into V_XMLREF
    from dual;
 
-   V_RESULT := dbms_xdb.createResource(V_TARGET_RESOURCE,V_XMLREF);
+   V_RESULT := DBMS_XDB.createResource(V_TARGET_RESOURCE,V_XMLREF);
    
-   dbms_xdb.setAcl(V_TARGET_RESOURCE,'/sys/acls/bootstrap_acl.xml');
+   DBMS_XDB.setAcl(V_TARGET_RESOURCE,'/sys/acls/bootstrap_acl.xml');
 end;
 --
 procedure addServletMapping(
@@ -178,7 +178,7 @@ procedure addServletMapping(
 as
   V_XDB_CONFIG XMLType; 
 begin
-   V_XDB_CONFIG := dbms_xdb.cfg_get();
+   V_XDB_CONFIG := DBMS_XDB.cfg_get();
    select deleteXML
           (
             V_XDB_CONFIG,
@@ -259,7 +259,7 @@ begin
      into V_XDB_CONFIG
      from dual;
 
-  dbms_xdb.cfg_update(V_XDB_CONFIG);
+  DBMS_XDB.cfg_update(V_XDB_CONFIG);
 
 end;
 --
@@ -267,7 +267,7 @@ procedure deleteservletMapping (P_SERVLET_NAME VARCHAR2)
 as
   V_XDB_CONFIG XMLType; 
 begin
-   V_XDB_CONFIG := dbms_xdb.cfg_get();
+   V_XDB_CONFIG := DBMS_XDB.cfg_get();
    select deleteXML
           (
             V_XDB_CONFIG,
@@ -284,7 +284,7 @@ begin
           into V_XDB_CONFIG
           from dual;
    
-  dbms_xdb.cfg_update(V_XDB_CONFIG);
+  DBMS_XDB.cfg_update(V_XDB_CONFIG);
 
 end;
 --
@@ -292,7 +292,7 @@ procedure addSchemaMapping(P_NAMESPACE VARCHAR2, P_ROOT_ELEMENT VARCHAR2, P_SCHE
 is
   V_XDB_CONFIG XMLType;
 begin
-  V_XDB_CONFIG := dbms_xdb.cfg_get();
+  V_XDB_CONFIG := DBMS_XDB.cfg_get();
   if (V_XDB_CONFIG.existsNode('/xdbconfig/sysconfig/schemaLocation-mappings','xmlns="http://xmlns.oracle.com/xdb/xdbconfig.xsd"') = 0) then
     select insertChildXML
            (
@@ -328,7 +328,7 @@ begin
       from dual;
   end if;
 
-  dbms_xdb.cfg_update(V_XDB_CONFIG);
+  DBMS_XDB.cfg_update(V_XDB_CONFIG);
 
 end;
 --
@@ -336,7 +336,7 @@ procedure addMimeMapping(P_EXTENSION VARCHAR2, P_MAPPING VARCHAR2)
 is
   V_XDB_CONFIG XMLType;
 begin
-  V_XDB_CONFIG := dbms_xdb.cfg_get();
+  V_XDB_CONFIG := DBMS_XDB.cfg_get();
   if (V_XDB_CONFIG.existsNode('/xdbconfig/sysconfig/protocolconfig/common/extension-mappings/mime-mappings/mime-mapping[extension="' || P_EXTENSION || '"]','xmlns="http://xmlns.oracle.com/xdb/xdbconfig.xsd"') = 0) then
     select insertChildXML
            (
@@ -363,7 +363,7 @@ begin
       from dual;
   end if;
 
-  dbms_xdb.cfg_update(V_XDB_CONFIG);
+  DBMS_XDB.cfg_update(V_XDB_CONFIG);
 
 end;
 --
@@ -371,7 +371,7 @@ procedure registerXMLExtension(P_EXTENSION VARCHAR2)
 is
   V_XDB_CONFIG XMLType;
 begin
-  V_XDB_CONFIG := dbms_xdb.cfg_get();
+  V_XDB_CONFIG := DBMS_XDB.cfg_get();
   if (V_XDB_CONFIG.existsNode('/xdbconfig/sysconfig/protocolconfig/common/extension-mappings/xml-extensions','xmlns="http://xmlns.oracle.com/xdb/xdbconfig.xsd"') = 0) then
 
     select insertChildXML
@@ -399,7 +399,7 @@ begin
       from dual;
   end if;
 
-  dbms_xdb.cfg_update(V_XDB_CONFIG);
+  DBMS_XDB.cfg_update(V_XDB_CONFIG);
 
 end;
 --
@@ -407,7 +407,7 @@ procedure setAnonymousAccess(P_STATE VARCHAR2)
 is
   V_XDB_CONFIG XMLType;
 begin
-  V_XDB_CONFIG := dbms_xdb.cfg_get();
+  V_XDB_CONFIG := DBMS_XDB.cfg_get();
   if (V_XDB_CONFIG.existsNode('/xdbconfig/sysconfig/protocolconfig/httpconfig/allow-repository-anonymous-access') = 0) then
     select insertChildXML
            (
@@ -431,7 +431,7 @@ begin
       from dual;
   end if;
 
-  dbms_xdb.cfg_update(V_XDB_CONFIG);
+  DBMS_XDB.cfg_update(V_XDB_CONFIG);
 end;
 --
 end XDBPM_CONFIGURATION;

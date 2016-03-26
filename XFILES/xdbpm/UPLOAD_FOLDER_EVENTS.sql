@@ -98,7 +98,7 @@ as
   V_RESOURCE_PATH    DBMS_XEVENT.xdbPath;  
 begin
   V_RESOURCE_PATH   := dbms_xevent.getPath(P_EVENT);  
-  dbms_xdb.deleteResource(dbms_xevent.getName(V_RESOURCE_PATH));
+  DBMS_XDB.deleteResource(dbms_xevent.getName(V_RESOURCE_PATH));
 end;
 --  
 end;

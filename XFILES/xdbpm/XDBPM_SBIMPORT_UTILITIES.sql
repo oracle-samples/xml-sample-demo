@@ -75,7 +75,7 @@ procedure patchXMLReference(P_RESOURCE_PATH VARCHAR2,P_XMLREF REF XMLTYPE, P_SCH
 as
 begin
   getTargetSchemaInfo(P_SCHEMA_ELEMENT);
-  xdb_helper.setSBXMLContent(dbms_xdb.getRESOID(P_RESOURCE_PATH),P_XMLREF,G_TARGET_SCHEMA_OID,G_GLOBAL_ELEMENT_ID);
+  xdb_helper.setSBXMLContent(DBMS_XDB.getRESOID(P_RESOURCE_PATH),P_XMLREF,G_TARGET_SCHEMA_OID,G_GLOBAL_ELEMENT_ID);
 end;
 --  
 procedure createPrinciples(P_XML_RESOURCE XMLType )
@@ -222,7 +222,7 @@ begin
   -- If Duplicate Policy is set to SKIP do Nothing 
   --
  
-  if (dbms_xdb.existsResource(P_RESOURCE_PATH)) then
+  if (DBMS_XDB.existsResource(P_RESOURCE_PATH)) then
     if (G_DUPLICATE_POLICY = XDB_CONSTANTS.SKIP) then
       return;
     end if;
@@ -274,13 +274,13 @@ begin
   -- end if;
   --
    
-  if (dbms_xdb.existsResource(P_RESOURCE_PATH)) then
+  if (DBMS_XDB.existsResource(P_RESOURCE_PATH)) then
     --
     -- If Duplicate Policy is set to OVERWRITE_DUPLICATES treat as an update of the existing document
     --
     if (G_DUPLICATE_POLICY = XDB_CONSTANTS.OVERWRITE) then
       patchXMLReference(P_RESOURCE_PATH,P_XMLREF,V_SCHEMA_ELEMENT);        
-      dbms_xdb.setAcl(P_RESOURCE_PATH,V_ACL_PATH); 
+      DBMS_XDB.setAcl(P_RESOURCE_PATH,V_ACL_PATH); 
       patchModificationStatus(P_RESOURCE_PATH,V_RESOURCE_XML);
       return;   
     end if;
@@ -299,7 +299,7 @@ begin
 
   insert into RESOURCE_VIEW (ANY_PATH, RES) values (P_RESOURCE_PATH, V_RESOURCE_XML);     
   patchXMLReference(P_RESOURCE_PATH,P_XMLREF,V_SCHEMA_ELEMENT);        
-  dbms_xdb.setAcl(P_RESOURCE_PATH,P_ACL_PATH); 
+  DBMS_XDB.setAcl(P_RESOURCE_PATH,P_ACL_PATH); 
   patchModificationStatus(P_RESOURCE_PATH,V_RESOURCE_XML);
   return;
 
@@ -321,7 +321,7 @@ as
   V_METADATA   CLOB;
   
 begin 
-  V_LAST_RESID := dbms_xdb.GETRESOID('/');
+  V_LAST_RESID := DBMS_XDB.GETRESOID('/');
   V_STATEMENT := 'select m.RESID, m.XMLREF, m.ACL_PATH, m.METADATA, p.PATH from "' || P_USER || '".XDBPM$RESOURCE_METADATA_TABLE m, "' || P_USER || '".XDBPM$RESOURCE_PATH_TABLE p where m.RESID = p.RESID';
 
   V_ROW_COUNT := 0;

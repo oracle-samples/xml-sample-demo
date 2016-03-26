@@ -38,8 +38,6 @@ as
   function  getRewriteTrace return XMLType;  
 
   function TRACE_FOLDER return VARCHAR2 deterministic;
-  function DEBUG_FILE return VARCHAR2;
-
 
   procedure saveTraceFile;
  
@@ -48,7 +46,6 @@ as
   procedure writeDebug(P_LOG_MESSAGE VARCHAR2);
   procedure writeDebug(P_LOG_MESSAGE CLOB);
   procedure writeDebug(P_XML XMLType);
-
   function getDebugOutput return CLOB;
     
 end;
@@ -71,9 +68,6 @@ as
   G_CURRENT_OFFSET       NUMBER;
   G_CURRENT_TIMESTAMP    TIMESTAMP;
   G_CURRENT_MARKER       VARCHAR2(4000);
-
-  G_DEBUG_SEQUENCE_ID    NUMBER := 1;
-  G_DEBUG_FILE    VARCHAR2(700) := XDB_CONSTANTS.FOLDER_USER_DEBUG || '/logFiles/' || to_char(systimestamp,'YYYY-MM-DD') || '.' || lpad(XDBPM_HELPER.getSessionID(),6,'0') || '.' || lpad(G_DEBUG_SEQUENCE_ID,6,'0') || '.txt';
 
 --
 function getTraceFileFromView
@@ -99,14 +93,24 @@ function getTraceFileContents
 return CLOB
 as
 begin
-	if (XDBPM_SYSDBA_INTERNAL.hasTraceFileAccess()) then
-	  return XDBPM_HELPER.getTraceFileContents();
-	else
-	  return getTraceFileFromView();
-	end if;
-exception
-  when FILE_NOT_FOUND then
-    return 'Trace File  "' || XDBPM_HELPER.getTraceFileName() || '" not found.';
+	return XDBPM_HELPER.getTraceFileContents();
+end;
+--
+procedure saveTraceFile
+as
+  pragma autonomous_transaction;
+  V_RESULT              BOOLEAN;
+  V_TRACE_FILE_PATH     VARCHAR2(255);
+  V_TRACE_FILE_CONTENTS CLOB;
+begin
+  V_TRACE_FILE_CONTENTS := getTraceFileContents();
+  V_TRACE_FILE_PATH := TRACE_FOLDER || '/' || XDBPM_HELPER.getTraceFileName();
+  if (DBMS_XDB.existsResource(V_TRACE_FILE_PATH)) then
+    DBMS_XDB.deleteResource(V_TRACE_FILE_PATH);
+  end if;
+  V_RESULT := DBMS_XDB.createResource(V_TRACE_FILE_PATH,V_TRACE_FILE_CONTENTS);
+  dbms_lob.freeTemporary(V_TRACE_FILE_CONTENTS);
+  commit;
 end;
 --
 procedure setTraceFileOffset
@@ -260,13 +264,6 @@ begin
   return getRewriteTrace(G_CURRENT_TIMESTAMP);
 end;
 --
-function DEBUG_FILE
-return VARCHAR2
-as
-begin
-  return G_DEBUG_FILE;
-end;
---
 function TRACE_FOLDER 
 return VARCHAR2 deterministic
 as 
@@ -274,108 +271,46 @@ begin
   return C_TRACE_FOLDER;
 end;
 --
-procedure createDebugFolders
-as
-  pragma autonomous_transaction;
-begin
-  XDBPM_UTILITIES_PRIVATE.createDebugFolders(XDB_USERNAME.GET_USERNAME());
-  commit;
-end;
---
 procedure createDebugFile
 as 
-  pragma autonomous_transaction;
-  V_RESULT BOOLEAN;
 begin
-  if (not dbms_xdb.existsResource(G_DEBUG_FILE)) then
-    V_RESULT := dbms_xdb.createResource(G_DEBUG_FILE,to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' : Trace File Created.');
-    G_DEBUG_SEQUENCE_ID := G_DEBUG_SEQUENCE_ID + 1;
-    commit;
-  end if;  
+  XDB_OUTPUT.createDebugFile;
 end;
 --
 procedure switchDebugOutputFile
 as 
-  V_RESULT BOOLEAN;
 begin
-  G_DEBUG_FILE := XDB_CONSTANTS.FOLDER_USER_DEBUG || '/logFiles/' || to_char(systimestamp,'YYYY-MM-DD') || '.' || lpad(XDB_HELPER.getSessionID(),6,'0') || '.' || lpad(G_DEBUG_SEQUENCE_ID,6,'0') || '.txt';
-  createDebugFile();
+  XDB_OUTPUT.switchDebugFile;
 end;
 --
 procedure writeDebug(P_LOG_MESSAGE VARCHAR2)
 as
-  V_LOG_MESSAGE CLOB;
-  V_TIMESTAMP_INFO VARCHAR2(1024) := chr(13) || chr(10) || to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' :';
-begin
-	 
+begin	 
   createDebugFile();
-
-  dbms_lob.createTemporary(V_LOG_MESSAGE,true);
-  DBMS_LOB.WRITEAPPEND(V_LOG_MESSAGE,LENGTH(V_TIMESTAMP_INFO),V_TIMESTAMP_INFO);
-  DBMS_LOB.WRITEAPPEND(V_LOG_MESSAGE,LENGTH(P_LOG_MESSAGE),P_LOG_MESSAGE);
-  XDB_OUTPUT.writeToFile(G_DEBUG_FILE,V_LOG_MESSAGE);
-
+  XDB_OUTPUT.writeDebugFileEntry(P_LOG_MESSAGE);
 end;
 --
 procedure writeDebug(P_LOG_MESSAGE CLOB)
 as
-  V_LOG_MESSAGE CLOB;
-  V_TIMESTAMP_INFO VARCHAR2(1024) := chr(13) || chr(10) || to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' :' || chr(13) || chr(10);
 begin
-	 
-  createDebugFile();
-
-  dbms_lob.createTemporary(V_LOG_MESSAGE,true);
-  DBMS_LOB.WRITEAPPEND(V_LOG_MESSAGE,LENGTH(V_TIMESTAMP_INFO),V_TIMESTAMP_INFO);
-  dbms_lob.append(V_LOG_MESSAGE,P_LOG_MESSAGE);
-  XDB_OUTPUT.writeToFile(G_DEBUG_FILE,V_LOG_MESSAGE);
-
+	createDebugFile();
+  XDB_OUTPUT.writeDebugFileEntry(P_LOG_MESSAGE);
 end;
 --
 procedure writeDebug(P_XML XMLType)
 as
-  V_SERIALIZED_XML CLOB;
 begin
-$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
-  select P_XML.getClobVal()
-    into V_SERIALIZED_XML
-    from DUAL;
-$ELSE
-  select XMLSERIALIZE(DOCUMENT P_XML AS CLOB INDENT SIZE = 2)
-    into V_SERIALIZED_XML
-    from DUAL;
-$END 
-
-  writeDebug(V_SERIALIZED_XML);	 
+	createDebugFile();
+  XDB_OUTPUT.writeDebugFileEntry(P_XML);
 end;
 --
 function getDebugOutput
 return CLOB
 as
 begin
-  return xdburitype(G_DEBUG_FILE).getCLOB();
+  return XDBPM_OUTPUT.getDebugFileContent();
 end;
 --
-procedure saveTraceFile
-as
-  pragma autonomous_transaction;
-  V_RESULT              BOOLEAN;
-  V_TRACE_FILE_PATH     VARCHAR2(255);
-  V_TRACE_FILE_CONTENTS CLOB;
-begin
-  V_TRACE_FILE_CONTENTS := getTraceFileContents();
-  V_TRACE_FILE_PATH := TRACE_FOLDER || '/' || XDBPM_HELPER.getTraceFileName();
-  if (dbms_xdb.existsResource(V_TRACE_FILE_PATH)) then
-    dbms_xdb.deleteResource(V_TRACE_FILE_PATH);
-  end if;
-  V_RESULT := dbms_xdb.createResource(V_TRACE_FILE_PATH,V_TRACE_FILE_CONTENTS);
-  dbms_lob.freeTemporary(V_TRACE_FILE_CONTENTS);
-  commit;
-end;
---
---
-begin
-  createDebugFolders();
 end;
 /
 show errors

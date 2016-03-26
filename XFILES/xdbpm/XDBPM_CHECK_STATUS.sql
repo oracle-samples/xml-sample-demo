@@ -48,10 +48,14 @@ select '&XDBPM_STATUS'
 set define on
 --
 @@&XDBPM_STATUS
+--
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:TRUE'
 /
 begin
   dbms_utility.compile_schema('XDBPM',TRUE);
 end;
+/
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
 set pages 100
 --

@@ -116,22 +116,22 @@ $THEN
   NULL;
 $ELSE
 	if (not DBMS_XDB.existsResource(V_PUBLIC_FOLDER || '/events')) then
-    dbms_xdb.link(V_HOME_FOLDER || '/events',V_PUBLIC_FOLDER,'events',DBMS_XDB.LINK_TYPE_WEAK);
+    DBMS_XDB.link(V_HOME_FOLDER || '/events',V_PUBLIC_FOLDER,'events',DBMS_XDB.LINK_TYPE_WEAK);
 	end if;
 
-	dbms_xdb.setAcl(V_HOME_FOLDER || '/events','/sys/acls/bootstrap_acl.xml');
-	dbms_xdb.setAcl(V_HOME_FOLDER || '/events/UPLOAD_FOLDER_EVENTS.pkg','/sys/acls/bootstrap_acl.xml');
-	dbms_xdb.setAcl(V_HOME_FOLDER || '/events/UPLOAD_FOLDER_EVENTS.sql','/sys/acls/bootstrap_acl.xml');
+	DBMS_XDB.setAcl(V_HOME_FOLDER || '/events','/sys/acls/bootstrap_acl.xml');
+	DBMS_XDB.setAcl(V_HOME_FOLDER || '/events/UPLOAD_FOLDER_EVENTS.pkg','/sys/acls/bootstrap_acl.xml');
+	DBMS_XDB.setAcl(V_HOME_FOLDER || '/events/UPLOAD_FOLDER_EVENTS.sql','/sys/acls/bootstrap_acl.xml');
 
 	if (not DBMS_XDB.existsResource(V_PUBLIC_FOLDER || '/lib')) then
-    dbms_xdb.link(V_HOME_FOLDER || '/lib',V_PUBLIC_FOLDER,'lib',DBMS_XDB.LINK_TYPE_WEAK);
+    DBMS_XDB.link(V_HOME_FOLDER || '/lib',V_PUBLIC_FOLDER,'lib',DBMS_XDB.LINK_TYPE_WEAK);
 	end if;
 
-	dbms_xdb.setAcl(V_HOME_FOLDER || '/lib','/sys/acls/bootstrap_acl.xml');
-	dbms_xdb.setAcl(V_HOME_FOLDER || '/lib/XDBResource.xml','/sys/acls/bootstrap_acl.xml');
-	dbms_xdb.setAcl(V_HOME_FOLDER || '/lib/XDBResource.xsd','/sys/acls/bootstrap_acl.xml');
-	dbms_xdb.setAcl(V_HOME_FOLDER || '/lib/XDBSchema.xsd','/sys/acls/bootstrap_acl.xml');
-	dbms_xdb.setAcl(V_HOME_FOLDER || '/lib/xdbAnnotations.xsd','/sys/acls/bootstrap_acl.xml');
+	DBMS_XDB.setAcl(V_HOME_FOLDER || '/lib','/sys/acls/bootstrap_acl.xml');
+	DBMS_XDB.setAcl(V_HOME_FOLDER || '/lib/XDBResource.xml','/sys/acls/bootstrap_acl.xml');
+	DBMS_XDB.setAcl(V_HOME_FOLDER || '/lib/XDBResource.xsd','/sys/acls/bootstrap_acl.xml');
+	DBMS_XDB.setAcl(V_HOME_FOLDER || '/lib/XDBSchema.xsd','/sys/acls/bootstrap_acl.xml');
+	DBMS_XDB.setAcl(V_HOME_FOLDER || '/lib/xdbAnnotations.xsd','/sys/acls/bootstrap_acl.xml');
   commit;
 $END
 --

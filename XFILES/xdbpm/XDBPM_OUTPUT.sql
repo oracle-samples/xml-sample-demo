@@ -27,6 +27,8 @@ as
   procedure writeOutputFileEntry(P_CONTENT XMLTYPE, P_PRETTY_PRINT BOOLEAN DEFAULT TRUE,P_FLUSH BOOLEAN DEFAULT FALSE);
   procedure createOutputFile(P_FILE_PATH VARCHAR2 DEFAULT NULL, P_OVERWRITE BOOLEAN DEFAULT FALSE);
   procedure flushOutputFile;
+  function  getOutputFileContent return CLOB;
+  function  getOutputFilePath return VARCHAR2;
 
   procedure writeTraceFileEntry(P_CONTENT VARCHAR2,P_FLUSH BOOLEAN DEFAULT FALSE);
   procedure writeTraceFileEntry(P_CONTENT CLOB,P_FLUSH BOOLEAN DEFAULT FALSE);
@@ -34,6 +36,8 @@ as
   procedure traceException(P_FLUSH BOOLEAN DEFAULT TRUE);
   procedure createTraceFile(P_FILE_PATH VARCHAR2 DEFAULT NULL, P_OVERWRITE BOOLEAN DEFAULT FALSE);
   procedure flushTraceFile;
+  function  getTraceFileContent return CLOB;
+  function  getTraceFilePath return VARCHAR2;
 
   procedure writeLogFileEntry(P_CONTENT VARCHAR2,P_FLUSH BOOLEAN DEFAULT FALSE);
   procedure writeLogFileEntry(P_CONTENT CLOB,P_FLUSH BOOLEAN DEFAULT FALSE);
@@ -41,8 +45,20 @@ as
   procedure logException(P_FLUSH BOOLEAN DEFAULT TRUE);
   procedure createLogFile(P_TRACE_FILE_PATH VARCHAR2 DEFAULT NULL, P_OVERWRITE BOOLEAN DEFAULT FALSE);
   procedure flushLogFile;
+  function  getLogFileContent return CLOB;
+  function  getLogFilePath return VARCHAR2;
   
-  procedure createFile(P_RESOURCE_PATH VARCHAR2 DEFAULT NULL,P_OVERWRITE BOOLEAN DEFAULT FALSE);
+  procedure writeDebugFileEntry(P_CONTENT VARCHAR2,P_FLUSH BOOLEAN DEFAULT TRUE);
+  procedure writeDebugFileEntry(P_CONTENT CLOB,P_FLUSH BOOLEAN DEFAULT TRUE);
+  procedure writeDebugFileEntry(P_CONTENT XMLTYPE, P_PRETTY_PRINT BOOLEAN DEFAULT TRUE,P_FLUSH BOOLEAN DEFAULT TRUE);
+  procedure debugException(P_FLUSH BOOLEAN DEFAULT TRUE);
+  procedure createDebugFile;
+  procedure switchDebugFile;
+  procedure flushDebugFile;
+  function  getDebugFileContent return CLOB;
+  function  getDebugFilePath return VARCHAR2;
+
+  procedure createFile(P_RESOURCE_PATH VARCHAR2, P_OVERWRITE BOOLEAN DEFAULT FALSE);
   procedure writeToFile(P_RESOURCE_PATH VARCHAR2, P_CONTENT IN OUT CLOB);
 end;
 /
@@ -54,12 +70,48 @@ show errors
 --
 create or replace package body XDBPM_OUTPUT
 as
-  G_OUTPUT_FILE_PATH   VARCHAR2(700) := NULL;
-  G_OUTPUT_FILE_BUFFER CLOB;
-  G_TRACE_FILE_PATH   VARCHAR2(700) := NULL;
-  G_TRACE_FILE_BUFFER CLOB;
-  G_LOG_FILE_PATH   VARCHAR2(700) := NULL;
-  G_LOG_FILE_BUFFER CLOB;
+  TYPE FILE_HANDLE_T is RECORD (
+     PATH    VARCHAR2(700),
+     CONTENT CLOB
+  );
+  
+  TYPE FILE_HANDLE_LIST_T 
+    is TABLE of FILE_HANDLE_T 
+       INDEX by VARCHAR2(32);
+                        
+  G_FILE_HANDLE_LIST FILE_HANDLE_LIST_T;
+  
+  C_DEBUG_FILE    CONSTANT  VARCHAR2(32) := SYS_GUID();
+  C_OUTPUT_FILE   CONSTANT  VARCHAR2(32) := SYS_GUID();
+  C_TRACE_FILE    CONSTANT  VARCHAR2(32) := SYS_GUID();
+  C_LOG_FILE      CONSTANT  VARCHAR2(32) := SYS_GUID();
+  
+  G_VERSION NUMBER := 0;
+  
+  G_CREATING_DEBUG_FOLDERS BOOLEAN := FALSE;
+
+--
+procedure createFileInternal(P_RESOURCE_PATH VARCHAR2, P_OVERWRITE BOOLEAN DEFAULT FALSE)
+as
+  V_RESULT BOOLEAN;
+begin
+  -- DBMS_OUTPUT.put_line($$PLSQL_UNIT || '.createFileInternal : ' || P_RESOURCE_PATH);
+  if (DBMS_XDB.existsResource(P_RESOURCE_PATH)) then
+    if (P_OVERWRITE) then
+      DBMS_XDB.deleteResource(P_RESOURCE_PATH,DBMS_XDB.DELETE_FORCE);
+    end if;
+  else
+    V_RESULT := DBMS_XDB.createResource(P_RESOURCE_PATH,'');
+  end if;
+end;
+--
+procedure createFile(P_RESOURCE_PATH VARCHAR2, P_OVERWRITE BOOLEAN DEFAULT FALSE)
+as
+  pragma autonomous_transaction;
+begin
+	createFileInternal(P_RESOURCE_PATH, P_OVERWRITE);
+	commit;
+end;
 --
 procedure writeToFile(P_RESOURCE_PATH VARCHAR2, P_CONTENT IN OUT CLOB)
 as
@@ -79,80 +131,82 @@ $THEN
 $END
 
 begin	
-  dbms_lob.createTemporary(V_BINARY_CONTENT,true);
-  dbms_lob.convertToBlob(V_BINARY_CONTENT,P_CONTENT,dbms_lob.getLength(P_CONTENT),V_SOURCE_OFFSET,V_TARGET_OFFSET,nls_charset_id('AL32UTF8'),V_LANG_CONTEXT,V_WARNING);
+  DBMS_LOB.createTemporary(V_BINARY_CONTENT,true);
+  DBMS_LOB.convertToBlob(V_BINARY_CONTENT,P_CONTENT,DBMS_LOB.getLength(P_CONTENT),V_SOURCE_OFFSET,V_TARGET_OFFSET,nls_charset_id('AL32UTF8'),V_LANG_CONTEXT,V_WARNING);
 
-$IF DBMS_DB_VERSION.VER_LE_10_2 
-$THEN
-  V_RESULT := DBMS_XDB.createResource(P_RESOURCE_PATH,'');
+  -- 
+  -- Ensure File Exists 
+  -- 
+  createFileInternal(P_RESOURCE_PATH,FALSE);
+
+  -- Ensure Transaction in progress. The Select for Update is not enought to allow the LOB update (readwrite) operation.
+
+  -- DBMS_OUTPUT.put_line($$PLSQL_UNIT || '.writeToFile : ' || P_RESOURCE_PATH || '(' || USER || ')');
+  -- DBMS_OUTPUT.put_line($$PLSQL_UNIT || '.writeToFile : ' || DBMS_UTILITY.FORMAT_CALL_STACK());
+
+$IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
+  update RESOURCE_VIEW
+     set RES = updateXML(RES,'/Resource/DisplayName',extract(res,'/Resource/DisplayName'))
+   where equals_path(res, P_RESOURCE_PATH) = 1;
 $ELSE
   DBMS_XDB.touchResource(P_RESOURCE_PATH);
-$END
-   
+$END  
+
   select extractValue(res,'/Resource/XMLLob') 
     into V_EXISTING_CONTENT
     from RESOURCE_VIEW 
    where equals_path(res,P_RESOURCE_PATH) = 1
      for update;
-  
-  dbms_lob.open(V_EXISTING_CONTENT,dbms_lob.lob_readwrite);
-  dbms_lob.append(V_EXISTING_CONTENT,V_BINARY_CONTENT);
-  dbms_lob.close(V_EXISTING_CONTENT);
+ 
+  DBMS_LOB.open(V_EXISTING_CONTENT,DBMS_LOB.lob_readwrite);
+  DBMS_LOB.append(V_EXISTING_CONTENT,V_BINARY_CONTENT);
+  DBMS_LOB.close(V_EXISTING_CONTENT);
   commit;
 
-  dbms_lob.freeTemporary(V_BINARY_CONTENT);
-  dbms_lob.freeTemporary(P_CONTENT);
+  DBMS_LOB.freeTemporary(V_BINARY_CONTENT);
+  DBMS_LOB.freeTemporary(P_CONTENT);
   P_CONTENT := NULL;
 end;
 --
-procedure createFile(P_RESOURCE_PATH VARCHAR2 DEFAULT NULL,P_OVERWRITE BOOLEAN DEFAULT FALSE)
+procedure createFile(P_FILE_ID VARCHAR2, P_RESOURCE_PATH VARCHAR2 DEFAULT NULL, P_OVERWRITE BOOLEAN DEFAULT FALSE)
 as
-  pragma autonomous_transaction;
-  V_RESULT BOOLEAN;
 begin
-  if (DBMS_XDB.EXISTSRESOURCE(P_RESOURCE_PATH)) then
-    if (P_OVERWRITE) then
-      DBMS_XDB.DELETERESOURCE(P_RESOURCE_PATH,DBMS_XDB.DELETE_FORCE);
-      V_RESULT := DBMS_XDB.CREATERESOURCE(P_RESOURCE_PATH,'');
-    end if;
-  else
-      V_RESULT := DBMS_XDB.CREATERESOURCE(P_RESOURCE_PATH,'');
-  end if;
-  commit;
+	G_FILE_HANDLE_LIST(P_FILE_ID).PATH := P_RESOURCE_PATH;
+	createFile(P_RESOURCE_PATH,P_OVERWRITE);
 end;
 --
-procedure writeEntry(P_CONTENT VARCHAR2,P_BUFFER IN OUT CLOB) 
+procedure writeEntry(P_FILE_ID VARCHAR2, P_CONTENT VARCHAR2) 
 as
   V_BUFFER            VARCHAR2(32000);    
 begin
-	if (P_BUFFER IS NULL) THEN
-	  DBMS_LOB.CREATETEMPORARY(P_BUFFER,TRUE);
+	if (G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT IS NULL) THEN
+	  DBMS_LOB.CREATETEMPORARY(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,TRUE);
 	else
-    DBMS_LOB.WRITEAPPEND(P_BUFFER,2, CHR(13) || CHR(10));
+    DBMS_LOB.WRITEAPPEND(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,2,CHR(13) || CHR(10));
 	end if;
-	DBMS_LOB.WRITEAPPEND(P_BUFFER,LENGTH(P_CONTENT),P_CONTENT);
+	DBMS_LOB.WRITEAPPEND(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,LENGTH(P_CONTENT),P_CONTENT);
 end;
 --
-procedure writeEntry(P_CONTENT CLOB,P_BUFFER IN OUT CLOB) 
+procedure writeEntry(P_FILE_ID VARCHAR2, P_CONTENT CLOB) 
 as
 begin
-	if (P_BUFFER IS NULL) THEN
-	  DBMS_LOB.CREATETEMPORARY(P_BUFFER,TRUE);
+	if (G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT IS NULL) THEN
+	  DBMS_LOB.CREATETEMPORARY(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,TRUE);
 	else
-    DBMS_LOB.WRITEAPPEND(P_BUFFER,2, CHR(13) || CHR(10));
+    DBMS_LOB.WRITEAPPEND(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,2,CHR(13) || CHR(10));
 	end if;
-  DBMS_LOB.APPEND(P_BUFFER,P_CONTENT);
+  DBMS_LOB.APPEND(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,P_CONTENT);
 end;
 --
-procedure writeEntry(P_CONTENT XMLTYPE, P_PRETTY_PRINT BOOLEAN,P_BUFFER IN OUT CLOB) 
+procedure writeEntry(P_FILE_ID VARCHAR2, P_CONTENT XMLTYPE, P_PRETTY_PRINT BOOLEAN) 
 as
   V_BUFFER            VARCHAR2(32000);    
   V_SERIALIZED_XML    CLOB;
 begin
-	if (P_BUFFER IS NULL) THEN
-	  DBMS_LOB.CREATETEMPORARY(P_BUFFER,TRUE);
+	if (G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT IS NULL) THEN
+	  DBMS_LOB.CREATETEMPORARY(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,TRUE);
 	else
-    DBMS_LOB.WRITEAPPEND(P_BUFFER,2,CHR(13) || CHR(10));
+    DBMS_LOB.WRITEAPPEND(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,2,CHR(13) || CHR(10));
 	end if;
   if (P_PRETTY_PRINT) then
 $IF DBMS_DB_VERSION.VER_LE_10_2 $THEN
@@ -170,60 +224,76 @@ $END
       from DUAL;
   end if;
   
-  DBMS_LOB.APPEND(P_BUFFER,V_SERIALIZED_XML);
+  DBMS_LOB.APPEND(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,V_SERIALIZED_XML);
 end;
 --
-procedure writeException(P_BUFFER IN OUT CLOB)
+procedure writeException(P_FILE_ID VARCHAR2)
 as
-  V_BUFFER            VARCHAR2(32000);
+  V_BUFFER      VARCHAR2(32000);
 begin
-	if (P_BUFFER IS NULL) THEN
-	  DBMS_LOB.CREATETEMPORARY(P_BUFFER,TRUE);
+	if (G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT IS NULL) THEN
+	  DBMS_LOB.CREATETEMPORARY(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,TRUE);
 	else
-    DBMS_LOB.WRITEAPPEND(P_BUFFER,2,CHR(13) || CHR(10));
+    DBMS_LOB.WRITEAPPEND(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,2,CHR(13) || CHR(10));
 	end if;
 
   V_BUFFER := to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' : Exception Details' || CHR(13) || CHR(10);
-  DBMS_LOB.WRITEAPPEND(P_BUFFER,LENGTH(V_BUFFER),V_BUFFER);
+  DBMS_LOB.WRITEAPPEND(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,LENGTH(V_BUFFER),V_BUFFER);
 
   V_BUFFER := DBMS_UTILITY.FORMAT_ERROR_STACK() || CHR(13) || CHR(10);
-  DBMS_LOB.WRITEAPPEND(P_BUFFER,LENGTH(V_BUFFER),V_BUFFER);
+  DBMS_LOB.WRITEAPPEND(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,LENGTH(V_BUFFER),V_BUFFER);
 
   V_BUFFER := DBMS_UTILITY.FORMAT_ERROR_BACKTRACE() || CHR(13) || CHR(10);
-  DBMS_LOB.WRITEAPPEND(P_BUFFER,LENGTH(V_BUFFER),V_BUFFER);
+  DBMS_LOB.WRITEAPPEND(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT,LENGTH(V_BUFFER),V_BUFFER);
 end;
 --
-procedure flushFile(P_RESOURCE_PATH VARCHAR2,P_BUFFER IN OUT CLOB)
+procedure flushFile(P_FILE_ID VARCHAR2)
 as
 begin
-	if (P_BUFFER IS NOT NULL) THEN
-  	DBMS_LOB.WRITEAPPEND(P_BUFFER, 2, CHR(13) || CHR(10));
-    writeToFile(P_RESOURCE_PATH,P_BUFFER);
+	if (G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT IS NOT NULL) THEN
+  	DBMS_LOB.WRITEAPPEND(G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT, 2, CHR(13) || CHR(10));
+    writeToFile(G_FILE_HANDLE_LIST(P_FILE_ID).PATH,G_FILE_HANDLE_LIST(P_FILE_ID).CONTENT);
   end if;
 end;
 --
+function getFilePath(P_FILE_ID VARCHAR2) 
+return VARCHAR2
+as
+begin
+	return G_FILE_HANDLE_LIST(P_FILE_ID).PATH;
+end;
+--
+function getFileContent(P_FILE_ID VARCHAR2) return CLOB
+as
+begin
+	return xdburitype(G_FILE_HANDLE_LIST(P_FILE_ID).PATH).getClob();
+end;
 --
 -- Output File
 --
 procedure createOutputFile(P_FILE_PATH VARCHAR2 DEFAULT NULL,P_OVERWRITE BOOLEAN DEFAULT FALSE)
 as
-  pragma autonomous_transaction;
-  V_RESULT BOOLEAN;
 begin
-	G_OUTPUT_FILE_PATH := P_FILE_PATH;
-  createFile(G_OUTPUT_FILE_PATH,P_OVERWRITE);
+  createFile(C_OUTPUT_FILE,P_FILE_PATH,P_OVERWRITE);
+end;
+--
+function getOutputFilePath
+return VARCHAR2
+as
+begin
+	return getFilePath(C_OUTPUT_FILE);
 end;
 --
 procedure flushOutputFile
 as
 begin
-	flushFile(G_OUTPUT_FILE_PATH,G_OUTPUT_FILE_BUFFER);
+	flushFile(C_OUTPUT_FILE);
 end;
 --
 procedure writeOutputFileEntry(P_CONTENT VARCHAR2,P_FLUSH BOOLEAN DEFAULT FALSE) 
 as
 begin
-	writeEntry(P_CONTENT,G_OUTPUT_FILE_BUFFER);
+	writeEntry(C_OUTPUT_FILE,P_CONTENT);
 	if (P_FLUSH) then
 	  flushOutputFile();
 	end if;
@@ -232,7 +302,8 @@ end;
 procedure writeOutputFileEntry(P_CONTENT CLOB,P_FLUSH BOOLEAN DEFAULT FALSE) 
 as
 begin
-	writeEntry(P_CONTENT,G_OUTPUT_FILE_BUFFER);
+	writeOutputFileEntry('Clob Content',FALSE);
+	writeEntry(C_OUTPUT_FILE,P_CONTENT);
 	if (P_FLUSH) then
 	  flushOutputFile();
 	end if;
@@ -241,33 +312,44 @@ end;
 procedure writeOutputFileEntry(P_CONTENT XMLTYPE, P_PRETTY_PRINT BOOLEAN DEFAULT TRUE,P_FLUSH BOOLEAN DEFAULT FALSE) 
 as
 begin
-	writeEntry(P_CONTENT,P_PRETTY_PRINT,G_OUTPUT_FILE_BUFFER);
+	writeOutputFileEntry('XML Content',FALSE);
+	writeEntry(C_OUTPUT_FILE,P_CONTENT,P_PRETTY_PRINT);
 	if (P_FLUSH) then
 	  flushOutputFile();
 	end if;
+end;
+--
+function getOutputFileContent return CLOB
+as
+begin
+	return getFileContent(C_OUTPUT_FILE);
 end;
 --
 -- Trace File
 --
 procedure createTraceFile(P_FILE_PATH VARCHAR2 DEFAULT NULL,P_OVERWRITE BOOLEAN DEFAULT FALSE)
 as
-  pragma autonomous_transaction;
-  V_RESULT BOOLEAN;
 begin
-	G_TRACE_FILE_PATH := P_FILE_PATH;
-  createFile(G_TRACE_FILE_PATH,P_OVERWRITE);
+  createFile(C_TRACE_FILE,P_FILE_PATH,P_OVERWRITE);
+end;
+--
+function getTraceFilePath
+return VARCHAR2
+as
+begin
+	return getFilePath(C_TRACE_FILE);
 end;
 --
 procedure flushTraceFile
 as
 begin
-	flushFile(G_TRACE_FILE_PATH,G_TRACE_FILE_BUFFER);
+	flushFile(C_TRACE_FILE);
 end;
 --
 procedure writeTraceFileEntry(P_CONTENT VARCHAR2,P_FLUSH BOOLEAN DEFAULT FALSE) 
 as
 begin
-	writeEntry(P_CONTENT,G_TRACE_FILE_BUFFER);
+	writeEntry(C_TRACE_FILE,P_CONTENT);
 	if (P_FLUSH) then
 	  flushTraceFile();
 	end if;
@@ -276,7 +358,8 @@ end;
 procedure writeTraceFileEntry(P_CONTENT CLOB,P_FLUSH BOOLEAN DEFAULT FALSE) 
 as
 begin
-	writeEntry(P_CONTENT,G_TRACE_FILE_BUFFER);
+	writeTraceFileEntry('CLOB Content',FALSE);
+	writeEntry(C_TRACE_FILE,P_CONTENT);
 	if (P_FLUSH) then
 	  flushTraceFile();
 	end if;
@@ -285,7 +368,8 @@ end;
 procedure writeTraceFileEntry(P_CONTENT XMLTYPE, P_PRETTY_PRINT BOOLEAN DEFAULT TRUE,P_FLUSH BOOLEAN DEFAULT FALSE) 
 as
 begin
-	writeEntry(P_CONTENT,P_PRETTY_PRINT,G_TRACE_FILE_BUFFER);
+	writeTraceFileEntry('XML Content',FALSE);
+	writeEntry(C_TRACE_FILE,P_CONTENT,P_PRETTY_PRINT);
 	if (P_FLUSH) then
 	  flushTraceFile();
 	end if;
@@ -294,35 +378,47 @@ end;
 procedure traceException(P_FLUSH BOOLEAN DEFAULT TRUE) 
 as  
 begin
-	writeException(G_TRACE_FILE_BUFFER);
+	writeException(C_TRACE_FILE);
 	if (P_FLUSH) then
 	  flushTraceFile();
 	end if;
+end;
+--
+function getTraceFileContent return CLOB
+as
+begin
+	return getFileContent(C_TRACE_FILE);
 end;
 --
 -- Log File
 --
 procedure createLogFile(P_TRACE_FILE_PATH VARCHAR2 DEFAULT NULL,P_OVERWRITE BOOLEAN DEFAULT FALSE)
 as
-  V_RESULT BOOLEAN;
+  V_PATH VARCHAR2(700) := P_TRACE_FILE_PATH;
 begin
-	G_LOG_FILE_PATH := P_TRACE_FILE_PATH;
-	if (G_LOG_FILE_PATH is NULL) then
-	  G_LOG_FILE_PATH := '/public/' || USER || '_' || to_char(systimestamp,'YYYY-MM-DD"T"HH24.MI.SS.FF') || '.log';
+	if (V_PATH is NULL) then
+	  V_PATH := '/public/' || USER || '_' || XDBPM_INTERNAL_CONSTANTS.getTraceFileId() || '.log';
   end if;
-  createFile(G_LOG_FILE_PATH,P_OVERWRITE);
+  createFile(C_LOG_FILE,V_PATH,P_OVERWRITE);
+end;
+--
+function getLogFilePath
+return VARCHAR2
+as
+begin
+	return getFilePath(C_LOG_FILE);
 end;
 --
 procedure flushLogFile
 as
 begin
-	flushFile(G_LOG_FILE_PATH,G_LOG_FILE_BUFFER);
+	flushFile(C_LOG_FILE);
 end;
 --
 procedure writeLogFileEntry(P_CONTENT VARCHAR2,P_FLUSH BOOLEAN DEFAULT FALSE) 
 as
 begin
-	writeEntry(to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' : ' || P_CONTENT,G_LOG_FILE_BUFFER);
+	writeEntry(C_LOG_FILE,to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' : ' || P_CONTENT);
 	if (P_FLUSH) then
 	  flushLogFile();
 	end if;
@@ -331,8 +427,8 @@ end;
 procedure writeLogFileEntry(P_CONTENT CLOB,P_FLUSH BOOLEAN DEFAULT FALSE) 
 as
 begin
-	writeLogFileEntry('CLOB Content',FALSE);
-	writeEntry(P_CONTENT,G_LOG_FILE_BUFFER);
+	writeLogFileEntry(to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' : ' || 'CLOB Content',FALSE);
+	writeEntry(C_LOG_FILE,P_CONTENT);
 	if (P_FLUSH) then
 	  flushLogFile();
 	end if;
@@ -341,8 +437,8 @@ end;
 procedure writeLogFileEntry(P_CONTENT XMLTYPE, P_PRETTY_PRINT BOOLEAN DEFAULT TRUE,P_FLUSH BOOLEAN DEFAULT FALSE) 
 as
 begin
-	writeLogFileEntry('XML Content',FALSE);
-	writeEntry(P_CONTENT,P_PRETTY_PRINT,G_LOG_FILE_BUFFER);
+	writeLogFileEntry(to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' : ' || 'XML Content',FALSE);
+	writeEntry(C_LOG_FILE,P_CONTENT,P_PRETTY_PRINT);
 	if (P_FLUSH) then
 	  flushLogFile();
 	end if;
@@ -351,10 +447,123 @@ end;
 procedure logException(P_FLUSH BOOLEAN DEFAULT TRUE) 
 as  
 begin
-	writeException(G_LOG_FILE_BUFFER);
+	writeException(C_LOG_FILE);
 	if (P_FLUSH) then
 	  flushLogFile();
 	end if;
+end;
+--
+function getLogFileContent return CLOB
+as
+begin
+	return getFileContent(C_LOG_FILE);
+end;
+--
+-- Debug File
+--
+function  generateDebugFileName
+return VARCHAR2
+as
+  V_PATH VARCHAR2(700);
+begin
+  V_PATH := XDBPM_CONSTANTS.FOLDER_USER_DEBUG || '/XDBPM_DEBUG_' || lpad(XDBPM_INTERNAL_CONSTANTS.getTraceFileId(),6,'0');
+  if (G_VERSION > 0) then
+    V_PATH := V_PATH || '.' || lpad(G_VERSION,6,'0');
+  end if;
+  V_PATH := V_PATH || '.log';
+  return V_PATH;
+end;
+--
+procedure createDebugFolders
+as
+  pragma autonomous_transaction;
+begin
+	if (not G_CREATING_DEBUG_FOLDERS) then
+		G_CREATING_DEBUG_FOLDERS := TRUE;
+    XDBPM_UTILITIES_PRIVATE.createDebugFolders(XDB_USERNAME.GET_USERNAME());
+	  G_CREATING_DEBUG_FOLDERS := FALSE;
+	end if;
+  commit;
+end;
+--
+procedure createDebugFile
+as
+  V_PATH VARCHAR2(700) := generateDebugFileName;
+begin
+	begin
+    createFile(C_DEBUG_FILE,V_PATH,FALSE);
+  exception 
+    when OTHERS then
+      -- DBMS_OUTPUT.put_line($$PLSQL_UNIT || '.createDebugFile : [' || SQLCODE || '] "' || SQLERRM || '".');
+      createFile(C_DEBUG_FILE,V_PATH,FALSE);
+	end;	 	
+end;
+--
+procedure switchDebugFile
+as 
+begin
+	G_VERSION := G_VERSION + 1;
+  createDebugFile();
+end;
+--
+function getDebugFilePath
+return VARCHAR2
+as
+begin
+	return getFilePath(C_DEBUG_FILE);
+end;
+--
+procedure flushDebugFile
+as
+begin
+	flushFile(C_DEBUG_FILE);
+end;
+--
+procedure writeDebugFileEntry(P_CONTENT VARCHAR2,P_FLUSH BOOLEAN DEFAULT TRUE) 
+as
+begin
+	createDebugFile();
+	writeEntry(C_DEBUG_FILE,to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' : ' || P_CONTENT);
+	if (P_FLUSH) then
+	  flushDebugFile();
+	end if;
+end;
+--
+procedure writeDebugFileEntry(P_CONTENT CLOB,P_FLUSH BOOLEAN DEFAULT TRUE) 
+as
+begin
+	createDebugFile();
+	writeDebugFileEntry(to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' : ' || 'CLOB Content');
+	writeEntry(C_DEBUG_FILE,P_CONTENT);
+	if (P_FLUSH) then
+	  flushDebugFile();
+	end if;
+end;
+--
+procedure writeDebugFileEntry(P_CONTENT XMLTYPE, P_PRETTY_PRINT BOOLEAN DEFAULT TRUE,P_FLUSH BOOLEAN DEFAULT TRUE) 
+as
+begin
+	createDebugFile();
+	writeDebugFileEntry(to_char(systimestamp,'YYYY-MM-DD"T"HH24:MI:SS.FF') || ' : ' || 'XML Content');
+	writeEntry(C_DEBUG_FILE,P_CONTENT,P_PRETTY_PRINT);
+	if (P_FLUSH) then
+	  flushDebugFile();
+	end if;
+end;
+--
+procedure debugException(P_FLUSH BOOLEAN DEFAULT TRUE) 
+as  
+begin
+	writeException(C_DEBUG_FILE);
+	if (P_FLUSH) then
+	  flushDebugFile();
+	end if;
+end;
+--
+function getDebugFileContent return CLOB
+as
+begin
+	return getFileContent(C_DEBUG_FILE);
 end;
 --
 end;
