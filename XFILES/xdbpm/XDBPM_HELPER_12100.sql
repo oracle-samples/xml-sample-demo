@@ -28,7 +28,7 @@ grant CREATE SESSION to XDBPM
 alter user XDBPM identified by XDBPM account unlock
 /
 --
-host SQLPLUS XDBPM/XDBPM@&_CONNECT_IDENTIFIER @"&SCRIPT_LOCATION/XDBPM_GRANT_XDBADMIN.sql" 
+host sqlplus XDBPM/XDBPM@&_CONNECT_IDENTIFIER @"&SCRIPT_LOCATION/XDBPM_GRANT_XDBADMIN.sql" 
 --
 alter user XDBPM identified by XDBPM account lock
 /
