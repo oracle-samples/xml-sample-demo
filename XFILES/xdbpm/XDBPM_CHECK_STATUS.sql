@@ -49,7 +49,7 @@ set define on
 --
 @@&XDBPM_STATUS
 --
-ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:TRUE'
+ALTER SESSION SET PLSQL_CCFLAGS = 'DEBUG:FALSE'
 /
 begin
   dbms_utility.compile_schema('XDBPM',TRUE);
