@@ -70,25 +70,6 @@ as
   G_CURRENT_MARKER       VARCHAR2(4000);
 
 --
-function getTraceFileFromView
-return CLOB
-as
-  V_TRACE_FILE_NAME     VARCHAR2(64) := lower(XDBPM_HELPER.getTraceFileName());
-  V_TRACE_FILE_CONTENTS CLOB;
-  
-  cursor getTraceFileContent(C_TRACE_FILE_NAME VARCHAR2)
-  is
-  select PAYLOAD
-    from V$DIAG_TRACE_FILE_CONTENTS
-   order by LINE_NUMBER;
-begin
-	DBMS_LOB.createTemporary(V_TRACE_FILE_CONTENTS,FALSE,DBMS_LOB.SESSION);
-	for l in getTraceFileContent(V_TRACE_FILE_NAME) loop
-	  DBMS_LOB.writeAppend(V_TRACE_FILE_CONTENTS,length(l.PAYLOAD),l.PAYLOAD);
-  end loop;
-	return V_TRACE_FILE_CONTENTS;
-end;
-
 function getTraceFileContents
 return CLOB
 as

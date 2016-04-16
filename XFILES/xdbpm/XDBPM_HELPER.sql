@@ -506,6 +506,8 @@ begin
   return bfilename(C_ORACLE_TRACE_DIRECTORY,V_TRACE_FILE_NAME);
 end;
 --
+$IF DBMS_DB_VERSION.VER_LE_12_1 $THEN
+$ELSE
 function getTraceFileFromView
 return CLOB
 as
@@ -530,6 +532,7 @@ begin
 	return V_TRACE_FILE_CONTENTS;
 end;
 --
+$END
 function getTraceFileContents
 return CLOB
 as
@@ -540,10 +543,12 @@ begin
     XDBPM_SYSDBA_INTERNAL.flushTraceFile();
     V_TRACE_FILE_CONTENTS := xdb_utilities.getFileContent(getTraceFileHandle());
   exception
-    when DIRECTORY_NOT_FOUND then
+$IF DBMS_DB_VERSION.VER_LE_12_1 $THEN
+$ELSE    when DIRECTORY_NOT_FOUND then
       V_TRACE_FILE_CONTENTS := getTraceFileFromView();
     when FILE_NOT_FOUND then
       V_TRACE_FILE_CONTENTS := getTraceFileFromView();
+$END
     when OTHERS then
       RAISE;
   end;
