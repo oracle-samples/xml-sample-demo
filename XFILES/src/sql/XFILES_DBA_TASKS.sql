@@ -114,16 +114,14 @@ call DBMS_XDB.DELETESERVLETSECROLE(SERVNAME  => 'orawsv', ROLENAME  => 'XDB_WEBS
 /    
 call DBMS_XDB.ADDSERVLETMAPPING(PATTERN => '/orawsv/*', NAME    => 'orawsv')
 /
-call DBMS_XDB.ADDSERVLET
-     (
+call DBMS_XDB.ADDSERVLET(
         NAME     => 'orawsv',
         LANGUAGE => 'C',
         DISPNAME => 'Oracle Database Native Web Services',
         DESCRIPT => 'Servlet for issuing queries as a Web Service'
      )
 /
-call DBMS_XDB.ADDSERVLETSECROLE
-(
+call DBMS_XDB.ADDSERVLETSECROLE(
    SERVNAME  => 'orawsv',               
    ROLENAME  => 'XDB_WEBSERVICES',
    ROLELINK  => 'XDB_WEBSERVICES'
@@ -136,6 +134,58 @@ call DBMS_XDB.addMimeMapping('log','text/plain')
 call DBMS_XDB.addMimeMapping('ctl','text/plain')
 /
 call DBMS_XDB.addMimeMapping('exif','text/xml')
+/
+call DBMS_XDB.addMimeMapping('doc', 'application/msword')
+/
+call DBMS_XDB.addMimeMapping('dot', 'application/msword')
+/
+call DBMS_XDB.addMimeMapping('docx','application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+/
+call DBMS_XDB.addMimeMapping('dotx','application/vnd.openxmlformats-officedocument.wordprocessingml.template')
+/
+call DBMS_XDB.addMimeMapping('docm','application/vnd.ms-word.document.macroEnabled.12')
+/
+call DBMS_XDB.addMimeMapping('dotm','application/vnd.ms-word.template.macroEnabled.12')
+/
+call DBMS_XDB.addMimeMapping('xls', 'application/vnd.ms-excel')
+/
+call DBMS_XDB.addMimeMapping('xlt', 'application/vnd.ms-excel')
+/
+call DBMS_XDB.addMimeMapping('xla', 'application/vnd.ms-excel')
+/
+call DBMS_XDB.addMimeMapping('xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+/
+call DBMS_XDB.addMimeMapping('xltx','application/vnd.openxmlformats-officedocument.spreadsheetml.template')
+/
+call DBMS_XDB.addMimeMapping('xlsm','application/vnd.ms-excel.sheet.macroEnabled.12')
+/
+call DBMS_XDB.addMimeMapping('xltm','application/vnd.ms-excel.template.macroEnabled.12')
+/
+call DBMS_XDB.addMimeMapping('xlam','application/vnd.ms-excel.addin.macroEnabled.12')
+/
+call DBMS_XDB.addMimeMapping('xlsb','application/vnd.ms-excel.sheet.binary.macroEnabled.12')
+/                                   
+call DBMS_XDB.addMimeMapping('ppt', 'application/vnd.ms-powerpoint')
+/
+call DBMS_XDB.addMimeMapping('pot', 'application/vnd.ms-powerpoint')
+/
+call DBMS_XDB.addMimeMapping('pps', 'application/vnd.ms-powerpoint')
+/
+call DBMS_XDB.addMimeMapping('ppa', 'application/vnd.ms-powerpoint')
+/                                   
+call DBMS_XDB.addMimeMapping('pptx','application/vnd.openxmlformats-officedocument.presentationml.presentation')
+/
+call DBMS_XDB.addMimeMapping('potx','application/vnd.openxmlformats-officedocument.presentationml.template')
+/
+call DBMS_XDB.addMimeMapping('ppsx','application/vnd.openxmlformats-officedocument.presentationml.slideshow')
+/
+call DBMS_XDB.addMimeMapping('ppam','application/vnd.ms-powerpoint.addin.macroEnabled.12')
+/
+call DBMS_XDB.addMimeMapping('pptm','application/vnd.ms-powerpoint.presentation.macroEnabled.12')
+/
+call DBMS_XDB.addMimeMapping('potm','application/vnd.ms-powerpoint.template.macroEnabled.12')
+/
+call DBMS_XDB.addMimeMapping('ppsm','application/vnd.ms-powerpoint.slideshow.macroEnabled.12')
 /
 commit
 /
