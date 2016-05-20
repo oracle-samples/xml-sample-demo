@@ -318,26 +318,26 @@ doInstall() {
     echo "PUT \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/registrationWizard.xsl\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/GlobalElementList.xsl" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/globalElementList.xsl" | head -1)
   if [ $HttpStatus != "404" ] 
   then
     if [ $HttpStatus == "200" ] 
     then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/GlobalElementList.xsl" | head -1)
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/globalElementList.xsl" | head -1)
       if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
       then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/GlobalElementList.xsl\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        echo "PUT[DELETE] \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/globalElementList.xsl\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
         exit 5
       fi
     else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/GlobalElementList.xsl\":$HttpStatus - Operation Failed. See $logfilename for details."
+      echo "PUT[HEAD] \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/globalElementList.xsl\":$HttpStatus - Operation Failed. See $logfilename for details."
       exit 5
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xsl/GlobalElementList.xsl" "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/GlobalElementList.xsl" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/xsl/globalElementList.xsl" "$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/globalElementList.xsl" | head -1)
   if [ $HttpStatus != "201" ] 
   then
-    echo "PUT \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/GlobalElementList.xsl\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    echo "PUT \"$SERVER/home/$USER/Applications/XMLSchemaWizard/xsl/globalElementList.xsl\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Applications/XMLSchemaWizard/js/registrationWizard.js" | head -1)

@@ -41,8 +41,8 @@
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\xsl\GlobalElementList.xsl</local>
-  			<remote>%BASEFOLDER%/xsl/GlobalElementList.xsl</remote>
+  			<local>%DEMODIRECTORY%\xsl\globalElementList.xsl</local>
+  			<remote>%BASEFOLDER%/xsl/globalElementList.xsl</remote>
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>

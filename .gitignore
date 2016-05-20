@@ -6,3 +6,6 @@ XFILES/xdbpm/XDBPM_SOURCE_FILES.dat
 XFILES/xdbpm/XDBPM_SOURCE_FILES.bad
 *.bak
 *.log
+*.jdb
+*.class
+*.cdi
