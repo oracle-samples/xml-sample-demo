@@ -21,9 +21,9 @@ grant execute on DBMS_AQ to &METADATA_SCHEMA
 /
 grant execute on DBMS_AQADM to &METADATA_SCHEMA
 /
-grant execute on XDB.XDBPM_XDB       to &METADATA_SCHEMA
+grant execute on XDB.XDBPM_DBMS_XDB to &METADATA_SCHEMA
 /
-grant execute on XDB.XDBPM_RESCONFIG to &METADATA_SCHEMA
+grant execute on XDB.XDBPM_DBMS_RESCONFIG to &METADATA_SCHEMA
 /
 grant execute on XDB.XDBPM_HELPER    to &METADATA_SCHEMA
 /

@@ -9,3 +9,7 @@ XFILES/xdbpm/XDBPM_SOURCE_FILES.bad
 *.jdb
 *.class
 *.cdi
+*.class
+*.cdi
+*.class
+*.cdi
