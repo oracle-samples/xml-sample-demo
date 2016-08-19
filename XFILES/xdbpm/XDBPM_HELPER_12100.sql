@@ -35,5 +35,5 @@ alter user XDBPM identified by XDBPM account lock
 revoke CREATE SESSION from XDBPM
 /
 --
-get &SCRIPT_LOCATION/XDBPM_GRANT_XDBADMIN.log
+get XDBPM_GRANT_XDBADMIN.log
 .
