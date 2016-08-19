@@ -19,7 +19,7 @@ DEF METADATA_SCHEMA = &1
 --
 grant xdbadmin, create any directory, alter session, create public synonym to &METADATA_SCHEMA
 /
-call XDBPM.XDB_HELPER.createHomeFolder('&METADATA_SCHEMA')
+call XDBPM.XDBPM_UTILITIES_PRIVATE.createHomeFolder('&METADATA_SCHEMA')
 /
 call DBMS_XDB.setACL('/home/&METADATA_SCHEMA','/sys/acls/bootstrap_acl.xml')
 /
@@ -83,7 +83,7 @@ CREATE OR REPLACE PACKAGE BODY IMAGE_EVENT_MANAGER
 as
 end;
 /
-call XDBPM.XDB_HELPER.createHomeFolder('&METADATA_SCHEMA')
+call XDBPM.XDBPM_UTILITIES_PRIVATE.createHomeFolder('&METADATA_SCHEMA')
 /
 --
 quit
