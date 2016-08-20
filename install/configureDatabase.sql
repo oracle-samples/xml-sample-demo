@@ -90,28 +90,10 @@ grant connect, resource, unlimited tablespace to &USERNAME identified by &USERPW
 /
 alter user &USERNAME identified by &USERPWD account unlock
 /
-var SET_MD5_SCRIPT VARCHAR2(120);
+@@setDigestAuthScript
 --
-declare
-  V_SET_MD5_SCRIPT VARCHAR2(120);
-begin
-$IF DBMS_DB_VERSION.VER_LE_12_1 $THEN
-  V_SET_MD5_SCRIPT := 'doNothing.sql';
-$ELSE
-  V_SET_MD5_SCRIPT := 'enableDigest.sql';
-$END
-  :SET_MD5_SCRIPT := V_SET_MD5_SCRIPT;
-end;
-/
-undef SET_MD5_SCRIPT
+@@&DIGEST_AUTH_SCRIPT &DBA &DBAPWD
 --
-column SET_MD5_SCRIPT new_value SET_MD5_SCRIPT 
---
-select :SET_MD5_SCRIPT SET_MD5_SCRIPT
-  from dual
-/
-def SET_MD5_SCRIPT
---
-@@&SET_MD5_SCRIPT
+@@&DIGEST_AUTH_SCRIPT &USERNAME &USERPWD
 --
 quit

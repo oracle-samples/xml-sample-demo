@@ -24,29 +24,10 @@ call dbms_xdb_config.setHttpPort(&HTTPPORT)
 /
 alter user anonymous account unlock
 /
-var SET_MD5_SCRIPT VARCHAR2(120);
 --
-declare
-  V_SET_MD5_SCRIPT VARCHAR2(120);
-begin
-$IF DBMS_DB_VERSION.VER_LE_12_1 $THEN
-  V_SET_MD5_SCRIPT := 'doNothing.sql';
-$ELSE
-  V_SET_MD5_SCRIPT := 'enableDigestAuth.sql';
-$END
-  :SET_MD5_SCRIPT := V_SET_MD5_SCRIPT;
-end;
-/
-undef SET_MD5_SCRIPT
+@@setDigestAuthScript
 --
-column SET_MD5_SCRIPT new_value SET_MD5_SCRIPT 
---
-select :SET_MD5_SCRIPT SET_MD5_SCRIPT
-  from dual
-/
-def SET_MD5_SCRIPT
---
-@@&SET_MD5_SCRIPT
+@@&DIGEST_AUTH_SCRIPT &USERNAME &PASSWORD
 --
 quit
 

@@ -18,7 +18,11 @@ def PASSWORD = &2
 --
 grant CONNECT, RESOURCE, UNLIMITED TABLESPACE, XDB_SET_INVOKER to &USERNAME identified by &PASSWORD
 /
-alter user &USERNAME identified by &PASSWORD account unlock
+ALTER USER &USERNAME identified by &PASSWORD ACCOUNT UNLOCK
 /
+@@setDigestAuthScript
+--
+@@&DIGEST_AUTH_SCRIPT &USERNAME &PASSWORD
+--
 quit
 

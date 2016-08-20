@@ -486,7 +486,9 @@ var resolveExternals    = true;
 
 var dialogClosers = new Array();
 var xslProcessorCache = new Array();
-var useMSXML = !browserImplementsXSLTProcessor();
+
+var useMSXML = browserSupportsActiveXObjects();
+// var useMSXML = !browserImplementsXSLTProcessor();
 var isORDS = !isOracleRDBMS()
 
 var timezoneOffset = 0;
@@ -590,6 +592,19 @@ function isOracleRDBMS() {
    return isXDBHTTPServer(XHR);
 
 }	
+
+function browserSupportsActiveXObjects() {
+	
+  var result;
+  try {
+	  var object = new ActiveXObject(domImplementation); 
+	  result = true;
+	} catch (e) {
+		result = false;
+  }
+  return result;
+}
+
 
 function browserImplementsXSLTProcessor() {
 	
