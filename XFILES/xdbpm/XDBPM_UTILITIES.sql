@@ -689,13 +689,13 @@ end;
 procedure createHomeFolder
 as
 begin
-  XDBPM_UTILITIES_PRIVATE.createHomeFolder(XDB_USERNAME.GET_USERNAME());
+  XDBPM_UTILITIES_INTERNAL.createHomeFolder(XDB_USERNAME.GET_USERNAME());
 end;
 --
 procedure createPublicFolder
 as
 begin
-  XDBPM_UTILITIES_PRIVATE.createPublicFolder(XDB_USERNAME.GET_USERNAME());
+  XDBPM_UTILITIES_INTERNAL.createPublicFolder(XDB_USERNAME.GET_USERNAME());
 end;
 --
 function getVersionsByPath(P_RESOURCE_PATH VARCHAR2)
@@ -768,7 +768,7 @@ end;
 procedure setPublicIndexPageContent
 as
 begin
-  XDBPM_UTILITIES_PRIVATE.setPublicIndexPageContent(XDB_USERNAME.GET_USERNAME());
+  XDBPM_UTILITIES_INTERNAL.setPublicIndexPageContent(XDB_USERNAME.GET_USERNAME());
 end;
 --
 $IF DBMS_DB_VERSION.VER_LE_10_2 $THEN

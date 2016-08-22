@@ -36,7 +36,7 @@ grant execute on XDBPM_RV_HELPER to XDBPM
 /
 grant execute on XDBPM_RESCONFIG_HELPER to XDBPM
 /
-grant execute on XDBPM_UTILITIES_PRIVATE to XDBPM
+grant execute on XDBPM_UTILITIES_INTERNAL to XDBPM
 /
 --
 alter session set current_schema = XDBPM

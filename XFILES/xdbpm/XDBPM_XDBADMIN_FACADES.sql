@@ -22,7 +22,8 @@ as
 
   function existsResource(P_RESOURCE_PATH VARCHAR2) return BOOLEAN;
   function existsResource(P_XMLREF REF XMLType) return BOOLEAN;
-  --
+
+  function getLobLocator(P_ABSPATH VARCHAR2) return BLOB;
 end;
 /
 show errors 
@@ -53,6 +54,12 @@ return BOOLEAN
 as
 begin
   return XDB.XDBPM_RV_HELPER.existsResource(P_XMLREF);
+end;
+--
+function getLobLocator(P_ABSPATH VARCHAR2) return BLOB
+as
+begin
+  return XDB.XDBPM_RV_HELPER.getLobLocator(P_ABSPATH);
 end;
 --
 end;
@@ -86,41 +93,76 @@ end;
 /
 show errors
 --
-create or replace package XDBPM_UTILITIES_PRIVATE
+create or replace package XDBPM_UTILITIES_INTERNAL
 AUTHID &RIGHTS
 as
   procedure createHomeFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
   procedure createPublicFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
   procedure setPublicIndexPageContent(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
   procedure createDebugFolders(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
+
+  procedure mkdir(P_FOLDER_PATH VARCHAR2,P_FORCE VARCHAR2 default 'FALSE');
+  procedure mkdir(P_FOLDER_PATH VARCHAR2,P_FORCE BOOLEAN  default FALSE);
+  procedure rmdir(P_FOLDER_PATH VARCHAR2,P_FORCE VARCHAR2 default 'FALSE');
+  procedure rmdir(P_FOLDER_PATH VARCHAR2,P_FORCE BOOLEAN  default FALSE);
 end;
 /
 show errors
 --
-create or replace package body XDBPM_UTILITIES_PRIVATE
+create or replace package body XDBPM_UTILITIES_INTERNAL
 as
 procedure createHomeFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
 as
 begin
-	XDB.XDBPM_UTILITIES_PRIVATE.createHomeFolder(P_PRINCIPLE);
+	XDB.XDBPM_UTILITIES_INTERNAL.createHomeFolder(P_PRINCIPLE);
 end;
 --
 procedure createPublicFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
 as
 begin
-	XDB.XDBPM_UTILITIES_PRIVATE.createPublicFolder(P_PRINCIPLE);
+	XDB.XDBPM_UTILITIES_INTERNAL.createPublicFolder(P_PRINCIPLE);
 end;
 --
 procedure setPublicIndexPageContent(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
 as
 begin
-	XDB.XDBPM_UTILITIES_PRIVATE.setPublicIndexPageContent(P_PRINCIPLE);
+	XDB.XDBPM_UTILITIES_INTERNAL.setPublicIndexPageContent(P_PRINCIPLE);
 end;
 --
 procedure createDebugFolders(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
 as
 begin
-	XDB.XDBPM_UTILITIES_PRIVATE.createDebugFolders(P_PRINCIPLE);
+	XDB.XDBPM_UTILITIES_INTERNAL.createDebugFolders(P_PRINCIPLE);
+end;
+--
+procedure createDebugFolders(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME)
+as
+begin
+	XDB.XDBPM_UTILITIES_INTERNAL.createDebugFolders(P_PRINCIPLE);
+end;
+--
+procedure mkdir(P_FOLDER_PATH VARCHAR2,P_FORCE VARCHAR2 default 'FALSE')
+as
+begin
+	XDB.XDBPM_UTILITIES_INTERNAL.mkdir(P_FOLDER_PATH,P_FORCE);
+end;
+--
+procedure mkdir(P_FOLDER_PATH VARCHAR2,P_FORCE BOOLEAN  default FALSE)
+as
+begin
+	XDB.XDBPM_UTILITIES_INTERNAL.mkdir(P_FOLDER_PATH,P_FORCE);
+end;
+--
+procedure rmdir(P_FOLDER_PATH VARCHAR2,P_FORCE VARCHAR2 default 'FALSE')
+as
+begin
+	XDB.XDBPM_UTILITIES_INTERNAL.mkdir(P_FOLDER_PATH,P_FORCE);
+end;
+--
+procedure rmdir(P_FOLDER_PATH VARCHAR2,P_FORCE BOOLEAN  default FALSE)
+as
+begin
+	XDB.XDBPM_UTILITIES_INTERNAL.mkdir(P_FOLDER_PATH,P_FORCE);
 end;
 --
 end;

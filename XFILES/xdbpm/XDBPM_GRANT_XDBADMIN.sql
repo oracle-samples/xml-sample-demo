@@ -14,7 +14,7 @@ grant XDBADMIN to package XDBPM_RV_HELPER
 /
 grant XDBADMIN to package XDBPM_RESCONFIG_HELPER
 /
-grant XDBADMIN to package XDBPM_UTILITIES_PRIVATE
+grant XDBADMIN to package XDBPM_UTILITIES_INTERNAL
 /
 --
 spool off

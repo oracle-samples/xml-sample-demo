@@ -14,3 +14,4 @@ XFILES/xdbpm/XDBPM_SOURCE_FILES.bad
 *.class
 *.cdi
 *.class
+*.class

@@ -30,7 +30,8 @@ as
 
   function existsResource(P_RESOURCE_PATH VARCHAR2) return BOOLEAN;
   function existsResource(P_XMLREF REF XMLType) return BOOLEAN;
-  --
+
+  function getLobLocator(P_ABSPATH VARCHAR2) return BLOB;
 end;
 /
 show errors 
@@ -147,6 +148,18 @@ exception
      RAISE;
 end;
 --
+function getLobLocator(P_ABSPATH VARCHAR2) 
+return BLOB 
+as
+  V_RESULT BLOB;
+begin
+  select extractValue(res,'/Resource/XMLLob')
+    into V_RESULT
+    from resource_view
+   where equals_path(res,P_ABSPATH) = 1;
+  return V_RESULT;
+end;
+--
 end;
 /
 show errors
@@ -195,14 +208,20 @@ end;
 /
 show errors
 --
-create or replace package XDBPM_UTILITIES_PRIVATE
+create or replace package XDBPM_UTILITIES_INTERNAL
 AUTHID &RIGHTS
 as
   procedure createHomeFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
   procedure createPublicFolder(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
   procedure setPublicIndexPageContent(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME);
-  
   procedure createDebugFolders(P_PRINCIPLE VARCHAR2 default XDB_USERNAME.GET_USERNAME); 
+
+  procedure mkdir(P_FOLDER_PATH VARCHAR2,P_FORCE VARCHAR2 default 'FALSE');
+  procedure mkdir(P_FOLDER_PATH VARCHAR2,P_FORCE BOOLEAN  default FALSE);
+  procedure rmdir(P_FOLDER_PATH VARCHAR2,P_FORCE VARCHAR2 default 'FALSE');
+  procedure rmdir(P_FOLDER_PATH VARCHAR2,P_FORCE BOOLEAN  default FALSE);
+  
+  function getLobLocator(P_ABSPATH VARCHAR2) return BLOB;
 end;
 /
 show errors
@@ -211,7 +230,7 @@ set define off
 --
 -- & Characters is HTML Fragments..
 --
-create or replace package body XDBPM_UTILITIES_PRIVATE
+create or replace package body XDBPM_UTILITIES_INTERNAL
 as
 --
 procedure changeOwnerInternal(P_RESOURCE_PATH VARCHAR2, P_NEW_OWNER VARCHAR2)
@@ -621,6 +640,90 @@ begin
     createLoggingFolders(V_PRINCIPLE);   
   end if;
    
+end;
+--
+procedure createFolderTree(P_FOLDER_PATH varchar2)
+as
+  pathSeperator varchar2(1) := '/';
+  parentFolderPath varchar2(256);
+  result boolean;
+begin
+  if (not XDBPM_DBMS_XDB.existsResource(P_FOLDER_PATH)) then
+    if instr(P_FOLDER_PATH,pathSeperator,-1) > 1 then
+      parentFolderPath := substr(P_FOLDER_PATH,1,instr(P_FOLDER_PATH,pathSeperator,-1)-1);    
+      createFolderTree(parentFolderPath);
+    end if;
+    result := XDBPM_DBMS_XDB.createFolder(P_FOLDER_PATH);
+  end if;
+end;
+--
+procedure mkdir(P_FOLDER_PATH VARCHAR2, P_FORCE BOOLEAN default false)
+as
+  res boolean;
+begin
+  if (not XDBPM_DBMS_XDB.existsResource(P_FOLDER_PATH)) then
+    if (P_FORCE) then
+      createFolderTree(P_FOLDER_PATH);
+    else
+      res := XDBPM_DBMS_XDB.createFolder(P_FOLDER_PATH);
+    end if;
+  end if;
+end;
+--
+procedure mkdir(P_FOLDER_PATH VARCHAR2, P_FORCE VARCHAR2 default 'FALSE')
+as
+  f boolean;
+begin
+  mkdir(P_FOLDER_PATH,upper(P_FORCE) = 'TRUE');
+end;
+--
+procedure deleteFolderTree(P_FOLDER_PATH VARCHAR2)
+as
+  cursor getSubFolders is
+  select path, extractValue(res,'/Resource/RefCount') REFCOUNT
+    from path_view
+   where under_path(res,1,P_FOLDER_PATH) = 1;
+
+begin
+  delete 
+    from path_view
+   where under_path(res,1,P_FOLDER_PATH) = 1
+     and existsNode(res,'/Resource[@Container = "false"]') = 1;
+   
+   -- At this point only subFolders should remain.
+   -- Delete Recursively where REFCOUNT is 1 and remove Link where REFCOUNT > 1
+   
+   for folder in getSubFolders loop
+     if (folder.REFCOUNT = 1 ) then
+       deleteFolderTree(folder.path);
+     else
+       XDBPM_DBMS_XDB.deleteResource(folder.path);
+     end if;
+   end loop;
+
+   XDBPM_DBMS_XDB.deleteResource(P_FOLDER_PATH);
+end;
+--
+procedure rmdir(P_FOLDER_PATH VARCHAR2, P_FORCE BOOLEAN default FALSE)
+as
+begin
+  if (P_FORCE) then
+    deleteFolderTree(P_FOLDER_PATH);
+  else
+    XDBPM_DBMS_XDB.deleteResource(P_FOLDER_PATH);
+  end if;
+end;
+--
+procedure rmdir(P_FOLDER_PATH VARCHAR2, P_FORCE VARCHAR2 default 'FALSE')
+as
+begin
+  rmdir(P_FOLDER_PATH,upper(P_FORCE) = 'TRUE');
+end;
+--
+function getLobLocator(P_ABSPATH VARCHAR2) return BLOB
+as
+begin
+  return XDBPM_RV_HELPER.getLobLocator(P_ABSPATH);
 end;
 --
 end;

@@ -79,8 +79,8 @@ end;
 declare
   V_RESULT boolean;
 begin
-	XDBPM.XDBPM_UTILITIES_PRIVATE.createHomeFolder('XDBPM');
-  XDBPM.XDBPM_UTILITIES_PRIVATE.createPublicFolder('XDBPM');  
+	XDBPM.XDBPM_UTILITIES_INTERNAL.createHomeFolder('XDBPM');
+  XDBPM.XDBPM_UTILITIES_INTERNAL.createPublicFolder('XDBPM');  
 end;
 /
 --
