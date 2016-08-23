@@ -188,6 +188,7 @@ doInstall() {
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/deleteMetadataSchema.sql $USER
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeEventHandler.sql XDBMETADATA /publishedContent/repositoryFeatures/xml/imageEventConfiguration.xml
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeRepositoryQueue.sql XDBMETADATA
+  sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeEventHandler.sql XDBMETADATA /home/$USER/imageMetadata/resConfig/imageGalleryResConfig.xml
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeEventHandler.sql $USER /home/$USER/imageMetadata/resConfig/imageEventConfiguration.xml
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeEventHandler.sql $USER /home/$USER/imageMetadata/resConfig/imageGalleryConfiguration.xml
   sqlplus $DBA/$DBAPWD@$ORACLE_SID @$demohome/deinstall/sql/removeRepositoryQueue.sql $USER

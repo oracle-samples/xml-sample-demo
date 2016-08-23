@@ -70,6 +70,9 @@
 		<!-- Remove Legacy Event Queue -->
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\removeRepositoryQueue.sql XDBMETADATA</action>
 
+		<!-- Remove Legacy Event Handler -->
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\removeEventHandler.sql XDBMETADATA /home/%USER%/imageMetadata/resConfig/imageGalleryResConfig.xml</action>
+
 		<!-- Remove Current Event Handler -->
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\removeEventHandler.sql %USER% %EVENT_RESCONFIG%</action>
 

@@ -34,7 +34,7 @@ select rv.ANY_PATH, rv.RESID, RESCONFIG_ID
          $R/Resource/RCList/OID' 
          passing rv.RES as "R"
        )
-   and not exists (SELECT 1 from XDB.XDB$RESCONFIG rc where RCE.RESCONFIG_ID = RC.OBJECT_ID);
+   and not exists (SELECT 1 from XDB.XDB$RESCONFIG rc where RCE.RESCONFIG_ID = RC.OBJECT_ID)
 /
 --
 -- Remove RESCONFIG list from Resources with a RESCONFIG that will result in a dangling REF
@@ -87,7 +87,7 @@ select rv.ANY_PATH, rv.RESID, RESCONFIG_ID
          $R/Resource/RCList/OID' 
          passing rv.RES as "R"
        )
-   and not exists (SELECT 1 from XDB.XDB$RESCONFIG rc where RCE.RESCONFIG_ID = RC.OBJECT_ID);
+   and not exists (SELECT 1 from XDB.XDB$RESCONFIG rc where RCE.RESCONFIG_ID = RC.OBJECT_ID)
 /
 declare
   V_RESULT BOOLEAN;
