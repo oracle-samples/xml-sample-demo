@@ -33,7 +33,9 @@ declare
       and equals_path(r.res,targetPath) = 1
       and p.path <> targetPath;
 begin
+  dbms_output.put_line('Processing: &RESCONFIG_PATH');
   for p in findPaths('&RESCONFIG_PATH') loop
+    dbms_output.put_line('Processing: ' + p.PATH);
     dbms_xdb.deleteResource(p.PATH);
   end loop;
   commit;

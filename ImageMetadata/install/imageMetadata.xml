@@ -1,20 +1,21 @@
 <installerConfiguration>
 
 	<parameters>
-		<parameter name="%DEMONAME%"       value="Oracle XML DB Repository Metadata and Events"/>
+		<parameter name="%DEMONAME%"          value="Oracle XML DB Repository Metadata and Events"/>
     
-		<parameter name="%HOMEFOLDER%"     value="/home/%USER%"/>
-		<parameter name="%BASEFOLDER%"     value="%HOMEFOLDER%/imageMetadata"/>
-  	<parameter name="%PUBLICFOLDER%"   value="/publishedContent"/>
-  	<parameter name="%SCHEMAURL%"      value="http://xmlns.oracle.com/xdb/extras/imageMetadata.xsd"/>
-	  <parameter name="%RESCONFIG_PATH%" value="%BASEFOLDER%/resConfig/imageEventConfiguration.xml"/>
-	  <parameter name="%XFILES_SCHEMA%"  value="XFILES"/>
-		<parameter name="%XFILES_ROOT%"    value="XFILES"/>
+		<parameter name="%HOMEFOLDER%"        value="/home/%USER%"/>
+		<parameter name="%BASEFOLDER%"        value="%HOMEFOLDER%/imageMetadata"/>
+  	<parameter name="%PUBLICFOLDER%"      value="/publishedContent"/>
+  	<parameter name="%SCHEMAURL%"         value="http://xmlns.oracle.com/xdb/extras/imageMetadata.xsd"/>
+	  <parameter name="%EVENT_RESCONFIG%"   value="%BASEFOLDER%/resConfig/imageEventConfiguration.xml"/>
+	  <parameter name="%GALLERY_RESCONFIG%" value="%BASEFOLDER%/resConfig/imageGalleryConfiguration.xml"/>
+	  <parameter name="%XFILES_SCHEMA%"     value="XFILES"/>
+		<parameter name="%XFILES_ROOT%"       value="XFILES"/>
 
-		<parameter name="protocol"         value="HTTP"/>
-		<parameter name="enableHTTPTrace"  value="false"/>
+		<parameter name="protocol"            value="HTTP"/>
+		<parameter name="enableHTTPTrace"     value="false"/>
 		
-		<parameter name="%DEBUG%"          value="false"/>
+		<parameter name="%DEBUG%"             value="false"/>
 	</parameters>
 
 	<installation>
@@ -55,7 +56,7 @@
   			<remote>%BASEFOLDER%/sql/imageMetadataConstants.sql</remote>
   		</action>
   	</action>
-  	<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\imageMetadataConstants.sql %USER%</action>
+  	<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\sql\imageMetadataConstants.sql %USER% %EVENT_RESCONFIG% %GALLERY_RESCONFIG%</action>
 
     <!-- Remove 10gR2 version of the demo -->
 		<action type="SYSDBA" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\remove10gR2Demo.sql</action>
@@ -70,7 +71,10 @@
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\removeRepositoryQueue.sql XDBMETADATA</action>
 
 		<!-- Remove Current Event Handler -->
-		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\removeEventHandler.sql %USER% %RESCONFIG_PATH%</action>
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\removeEventHandler.sql %USER% %EVENT_RESCONFIG%</action>
+
+		<!-- Remove Current Event Handler -->
+		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\removeEventHandler.sql %USER% %GALLERY_RESCONFIG%</action>
 
 		<!-- Remove Current Event Queue -->
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\deinstall\sql\removeRepositoryQueue.sql %USER%</action>
@@ -144,7 +148,7 @@
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
   			<local>%DEMODIRECTORY%\resConfig\imageEventConfiguration.xml</local>
-  			<remote>%BASEFOLDER%/resConfig/imageEventConfiguration.xml</remote>
+  			<remote>%EVENT_RESCONFIG%</remote>
   		</action>
    	</action>  
 
@@ -244,8 +248,8 @@
     <action type="UPLOAD">
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<local>%DEMODIRECTORY%\resConfig\imageGalleryResConfig.xml</local>
-  			<remote>%BASEFOLDER%/resConfig/imageGalleryResConfig.xml</remote>
+  			<local>%DEMODIRECTORY%\resConfig\imageGalleryConfiguration.xml</local>
+  			<remote>%GALLERY_RESCONFIG%</remote>
   		</action>
    	</action>
 		<action type="RUNSQL" user="%DBA%" password="%DBAPASSWORD%">%DEMODIRECTORY%\sql\createImageCategoryFolders.sql %USER%</action>
@@ -267,8 +271,8 @@
 				<target>%DEMODIRECTORY%\resConfig\imageEventConfiguration.xml</target>
 			</file>
 			<file>
-				<source>%DEMODIRECTORY%\setup\cloneSource\imageGalleryResConfig.xml</source>
-				<target>%DEMODIRECTORY%\resConfig\imageGalleryResConfig.xml</target>
+				<source>%DEMODIRECTORY%\setup\cloneSource\imageGalleryConfiguration.xml</source>
+				<target>%DEMODIRECTORY%\resConfig\imageGalleryConfiguration.xml</target>
 			</file>
 			<file>
 				<source>%DEMODIRECTORY%\setup\cloneSource\EXIFViewer.js</source>
