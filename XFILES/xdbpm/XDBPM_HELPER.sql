@@ -148,6 +148,7 @@ create or replace package XDBPM_SYSDBA_INTERNAL
 as
   C_WRITE_TO_TRACE_FILE constant binary_integer := 1;
 
+	procedure resetResConfigs(P_RESID RAW);
   procedure resetLobLocator(P_RESID RAW);
   procedure setBinaryContent(P_RESID RAW, P_SCHEMA_OID RAW, P_BINARY_ELEMENT_ID NUMBER);
   procedure setTextContent(P_RESID RAW, P_SCHEMA_OID RAW, P_TEXT_ELEMENT_ID NUMBER);
@@ -201,6 +202,37 @@ $IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN
      set r.XMLDATA.XMLLOB = empty_blob()
    where OBJECT_ID = P_RESID
      and r.XMLDATA.XMLLOB is null;
+$ELSE
+  raise UNIMPLEMENTED_FEATURE;
+$END
+end;
+--
+procedure resetResConfigs(P_RESID RAW)
+as
+/*
+**
+** TODO: Delete the offending object(s) rather than the entire set of RESCONFIG entries.
+**
+** Remove the RCList (entry) if the RCLIST contains a reference to a non existing RESCONFIG.
+**
+*/
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+  update XDB.XDB$RESOURCE r
+     set r.XMLDATA.RCLIST = NULL
+   where OBJECT_ID = P_RESID
+     and r.XMLDATA.RCLIST is not NULL
+     and exists (
+           select 1
+             from XDB.XDB$RESOURCE r,
+                  table(r.XMLDATA.RCLIST.OID) x
+						where OBJECT_ID = P_RESID
+              and not exists (
+                        select 1 
+                          from XDB.XDB$RESCONFIG rc
+                         where COLUMN_VALUE = rc.OBJECT_ID
+                      )
+         );    
 $ELSE
   raise UNIMPLEMENTED_FEATURE;
 $END

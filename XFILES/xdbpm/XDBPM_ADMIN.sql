@@ -29,11 +29,13 @@ as
     FUNCTION DIGEST_AUTHENTICATION return number deterministic;
     FUNCTION CUSTOM_AUTHENTICATION return number deterministic;
     
-    PROCEDURE resetAuthentication(P_AUTHENTICATION NUMBER DEFAULT C_DIGEST_AUTHENTICATION);
-    procedure releaseDavLocks;
+    PROCEDURE resetAuthentication(P_AUTHENTICATION NUMBER DEFAULT C_DIGEST_AUTHENTICATION);   
     procedure setDigest;
     procedure setBasic;
  
+    procedure releaseDavLocks;
+    procedure resetResConfigs(P_RESOURCE_PATH VARCHAR2);
+
 end;
 /
 show errors
@@ -134,12 +136,6 @@ begin
 
 end;
 --
-procedure releaseDavLocks
-as
-begin 
-    XDBPM_SYSDBA_INTERNAL.releaseDavLocks;
-end; 
---
 procedure setDigest 
 as 
 begin
@@ -150,6 +146,37 @@ procedure setBasic
 as 
 begin
 	 resetAuthentication(BASIC_AUTHENTICATION);
+end;
+--
+procedure releaseDavLocks
+as
+begin 
+    XDBPM_SYSDBA_INTERNAL.releaseDavLocks;
+end; 
+--
+procedure RESETRESCONFIGS(P_RESOURCE_PATH VARCHAR2) 
+as
+  V_RESID RAW(16);
+begin
+	select RESID
+	  into V_RESID
+	  from RESOURCE_VIEW rv,
+	       XMLTable(
+           'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
+           $R/Resource/RCList/OID'
+           passing rv.RES as "R"
+           columns
+             RESCONFIG_ID RAW(16) path '.'
+         ) rce
+	 where equals_path(rv.RES,P_RESOURCE_PATH) = 1
+     and XMLEXists(
+          'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
+           $R/Resource/RCList' 
+           passing rv.RES as "R"
+         )
+     and not exists (SELECT 1 from XDB.XDB$RESCONFIG rc where RESCONFIG_ID = RC.OBJECT_ID);
+   DBMS_OUTPUT.put_line('Processing : ' || V_RESID);
+   XDBPM_SYSDBA_INTERNAL.resetResConfigs(V_RESID);
 end;
 --
 end;

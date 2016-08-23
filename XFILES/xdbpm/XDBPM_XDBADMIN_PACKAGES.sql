@@ -155,7 +155,7 @@ as
 begin
   select extractValue(res,'/Resource/XMLLob')
     into V_RESULT
-    from resource_view
+    from RESOURCE_VIEW
    where equals_path(res,P_ABSPATH) = 1;
   return V_RESULT;
 end;

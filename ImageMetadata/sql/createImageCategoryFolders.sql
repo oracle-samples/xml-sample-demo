@@ -15,6 +15,80 @@
 set echo on
 spool sqlOperations.log APPEND
 --
+set serveroutput on
+--
+-- Look for resources with a RESCONFIG that will result in a dangling REF. This can arise if earlier versions of this demo were installed in the 
+-- target database.
+--      
+select rv.ANY_PATH, rv.RESID, RESCONFIG_ID
+  from RESOURCE_VIEW rv,
+       XMLTable(
+        'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
+         $R/Resource/RCList/OID'
+         passing rv.RES as "R"
+         columns
+           RESCONFIG_ID RAW(16) path '.'
+       ) rce
+ where XMLEXists(
+        'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
+         $R/Resource/RCList/OID' 
+         passing rv.RES as "R"
+       )
+   and not exists (SELECT 1 from XDB.XDB$RESCONFIG rc where RCE.RESCONFIG_ID = RC.OBJECT_ID);
+/
+--
+-- Remove RESCONFIG list from Resources with a RESCONFIG that will result in a dangling REF
+--      
+declare
+  cursor getResourceList 
+  is
+  select rv.ANY_PATH
+    from RESOURCE_VIEW rv,
+         XMLTable(
+          'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
+           $R/Resource/RCList/OID'
+           passing rv.RES as "R"
+           columns
+             OBJECT_ID RAW(16) path '.'
+         ) rce
+   where XMLEXists(
+          'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
+           $R/Resource/RCList/OID' 
+           passing rv.RES as "R"
+         )
+     and not exists (SELECT 1 from XDB.XDB$RESCONFIG rc where RCE.OBJECT_ID = RC.OBJECT_ID);
+begin
+  for r in getResourceList() loop
+    DBMS_OUTPUT.put_line('Processing : ' || r.ANY_PATH);
+    /*
+      update RESOURCE_VIEW
+	       set RES = deleteXML(RES,'/Resource/RCList')
+       where equals_path(RES,r.ANY_PATH) = 1;
+    */
+    XDB_ADMIN.resetResConfigs(r.ANY_PATH);
+  end loop;
+  commit;
+end;
+/
+--
+-- Verify Cleanup was successful. The following query should return no rows.
+--
+select rv.ANY_PATH, rv.RESID, RESCONFIG_ID
+  from RESOURCE_VIEW rv,
+       XMLTable(
+        'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
+         $R/Resource/RCList/OID'
+         passing rv.RES as "R"
+         columns
+           RESCONFIG_ID RAW(16) path '.'
+       ) rce
+ where XMLEXists(
+        'declare default element namespace "http://xmlns.oracle.com/xdb/XDBResource.xsd"; (: :)
+         $R/Resource/RCList/OID' 
+         passing rv.RES as "R"
+       )
+   and not exists (SELECT 1 from XDB.XDB$RESCONFIG rc where RCE.RESCONFIG_ID = RC.OBJECT_ID);
+/
 declare
   V_RESULT BOOLEAN;
 begin
