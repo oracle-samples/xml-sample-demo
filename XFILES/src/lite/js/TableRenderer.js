@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";
+
 function onPageLoaded() {
   loadContents();
 }
@@ -28,7 +30,7 @@ function loadContents() {
       showUserErrorMessage("Unable to access : " + e.target + ". Access Denied.");
     }
     else {
-  		error = new xfilesException('SourceViewer.viewSource',12, resourceURL, e);
+  		var error = new xfilesException('SourceViewer.viewSource',12, resourceURL, e);
   		throw error;
     } 
   }

@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";
+
 var dummy // Declaring a variable seems to help IE load the script correctly
 
 function onPageLoaded() {
@@ -52,7 +54,7 @@ function processUpdate(mgr, outputWindow, closeFormWhenFinished) {
       return;
     }
     
-    error = new xfilesException('ResourceProperties.processUpdate',12, resourceURL, null);
+    var error = new xfilesException('ResourceProperties.processUpdate',12, resourceURL, null);
     error.setDescription("Invalid Update Properties Document Receieved :  " + soapResponse.serialize());
     throw error;
   }
@@ -72,11 +74,11 @@ function doSaveAndClose() {
 
 function updateProperties(resourceURL, closeFormWhenFinished, newValues, outputWindow) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "UPDATEPROPERTIES";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var XHR = mgr.createPostRequest();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processUpdate(mgr, outputWindow, closeFormWhenFinished)}};
 

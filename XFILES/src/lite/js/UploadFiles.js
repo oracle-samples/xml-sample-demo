@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";
+
 function onPageLoaded() {
 
   setDefaults();
@@ -36,7 +38,7 @@ function doUploadFiles() {
 
 	var fileCollection = document.getElementsByName('FILE');
 
-  for (i=0; i < fileCollection.length; i++) {
+  for (var i=0; i < fileCollection.length; i++) {
   	if (fileCollection[i].value != "") {
   		document.getElementById('Loading').style.display = "block";
       document.getElementById('uploadFiles').submit();

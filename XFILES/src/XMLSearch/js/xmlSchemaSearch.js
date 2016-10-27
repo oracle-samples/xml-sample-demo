@@ -13,6 +13,7 @@
  * ================================================
  */
 
+"use strict";
 
 function loadXMLSchemaXSL() {
   stylesheetURL = '/XFILES/XMLSearch/xsl/xmlSchema.xsl';
@@ -20,11 +21,11 @@ function loadXMLSchemaXSL() {
 
 function invokeGetRootNodeMap(nodeMap, schemaLocationHint, schemaOwner, elementName) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SEARCH_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SEARCH_SERVICES";
   var method =  "GETXMLSCHEMAROOTNODEMAP";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var XHR  = mgr.createPostRequest();
   var requestDate  = new Date();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processResponse(mgr, nodeMap, requestDate)}};
@@ -40,11 +41,11 @@ function invokeGetRootNodeMap(nodeMap, schemaLocationHint, schemaOwner, elementN
 
 function invokeGetChildNodeMap(nodeMap, propertyNumber) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SEARCH_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SEARCH_SERVICES";
   var method =  "GETXMLSCHEMACHILDNODEMAP";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var XHR  = mgr.createPostRequest();
   var requestDate  = new Date();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processResponse(mgr, nodeMap, requestDate)}};
@@ -58,11 +59,11 @@ function invokeGetChildNodeMap(nodeMap, propertyNumber) {
 
 function invokeGetSubstitutionGroup(nodeMap, headID,id) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SEARCH_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SEARCH_SERVICES";
   var method =  "GETSUBSTITUTIONGROUP";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var XHR  = mgr.createPostRequest();
   var requestDate  = new Date();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processResponse(mgr, nodeMap, requestDate, id)}};

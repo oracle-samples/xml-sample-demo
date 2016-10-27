@@ -12,6 +12,8 @@
  *
  * ================================================
  */
+ 
+ "use strict";
 
 var restAPI = new RestAPI();
 
@@ -19,7 +21,7 @@ function RestAPI() {
 
   var isORDS = false;
 
-  var schema 
+  var schema     
   var collectionName
   var logger = new Array();
   var self = this;
@@ -379,13 +381,13 @@ function RestAPI() {
    			authenticatedUser = getHttpUsername();
   		}; 
     	if (authenticatedUser != schema) {
-        error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
+        var error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
         error.setDescription('User Mismatch following ReAuthentication : Expected "' + schema + '", found "' + authenticatedUser + '".');
     	  throw error;
 		  }  		
     }
     catch (e) {
-      error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
+      var error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
       error.setDescription('Exeception raised while performing ReAuthentication process for "' + schema + '".');
     	throw error;
   	}	  	

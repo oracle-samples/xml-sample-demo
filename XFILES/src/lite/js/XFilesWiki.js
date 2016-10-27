@@ -12,6 +12,8 @@
  *
  * ================================================
  */
+ 
+"use strict";
 
 var xinhaController 
 
@@ -55,14 +57,14 @@ function processUpdate(mgr, updatedContent, closeForm) {
 
 function saveChanges(closeForm) {
     
-  var schema  = "XFILES";
-  var package = "XFILES_WIKI_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_WIKI_SERVICES";
   var method =  "UPDATEWIKIPAGE";
 
   var newContent = new xmlDocument().parse('<wiki:XFilesWikiPage xmlns:wiki="http://xmlns.oracle.com/xdb/xfiles/wiki" xmlns:xhtml="http://www.w3.org/1999/xhtml"/>');
   newContent.getDocumentElement().appendChild(newContent.importNode(xinhaController.getContent().getDocumentElement().cloneNode(true),true));
 
-	var mgr = soapManager.getRequestManager(schema,package,method);	
+	var mgr = soapManager.getRequestManager(schema,packageName,method);	
 	var ajaxControl = mgr.createPostRequest();
   ajaxControl.onreadystatechange=function() { if( ajaxControl.readyState==4 ) { processUpdate(mgr, newContent, closeForm)}};
 

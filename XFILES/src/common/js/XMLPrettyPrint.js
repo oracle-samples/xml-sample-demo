@@ -13,6 +13,7 @@
  * ================================================
  */
 
+"use strict";
 
 var xmlPP = new XMLPrettyPrinter();
 
@@ -96,7 +97,7 @@ function XMLPrettyPrinter() {
        
     var	nodeMap = elementNode.attributes;
     
-    for (i=0; i < nodeMap.length; i++ ) {
+    for (var i=0; i < nodeMap.length; i++ ) {
 
       attr = nodeMap.item(i);
    
@@ -300,7 +301,7 @@ function XMLPrettyPrinter() {
       span.appendChild(text);
     }
     else {
-      for (i = 0; i < content.length-1; i++) {
+      for (var i = 0; i < content.length-1; i++) {
         if (content[i].length > 0) {
           var text = document.createTextNode(content[i]);
           span.appendChild(text);

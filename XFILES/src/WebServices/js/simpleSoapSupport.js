@@ -13,6 +13,7 @@
  * ================================================
  */
 
+"use strict";
 
 function formatResults(soapResponse, target) {
 
@@ -179,7 +180,7 @@ function loadMethodList() {
 	  }
 	
 		var owner = ownerList.value;	
-    var package = packageList.value;	
+    var packageName = packageList.value;	
 
     var SQLQuery = 
     'select distinct PROCEDURE_NAME ' + "\n" + 
@@ -199,7 +200,7 @@ function loadMethodList() {
 }
 
 
-function getMethodWSDL(owner,package,method) {
+function getMethodWSDL(owner,packageName,method) {
 	
 	var ownerList = document.getElementById("ownerList");		
   var packageList = document.getElementById("packageList")
@@ -209,7 +210,7 @@ function getMethodWSDL(owner,package,method) {
 
 	if (methodList.selectedIndex > 0) {
 		var owner = ownerList.value;	
-    var package = packageList.value;	
+    var packageName = packageList.value;	
     var method = methodList.value;			
     var url = "/orawsv/" + owner + "/" + package + "/" + method + '?wsdl';
     getTargetWSDL(url);

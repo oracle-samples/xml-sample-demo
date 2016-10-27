@@ -55,4 +55,7 @@ create or replace public synonym XFILES_REST_SERVICES
 create or replace public synonym XFILES_WEBDEMO_SERVICES 
                              for XFILES_WEBDEMO_SERVICES
 /
+create or replace public synonym XFILES_RESULT_CACHE 
+                             for XFILES_RESULT_CACHE
+/
 quit

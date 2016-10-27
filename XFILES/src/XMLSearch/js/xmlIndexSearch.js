@@ -13,6 +13,7 @@
  * ================================================
  */
 
+"use strict";
 
 function loadXMLIndexXSL() {
   stylesheetURL = '/XFILES/XMLSearch/xsl/xmlIndex.xsl';
@@ -20,11 +21,11 @@ function loadXMLIndexXSL() {
 
 function invokeGetRootNodeMap(nodeMap, pathTable, pathTableOwner) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SEARCH_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SEARCH_SERVICES";
   var method =  "GETXMLINDEXROOTNODEMAP";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);    		
+	var mgr = soapManager.getRequestManager(schema,packageName,method);    		
 	var XHR  = mgr.createPostRequest();
   var requestDate  = new Date();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processResponse(mgr, nodeMap, requestDate) } };
@@ -39,11 +40,11 @@ function invokeGetRootNodeMap(nodeMap, pathTable, pathTableOwner) {
 
 function invokeGetChildNodeMap(nodeMap, pathID, pathTable, pathTableOwner) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SEARCH_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SEARCH_SERVICES";
   var method =  "GETXMLINDEXCHILDNODEMAP";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var XHR  = mgr.createPostRequest();
   var requestDate  = new Date();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processResponse(mgr, nodeMap, requestDate) } };
@@ -162,7 +163,7 @@ function doUploadComplete(reloadUploadFrame,status,errorCode,errorMessage,resour
     refreshPage();
   }
   else {
-  	error = new xfilesException("XFILES.XFILES_DOCUMENT_UPLOAD.UPLOAD",12,resourcePath);
+  	var error = new xfilesException("XFILES.XFILES_DOCUMENT_UPLOAD.UPLOAD",12,resourcePath);
     error.setDescription(errorMessage);
     error.setNumber(errorCode);
     handleException("uploadFiles.submit",error,resourcePath);

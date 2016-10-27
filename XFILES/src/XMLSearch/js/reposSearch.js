@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";
+
 // Generic dummy node map required to allow common fetchDocument function()
 
 var nodeMap

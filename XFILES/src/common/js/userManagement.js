@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";          
+          
 var authStatusURL = '/XFILES/authenticationStatus.xml';
 
 function getHttpUsername() {
@@ -69,14 +71,14 @@ function getHttpUsername() {
             currentHttpState = httpStateUnauthorized;
           }
           else {
-            error = new xfilesException('userManagement.getHttpUsername',14,authStatusURL,e);
+            var error = new xfilesException('userManagement.getHttpUsername',14,authStatusURL,e);
             error.setDescription("[MSFT]:Load");
             throw error;
           }
         }
       }
       else {
-        error = new xfilesException('userManagement.getHttpUsername',14,whoAmIURL,e);
+        var error = new xfilesException('userManagement.getHttpUsername',14,whoAmIURL,e);
         error.setDescription("[MSFT]:Load");
       }
     }
@@ -100,7 +102,7 @@ function getHttpUsername() {
         XHR.mozBackgroundRequest = true;
    	  }
    	  catch (e) {
-        error = new xfilesException('userManagement.getHttpUsername',14,authStatusURL,e);
+        var error = new xfilesException('userManagement.getHttpUsername',14,authStatusURL,e);
         error.setDescription("[GECKO]:Unsupported Firefox / Chrome / Safari Version : Error setting XHR.mozBackgroundRequest=true");
         throw error;
       }
@@ -111,7 +113,7 @@ function getHttpUsername() {
       }
       else {
       	if (XHR.status == 200) {
-          isAuthenticatedXML = new xmlDocument().parse(XHR.responseText);
+          var isAuthenticatedXML = new xmlDocument().parse(XHR.responseText);
           currentHttpState = isAuthenticatedXML.getDocumentElement().firstChild.nodeValue;
           if (isAuthenticatedUser()) {
           	try {
@@ -119,7 +121,7 @@ function getHttpUsername() {
               l_httpUsername = usernameXML.getDocumentElement().firstChild.nodeValue;
             }
             catch (e) {
-              error = new xfilesException('userManagement.getHttpUsername',14,whoAmIURL,e);
+              var error = new xfilesException('userManagement.getHttpUsername',14,whoAmIURL,e);
               error.setDescription("[GECKO]:" + XHR.statusText);
               error.setNumber(XHR.status);
               throw error;
@@ -127,7 +129,7 @@ function getHttpUsername() {
           }
         }
         else {
-          error = new xfilesException('userManagement.getHttpUsername',14,authStatusURL,null);
+          var error = new xfilesException('userManagement.getHttpUsername',14,authStatusURL,null);
           error.setDescription("[GECKO]:" + XHR.statusText);
           error.setNumber(XHR.status);
           throw error;
@@ -135,7 +137,7 @@ function getHttpUsername() {
       } 
     }  
     catch (e) {
-      error = new xfilesException('userManagement.getHttpUsername',14,null,e);
+      var error = new xfilesException('userManagement.getHttpUsername',14,null,e);
       throw error;
     }
   }    
@@ -183,11 +185,11 @@ function doHttpAuthentication() {
   }
   else{
   	if (XHR.status == 401) {
-      error = new xfilesException('userManagement.doHttpAuthentication',1,targetURL,null);
+      var error = new xfilesException('userManagement.doHttpAuthentication',1,targetURL,null);
       throw error;
     }
     else {
-      error = new xfilesException('userManagement.doHttpAuthentication',14,targetURL,null);
+      var error = new xfilesException('userManagement.doHttpAuthentication',14,targetURL,null);
       error.setDescription(XHR.statusText);
       error.setNumber(XHR.status);
       throw error;
@@ -215,7 +217,7 @@ function doLogon(evt) {
     // processAuthentication(XHR);
   }
   catch (e) {
-    error = new xfilesException('userManagement.doLogon',12, null, e);
+    var error = new xfilesException('userManagement.doLogon',12, null, e);
     throw error;
   }
   
@@ -252,13 +254,13 @@ function ffxClearAuthenticationCache() {
     	XHR.mozBackgroundRequest = true;
    	}
    	catch (e) {
-      error = new xfilesException('userManagement.ffxClearAuthenticationCache',14,authStatusURL,e);
+      var error = new xfilesException('userManagement.ffxClearAuthenticationCache',14,authStatusURL,e);
       error.setDescription("[GECKO]:Unsupported Firefox Version : Error setting XHR.mozBackgroundRequest=true");
       throw error;
     };    
     XHR.send("");
     if (XHR.status != 401) {
-      error = new xfilesException('userManagement.ffxClearAuthenticationCache',14,authStatusURL,null);
+      var error = new xfilesException('userManagement.ffxClearAuthenticationCache',14,authStatusURL,null);
       error.setDescription("[GECKO] Unable to clear authentication cache. Please close Browser to complete Logoff. (HTTP Status = '" + XHR.status + "')");
       throw error;
     }    	
@@ -301,13 +303,13 @@ function chromeClearAuthenticationCache() {
     	XHR.mozBackgroundRequest = true;
    	}
    	catch (e) {
-      error = new xfilesException('userManagement.chromeClearAuthenticationCache',14,authStatusURL,e);
+      var error = new xfilesException('userManagement.chromeClearAuthenticationCache',14,authStatusURL,e);
       error.setDescription("[CHROME]:Unsupported Chrome / Safari Version : Error setting XHR.mozBackgroundRequest=true");
       throw error;
     };    
     XHR.send("");
     if (XHR.status != 401) {
-      error = new xfilesException('userManagement.chromeClearAuthenticationCache',14,authStatusURL,null);
+      var error = new xfilesException('userManagement.chromeClearAuthenticationCache',14,authStatusURL,null);
       error.setDescription("[CHROME] Unable to clear authentication cache. Please close Browser to complete Logoff. (HTTP Status = '" + XHR.status + "')");
       throw error;
     }    	
@@ -346,7 +348,7 @@ function doLogoff(evt)
     clearAuthenticationCache();
   }
   catch (e) {
-    error = new xfilesException('userManagement.doLogoff',12, null, e);
+    var error = new xfilesException('userManagement.doLogoff',12, null, e);
     throw error;
   }
   
@@ -374,7 +376,7 @@ function processAuthentication(XHR) {
       } catch (e1) {
  	      if (e1.number == -2147024891) {
   	  	  // Access Denied : User Login in inconsistant state...
-          error = new xfilesException('userManagement.processAuthentication',14,null, e);
+          var error = new xfilesException('userManagement.processAuthentication',14,null, e);
           error.setDescription("Inconsistant authentication state detected for user " + httpUsername + " : Please close your browser and try again.");
           throw error;
 	 		  }
@@ -453,7 +455,7 @@ function validCredentials(username,password) {
     while ((XHR.status == 12152) && (attemptCount < 2));
  
     if (attemptCount > 2) {
-      error = new xfilesException('userManagement.validCredentials',14,targetURL, null);
+      var error = new xfilesException('userManagement.validCredentials',14,targetURL, null);
       error.setDescription(XHR.statusText);
       error.setNumber(XHR.status);
       throw error;
@@ -461,7 +463,7 @@ function validCredentials(username,password) {
 
   }
   catch (e) {
-    error = new xfilesException('userManagement.validCredentials',14, resourceURL, e);
+    var error = new xfilesException('userManagement.validCredentials',14, resourceURL, e);
     throw error;
   }
   
@@ -491,7 +493,7 @@ function validateDBA() {
     }
   }
   catch (e) {
-    error = new xfilesException('userManagement.validCredentials',14, resourceURL, e);
+    var error = new xfilesException('userManagement.validCredentials',14, resourceURL, e);
     throw error;
   }
 
@@ -546,10 +548,10 @@ function setUserOptions() {
 
   try {
     var schema  = "XFILES";
-    var package = "XFILES_USER_SERVICES";
+    var packageName = "XFILES_USER_SERVICES";
     var method =  "RESETUSEROPTIONS";
   
-  	var mgr = soapManager.getRequestManager(schema,package,method);
+  	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	var XHR = mgr.createPostRequest();
     XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processsPasswordReset(mgr, 'User Updated')}};
   	  	
@@ -649,10 +651,10 @@ function processAdminPrivileges(mgr,evt) {
 function checkAdminPrivileges(evt) {
 
   var schema  = "XFILES";
-  var package = "XFILES_USER_SERVICES";
+  var packageName = "XFILES_USER_SERVICES";
   var method =  "GETUSERPRIVILEGES";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
  	var XHR  = mgr.createPostRequest();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processAdminPrivileges(mgr,evt)}};
 
@@ -681,10 +683,10 @@ function manageUser(userName, pwd1, pwd2) {
   try {
 
     var schema  = "XFILES";
-    var package = "XFILES_ADMIN_SERVICES";
+    var packageName = "XFILES_ADMIN_SERVICES";
     var method =  "CREATEXFILESUSER";
   
-  	var mgr = soapManager.getRequestManager(schema,package,method);    	
+  	var mgr = soapManager.getRequestManager(schema,packageName,method);    	
   	var XHR = mgr.createPostRequest();
     XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { reportSuccess(mgr, 'User Created')}};
   	
@@ -703,7 +705,7 @@ function manageUser(userName, pwd1, pwd2) {
 function updateRole(user,role) {
 
   var schema  = "XFILES";
-  var package = "XFILES_ADMIN_SERVICES ";
+  var packageName = "XFILES_ADMIN_SERVICES ";
   var method;
   var message;
   
@@ -722,7 +724,7 @@ function updateRole(user,role) {
     message =  'XFiles adminstration enabled for "' + user + '"';
   }
  
-  var mgr = soapManager.getRequestManager(schema,package,method);
+  var mgr = soapManager.getRequestManager(schema,packageName,method);
   var XHR = mgr.createPostRequest();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { reportSuccess(mgr,message)}};
   
@@ -769,13 +771,13 @@ function doReauthentication(currentUser,URL) {
   		authenticatedUser = getHttpUsername();
   	}; 
    	if (authenticatedUser != currentUser) {
-      error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
+      var error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
       error.setDescription('User Mismatch following ReAuthentication : Expected "' + schema + '", found "' + authenticatedUser + '".');
    	  throw error;
 	  }  		
   }
   catch (e) {
-    error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
+    var error = new xfilesException('RestAPI.doReauthentication',7, URL, e);
     error.setDescription('Exeception raised while performing ReAuthentication process for "' + schema + '".');
   	throw error;
   }	  	

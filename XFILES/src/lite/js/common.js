@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";
+
 var resource;
 var resourceURL;
 var stylesheetURL;
@@ -70,7 +72,7 @@ function getCacheGuid(resource) {
 	
 	var cacheGUID = resource.selectNodes("/res:Resource/xfiles:xfilesParameters/xfiles:cacheGUID",xfilesNamespaces).item(0)
 	if (cacheGUID == null) {
-    error = new xfilesException('common.getCacheGuid',12,resource.sourceURL, null);
+    var error = new xfilesException('common.getCacheGuid',12,resource.sourceURL, null);
     error.setDescription('Unable to locate GUID');
     throw error;
   }
@@ -131,11 +133,11 @@ function hasCreateResource(resourcePath) {
 	
 	var targetFolder = resourcePath.substring(0,resourcePath.lastIndexOf('/')-1);
 	
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
-  var method  = "GETPRIVILEGES";
+  var schema          = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
+  var method      = "GETPRIVILEGES";
 	
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var namespaces = xfilesNamespaces
 	namespaces.redefinePrefix("lite",mgr.getServiceNamespace());
@@ -216,7 +218,7 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
    transformXMLtoXHTML(this.treeState,this.treeStateXSL,this.targetWindow);
    
    function toggleChildren(parent,state) {
-     for (i=0 ; i < parent.childNodes.length; i++) {
+     for (var i=0 ; i < parent.childNodes.length; i++) {
        child = parent.childNodes[i];
        if (child.nodeName == 'DIV') {
          if (state == 'visible') {
@@ -230,21 +232,21 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
    }
    
    this.showChildren = function ( id ) { 
-     node = self.treeState.selectNodes('//*[@id="' + id + '"]/@children',self.treeNamespaces).item(0);
+     var node = self.treeState.selectNodes('//*[@id="' + id + '"]/@children',self.treeNamespaces).item(0);
      node.value = 'visible';
      transformXMLtoXHTML(self.treeState,self.treeStateXSL,self.targetWindow);
      raiseEvent(target,"click");
    }
 
    this.hideChildren = function ( id ) { 
-     node = self.treeState.selectNodes('//*[@id="' + id + '"]/@children',self.treeNamespaces).item(0);
+     var node = self.treeState.selectNodes('//*[@id="' + id + '"]/@children',self.treeNamespaces).item(0);
      node.value = 'hidden';
      transformXMLtoXHTML(self.treeState,self.treeStateXSL,self.targetWindow);
      raiseEvent(target,"click");
    }
 
    this.isWritableFolder = function() {
-     node = self.treeState.selectNodes('//*[@isOpen="open"]',self.treeNamespaces).item(0);
+     var node = self.treeState.selectNodes('//*[@isOpen="open"]',self.treeNamespaces).item(0);
      if (!node) {
      	 return false;
      }
@@ -254,7 +256,7 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
    }
    
    this.getOpenFolder = function() {
-     node = self.treeState.selectNodes('//*[@isOpen="open"]',self.treeNamespaces).item(0);
+     var node = self.treeState.selectNodes('//*[@isOpen="open"]',self.treeNamespaces).item(0);
      if (!node) {
        return null
      }
@@ -279,11 +281,11 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
    this.setOpenFolder = function(folderPath) {
 
      var targetNode = new xmlElement( self.treeState.selectNodes('//*[@name="/"]',self.treeNamespaces).item(0));
-;
+
      folderPath = folderPath.substring(1);
      
      while (folderPath.length > 0) {
-     	 seperator = folderPath.indexOf("/");
+     	 var seperator = folderPath.indexOf("/");
      	 var folderName;
      	 if (seperator < 0) {
      	 	 folderName = folderPath;
@@ -295,7 +297,7 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
        }
        targetNode =  new xmlElement( targetNode.selectNodes('*[@name="' + folderName + '"]',self.treeNamespaces).item(0));
   	 }
-  	 id = targetNode.baseElement.getAttribute('id')
+  	 var id = targetNode.baseElement.getAttribute('id')
   	 this.makeOpen(id);
    }
   		    
@@ -308,7 +310,7 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
    }
    
    this.makeOpen = function ( id ) { 
-     node = self.treeState.selectNodes('//*[@isOpen="open"]',self.treeNamespaces).item(0);
+     var node = self.treeState.selectNodes('//*[@isOpen="open"]',self.treeNamespaces).item(0);
      if (node) {
        node.setAttribute('children','hidden');
        node.setAttribute('isOpen','closed');
@@ -326,7 +328,7 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
    }
 
    this.makeClosed = function ( id ) { 
-     node = self.treeState.selectNodes('//*[@isOpen="open"]',self.treeNamespaces).item(0);
+     var node = self.treeState.selectNodes('//*[@isOpen="open"]',self.treeNamespaces).item(0);
      node.setAttribute('isOpen','closed');
      transformXMLtoXHTML(self.treeState,self.treeStateXSL,self.targetWindow);
      raiseEvent(target,"click");
@@ -375,14 +377,14 @@ function validateUploadPath(fileControl,targetFolderTree) {
     	  return null;
       }
       else {
-	    error = new xfilesException("common.validateUploadPath",14,repositoryPath);
+	    var error = new xfilesException("common.validateUploadPath",14,repositoryPath);
 				error.setDescription("HTTP HEAD Failed : " + XHR.statusText);
 				error.setNumber(XHR.status);
 				throw error;
       }
     }
   } catch (e) {
-    error = new xfilesException("common.validateUploadPath",14,repositoryPath,e);
+    var error = new xfilesException("common.validateUploadPath",14,repositoryPath,e);
 		error.setDescription("HTTP HEAD Error : " + XHR.statusText);
 		error.setNumber(XHR.status);
 		throw error;
@@ -399,7 +401,7 @@ function validateUploadFile(XHR, repositoryPath, callback) {
    	  callback(XHR,repositoryPath);
     }
     else {
-			error = new xfilesException("common.validateUploadFile",14,repositoryPath);
+			var error = new xfilesException("common.validateUploadFile",14,repositoryPath);
     	error.setDescription("File Upload Operation Failed : " + XHR.statusText);
    		error.setNumber(XHR.status);
    		throw error;
@@ -551,7 +553,7 @@ function processFolderTreeList(mgr,namespaces,loading,tree,openFolder,focusTarge
       return;
     }
     
-    error = new xfilesException("kmlShared.processFolderList",12,null, null);
+    var error = new xfilesException("kmlShared.processFolderList",12,null, null);
     error.setDescription("Invalid Folder Tree Document");
     error.setXML(soapResponse);
     throw error;
@@ -564,11 +566,11 @@ function processFolderTreeList(mgr,namespaces,loading,tree,openFolder,focusTarge
 
 function loadFolderTree(namespaces,loading,tree,openFolder, focusTarget) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
-  var method =  "GETTARGETFOLDERTREE";
+  var schema          = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
+  var method      =  "GETTARGETFOLDERTREE";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var XHR = mgr.createPostRequest();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processFolderTreeList(mgr, namespaces, loading, tree, openFolder, focusTarget) } };
 
@@ -643,7 +645,7 @@ function abortAccessDenied(module,e) {
   errorWindow = document.getElementById("fatalError");
   errorMessage = 'Application unavailable. Access Denied for user : "' + httpUsername + "\". Please contact your administrator for further information."
   if (errorWindow != null) {
-  	error = new xfilesException(module,12,null,e);
+  	var error = new xfilesException(module,12,null,e);
     error.setDescription(errorMessage);
     exceptionToHTML(error,errorWindow);
   }
@@ -718,8 +720,8 @@ function getResourceREST(resourceURL, outputWindow, stylesheetURL, includeConten
 
 function getResourceSOAP(resourceURL, outputWindow, stylesheetURL, includeContent) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema          = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method;
 
   if (includeContent) {
@@ -729,7 +731,7 @@ function getResourceSOAP(resourceURL, outputWindow, stylesheetURL, includeConten
 	  method =  "GETRESOURCE";
 	}
 	
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var namespaces = xfilesNamespaces
 	namespaces.redefinePrefix("lite",mgr.getServiceNamespace());
@@ -839,11 +841,11 @@ function showFolderREST(folderURL, outputWindow, stylesheetURL) {
 function showFolderSOAP(folderURL, outputWindow, stylesheetURL) {
 
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
-  var method =  "GETFOLDERLISTING";
+  var schema          = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
+  var method      =  "GETFOLDERLISTING";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var XHR = mgr.createPostRequest();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processFolderSOAP(mgr, outputWindow, stylesheetURL) } };
 
@@ -874,7 +876,7 @@ function showFolder(folderURL, outputWindow, stylesheetURL) {
     }
   }
   catch (e) {
-    error = new xfilesException('common.showFolder',12, folderURL, e);
+    var error = new xfilesException('common.showFolder',12, folderURL, e);
     throw error;
   }
 }
@@ -946,11 +948,11 @@ function processVersionHistorySOAP(mgr, outputWindow, stylesheetURL) {
 
 function getVersionHistorySOAP(resourceURL, outputWindow, stylesheetURL) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
-  var method =  "GETVERSIONHISTORY";
+  var schema          = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
+  var method      =  "GETVERSIONHISTORY";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var XHR = mgr.createPostRequest();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processVersionHistorySOAP(mgr, outputWindow, stylesheetURL) } };
 
@@ -1039,7 +1041,7 @@ function isErrorDialogOpen() {
 }
 
 function reportUploadError(module,repositoryPath,SQLCODE,SQLERRM) {
-  error = new xfilesException("XFILES.XFILES_DOCUMENT_UPLOAD.SINGLE_DOC_UPLOAD",12,repositoryPath);
+  var error = new xfilesException("XFILES.XFILES_DOCUMENT_UPLOAD.SINGLE_DOC_UPLOAD",12,repositoryPath);
   error.setDescription(SQLERRM);
   error.setNumber(SQLCODE);
   handleException(module,error,repositoryPath);
@@ -1155,64 +1157,64 @@ function loadFixedWSDLCache() {
 	
 	fixedWSDLCache = new Array()
 	
-	WSDL = '<definitions name="CREATEXFILESUSER"'
-       + '    targetNamespace="http://xmlns.oracle.com/orawsv/XFILES/XFILES_ADMIN_SERVICES/CREATEXFILESUSER"'
-       + '    xmlns="http://schemas.xmlsoap.org/wsdl/"'
-       + '    xmlns:tns="http://xmlns.oracle.com/orawsv/XFILES/XFILES_ADMIN_SERVICES/CREATEXFILESUSER"'
-       + '    xmlns:xsd="http://www.w3.org/2001/XMLSchema"'
-       + '    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">'
-       + '  <types>'
-       + '    <xsd:schema targetNamespace="http://xmlns.oracle.com/orawsv/XFILES/XFILES_ADMIN_SERVICES/CREATEXFILESUSER"'
-       + '     elementFormDefault="qualified">'
-       + '      <xsd:element name="CREATEXFILESUSERInput">'
-       + '        <xsd:complexType>'
-       + '            <xsd:sequence>'
-       + '              <xsd:element name="P_PASSWORD-VARCHAR2-IN" type="xsd:string"/>'
-       + '              <xsd:element name="P_PRINCIPLE_NAME-VARCHAR2-IN" type="xsd:string"/>'
-       + '            </xsd:sequence>'
-       + '          </xsd:complexType>'
-       + '      </xsd:element>'
-       + '      <xsd:element name="CREATEXFILESUSEROutput">'
-       + '        <xsd:complexType>'
-       + '            <xsd:sequence>'
-       + '            </xsd:sequence>'
-       + '          </xsd:complexType>'
-       + '      </xsd:element>'
-       + '   </xsd:schema>'
-       + '  </types>'
-       + '  <message name="CREATEXFILESUSERInputMessage">'
-       + '    <part name="parameters" element="tns:CREATEXFILESUSERInput"/>'
-       + '  </message>'
-       + '  <message name="CREATEXFILESUSEROutputMessage">'
-       + '    <part name="parameters" element="tns:CREATEXFILESUSEROutput"/>'
-       + '  </message>'
-       + '  <portType name="CREATEXFILESUSERPortType">'
-       + '  <operation name="CREATEXFILESUSER">'
-       + '      <input message="tns:CREATEXFILESUSERInputMessage"/>'
-       + '      <output message="tns:CREATEXFILESUSEROutputMessage"/>'
-       + '    </operation>'
-       + '  </portType>'
-       + '  <binding name="CREATEXFILESUSERBinding"'
-       + '           type="tns:CREATEXFILESUSERPortType">'
-       + '    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>'
-       + '    <operation name="CREATEXFILESUSER">'
-       + '      <soap:operation soapAction="CREATEXFILESUSER"/>'
-       + '      <input>'
-       + '        <soap:body parts="parameters" use="literal"/>'
-       + '      </input>'
-       + '      <output>'
-       + '        <soap:body parts="parameters" use="literal"/>'
-       + '      </output>'
-       + '    </operation>'
-       + '  </binding>'
-       + '  <service name="CREATEXFILESUSERService">'
-       + '    <documentation>Oracle Web Service</documentation>'
-       + '    <port name="CREATEXFILESUSERPort" binding="tns:CREATEXFILESUSERBinding">'
-       + '       <soap:address location="http://xmldb.us.oracle.com:9000/orawsv/XFILES/XFILES_ADMIN_SERVICES/CREATEXFILESUSER"/>'
-       + '     </port>'
-       + '  </service>'
-       + '</definitions>';
-       
+	var WSDL = '<definitions name="CREATEXFILESUSER"'
+           + '    targetNamespace="http://xmlns.oracle.com/orawsv/XFILES/XFILES_ADMIN_SERVICES/CREATEXFILESUSER"'
+           + '    xmlns="http://schemas.xmlsoap.org/wsdl/"'
+           + '    xmlns:tns="http://xmlns.oracle.com/orawsv/XFILES/XFILES_ADMIN_SERVICES/CREATEXFILESUSER"'
+           + '    xmlns:xsd="http://www.w3.org/2001/XMLSchema"'
+           + '    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">'
+           + '  <types>'
+           + '    <xsd:schema targetNamespace="http://xmlns.oracle.com/orawsv/XFILES/XFILES_ADMIN_SERVICES/CREATEXFILESUSER"'
+           + '     elementFormDefault="qualified">'
+           + '      <xsd:element name="CREATEXFILESUSERInput">'
+           + '        <xsd:complexType>'
+           + '            <xsd:sequence>'
+           + '              <xsd:element name="P_PASSWORD-VARCHAR2-IN" type="xsd:string"/>'
+           + '              <xsd:element name="P_PRINCIPLE_NAME-VARCHAR2-IN" type="xsd:string"/>'
+           + '            </xsd:sequence>'
+           + '          </xsd:complexType>'
+           + '      </xsd:element>'
+           + '      <xsd:element name="CREATEXFILESUSEROutput">'
+           + '        <xsd:complexType>'
+           + '            <xsd:sequence>'
+           + '            </xsd:sequence>'
+           + '          </xsd:complexType>'
+           + '      </xsd:element>'
+           + '   </xsd:schema>'
+           + '  </types>'
+           + '  <message name="CREATEXFILESUSERInputMessage">'
+           + '    <part name="parameters" element="tns:CREATEXFILESUSERInput"/>'
+           + '  </message>'
+           + '  <message name="CREATEXFILESUSEROutputMessage">'
+           + '    <part name="parameters" element="tns:CREATEXFILESUSEROutput"/>'
+           + '  </message>'
+           + '  <portType name="CREATEXFILESUSERPortType">'
+           + '  <operation name="CREATEXFILESUSER">'
+           + '      <input message="tns:CREATEXFILESUSERInputMessage"/>'
+           + '      <output message="tns:CREATEXFILESUSEROutputMessage"/>'
+           + '    </operation>'
+           + '  </portType>'
+           + '  <binding name="CREATEXFILESUSERBinding"'
+           + '           type="tns:CREATEXFILESUSERPortType">'
+           + '    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>'
+           + '    <operation name="CREATEXFILESUSER">'
+           + '      <soap:operation soapAction="CREATEXFILESUSER"/>'
+           + '      <input>'
+           + '        <soap:body parts="parameters" use="literal"/>'
+           + '      </input>'
+           + '      <output>'
+           + '        <soap:body parts="parameters" use="literal"/>'
+           + '      </output>'
+           + '    </operation>'
+           + '  </binding>'
+           + '  <service name="CREATEXFILESUSERService">'
+           + '    <documentation>Oracle Web Service</documentation>'
+           + '    <port name="CREATEXFILESUSERPort" binding="tns:CREATEXFILESUSERBinding">'
+           + '       <soap:address location="http://xmldb.us.oracle.com:9000/orawsv/XFILES/XFILES_ADMIN_SERVICES/CREATEXFILESUSER"/>'
+           + '     </port>'
+           + '  </service>'
+           + '</definitions>';
+           
   fixedWSDLCache["XFILES.XFILES_ADMIN_SERVICES.CREATEXFILESUSER"] = new xmlDocument().parse(WSDL);
   
   // soapManager.setWSDLCacheEntry("XFILES.XFILES_ADMIN_SERVICES.CREATEXFILESUSER",new xmlDocument().parse(WSDL));

@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";
+
 var SearchTreeViewXSL;
 var DocumentIdListXSL;
 var UniqueKeyListXSL;
@@ -546,7 +548,7 @@ function processAttributes(element) {
    var pathExpression = "";
    var attrName;
     
-   for (i=0; i < attrList.length; i++) {
+   for (var i=0; i < attrList.length; i++) {
      var currentAttr = attrList.item(i);
      attrName = "@" + getName(currentAttr);
 
@@ -1312,7 +1314,7 @@ function createNodeMap(rootNodeMap,nodeMap){
   
   var nodeList = nodeMap.getNodeMap().selectNodes('/map:NodeMap/map:Element',searchNamespaces);
   
-  for (i=0; i < nodeList.length; i++) {
+  for (var i=0; i < nodeList.length; i++) {
     currentElement = nodeList.item(i);
 
     if (nodeMap.hasParent()) {
@@ -1331,7 +1333,7 @@ function createNodeMap(rootNodeMap,nodeMap){
     
     var xmlElmnt = new xmlElement(currentElement);
     var attrList = xmlElmnt.selectNodes('map:Attrs/map:Attr',searchNamespaces);
-    for (j=0; j < attrList.length; j++) {
+    for (var j=0; j < attrList.length; j++) {
       childElement = attrList.item(j);
       attrID = childElement.getAttribute('ID');
       childElement.setAttribute('ID',ID + '.' + attrID);
@@ -1342,7 +1344,7 @@ function createNodeMap(rootNodeMap,nodeMap){
     }
 
     var elementList = xmlElmnt.selectNodes('map:Elements/map:Element',searchNamespaces);
-    for (j=0; j < elementList.length; j++) {
+    for (var j=0; j < elementList.length; j++) {
       childElement = elementList.item(j);
       elementID = childElement.getAttribute('ID');
       childElement.setAttribute('ID',ID + '.' + elementID);
@@ -1362,7 +1364,7 @@ function expandNodeMap(nodeMap, childNodeMap) {
   // currentElement = getCurrentElement(nodeMap,ID);
   var matchingElementList = nodeMap.getNodeMap().selectNodes("//map:Element[substring(@ID,string-length(@ID)-string-length('" + ID + "')+1,string-length('" + ID + "')) = '" + ID + "' and not(map:Name)]",searchNamespaces);  
 
-  for (i=0; i < matchingElementList.length; i++) {
+  for (var i=0; i < matchingElementList.length; i++) {
     currentElement = matchingElementList.item(i);
     // alert('Processing ' + currentElement.getAttribute('ID'));
   
@@ -1387,7 +1389,7 @@ function expandNodeMap(nodeMap, childNodeMap) {
     var xmlElmnt = new xmlElement(cloneNodeMap);
 
     var attrList = xmlElmnt.selectNodes('map:Attrs/map:Attr',searchNamespaces);
-    for (j=0; j < attrList.length; j++) {
+    for (var j=0; j < attrList.length; j++) {
       childElement = attrList.item(j);
       attrID = childElement.getAttribute('ID');
       childElement.setAttribute('ID',ID + '.' + attrID);
@@ -1398,7 +1400,7 @@ function expandNodeMap(nodeMap, childNodeMap) {
     }
 
     var elementList = xmlElmnt.selectNodes('map:Elements/map:Element',searchNamespaces);
-    for (j=0; j < elementList.length; j++) {
+    for (var j=0; j < elementList.length; j++) {
       childElement = elementList.item(j);
       elementID = childElement.getAttribute('ID');
       childElement.setAttribute('ID',ID + '.' + elementID);
@@ -1413,7 +1415,7 @@ function expandSubstitionGroup(nodeMap, childNodeMap) {
   headElementID = childNodeMap.getAttribute('Head');
   var matchingElementList = nodeMap.getNodeMap().selectNodes("//map:Element[@subGroupHead='" + headElementID + "' and not(map:SubGroup)]",searchNamespaces);
 
-  for (i=0; i < matchingElementList.length; i++) {
+  for (var i=0; i < matchingElementList.length; i++) {
     currentElement = matchingElementList.item(i);
     ID = currentElement.getAttribute('ID');
 
@@ -1426,7 +1428,7 @@ function expandSubstitionGroup(nodeMap, childNodeMap) {
     subGroupElement.setAttribute("SelectedMember",ID);
   
     var elementList = xmlElmnt.selectNodes('map:Element',searchNamespaces);
-    for (j=0; j < elementList.length; j++) {
+    for (var j=0; j < elementList.length; j++) {
       childElement = elementList.item(j);
       elementID = childElement.getAttribute('ID');
       childElement.setAttribute('ID',ID + '.' + elementID);

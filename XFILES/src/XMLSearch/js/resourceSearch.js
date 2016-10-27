@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";
+
 var ResourceSearchXSL;
 var documentNodeMap;
 var metadataNodeMap;
@@ -177,11 +179,11 @@ function checkSchemaState(nodeMap,currentElement) {
 
 function invokeResourceSearch(nodeMap) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SEARCH_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SEARCH_SERVICES";
   var method =  "GETREPOSITORYNODEMAP";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
  	var XHR  = mgr.createPostRequest();
   var requestDate  = new Date();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processResponse(mgr, nodeMap, requestDate)}};
@@ -205,11 +207,11 @@ function findContentModel(nodeMap, ID) {
 
 function invokeGetChildNodeMap(nodeMap, propertyNumber) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SEARCH_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SEARCH_SERVICES";
   var method =  "GETXMLSCHEMACHILDNODEMAP";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var XHR  = mgr.createPostRequest();
   var requestDate  = new Date();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processResponse(mgr, nodeMap, requestDate)}};
@@ -229,11 +231,11 @@ function getDocumentNodeMap() {
 
 function invokeGetRootNodeMap(nodeMap, xmlSchema, xmlSchemaOwner, globalElement) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SEARCH_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SEARCH_SERVICES";
   var method =  "GETXMLSCHEMAROOTNODEMAP";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var XHR  = mgr.createPostRequest();
   var requestDate  = new Date();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processResponse(mgr, nodeMap, requestDate)}};
@@ -255,7 +257,7 @@ function reloadContentSchema(nodeMap,id) {
   contentNodeMap.setParent(nodeMap);
   nodeMap.setContentSchema(contentNodeMap);
 
-  var schema = nodeMap.getNodeMap().selectNodes('/map:NodeMap/map:Schemas/map:Schema[@SCHOID="' + schOID + '"]',searchNamespaces).item(0);
+  var schema     = nodeMap.getNodeMap().selectNodes('/map:NodeMap/map:Schemas/map:Schema[@SCHOID="' + schOID + '"]',searchNamespaces).item(0);
   invokeGetRootNodeMap(contentNodeMap, schema.getAttribute("Location"), schema.getAttribute("Owner"), globalElementName);  
 
 }
@@ -269,7 +271,7 @@ function setMetadataSchema(nodeMap,id) {
   metadataNodeMap.setParent(nodeMap);
   nodeMap.setMetadataSchema(metadataNodeMap);
 
-  var schema = nodeMap.getNodeMap().selectNodes('/map:NodeMap/map:Schemas/map:Schema[@SCHOID="' + schOID + '"]',searchNamespaces).item(0);
+  var schema     = nodeMap.getNodeMap().selectNodes('/map:NodeMap/map:Schemas/map:Schema[@SCHOID="' + schOID + '"]',searchNamespaces).item(0);
   invokeGetRootNodeMap(metadataNodeMap, schema.getAttribute("Location"), schema.getAttribute("Owner"), globalElementName);  
 
 }

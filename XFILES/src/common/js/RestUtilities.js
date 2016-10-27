@@ -12,6 +12,8 @@
  *
  * ================================================
  */
+ 
+ "use strict";
 
 /**
  * Generates a GUID string, according to RFC4122 standards.
@@ -92,7 +94,7 @@ function populateOptionList(optionList,optionValues,propertyName) {
 
   optionList.value = ""
   var i;
-  for (i=0; i<optionValues.length;i++) {
+  for (var i=0; i<optionValues.length;i++) {
     OPTION = document.createElement("OPTION")
     optionList.appendChild(OPTION);
     var value 
@@ -114,7 +116,7 @@ function populateOptionList2(optionList,valueList,keyValue,textList,keyText) {
   optionList.value = ""
   textPath = keyText.split(".")
   var i;
-  for (i=0; i<valueList.length;i++) {
+  for (var i=0; i<valueList.length;i++) {
     OPTION = document.createElement("OPTION")
     optionList.appendChild(OPTION);
     var value 

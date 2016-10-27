@@ -1,7 +1,7 @@
 
 /* ================================================  
  *    
- * Copyright (c) 2015 Oracle and/or its affiliates.  All rights reserved.
+ * Copyright (c) 2016 Oracle and/or its affiliates.  All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
  *
@@ -350,11 +350,11 @@ function saveChanges(closeFormWhenFinished) {
 	  var newDescription = new xmlDocument().parse('<img:Description xmlns:img="' + imageMetadataNamespace + '" xmlns:xhtml="http://www.w3.org/1999/xhtml"/>');
     newDescription.getDocumentElement().appendChild(newDescription.importNode(currentDescription.getDocumentElement().cloneNode(true),true));
 
-    var schema  = "XDBEXT";
-    var package = "METADATA_SERVICES";
+    var schema      = "XDBEXT";
+    var packageName = "METADATA_SERVICES";
     var method =  "UPDATEIMAGEMETADATA";
   
-  	var mgr = soapManager.getRequestManager(schema,package,method);  	
+  	var mgr = soapManager.getRequestManager(schema,packageName,method);  	
   	var XHR = mgr.createPostRequest();
     XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processUpdate(mgr, currentTitle, currentDescription, closeFormWhenFinished) } };
   

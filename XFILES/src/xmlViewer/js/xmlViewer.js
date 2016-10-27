@@ -12,6 +12,8 @@
  *
  * ================================================
  */
+ 
+"use strict";
 
 function displayXMLDocument(XHR, url, target) {
 	

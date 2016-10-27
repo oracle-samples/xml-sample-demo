@@ -12,6 +12,8 @@
  *
  * ================================================
  */
+ 
+"use strict";
 
 var dummy // Declaring a variable seems to help IE load the script correctly
 

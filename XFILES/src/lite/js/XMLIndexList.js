@@ -12,6 +12,8 @@
  *
  * ================================================
  */
+ 
+"use strict";
 
 function onPageLoaded() {
 }
@@ -61,11 +63,11 @@ function createXMLIndexedTable(tableName,indexName,uploadFolderPath) {
       return;
     }
  
-    var schema  = "XDBPM";
-    var package = "XDBPM_TABLE_UPLOAD";
+    var schema      = "XDBPM";
+    var packageName = "XDBPM_TABLE_UPLOAD";
     var method =  "CREATEXMLINDEXEDTABLE";
   
-  	var mgr = soapManager.getRequestManager(schema,package,method);
+  	var mgr = soapManager.getRequestManager(schema,packageName,method);
    	var XHR = mgr.createPostRequest();
   	XHR.onreadystatechange = function() { if( XHR.readyState==4 ) { processResponse(mgr) } };
     

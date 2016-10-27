@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";
+
 var jPP = new JSONPrettyPrinter();
 
 function JSONPrettyPrinter() {
@@ -21,7 +23,7 @@ function JSONPrettyPrinter() {
 
   function addOpenObject(isArray, target) {
   
-    span = document.createElement('SPAN');
+    var span = document.createElement('SPAN');
     target.appendChild(span);
     
     if (isArray) {
@@ -36,7 +38,7 @@ function JSONPrettyPrinter() {
 
   function addCloseObject(isArray, target) {
   	
-    span = document.createElement('SPAN');
+    var span = document.createElement('SPAN');
     target.appendChild(span);
     if (isArray) {
       span.className = 'jsonArray';
@@ -112,7 +114,7 @@ function JSONPrettyPrinter() {
   }
 
   function addToggleControl(target,iconPath, hint) { 
-      toggleControl = document.createElement('a');
+      var toggleControl = document.createElement('a');
       target.appendChild(toggleControl);
       toggleControl.className = 'openClose';
       toggleControl.href = '#';
@@ -124,7 +126,7 @@ function JSONPrettyPrinter() {
       else {
  	      toggleControl.attachEvent("onclick", self.toggleShowChildren);
       }
-      img = document.createElement("IMG");
+      var img = document.createElement("IMG");
       toggleControl.appendChild(img);
       img.style.display="block";
       img.src = iconPath;
@@ -318,7 +320,7 @@ function JSONPrettyPrinter() {
 	  if (propertyName != null) {
 	  	addName(container,propertyName);
     }
-    span = document.createElement("SPAN");
+    var span = document.createElement("SPAN");
     span.className = "jsonValue"
     container.appendChild(span)
     span.appendChild(document.createTextNode(innerJson));
@@ -332,7 +334,7 @@ function JSONPrettyPrinter() {
 	  if (propertyName != null) {
 	  	addName(container,propertyName);
     }
-    span = document.createElement("SPAN");
+    var span = document.createElement("SPAN");
     span.className = "jsonValue"
     container.appendChild(span)
     span.appendChild(document.createTextNode(innerJson));

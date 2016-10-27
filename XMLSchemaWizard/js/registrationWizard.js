@@ -1,4 +1,20 @@
 
+/* ================================================  
+ * Oracle XFiles Demonstration.  
+ *    
+ * Copyright (c) 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * ================================================
+ */
+
+"use strict";
+
 var targetFolderTree
 var targetFolder = null
 
@@ -174,7 +190,7 @@ function displayUploadedSchemas(mgr,archivePath) {
 			searchCurrentFolder(targetFolder);
 			return
     }
-    error = new xfilesException("registrationWizard.displaySchemaList",12,null, null);
+    var error = new xfilesException("registrationWizard.displaySchemaList",12,null, null);
     error.setDescription("Invalid Schema List Document");
     error.setXML(soapResponse);
     throw error;
@@ -192,11 +208,11 @@ function unzipSchemaArchive(repositoryPath) {
 	
   try {
  
-  	var schema  = "XFILES";
-    var package = "XFILES_XMLSCHEMA_WIZARD";
+  	var schema      = "XFILES";
+    var packageName = "XFILES_XMLSCHEMA_WIZARD";
     var method =  "UNPACK_ARCHIVE";
 
-  	var mgr = soapManager.getRequestManager(schema,package,method);
+  	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	var XHR = mgr.createPostRequest();
     XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displayUploadedSchemas(mgr,repositoryPath) } };
 
@@ -340,7 +356,7 @@ function displaySchemaOrdering(mgr,rootSchemaPath) {
     	return;
     }
     
-    error = new xfilesException("registrationWizard.displaySchemaOrdering",12,null, null);
+    var error = new xfilesException("registrationWizard.displaySchemaOrdering",12,null, null);
     error.setDescription("Invalid Schema List Document");
     error.setXML(soapResponse);
     throw error;
@@ -371,7 +387,7 @@ function processSchemaList(schemas) {
 
   for (var i=0; i<schemaList.length; i++) {
     if (schemaList.options[i].selected) {
-      var schema = schemaList.options[i].value;
+      var schema     = schemaList.options[i].value;
       if (schemas.indexOf(schema) == -1) {
         schemas.push(schema);
       }
@@ -401,7 +417,7 @@ function verifySchemaSet() {
   xmlSchemaList.appendChild(schemas);
   
   for (var i=0; i<schemaList.length; i++) {
-  	var schema = xmlSchemaList.createElement("schema");
+  	var schema     = xmlSchemaList.createElement("schema");
     // var schemaPath = appendPath(repositoryFolderPath,schemaList[i]);
     var schemaPath = schemaList[i];
 		var text   = xmlSchemaList.createTextNode(schemaPath);
@@ -413,11 +429,11 @@ function verifySchemaSet() {
    
   try {
  
-  	var schema  = "XFILES";
-    var package = "XFILES_XMLSCHEMA_WIZARD";
+  	var schema      = "XFILES";
+    var packageName = "XFILES_XMLSCHEMA_WIZARD";
     var method =  "ORDER_SCHEMA_LIST";
 	
-  	var mgr = soapManager.getRequestManager(schema,package,method);
+  	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	var XHR = mgr.createPostRequest();
     XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displaySchemaOrdering(mgr,"") } };
   
@@ -541,7 +557,7 @@ function showFileContent(path,target) {
     logWindow.parentNode.scrollTop = logWindow.parentNode.scrollHeight;
   }
   catch (e) {
-   error = new xfilesException("registrationWizard.showFileContent",14,path,e);
+   var error = new xfilesException("registrationWizard.showFileContent",14,path,e);
    throw error;
   }
 	
@@ -586,11 +602,11 @@ function generateScripts() {
   
   try {
  
-  	var schema  = "XFILES";
-    var package = "XFILES_XMLSCHEMA_WIZARD";
+  	var schema      = "XFILES";
+    var packageName = "XFILES_XMLSCHEMA_WIZARD";
     var method =  "CREATE_SCRIPT";
 	
-  	var mgr = soapManager.getRequestManager(schema,package,method);
+  	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	var XHR = mgr.createPostRequest();
     XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displayRegistrationScript(mgr) } };
   
@@ -641,8 +657,8 @@ function registerSchema(schemaSettings, index) {
 	
   try {
  
-  	var schema  = "XFILES";
-    var package = "XFILES_XMLSCHEMA_WIZARD";
+  	var schema      = "XFILES";
+    var packageName = "XFILES_XMLSCHEMA_WIZARD";
     var method =  "REGISTER_SCHEMA";
     
     /*
@@ -670,7 +686,7 @@ function registerSchema(schemaSettings, index) {
     var repositoryPath = schemaSettings.selectNodes("rc:repositoryPath",rcNamespace).item(0).firstChild.nodeValue;
     var force          = schemaSettings.selectNodes("rc:force",rcNamespace).item(0).firstChild.nodeValue;
         
-  	var mgr = soapManager.getRequestManager(schema,package,method);   	
+  	var mgr = soapManager.getRequestManager(schema,packageName,method);   	
 	  var XHR = mgr.createPostRequest();  	  
     XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { checkRegisterSchema(mgr, index, currentOption ) } };
 
@@ -753,7 +769,7 @@ function displayTypeAnalyis(mgr,logFilePath) {
     	registrationConfiguration.appendChild(registrationConfiguration.importNode(resultSet.item(0),true));  	
     }
     else {
-      error = new xfilesException("registrationWizard.validateTypeAnalysis",12,null, null);
+      var error = new xfilesException("registrationWizard.validateTypeAnalysis",12,null, null);
       error.setDescription("Type Analysis Failure");
       error.setXML(soapResponse);
       throw error;
@@ -791,8 +807,8 @@ function startTypeAnalysis() {
 	
   try {
  
-  	var schema  = "XFILES";
-    var package = "XFILES_XMLSCHEMA_WIZARD";
+  	var schema      = "XFILES";
+    var packageName = "XFILES_XMLSCHEMA_WIZARD";
     var method =  "DO_TYPE_ANALYSIS";
     
     /*
@@ -806,7 +822,7 @@ function startTypeAnalysis() {
     **
     */
     
-  	var mgr = soapManager.getRequestManager(schema,package,method);
+  	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
   	var XHR = mgr.createPostRequest();
     XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displayTypeAnalyis(mgr, logFilePath) } };

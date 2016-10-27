@@ -12,6 +12,8 @@
  *
  * ================================================
  */
+ 
+"use strict";
 
 function onPageLoaded() {
   viewSource();
@@ -31,7 +33,7 @@ function viewSource() {
         showUserErrorMessage("Unable to access : " + e.target + ". Access Denied.");
       }
       else {
-				error = new xfilesException('SourceViewer.viewSource',12, resourceURL, e);
+				var error = new xfilesException('SourceViewer.viewSource',12, resourceURL, e);
     		throw error;
       } 
     }
@@ -49,7 +51,7 @@ function viewSource() {
         showUserErrorMessage("Unable to access : " + e.target + ". Access Denied.");
       }
       else {
-				error = new xfilesException('SourceViewer.viewSource',12, resourceURL, e);
+				var error = new xfilesException('SourceViewer.viewSource',12, resourceURL, e);
     		throw error;
       } 
     }

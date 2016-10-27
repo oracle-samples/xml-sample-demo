@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";
+
 function showSourceCodeEPG(xml) {
 
   xmlText = xml.serialize();
@@ -71,11 +73,11 @@ function showSourceCodeEPG(xml) {
 
 function copyResource(targetFolder, resource, deep) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "COPYRESOURCE";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
  	var ajaxControl = mgr.createPostRequest();
   ajaxControl.onreadystatechange=function() { if( ajaxControl.readyState==4 ) { reportComplete(mgr, document.getElementById("pageContent"), "Copy")}};
   outstandingRequestCount++;
@@ -91,11 +93,11 @@ function copyResource(targetFolder, resource, deep) {
 
 function moveResource(targetFolder,resource) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "MOVERESOURCE";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var parameters = new Object;
 	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = resource;
@@ -113,11 +115,11 @@ function moveResource(targetFolder,resource) {
 
 function linkResource(targetFolder,resource,linkType) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "LINKRESOURCE";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var parameters = new Object;
 	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = resource;
@@ -136,11 +138,11 @@ function linkResource(targetFolder,resource,linkType) {
 
 function deleteResource(resource,deep,force) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "DELETERESOURCE";
   
-	var mgr = soapManager.getRequestManager(schema,package,method);	
+	var mgr = soapManager.getRequestManager(schema,packageName,method);	
 	var ajaxControl = mgr.createPostRequest();
   ajaxControl.onreadystatechange=function() { if( ajaxControl.readyState==4 ) { reportComplete(mgr, document.getElementById("pageContent"), "Delete")}};
 
@@ -156,11 +158,11 @@ function deleteResource(resource,deep,force) {
 
 function lockResource(resource,deep) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "LOCKRESOURCE";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var parameters = new Object;
 	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = resource;
@@ -179,11 +181,11 @@ function lockResource(resource,deep) {
    
 function unlockResource(resource,deep) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "UNLOCKRESOURCE";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var parameters = new Object;
 	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = resource;
@@ -201,11 +203,11 @@ function unlockResource(resource,deep) {
     
 function publishResource(resource,deep) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "PUBLISHRESOURCE";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var parameters = new Object;
 	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = resource;
@@ -225,11 +227,11 @@ function publishResource(resource,deep) {
 
 function setAcl(resource,acl,deep) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "SETACL";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var parameters = new Object;
 	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = resource
@@ -248,11 +250,11 @@ function setAcl(resource,acl,deep) {
 
 function setPrinciple(resource,owner,deep) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "CHANGEOWNER";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var parameters = new Object;
 	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = resource;
@@ -271,11 +273,11 @@ function setPrinciple(resource,owner,deep) {
 
 function makeVersioned(resource,deep) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "MAKEVERSIONED";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var parameters = new Object;
 	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = resource;
@@ -293,11 +295,11 @@ function makeVersioned(resource,deep) {
     
 function checkOut(resource,deep) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "CHECKOUT";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var parameters = new Object;
 	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = resource;
@@ -316,11 +318,11 @@ function checkOut(resource,deep) {
     
 function checkIn(resource,comment,deep) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "CHECKIN";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var parameters = new Object;
 	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = resource;
@@ -339,11 +341,11 @@ function checkIn(resource,comment,deep) {
 
 function unzipResource(targetFolder,zipFile,duplicateAction) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "UNZIP";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	
 	var parameters = new Object;
 	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]     = zipFile

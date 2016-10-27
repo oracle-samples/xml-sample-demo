@@ -13,6 +13,9 @@
  * ================================================
  */
 
+"use strict";
+
+var sqlScriptUsername = null;
 var steps = new Array();
 var demoPlayer = null;
 
@@ -54,6 +57,8 @@ function SqlScript(id) {
   var autoTraceEnabled = false;
   var timingEnabled    = false;
 
+  var sqlScript;
+  var sqlScriptURL;
   var scriptLocation;
   var scriptContent;
 
@@ -210,7 +215,7 @@ function SqlScript(id) {
     try {
       sqlScript  = getDocumentContentImpl(sqlScriptURL).split('\n');
     } catch (e) {
-      error = new xfilesException('sqlScript.getSQLScript',11, sqlScriptURL, e);
+      var error = new xfilesException('sqlScript.getSQLScript',11, sqlScriptURL, e);
       throw error;
     }
     stripOracleCopyRightNotice()
@@ -352,7 +357,7 @@ function DemonstrationPlayer() {
         action.appendChild(span);
         span.style.display="inline-block";
       
-        img = document.createElement("img");
+        var img = document.createElement("img");
         span.appendChild(img);
         img.onclick = function(){demoPlayer.executeStatement(statementId); return false;};
         img.id      = statementId + ".statementExecute";
@@ -472,7 +477,7 @@ function DemonstrationPlayer() {
     	tabs.appendChild(tab);
   		setActiveTab(tab);
       tab.id = statementId + ".tab";
-      currentTab = statementId;
+      var currentTab = statementId;
   		tab.onclick = function(){demoPlayer.switchTab(statementId); return false;};
      	tab.innerHTML = "Statement " + sqlScript.getCommandId();
 
@@ -546,7 +551,7 @@ function DemonstrationPlayer() {
     }
   }
 
-  displayStep = function (step) {
+  function displayStep(step) {
 
     if (step.isClientCommand()) {
       return;
@@ -623,7 +628,7 @@ function DemonstrationPlayer() {
       self.showStep(targetStep);
     }
     catch (e) {
-      error = new xfilesException("DemoPlayer.showNextStep",11,null,e);
+      var error = new xfilesException("DemoPlayer.showNextStep",11,null,e);
       handleException('DemoPlayer.showNextStep',error,null);
     }
   }
@@ -638,7 +643,7 @@ function DemonstrationPlayer() {
       self.showStep(targetStep);
     }
     catch (e) {
-      error = new xfilesException("DemoPlayer.showPreviousStep",11,null,e);
+      var error = new xfilesException("DemoPlayer.showPreviousStep",11,null,e);
       handleException('DemoPlayer.showPreviousStep',error,null);
     }
   }
@@ -664,7 +669,7 @@ function DemonstrationPlayer() {
   	**
   	*/
 
-    currentStepId = stepId;
+    var currentStepId = stepId;
 
     if (document.getElementById('targetUser.' + stepId)) {
       var targetUsername = document.getElementById('targetUser.' + stepId).value;
@@ -709,7 +714,7 @@ function DemonstrationPlayer() {
   this.executeStatement = function(statementId) {
 
   	try {
-    	executeButton = document.getElementById( statementId + '.statementExecute');
+    	var executeButton = document.getElementById( statementId + '.statementExecute');
       if (executeButton.disabled) {
     	  return;
     	}
@@ -739,13 +744,13 @@ function DemonstrationPlayer() {
 
   this.switchTab = function (statementId) {
 
-	  currentTab    = statementId;
-		var tab       = document.getElementById(statementId + ".tab");
-    var statement = document.getElementById(statementId + ".statement");
-    var actions   = document.getElementById(statementId + ".actions");
-    var result    = document.getElementById(statementId + ".result");
-    var plan      = document.getElementById(statementId + ".explainPlan");
-    var timing    = document.getElementById(statementId + ".timing");
+	  var currentTab = statementId;
+		var tab        = document.getElementById(statementId + ".tab");
+    var statement  = document.getElementById(statementId + ".statement");
+    var actions    = document.getElementById(statementId + ".actions");
+    var result     = document.getElementById(statementId + ".result");
+    var plan       = document.getElementById(statementId + ".explainPlan");
+    var timing     = document.getElementById(statementId + ".timing");
 
     setActiveTab(tab);
     hideSiblings(statement);
@@ -782,7 +787,7 @@ function DemonstrationPlayer() {
     sqlScript.setStatementExecuted();
 	  sqlScript.loadNextStatement();
 
-  	step = steps[sqlScript.getScriptId()];
+  	var step = steps[sqlScript.getScriptId()];
     setStatementTab(step);
 
     if ((!sqlScript.isScriptComplete()) && (!sqlScript.isExecutionPaused())) {
@@ -948,7 +953,7 @@ function DemonstrationPlayer() {
     var outputTarget = document.getElementById(outputTargetName);
 
     if (!outputTarget) {
-      error = new xfilesException("DemoPlayer.getOutputTarget",11,null,null);
+      var error = new xfilesException("DemoPlayer.getOutputTarget",11,null,null);
   	  error.setDescription("Unable to locate output area [" +  outputTargetName + "]");
       error.setXML(response)
       throw error;
@@ -968,12 +973,12 @@ function DemonstrationPlayer() {
 
     var results = document.getElementById(statementId + ".result");
     hideSiblings(results);
-    resultsDiv = results.parentNode;
+    var resultsDiv = results.parentNode;
     resultsDiv.style.display = "block";
 
     var explainPlan = document.getElementById(statementId + ".explainPlan");
     hideSiblings(explainPlan)
-    explainDiv = explainPlan.parentNode;
+    var explainDiv = explainPlan.parentNode;
     explainDiv.style.display = "none";
 
     var img = document.getElementById(statementId + ".toggleResultsPanel");
@@ -1012,8 +1017,8 @@ function DemonstrationPlayer() {
 
     // If the step is not re-runnable change the ICON for the current statement to StopDisabled and disable the control.
 
-	  rerunnableStep = document.getElementById(scriptId + ".isRerunnable");
-	  executeButton = document.getElementById(statementId + ".statementExecute");
+	  var rerunnableStep = document.getElementById(scriptId + ".isRerunnable");
+	  var executeButton = document.getElementById(statementId + ".statementExecute");
 	  if (result && !rerunnableStep) {
       executeButton.style.display = "none";
 	    executeButton.disabled = true;
@@ -1066,7 +1071,7 @@ function DemonstrationPlayer() {
      	showInfoMessage("Simulation Complete.");
     }
     catch (e) {
-      error = new xfilesException("DemoPlayer.completeSimulation",11,null,e);
+      var error = new xfilesException("DemoPlayer.completeSimulation",11,null,e);c
       handleException('DemoPlayer.completeSimulation',error,null);
     }
   }
@@ -1232,7 +1237,7 @@ function SqlProcessor() {
     try {
       includeScriptText = getDocumentContentImpl(scriptLocation);
     } catch (e) {
-      error = new xfilesException('sqlScript.includeSQLScript',11, scriptLocation, e);
+      var error = new xfilesException('sqlScript.includeSQLScript',11, scriptLocation, e);
       throw error;
     }
     // alert(includeScriptText);
@@ -1249,7 +1254,7 @@ function SqlProcessor() {
 
    // Read the next statement from the scriptContent
 
-   statementHTML = "";
+   var statementHTML = "";
    var statement = "";
 
    var statementStarted = false;
@@ -1269,7 +1274,7 @@ function SqlProcessor() {
    try {
      while (scriptContent.length > 0) {
 
-       nextLine = scriptContent[0];
+       var nextLine = scriptContent[0];
 
        if (nextLine == '') {
          // Skip blank lines
@@ -1342,7 +1347,7 @@ function SqlProcessor() {
          }
        }
 
-       nextLineHTML = nextLine.replace(/&/g,'&amp;');
+       var nextLineHTML = nextLine.replace(/&/g,'&amp;');
        nextLineHTML = nextLineHTML.replace(/\s/g,"&nbsp;");
        nextLineHTML = nextLineHTML.replace(/</g,"&lt;");
        nextLineHTML = nextLineHTML.replace(/>/g,"&gt;");
@@ -1456,7 +1461,7 @@ function SqlProcessor() {
      return statement;
    }
    catch (e) {
-     error = new xfilesException('SqlProcessor.readStatement',11, null, e);
+     var error = new xfilesException('SqlProcessor.readStatement',11, null, e);
      throw error;
    }
   }
@@ -1621,7 +1626,7 @@ function SqlProcessor() {
     // alert("processReturnCode(" + statementType + "," + rows + ")");
 
     if (ddlTarget) {
-      firstChar = ddlTarget.substr(0,1).toUpperCase();
+      var firstChar = ddlTarget.substr(0,1).toUpperCase();
       ddlTarget = firstChar + ddlTarget.substr(1);
     }
 
@@ -1683,7 +1688,7 @@ function SqlProcessor() {
 
   function displayJSON(soapResponse, namespaces, sqlScript) {
 
-    nodeList = soapResponse.selectNodes("/soap:Envelope/soap:Body/orawsv:queryOut/orawsv:ROWSET/orawsv:ROW/*[starts-with(.,'[') or starts-with(.,'{')]",namespaces);
+    var nodeList = soapResponse.selectNodes("/soap:Envelope/soap:Body/orawsv:queryOut/orawsv:ROWSET/orawsv:ROW/*[starts-with(.,'[') or starts-with(.,'{')]",namespaces);
     if (nodeList.length > 0 ) {
       // Output contains JSON ....
       var rowList = soapResponse.selectNodes("/soap:Envelope/soap:Body/orawsv:queryOut/orawsv:ROWSET/orawsv:ROW",namespaces );
@@ -1712,7 +1717,7 @@ function SqlProcessor() {
   
   function displayXML(soapResponse, namespaces, sqlScript) {
 
-    nodeList = soapResponse.selectNodes("/soap:Envelope/soap:Body/orawsv:queryOut/orawsv:ROWSET/orawsv:ROW/*[*]",namespaces);
+    var nodeList = soapResponse.selectNodes("/soap:Envelope/soap:Body/orawsv:queryOut/orawsv:ROWSET/orawsv:ROW/*[*]",namespaces);
     if (nodeList.length > 0 ) {
       // Output contains XML....
       var rowList = soapResponse.selectNodes("/soap:Envelope/soap:Body/orawsv:queryOut/orawsv:ROWSET/orawsv:ROW",namespaces );
@@ -1747,7 +1752,7 @@ function SqlProcessor() {
         return false;
    	  }
       else {
-        error = new xfilesException("sqlProcessor.displayResponse",11,null,e);
+        var error = new xfilesException("sqlProcessor.displayResponse",11,null,e);
   	    error.setDescription("Unexpected sqlProcessor Error.");
         throw error;
       }
@@ -1797,7 +1802,7 @@ function SqlProcessor() {
       return true;
     }
 
-    error = new xfilesException("sqlProcessor.displayResponse",11,null,e);
+    var error = new xfilesException("sqlProcessor.displayResponse",11,null,e);
     error.setDescription("Unexpected Soap Response Error.");
     error.setXML(soapResponse);
     throw error;

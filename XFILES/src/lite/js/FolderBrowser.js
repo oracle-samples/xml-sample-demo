@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict"; 
+
 var uploadDialogURL
 
 var outstandingRequestCount = 0;
@@ -47,7 +49,7 @@ function updateFolderContents(mgr, outputWindow, module) {
   namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
   
   var newFolder  = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:P_UPDATED_RESOURCE/res:Resource",namespaces).item(0);
-  resourceXML    = importResource(newFolder);
+  var resourceXML    = importResource(newFolder);
   displayFolder(resourceXML,outputWindow,stylesheetURL);
 }
 
@@ -55,7 +57,7 @@ function reportComplete(mgr, outputWindow, operation, targetFolder) {
 
   // Use when the current folder should be reloaded when the operation is complete.
 
-  var module = "FolderBrowser.reportComplete[" + operation + "]";
+  var module     = "FolderBrowser.reportComplete[" + operation + "]";
 
   try {
     var soapResponse = mgr.getSoapResponse(module);
@@ -74,7 +76,7 @@ function reportComplete(mgr, outputWindow, operation, targetFolder) {
 
 function processCreateFolder(mgr, outputWindow) {
 
-  var module = "FolderBrowser.processCreateFolder";
+  var module     = "FolderBrowser.processCreateFolder";
 
   try {
     updateFolderContents(mgr, outputWindow, module);
@@ -87,11 +89,11 @@ function processCreateFolder(mgr, outputWindow) {
 
 function createFolder(newFolderPath, newFolderDescription, outputWindow) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
-  var method =  "CREATENEWFOLDER";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
+  var method      =  "CREATENEWFOLDER";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var XHR = mgr.createPostRequest();
 	XHR.onreadystatechange = function() { if( XHR.readyState==4 ) { processCreateFolder(mgr, outputWindow) } };
 
@@ -137,7 +139,7 @@ function openNewFolderDialog(evt) {
 
 function processCreateWikiPage(mgr, outputWindow) {
 
-  var module = "FolderBrowser.processCreateWikiPage";
+  var module     = "FolderBrowser.processCreateWikiPage";
 
   try {
     updateFolderContents(mgr, outputWindow, module);
@@ -150,11 +152,11 @@ function processCreateWikiPage(mgr, outputWindow) {
 
 function createWikiPage(newWikiPagePath, newWikiPageDescription, outputWindow) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
-  var method =  "CREATENEWWIKIPAGE";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
+  var method      =  "CREATENEWWIKIPAGE";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);	
+	var mgr = soapManager.getRequestManager(schema,packageName,method);	
 	var XHR = mgr.createPostRequest();
 	XHR.onreadystatechange = function() { if( XHR.readyState==4 ) { processCreateFolder(mgr, outputWindow) } };
 
@@ -197,7 +199,7 @@ function openNewWikiPageDialog(evt) {
 
 function processCreateZipFile(response, outputWindow) {
 
-  var module = "FolderBrowser.processCreateZipFile";
+  var module     = "FolderBrowser.processCreateZipFile";
 
   try {
     updateFolderContents(mgr, outputWindow,module);
@@ -251,11 +253,11 @@ function openFolderPicker(evt, action, resourceList, operation) {
     document.getElementById("unzipDuplicateAction").style.display="BLOCK";
   }
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
-  var method =  "GETTARGETFOLDERTREE";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
+  var method      =  "GETTARGETFOLDERTREE";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
  	var XHR = mgr.createPostRequest();
   XHR.onreadystatechange = function() { 
   	                         if ( XHR.readyState == 4 ) {
@@ -358,11 +360,11 @@ function openCheckInDialog(evt, resourceList) {
 
 function createZipFile(zipFileName, zipFileDescription, resourceListXML, outputWindow) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
-  var method =  "CREATEZIPFILE";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
+  var method      =  "CREATEZIPFILE";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);	
+	var mgr = soapManager.getRequestManager(schema,packageName,method);	
 	var XHR = mgr.createPostRequest();
 	XHR.onreadystatechange = function() { if( XHR.readyState==4 ) { processCreateFolder(mgr, outputWindow) } };
 
@@ -410,11 +412,11 @@ function openNewZipFileDialog(evt,resourceList) {
 
 function setRSSFeed(resource,enable,actionName,deep,itemsChangedIn) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
-  var method =  "SETRSSFEED";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
+  var method      =  "SETRSSFEED";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var XHR = mgr.createPostRequest();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { reportComplete(mgr, document.getElementById("pageContent"), actionName, resourceURL) } };
 
@@ -442,10 +444,10 @@ function disableRSS(folderURL) {
 
 function doListOperation(resourceListXML, parameters, module, actionName, targetFolder) {
 
-  var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+  var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
 
-	var mgr = soapManager.getRequestManager(schema,package,module);
+	var mgr = soapManager.getRequestManager(schema,packageName,module);
  	var XHR = mgr.createPostRequest();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) {reportComplete(mgr, document.getElementById("pageContent"), actionName, targetFolder)}};
 
@@ -458,7 +460,7 @@ function doListOperation(resourceListXML, parameters, module, actionName, target
 
 function copyResourceList(resourceListXML, targetFolder, deep, duplicatePolicy) {
 
-  var module  = "COPYRESOURCELIST";
+  var module      = "COPYRESOURCELIST";
   var actionName = "Copy"
 
   try {
@@ -476,7 +478,7 @@ function copyResourceList(resourceListXML, targetFolder, deep, duplicatePolicy) 
 
 function moveResourceList(resourceListXML, targetFolder, deep) {
 
-  var module  = "MOVERESOURCELIST";
+  var module      = "MOVERESOURCELIST";
   var actionName = "Move";
 
   try {
@@ -492,7 +494,7 @@ function moveResourceList(resourceListXML, targetFolder, deep) {
 
 function linkResourceList(resourceListXML, targetFolder, linkType) {
 
-  var module  = "LINKRESOURCELIST";
+  var module      = "LINKRESOURCELIST";
   var actionName = "Link";
 
 	try {
@@ -509,7 +511,7 @@ function linkResourceList(resourceListXML, targetFolder, linkType) {
 
 function deleteResourceList(resourceListXML, deep, force) {
 
-  var module  = "DELETERESOURCELIST";
+  var module      = "DELETERESOURCELIST";
   var actionName = "Delete"
 
   try {
@@ -526,7 +528,7 @@ function deleteResourceList(resourceListXML, deep, force) {
 
 function lockResourceList(resourceListXML, deepOption) {
 
-  var module  = "LOCKRESOURCELIST";
+  var module      = "LOCKRESOURCELIST";
   var actionName = "Lock"
 
   try {
@@ -542,7 +544,7 @@ function lockResourceList(resourceListXML, deepOption) {
 
 function unlockResourceList(resourceListXML, deepOption) {
 
-  var module  = "UNLOCKRESOURCELIST";
+  var module      = "UNLOCKRESOURCELIST";
   var actionName = "Unlock"
 
   try {
@@ -558,7 +560,7 @@ function unlockResourceList(resourceListXML, deepOption) {
 
 function publishResourceList(resourceListXML, deepOption, publicOption) {
 
-  var module  = "PUBLISHRESOURCELIST";
+  var module      = "PUBLISHRESOURCELIST";
   var actionName = "Publish Resource"
 
   try {
@@ -576,7 +578,7 @@ function publishResourceList(resourceListXML, deepOption, publicOption) {
 
 function setAclList(resourceListXML, newACL, deep) {
 
-  var module  = "SETACLLIST";
+  var module      = "SETACLLIST";
   var actionName = "Set ACL";
 
   try {
@@ -593,7 +595,7 @@ function setAclList(resourceListXML, newACL, deep) {
 
 function setViewerList(resourceListXML, newViewer, renderingMethod) {
 
-  var module  = "SETCUSTOMVIEWERLIST";
+  var module      = "SETCUSTOMVIEWERLIST";
   var actionName = "Set Viewer";
 
   try {
@@ -610,7 +612,7 @@ function setViewerList(resourceListXML, newViewer, renderingMethod) {
 
 function changeOwnerList(resourceListXML, newOwner, deep) {
 
-  var module  = "CHANGEOWNERLIST";
+  var module      = "CHANGEOWNERLIST";
   var actionName = "Change Owner";
 
   try {
@@ -627,7 +629,7 @@ function changeOwnerList(resourceListXML, newOwner, deep) {
 
 function versionResourceList(resourceListXML, deepOption) {
 
-  var module  = "MAKEVERSIONEDLIST";
+  var module      = "MAKEVERSIONEDLIST";
   var actionName = "Make Versioned"
 
   try {
@@ -643,7 +645,7 @@ function versionResourceList(resourceListXML, deepOption) {
 
 function checkOutResourceList(resourceListXML, deepOption) {
 
-  var module  = "CHECKOUTLIST";
+  var module      = "CHECKOUTLIST";
   var actionName = "Check Out"
 
   try {
@@ -658,7 +660,7 @@ function checkOutResourceList(resourceListXML, deepOption) {
 }  
 function checkInResourceList(resourceListXML, comment, deepOption) {
 
-  var module  = "CHECKINLIST";
+  var module      = "CHECKINLIST";
   var actionName = "Check In"
 
   try {
@@ -675,7 +677,7 @@ function checkInResourceList(resourceListXML, comment, deepOption) {
 
 function unzipResourceList(resourceListXML, targetFolder, duplicateAction) {
 
-  var module  = "UNZIPLIST";
+  var module      = "UNZIPLIST";
   var actionName = "Unzip"
 
   try {
@@ -692,7 +694,7 @@ function unzipResourceList(resourceListXML, targetFolder, duplicateAction) {
 
 function addHitCounter(resourceListXML, deepOption) {
 
-  var module  = "ADDPAGEHITCOUNTERLIST";
+  var module      = "ADDPAGEHITCOUNTERLIST";
   var actionName = "Page Counter"
 
   try {
@@ -1031,6 +1033,8 @@ function validateSelection(action, index) {
 
 function isAnyResouceSelected() {
 	
+	var currentItem = null;
+	
   for (var i = 1;  currentItem = document.getElementById("itemSelected." + i); i++) {
     if (currentItem.checked) {
     	  return true;
@@ -1065,10 +1069,12 @@ function processAction(evt,action) {
   var selectedList = new Array();
 
   var folderSelected = false;
-  
+
+	var currentItem = null;
+	  
   for (var i = 1;  currentItem = document.getElementById("itemSelected." + i); i++) {
     if (currentItem.checked) {
-      itemValid = validateSelection(action,i);
+      var itemValid = validateSelection(action,i);
       if (itemValid) {
         if (document.getElementById("isContainer." + i).value == "true") {
           folderSelected = true;
@@ -1228,7 +1234,10 @@ function toggleSelect(currentState) {
 }
 
 function select_all() {
-   for (var i = 1;  currentItem = document.getElementById("itemSelected." + i); i++) {
+
+	var currentItem = null;
+	
+	for (var i = 1;  currentItem = document.getElementById("itemSelected." + i); i++) {
      document.getElementById("itemSelected." + i).checked=true;
   }
 }
@@ -1287,7 +1296,7 @@ function doUploadComplete(status,errorCode,errorMessage,resourcePath) {
     refreshCurrentFolder();
   }
   else {
-  	error = new xfilesException("XFILES.XFILES_DOCUMENT_UPLOAD.UPLOAD",12,resourcePath);
+  	var error = new xfilesException("XFILES.XFILES_DOCUMENT_UPLOAD.UPLOAD",12,resourcePath);
     error.setDescription(errorMessage);
     error.setNumber(errorCode);
     handleException("uploadFiles.submit",error,resourcePath);
@@ -1308,7 +1317,7 @@ function refreshCurrentFolder() {
 
 function processCreateIndexPage(mgr, outputWindow) {
 
-  var module = "FolderBrowser.processCreateIndexPage";
+  var module     = "FolderBrowser.processCreateIndexPage";
 
   try {
     updateFolderContents(mgr, outputWindow, module);
@@ -1321,15 +1330,15 @@ function processCreateIndexPage(mgr, outputWindow) {
 
 function createIndexPage(event) {
 
-  var module = "FolderBrowser.createIndexPage";
+  var module     = "FolderBrowser.createIndexPage";
   var outputWindow = document.getElementById("pageContent");
   try {
 
-    var schema  = "XFILES";
-    var package = "XFILES_SOAP_SERVICES";
-    var method =  "CREATEINDEXPAGE";
+    var schema      = "XFILES";
+    var packageName = "XFILES_SOAP_SERVICES";
+    var method      =  "CREATEINDEXPAGE";
   
-  	var mgr = soapManager.getRequestManager(schema,package,method);
+  	var mgr = soapManager.getRequestManager(schema,packageName,method);
   	var XHR = mgr.createPostRequest();
   	XHR.onreadystatechange = function() { if( XHR.readyState==4 ) { processCreateIndexPage(mgr, outputWindow) } };
   

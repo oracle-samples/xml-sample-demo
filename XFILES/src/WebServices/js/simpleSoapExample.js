@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";
+
 var currentWSDL;
 var queryServiceWSDL;
 
@@ -93,8 +95,8 @@ function invokeQuery(SQLQUERY) {
 
 function callWS(form) {  
 
-  var schema = null;
-  var package = null;
+  var schema     = null;
+  var packageName = null;
   var method = null;
   
   try {
@@ -111,7 +113,7 @@ function callWS(form) {
     document.getElementById('d_results').innerHTML = "";
 	
   
-    var mgr = soapManager.getRequestManager(schema,package,method);  	
+    var mgr = soapManager.getRequestManager(schema,packageName,method);  	
   	var XHR = mgr.createPostRequest();
     XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { displayResponse(mgr)}};
 

@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";
+
 var max
 var first
 var last 
@@ -27,7 +29,7 @@ function loadPreviews() {
   var contentTypeList = resource.selectNodes('//res:Resource/res:ContentType',xfilesNamespaces)
   var contentType;
   	
-  for (i=0; i < residList.length; i++){
+  for (var i=0; i < residList.length; i++){
     var  contentType = contentTypeList.item(i).firstChild.nodeValue;
     var RESID        = residList.item(i).firstChild.nodeValue;
     var previewArea = document.getElementById(RESID);
@@ -65,11 +67,11 @@ function previewContent(target,RESID) {
   
   var path = '/sys/oid/' + RESID;
 
-	var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+	var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "GENERATEPREVIEW";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);	
+	var mgr = soapManager.getRequestManager(schema,packageName,method);	
 	var ajaxControl = mgr.createPostRequest();
   ajaxControl.onreadystatechange=function() { if( ajaxControl.readyState==4 ) { processPreview(mgr, target)}};
   
@@ -85,11 +87,11 @@ function renderContentSOAP(RESID) {
  
   var path = '/sys/oid/' + RESID;
 
-	var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+	var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "RENDERASXHTML";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var ajaxControl = mgr.createPostRequest();
   ajaxControl.onreadystatechange=function() { if( ajaxControl.readyState==4 ) { processXHTML(mgr)}};
   
@@ -119,11 +121,11 @@ function processXHTML(mgr) {
 function renderContent(path) {
  
 
-	var schema  = "XFILES";
-  var package = "XFILES_SOAP_SERVICES";
+	var schema      = "XFILES";
+  var packageName = "XFILES_SOAP_SERVICES";
   var method =  "RENDERASXHTML";
 
-	var mgr = soapManager.getRequestManager(schema,package,method);
+	var mgr = soapManager.getRequestManager(schema,packageName,method);
 	var ajaxControl = mgr.createPostRequest();
   ajaxControl.onreadystatechange=function() { if( ajaxControl.readyState==4 ) { processXHTML(mgr)}};
   

@@ -12,6 +12,8 @@
  *
  * ================================================
  */
+               
+"use strict";
 
 function init(target) {
 
@@ -23,7 +25,7 @@ function init(target) {
       stylesheetURL = '/XFILES/lite/xsl/ResourceProperties.xsl';
     }
     
-    includeContent = (getParameter("includeContent") == "true");
+    var includeContent = (getParameter("includeContent") == "true");
 
     resourceURL = unescape(getParameter("target"));
     if ((typeof resourceURL == "undefined") || (resourceURL == "")) {

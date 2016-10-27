@@ -34,6 +34,14 @@ create table XFILES_RESULT_CACHE(
 )
 /
 --
+grant all 
+   on XFILES_RESULT_CACHE
+   to ANONYMOUS
+/
+grant all 
+   on XFILES_RESULT_CACHE
+   to PUBLIC
+/
 create or replace package XFILES_UTILITIES
 authid CURRENT_USER
 as  

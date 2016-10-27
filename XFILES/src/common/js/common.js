@@ -173,14 +173,14 @@ function SoapManager(manager) {
           return new ActiveXObject(httpImplementation);  
         }
         else {
-          error = new xfilesException('SoapManager.newRequest',5, null, null);
+          var error = new xfilesException('SoapManager.newRequest',5, null, null);
           error.setDescription("Browser cannot instantiate an XMLHTTPRequest object");
           throw error;
         }      
       }
     }
     catch (e)  {  
-      error = new xfilesException('SoapManager.newRequest',3, null, e);
+      var error = new xfilesException('SoapManager.newRequest',3, null, e);
       throw error;
     }
   }
@@ -201,7 +201,9 @@ function SoapManager(manager) {
       XHR.open (method, targetURL, asynchronousMode, user, pwd);
     }
     // IE 10.0 : Specify we require XMLDocument not (HTML) Document objects
-    try { XHR.responseType =  'msxml-document'; } catch(e){}
+    if (useMSXML) {
+      try { XHR.responseType =  'msxml-document'; } catch(e){}
+    }
     return XHR;
   }
   
@@ -271,7 +273,7 @@ function SoapManager(manager) {
 	    for (var i in args) {
 	  	  var arg = requestDocument.selectNodes('//tns:' + i, serviceNamespaces).item(0);
 	  	  if (arg == null) {
-          error = new xfilesException("SoapManager.sendSoapRequest",15,requestManager.getServiceLocation(),null);
+          var error = new xfilesException("SoapManager.sendSoapRequest",15,requestManager.getServiceLocation(),null);
           error.setDescription("Invalid Parameter : " + i);
           error.setXML(requestDocument);
           throw error;
@@ -293,7 +295,7 @@ function SoapManager(manager) {
 	    for (var i in xargs) {
 	  	  var arg = requestDocument.selectNodes('//tns:' + i, serviceNamespaces).item(0);
 	  	  if (arg == null) {
-          error = new xfilesException("SoapManager.sendSoapRequest",15,requestManager.getServiceLocation(),null);
+          var error = new xfilesException("SoapManager.sendSoapRequest",15,requestManager.getServiceLocation(),null);
           error.setDescription("Invalid Parameter : " + i);
           error.setXML(requestDocument);
           throw error;
@@ -332,7 +334,7 @@ function SoapManager(manager) {
 
   this.getSoapResponse = function(requestManager,callingModule) {
   
-    var module = 'SoapManager.getSoapResponse';
+    var module     = 'SoapManager.getSoapResponse';
     var error;
   
     if (callingModule) {
@@ -343,14 +345,14 @@ function SoapManager(manager) {
     
     if (XHR.status == 0) {
     	// Backend Server Crash ?
-      error = new xfilesException(module,3, null, null);
+      var error = new xfilesException(module,3, null, null);
       error.setDescription('XMLHTTPRequest return code 0. Please check alert log for possible shared server crash.');
       error.setNumber(XHR.status);
       throw error;
     }
  
     if (XHR.status != 200) {
-      error = new xfilesException(module,3, null, null);
+      var error = new xfilesException(module,3, null, null);
       error.setDescription(XHR.statusText);
       error.setNumber(XHR.status);
       throw error;
@@ -374,13 +376,13 @@ function SoapManager(manager) {
     }
     else {
     	if (XHR.responseText != null) {
-        error = new xfilesException(module,15,requestManager.getServiceLocation(),null);
+        var error = new xfilesException(module,15,requestManager.getServiceLocation(),null);
         error.setDescription("ResponseXML is null : Possible malformed response ?");
         error.setContent(XHR.responseText);
         throw error;
       }
       else {
-        error = new xfilesException(module,15,requestManager.getServiceLocation(),null);
+        var error = new xfilesException(module,15,requestManager.getServiceLocation(),null);
         error.setDescription("Soap Error : ResponseXML and ResponseText both NULL");
         error.setXML(soapResponse);
         throw error;
@@ -397,7 +399,7 @@ function SoapManager(manager) {
     	**
     	*/
     	
-      error = new xfilesException(module,6,requestManager.getServiceLocation(),null);
+      var error = new xfilesException(module,6,requestManager.getServiceLocation(),null);
       error.setDescription("Soap Fault");
       error.setXML(soapResponse);
       var nl = soapResponse.selectNodes("/soap:Envelope/soap:Body/soap:Fault/detail/oraerr:OracleErrors/oraerr:OracleError[2]");
@@ -413,7 +415,7 @@ function SoapManager(manager) {
       return soapResponse;
     }
 
-    error = new xfilesException(module,15,requestManager.getServiceLocation(),null);
+    var error = new xfilesException(module,15,requestManager.getServiceLocation(),null);
     error.setDescription("Unexpected Soap Response");
     error.setXML(soapResponse);
     error.setContent(XHR.responseText);
@@ -443,10 +445,10 @@ function SoapManager(manager) {
 
   }
   
-  this.getRequestManager = function(schema, package, method) {
+  this.getRequestManager = function(schema, packageName, method) {
   
     if (getHttpUsername() == 'ANONYMOUS') {
-      error = new xfilesException('common.soapRequestManager',15, null, null);
+      var error = new xfilesException('common.soapRequestManager',15, null, null);
       error.setDescription('Soap Services only available to Authenticated Users.');
       throw error;
     }
@@ -457,7 +459,7 @@ function SoapManager(manager) {
       }          		
     }
   
-    var wsdlDetails = wsdlCache.getWSDL(schema, package, method);
+    var wsdlDetails = wsdlCache.getWSDL(schema, packageName, method);
     return new RequestManager(self,new WSDLManager(wsdlDetails));
   }
   
@@ -671,7 +673,7 @@ function browserSupportsXSLInclude() {
     if (result != null) {
       /*
 	    **
-	    ** Browser is Probably Firefox : native XSL Transformation is supported
+	    ** Browser is Probably Firefox : native XSL Transformation and xsl:include are supported
 	    **
 	    */ 
 	    return true;
@@ -679,7 +681,7 @@ function browserSupportsXSLInclude() {
     else {
       /*
 	    **
-	    ** Browser is probably Chrome or Safari : native XSL Transformation is not supported
+	    ** Browser does not appear to support XSL Transformation with xsl:include. Safari and EDGE ?
 	    **
 	    */ 
    	}
@@ -914,13 +916,13 @@ function webkitLoadXSLDocument(targetURL) {
 **       return result;
 **     }
 **     else {
-**       error = new xfilesException('common.webkitLoadXSLDocument',8, url, null);
+**       var error = new xfilesException('common.webkitLoadXSLDocument',8, url, null);
 **  	   error.setDescription('Error generating in-lined XSL for WebKit based Browser : HTTP Status = ' + XHR.status + " (" + XHR.statusText + ")");
 **    	 throw error;
 **     }
 **   }
 **   catch (e) {
-**       error = new xfilesException('common.webkitLoadXSLDocument',8, url, null);
+**       var error = new xfilesException('common.webkitLoadXSLDocument',8, url, null);
 **  	   error.setDescription('Error generating in-lined XSL for WebKit based Browser.');
 **    	 throw error;
 **   }
@@ -939,7 +941,7 @@ function loadXSLDocument(targetURL) {
     }
   }
   catch (e) { 
-    error = new xfilesException('common.loadXSLDocument',7, targetURL, e);
+    var error = new xfilesException('common.loadXSLDocument',7, targetURL, e);
     throw error;
   }
 
@@ -953,7 +955,7 @@ function loadXMLDocument(targetURL) {
     return new xmlDocument().load(targetURL);
   }
   catch (e) { 
-    error = new xfilesException('common.loadXMLDocument',7, targetURL, e);
+    var error = new xfilesException('common.loadXMLDocument',7, targetURL, e);
     throw error;
   }
  
@@ -966,7 +968,7 @@ function getXMLDocument(targetURL) {
     var XHR = soapManager.createGetRequest(targetURL);
     XHR.send(null);
     if (XHR.status != 200) {
-      error = new xfilesException('common.getXMLDocument',3, targetURL, null);
+      var error = new xfilesException('common.getXMLDocument',3, targetURL, null);
       error.setDescription(XHR.statusText);
       error.setNumber(XHR.status);
       throw error;
@@ -974,7 +976,7 @@ function getXMLDocument(targetURL) {
     return new xmlDocument(XHR.responseXML,xmlDocument.ResponseXML);
   }
   catch (e) {  
-    error = new xfilesException('common.getXMLDocument',7, targetURL, e);
+    var error = new xfilesException('common.getXMLDocument',7, targetURL, e);
     throw error;
   }
 }
@@ -985,7 +987,7 @@ function deleteXMLDocument(targetURL) {
     var XHR = soapManager.createDeleteRequest(targetURL,false);
     XHR.send(null);
     if ((XHR.status != 201) && (XHR.status != 204) && (XHR.status != 207) && (XHR.status != 404)) {
-      error = new xfilesException('common.getXMLDocument',3,targetURL, null);
+      var error = new xfilesException('common.getXMLDocument',3,targetURL, null);
       error.setDescription(XHR.statusText);
       error.setNumber(XHR.status);
       throw error;
@@ -993,7 +995,7 @@ function deleteXMLDocument(targetURL) {
     return;
   }
   catch (e)  {  
-    error = new xfilesException('common.deleteXMLDocument',7, targetURL, e);
+    var error = new xfilesException('common.deleteXMLDocument',7, targetURL, e);
     throw error;
   }
 }
@@ -1001,8 +1003,8 @@ function deleteXMLDocument(targetURL) {
 function getResourceXML(resourceURL, includeContent) {
 
   try {
-  	var schema  = "XFILES";
-    var package = "XFILES_SOAP_SERVICES";
+  	var schema          = "XFILES";
+    var packageName = "XFILES_SOAP_SERVICES";
     var method;
 
     if (includeContent) {
@@ -1012,7 +1014,7 @@ function getResourceXML(resourceURL, includeContent) {
 	    method =  "GETRESOURCE";
   	}
 	
-  	var mgr = soapManager.getRequestManager(schema,package,method);
+  	var mgr = soapManager.getRequestManager(schema,packageName,method);
    	var XHR = mgr.createPostRequest(false);
 
 	  var parameters = new Object;
@@ -1035,13 +1037,13 @@ function getResourceXML(resourceURL, includeContent) {
       return resource;
     }
      
-    error = new xfilesException('common.getResourceXML',12,resourceURL,null);
+    var error = new xfilesException('common.getResourceXML',12,resourceURL,null);
     error.setDescription("Invalid Resource Document."); 
     error.setXML(soapResponse);
     throw error;
   }
   catch (e) {
-    error = new xfilesException('common.getResourceXML',7,resourceURL,e);
+    var error = new xfilesException('common.getResourceXML',7,resourceURL,e);
     error.setDescription("Unable to load Document");
     throw error;
   }
@@ -1053,7 +1055,7 @@ function getDocumentContentImpl ( targetURL ) {
   var XHR = soapManager.createGetRequest(targetURL,false);
   XHR.send(null);
   if (XHR.status != 200) {
-    error = new xfilesException('common.getDocumentContentImpl',3,targetURL,null);
+    var error = new xfilesException('common.getDocumentContentImpl',3,targetURL,null);
     error.setDescription(XHR.statusText);
     error.setNumber(XHR.status);
     throw error;
@@ -1067,7 +1069,7 @@ function getDocumentContent ( targetURL ) {
     return getDocumentContentImpl(targetURL);
   }
   catch (e) {
-    error = new xfilesException('common.getDocumentContent',7, targetURL, e);
+    var error = new xfilesException('common.getDocumentContent',7, targetURL, e);
     throw error;
   }
 }
@@ -1180,7 +1182,7 @@ function loadOptions(selectControl,optionList,resultSet,initialValue,addEmptyOpt
  	 if (resultSet.length > 0) {
  		
      
-     for (i = 0; i < resultSet.length; i++) {
+     for (var i = 0; i < resultSet.length; i++) {
        var optionDefinition = resultSet.item(i);
        optionWidth = loadOption(optionList,optionDefinition,initialValue);
        if (width < optionWidth) {
@@ -1215,7 +1217,7 @@ function loadOptionList(mgr,selectControl,optionList,initialValue,addEmptyOption
     var resultSet = soapResponse.selectNodes(mgr.getOutputXPath() + "/orawsv:ROWSET/orawsv:ROW",namespaces );
     
     if ((resultSet.length == 0) && (!allowEmptyList)) {
-      error = new xfilesException("common.loadOptionList",12,null, null);
+      var error = new xfilesException("common.loadOptionList",12,null, null);
       error.setDescription("Invalid Option List Document Receieved");
       error.setXML(soapResponse);
       throw error;
@@ -1342,7 +1344,7 @@ function appendHTML (html,target,appendMode) {
        target.innerHTML = target.innerHTML + html;
     }
     catch (e) {
-      error = new xfilesException('common.appendHTML',10,xml.sourceURL,e);
+      var error = new xfilesException('common.appendHTML',10,xml.sourceURL,e);
       error.setDescription("Error while appending to innerHTML of " + htmlContent.nodeName + " to " + target.nodeName + ".");
       throw error;   
     }
@@ -1358,7 +1360,7 @@ function appendHTML (html,target,appendMode) {
       }
     }
     catch (e) {
-      error = new xfilesException('common.appendHTML',10,null,e);
+      var error = new xfilesException('common.appendHTML',10,null,e);
       if (e.name == 'NS_ERROR_DOM_HIERARCHY_REQUEST_ERR') {
         error.setDescription("NS_ERROR_DOM_HIERARCHY_REQUEST_ERR : Cannot append instance of " + html.nodeName + " to " + target.nodeName + ".");
       }
@@ -1391,7 +1393,7 @@ function remoteTransformContent(resourceURL,xslPath) {
  	  XHR.mozBackgroundRequest = true;
     XHR.send(null);
   	if (XHR.status != 200) {
-      error = new xfilesException('common.remoteTransformContent',8, restURL, null);
+      var error = new xfilesException('common.remoteTransformContent',8, restURL, null);
       error.setDescription(XHR.statusText);
       error.setNumber(XHR.statusText);
       throw error;
@@ -1399,7 +1401,7 @@ function remoteTransformContent(resourceURL,xslPath) {
     return XHR.responseText;
   }
   catch (e) {
-    error = new xfilesException('common.remoteTransformContent',10, resource.sourceURL, e);
+    var error = new xfilesException('common.remoteTransformContent',10, resource.sourceURL, e);
     throw error;    
   }
 }
@@ -1427,7 +1429,7 @@ function remoteTransformCache(guid,xslPath) {
  	  XHR.mozBackgroundRequest = true;
     XHR.send(null);
   	if (XHR.status != 200) {
-      error = new xfilesException('common.remoteTransformCache',8, restURL, null);
+      var error = new xfilesException('common.remoteTransformCache',8, restURL, null);
       error.setDescription(XHR.statusText);
       error.setNumber(XHR.status); 
       throw error;
@@ -1435,7 +1437,7 @@ function remoteTransformCache(guid,xslPath) {
     return XHR.responseText;
   }
   catch (e) {
-    error = new xfilesException('common.remoteTransformCache',10, resource.sourceURL, e);
+    var error = new xfilesException('common.remoteTransformCache',10, resource.sourceURL, e);
     throw error;    
   }
 }
@@ -1454,11 +1456,11 @@ function remoteTransformXMLTypeToXHTML(xml,xslPath) {
   try {
      
 	  if (isAuthenticatedUser()) {
-      var schema  = "XFILES";
-      var package = "XFILES_SOAP_SERVICES";
-      var method =  "TRANSFORMDOCUMENT1";
+      var schema          = "XFILES";
+      var packageName = "XFILES_SOAP_SERVICES";
+      var method      =  "TRANSFORMDOCUMENT1";
   
-    	var mgr = soapManager.getRequestManager(schema,package,method);
+    	var mgr = soapManager.getRequestManager(schema,packageName,method);
      	var XHR = mgr.createPostRequest(false);
 
   	  var parameters = new Object
@@ -1479,13 +1481,13 @@ function remoteTransformXMLTypeToXHTML(xml,xslPath) {
       // return nodeList.item(0).firstChild.nextSibling;
     }
     else {
-      error = new xfilesException('common.remoteTransformXMLType',9, xslPath, e);
+      var error = new xfilesException('common.remoteTransformXMLType',9, xslPath, e);
       error.setDescription('Remote XSL Transformation only supported for authenticated users.');
       throw error;
     }
   }
   catch (e) {  
-    error = new xfilesException('common.transformClientXML',9, xslPath, e);
+    var error = new xfilesException('common.transformClientXML',9, xslPath, e);
     error.setDescription('Error invoking remote XSL Transformation via SOAP.');
     throw error;
   }
@@ -1535,7 +1537,7 @@ function transformToXHTML(xml,xsl) {
 		  }
   	}	  
 	  else {
-      error = new xfilesException('common.transformToXHTML',9,xml.sourceURL,e);
+      var error = new xfilesException('common.transformToXHTML',9,xml.sourceURL,e);
       error.setDescription('Error generating HTML via XSL transformation');
       throw error;
     }
@@ -1565,7 +1567,7 @@ function transformXMLtoXHTML(xml,xsl,target,appendMode) {
     html = transformToXHTML(xml,xsl) 
   }
   catch (e) {
-    error = new xfilesException('common.transformXMLtoXHTML',9,xml.sourceURL,e);
+    var error = new xfilesException('common.transformXMLtoXHTML',9,xml.sourceURL,e);
     error.setDescription('Error generating HTML via XSL transformation');
     throw error;
   }
@@ -1574,7 +1576,7 @@ function transformXMLtoXHTML(xml,xsl,target,appendMode) {
     appendHTML(html,target,appendMode);
   }
   catch (e) {
-    error = new xfilesException('common.transformXMLtoXHTML',9,xml.sourceURL,e);
+    var error = new xfilesException('common.transformXMLtoXHTML',9,xml.sourceURL,e);
     error.setDescription('Error appending HTML to target');
     throw error;
   }
@@ -1588,7 +1590,7 @@ function xmlToHTML(target,xml,xsl,appendMode) {
 	  transformXMLtoXHTML(xml,xsl,target,appendMode);
   }
   catch (e) {
-    error = new xfilesException('common.xmlToHTML',9,xml.sourceURL,e);
+    var error = new xfilesException('common.xmlToHTML',9,xml.sourceURL,e);
     error.setDescription('Error generating HTML');
     throw error;
   }
@@ -1602,7 +1604,7 @@ function documentToXML(target,xml,xsl,appendMode) {
 	  transformXMLtoXHTML(xml,xsl,target,appendMode);
   }
   catch (e) {
-    error = new xfilesException('common.documentToXML',9,xml.sourceURL,e);
+    var error = new xfilesException('common.documentToXML',9,xml.sourceURL,e);
     error.setDescription('Error generating HTML');
     throw error;
   }
@@ -1616,7 +1618,7 @@ function contentAsHTML(target,xml,xsl,appendMode) {
 	  transformXMLtoXHTML(xml,xsl,target,appendMode);
   }
   catch (e) {
-    error = new xfilesException('common.contentAsHTML',9,xml.sourceURL,e);
+    var error = new xfilesException('common.contentAsHTML',9,xml.sourceURL,e);
     error.setDescription('Error generating HTML');
     throw error;
   }
@@ -1636,11 +1638,11 @@ function remoteTransformXMLTypeToHTML(xml,xslPath) {
   try {
      
 	  if (isAuthenticatedUser()) {
-      var schema  = "XFILES";
-      var package = "XFILES_SOAP_SERVICES";
-      var method =  "TRANSFORMDOCUMENTTOHTML1";
+      var schema          = "XFILES";
+      var packageName = "XFILES_SOAP_SERVICES";
+      var method      =  "TRANSFORMDOCUMENTTOHTML1";
   
-    	var mgr = soapManager.getRequestManager(schema,package,method);
+    	var mgr = soapManager.getRequestManager(schema,packageName,method);
      	var XHR = mgr.createPostRequest(false);
   
   	  var parameters = new Object
@@ -1672,13 +1674,13 @@ function remoteTransformXMLTypeToHTML(xml,xslPath) {
       return cdataSection.substring(9,cdataSection.length-4);
     }
     else {
-      error = new xfilesException('common.transformClientXMLRemote2',9, xslPath, e);
+      var error = new xfilesException('common.transformClientXMLRemote2',9, xslPath, e);
       error.setDescription('Remote XSL Transformation only supported for authenticated users.');
       throw error;
     }
   }
   catch (e) {  
-    error = new xfilesException('common.transformClientXMLRemote2',9, xslPath, e);
+    var error = new xfilesException('common.transformClientXMLRemote2',9, xslPath, e);
     error.setDescription('Error invoking remote XSL Transformation via SOAP.');
     throw error;
   }
@@ -1715,7 +1717,7 @@ function transformToHTML(xml,xsl) {
       html = remoteTransformXMLTypeToHTML(xml,xsl.sourceURL);
   	}	  
 	  else {
-      error = new xfilesException('common.transformToHTML',9,xml.sourceURL,e);
+      var error = new xfilesException('common.transformToHTML',9,xml.sourceURL,e);
       error.setDescription('Error generating HTML via XSL transformation');
       throw error;
     }
@@ -1743,7 +1745,7 @@ function transformXMLtoHTML(xml,xsl,target,appendMode) {
     html = transformToHTML(xml,xsl) 
   }
   catch (e) {
-    error = new xfilesException('common.transformXMLtoHTML',9,xml.sourceURL,e);
+    var error = new xfilesException('common.transformXMLtoHTML',9,xml.sourceURL,e);
     error.setDescription('Error generating HTML via XSL transformation');
     throw error;
   }
@@ -1752,7 +1754,7 @@ function transformXMLtoHTML(xml,xsl,target,appendMode) {
     appendHTML(html,target,appendMode);
   }
   catch (e) {
-    error = new xfilesException('common.transformXMLtoHTML',9,xml.sourceURL,e);
+    var error = new xfilesException('common.transformXMLtoHTML',9,xml.sourceURL,e);
     error.setDescription('Error appending HTML to target');
     throw error;
   }
@@ -1767,7 +1769,7 @@ function documentToHTML(target,xml,xsl,appendMode) {
 	  transformXMLtoHTML(xml,xsl,target,appendMode);
   }
   catch (e) {
-    error = new xfilesException('common.contentAsHTML',9,xml.sourceURL,e);
+    var error = new xfilesException('common.contentAsHTML',9,xml.sourceURL,e);
     error.setDescription('Error generating HTML');
     throw error;
   }
@@ -1908,7 +1910,7 @@ function reportSuccess(mgr, message) {
     closePopupDialog();
   }
   catch (e) {
-    error = new xfilesException('common.reportSuccess',12, null, e);
+    var error = new xfilesException('common.reportSuccess',12, null, e);
     throw error;
   }
 
@@ -1976,7 +1978,7 @@ function getEventTarget(event) {
 
 function setActiveTab(tab) {
 	var tabset = tab.parentNode.getElementsByTagName("SPAN");
-	for (i=0; i < tabset.length; i++) {
+	for (var i=0; i < tabset.length; i++) {
 		if (tabset[i].className == "activeTab") {
 			tabset[i].className = "inactiveTab";
 	  }
@@ -2051,7 +2053,7 @@ function hideSiblings(me,display){
   		display = "block";
   	}
   	
-  	for (i=0; i < me.parentNode.childNodes.length; i++) {
+  	for (var i=0; i < me.parentNode.childNodes.length; i++) {
   		if (me.parentNode.childNodes[i].nodeName == me.nodeName) {
   		  me.parentNode.childNodes[i].style.display = "none";
   		}
@@ -2157,7 +2159,7 @@ function xfilesException(module,id,target,exception) {
   this.setSQLErrCode  = function ( sqlErrCode )    { this.sqlErrCode = sqlErrCode };
   this.setSQLErrMsg   = function ( sqlErrMsg )     { this.sqlErrMsg = sqlErrMsg };
   	
-  this.isServerError = function() { return this.id == 6 }
+  this.isServervar error = function() { return this.id == 6 }
   	
   if (exception) {
     if (useMSXML) {
@@ -2290,14 +2292,14 @@ function xfilesException(module,id,target,exception) {
                 embeddedXML.appendChild(targetDocument.importNode(correctedVersion.documentElement,true))
               }
               else {
-                error = new xfilesException('xfileException.toXML()',8,null,e);
+                var error = new xfilesException('xfileException.toXML()',8,null,e);
                 error.setDescription("[MSXML] Import Node Error");
                 error.setContent(this.xml.baseDocument.xml);
                 throw error;
               }
             }
             else {
-              error = new xfilesException('xfileException.toXML()',8,null,e);
+              var error = new xfilesException('xfileException.toXML()',8,null,e);
               error.setDescription("[GECKO] Import Node Error");
               error.setContent(this.xml.baseDocument.xml);
               throw error;
@@ -2355,7 +2357,7 @@ var xfilesHandleException = function(module, e, target) {
     }
 
   	var xml = new xmlDocument();
-  	var clientError = xml.createElement("XFilesClientException");
+  	var clientvar error = xml.createElement("XFilesClientException");
   	xml.appendChild(clientError);
 
   	var timestampElement = xml.createElement("Timestamps");
@@ -2497,11 +2499,11 @@ var xfilesHandleException = function(module, e, target) {
   
     	if (isAuthenticatedUser()) {
  
-	    	var schema  = "XFILES";
-        var package = "XFILES_SOAP_SERVICES";
-        var method  = "WRITELOGRECORD";
+	    	var schema          = "XFILES";
+        var packageName = "XFILES_SOAP_SERVICES";
+        var method      = "WRITELOGRECORD";
 
-       	var mgr = soapManager.getRequestManager(schema,package,method);
+       	var mgr = soapManager.getRequestManager(schema,packageName,method);
         var XHR = mgr.createPostRequest(false);
  
         var parameters  = new Object;
@@ -2526,7 +2528,7 @@ var xfilesHandleException = function(module, e, target) {
           var XHR = soapManager.createGetRequest(restURL,false);
           XHR.send(null);
           if (XHR.status != 200) {
-            error = new xfilesException('common.xfilesHandleException',16, restURL, null);
+            var error = new xfilesException('common.xfilesHandleException',16, restURL, null);
             error.setDescription(XHR.statusText);
             error.setNumber(XHR.status);
             throw error;
@@ -2893,12 +2895,12 @@ function WsdlCache() {
     	cause = e.getBaseException();
     	if (cause.number = -2147024891) {
     		doLogoff();
-        error = new xfilesException('SoapManager.loadSQLService',15, wsdlURL, null);
+        var error = new xfilesException('SoapManager.loadSQLService',15, wsdlURL, null);
         error.setDescription('Error instantiating SOAP SERVICE MANAGER : Ensure user has been granted XFILES_USER or XFILES_ADMINISTRATOR');
         throw error;    	
       }
       else {
-        error = new xfilesException('SoapManager.loadSQLService',15, wsdlURL, null);
+        var error = new xfilesException('SoapManager.loadSQLService',15, wsdlURL, null);
         error.setDescription('Unexpected Error ecnountered instantiating SOAP SERVICE MANAGER');
         throw error;    	
       }
@@ -2906,7 +2908,7 @@ function WsdlCache() {
 
     var soapErrors = wsdl.selectNodes('/env:Envelope/env:Body/env:Fault',namespaces);
     if (soapErrors.length > 0) {
-        error = new xfilesException('SoapManager.loadSQLService',15, wsdlURL, null);
+        var error = new xfilesException('SoapManager.loadSQLService',15, wsdlURL, null);
         error.setDescription('Error Fetching WSDL : Ensure user has been granted XFILES_USER or XFILES_ADMINISTRATOR');
         error.setXML(wsdl);
         throw error;    	
@@ -2925,25 +2927,25 @@ function WsdlCache() {
     wsdlCache[target] = new Array(url,namespace,requestDocument,elementName);    
   }
  
-  function loadwsdlCache(schema, package, method) {
+  function loadwsdlCache(schema, packageName, method) {
 
     var target;
     var wsdlURL; 
     
     if (method == null) {
-  	  target = (schema + "." + package);
-      wsdlURL = "/orawsv/" + schema + "/" + package + "?wsdl";
+  	  target = (schema + "." + packageName3);
+      wsdlURL = "/orawsv/" + schema + "/" + packageName + "?wsdl";
     }
     else {
-  	  target = (schema + "." + package + "." + method);
-      var wsdlURL = "/orawsv/" + schema + "/" + package + "/" + method + "?wsdl";
+  	  target = (schema + "." + packageName + "." + method);
+      var wsdlURL = "/orawsv/" + schema + "/" + packageName + "/" + method + "?wsdl";
   	}
 
     var wsdl = loadXMLDocument(wsdlURL);    
 
     var soapErrors = wsdl.selectNodes('/env:Envelope/env:Body/env:Fault',namespaces);
     if (soapErrors.length > 0) {
-        error = new xfilesException('SoapManager.loadwsdlCache',15, wsdlURL, null);
+        var error = new xfilesException('SoapManager.loadwsdlCache',15, wsdlURL, null);
         error.setDescription('Error Fetching WSDL');
         error.setXML(wsdl);
         throw error;    	
@@ -2957,17 +2959,17 @@ function WsdlCache() {
     wsdlCache[target] = new Array(url,namespace,requestDocument,elementName);    
   }
   
-  this.getWSDL = function (schema, package, method) {
+  this.getWSDL = function (schema, packageName, method) {
 	  
 		if (method == null) {
-    	target = schema + "." + package;
+    	target = schema + "." + packageName;
 	  }
     else {
-    	target = schema + "." + package + "." + method;
+    	target = schema + "." + packageName + "." + method;
     }
 
   	if (!wsdlCache[target]) {
-  		loadwsdlCache(schema, package, method);
+  		loadwsdlCache(schema, packageName, method);
   	}
   	return wsdlCache[target];
   }

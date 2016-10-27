@@ -13,6 +13,8 @@
  * ================================================
  */
 
+"use strict";
+
 function onPageLoaded() {
   viewStatus();
 }
