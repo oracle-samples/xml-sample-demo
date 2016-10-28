@@ -221,6 +221,10 @@ function SqlScript(id) {
     stripOracleCopyRightNotice()
     return sqlScript;
   }
+  
+  this.getSQLScriptURL = function () {
+  	return sqlScriptURL
+  }
 
   this.loadNextStatement = function() {
     self.setCommand(self.getCommandId() + 1);
@@ -534,7 +538,7 @@ function DemonstrationPlayer() {
   	  pane = document.getElementById(statementNumber + regionName);
   	}
 
-    img = document.getElementById(statementNumber + iconName);
+    var img = document.getElementById(statementNumber + iconName);
     if (pane.style.overflowY == 'auto') {
       pane.style.overflowY =  'visible';
     	pane.style.height = pane.scrollHeight + "px";
@@ -542,7 +546,7 @@ function DemonstrationPlayer() {
     }
     else {
       pane.style.overflowY =  'auto';
-      // alert('Scroll : ' + pane.scrollHeight + '. Overflow : ' + pane.offsetHeight + '. Client : ' + pane.clientHeight);
+      // console.log('Scroll : ' + pane.scrollHeight + '. Overflow : ' + pane.offsetHeight + '. Client : ' + pane.clientHeight);
      	pane.style.height = '';
      	if (pane.scrollHeight > 250) {
      		pane.style.height = "250px";
@@ -1224,7 +1228,7 @@ function SqlProcessor() {
   	loadFormatResponseXSL();
   }
 
-  function includeSQLScript( scriptLocation, currentScript, relative ) {
+  function includeSQLScript( scriptLocation, currentScript, relative, sqlScriptURL ) {
 
     if (scriptLocation.toLowerCase().indexOf('.sql') < 1 ) {
       scriptLocation = scriptLocation + ".sql"
@@ -1234,17 +1238,19 @@ function SqlProcessor() {
       scriptLocation = sqlScriptURL.substring(0,sqlScriptURL.lastIndexOf("/")+1) + scriptLocation;
     }
 
+    var includeScriptText = "";
+ 
     try {
       includeScriptText = getDocumentContentImpl(scriptLocation);
     } catch (e) {
       var error = new xfilesException('sqlScript.includeSQLScript',11, scriptLocation, e);
       throw error;
     }
-    // alert(includeScriptText);
-    includeScript = includeScriptText.split('\n');
+    // console.log(includeScriptText);
+    var includeScript = includeScriptText.split('\n');
 
-    newScript = includeScript.concat(currentScript);
-    // alert("includeSQLScript(" + scriptLocation + ") : includeScript.length = " + includeScript.length + ". currentScript.length = " + currentScript.length + ". newScript.length = " + newScript.length + " : " + newScript[0])
+    var newScript = includeScript.concat(currentScript);
+    // console.log("includeSQLScript(" + scriptLocation + ") : includeScript.length = " + includeScript.length + ". currentScript.length = " + currentScript.length + ". newScript.length = " + newScript.length + " : " + newScript[0])
 
     return newScript;
 
@@ -1303,14 +1309,14 @@ function SqlProcessor() {
        if (!commentBlock) {
 
          if (nextLine.substring(0,2) == "@@") {
-           // alert("Include found at line " + scriptContent.length + " : " + nextLine);
+           // console.log("Include found at line " + scriptContent.length + " : " + nextLine);
            scriptContent.shift();
-         	 scriptContent = includeSQLScript(nextLine.substring(2),scriptContent,true);
+         	 scriptContent = includeSQLScript(nextLine.substring(2),scriptContent,true, sqlScript.getSQLScriptURL());
            continue;
          }
 
          if (nextLine.substring(0,1) == "@") {
-           // alert("Include found at line " + scriptContent.length + " : " + nextLine);
+           // console.log("Include found at line " + scriptContent.length + " : " + nextLine);
            scriptContent.shift();
          	 scriptContent = includeSQLScript(nextLine.substring(1),scriptContent,false);
            continue;
@@ -1352,7 +1358,7 @@ function SqlProcessor() {
        nextLineHTML = nextLineHTML.replace(/</g,"&lt;");
        nextLineHTML = nextLineHTML.replace(/>/g,"&gt;");
        nextLineHTML = nextLineHTML + "<BR/>";
-       // alert(nextLineHTML);
+       // console.log(nextLineHTML);
 
        statementHTML = statementHTML + nextLineHTML;
        scriptContent.shift();
@@ -1399,15 +1405,15 @@ function SqlProcessor() {
            if (setArguments.length > 2) {
              if ((setArguments[1] == "autotrace") || (setArguments[1] == "autot")) {
                if (setArguments[2].substring(0,3) == "off") {
-                 // alert('Autotrace Disabled');
+                 // console.log('Autotrace Disabled');
                  sqlScript.setAutoTrace(false);
                }
                else {
                  if (setArguments[2].substring(0,2) == "on") {
-                   // alert('Found autotrace on statement');
+                   // console.log('Found autotrace on statement');
                    if (setArguments.length > 3)  {
                      if ((setArguments[3].substring(0,7) == "explain") || (setArguments[3].substring(0,4) == "expl")) {
-                       // alert('Autotrace Enabled');
+                       // console.log('Autotrace Enabled');
                        sqlScript.setAutoTrace(true);
                      }
                    }
@@ -1623,7 +1629,7 @@ function SqlProcessor() {
     var bold = document.createElement("B");
     outputTarget.appendChild(bold)
 
-    // alert("processReturnCode(" + statementType + "," + rows + ")");
+    // console.log("processReturnCode(" + statementType + "," + rows + ")");
 
     if (ddlTarget) {
       var firstChar = ddlTarget.substr(0,1).toUpperCase();

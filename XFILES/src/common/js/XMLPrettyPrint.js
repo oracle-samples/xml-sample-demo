@@ -320,7 +320,7 @@ function XMLPrettyPrinter() {
   
   function addOpenElement(elementNode, target, parentNamespaces) {
   
-    span = document.createElement('span');
+    var span = document.createElement('span');
     target.appendChild(span);
     span.className = 'elmntFixed';
     span.appendChild(document.createTextNode('<'));
@@ -348,7 +348,7 @@ function XMLPrettyPrinter() {
 
   function addCloseElement(elementNode, target) {
   	
-    span = document.createElement('span');
+    var span = document.createElement('span');
     target.appendChild(span);
     span.className = 'elmntFixed';
     span.appendChild(document.createTextNode('</'))
@@ -366,7 +366,7 @@ function XMLPrettyPrinter() {
   }
   
   function addToggleControl(target,iconPath, hint) { 
-      toggleControl = document.createElement('a');
+      var toggleControl = document.createElement('a');
       target.appendChild(toggleControl);
       toggleControl.className = 'openClose';
       toggleControl.href = '#';
@@ -378,7 +378,7 @@ function XMLPrettyPrinter() {
       else {
  	      toggleControl.attachEvent("onclick", self.toggleShowChildren);
       }
-      img = document.createElement("IMG");
+      var img = document.createElement("IMG");
       toggleControl.appendChild(img);
       img.style.display="block";
       img.src = iconPath;
@@ -438,7 +438,7 @@ function XMLPrettyPrinter() {
       addToggleControl(expandedElement,'/XFILES/lib/icons/xml_visible_children.png','Hide Children');
     }
 
-    myNamespaces = addOpenElement(elementNode, expandedElement, parentNamespaces);
+    var myNamespaces = addOpenElement(elementNode, expandedElement, parentNamespaces);
           	        
     // ProcessContent 
     
@@ -482,7 +482,7 @@ function XMLPrettyPrinter() {
   	
   	var documentDefinition = document.createElement("div");
 
-	  childNode = doc.firstChild;
+	  var childNode = doc.firstChild;
     while (childNode) {
   	  copyNode(childNode,documentDefinition,false,new Array());
     	childNode = childNode.nextSibling;

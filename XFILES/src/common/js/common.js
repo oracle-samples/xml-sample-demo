@@ -2159,7 +2159,7 @@ function xfilesException(module,id,target,exception) {
   this.setSQLErrCode  = function ( sqlErrCode )    { this.sqlErrCode = sqlErrCode };
   this.setSQLErrMsg   = function ( sqlErrMsg )     { this.sqlErrMsg = sqlErrMsg };
   	
-  this.isServervar error = function() { return this.id == 6 }
+  this.isServerError = function() { return this.id == 6 };
   	
   if (exception) {
     if (useMSXML) {
@@ -2357,7 +2357,7 @@ var xfilesHandleException = function(module, e, target) {
     }
 
   	var xml = new xmlDocument();
-  	var clientvar error = xml.createElement("XFilesClientException");
+  	var clientError = xml.createElement("XFilesClientException");
   	xml.appendChild(clientError);
 
   	var timestampElement = xml.createElement("Timestamps");

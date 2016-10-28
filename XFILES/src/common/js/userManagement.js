@@ -249,7 +249,7 @@ function ffxClearAuthenticationCache() {
 	var target = '/XFILES/unauthenticated.xml';
 
   try {
-    XHR = soapManager.createGetRequest(target, false, 'INVALID', 'CREDENTIAL');
+    var XHR = soapManager.createGetRequest(target, false, 'INVALID', 'CREDENTIAL');
     try {
     	XHR.mozBackgroundRequest = true;
    	}
@@ -334,7 +334,7 @@ function clearAuthenticationCache() {
   	}
   }
 
-  xfilesSoapManager = null;
+  var xfilesSoapManager = null;
   xslProcessorCache = new Array();
   setHttpUsername();
 

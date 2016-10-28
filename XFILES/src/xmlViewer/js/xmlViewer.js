@@ -38,7 +38,7 @@ function displayXMLDocument(XHR, url, target) {
 	  prettyPrintXML(xml,div);
 	}
   catch (e) {
-    err = new xfilesException("xmlViewer.displayXML()",12,null,e);
+    var err = new xfilesException("xmlViewer.displayXML()",12,null,e);
     err.setDescription('Underlying exception.');
     err.toHTML(document.body);
   }
@@ -60,7 +60,7 @@ function init(target) {
  
   }
   catch (e) {
-    err = new xfilesException("xmlViewer.init()",12,null,e);
+    var err = new xfilesException("xmlViewer.init()",12,null,e);
     err.setDescription('Underlying exception.');
     err.toHTML(document.body);
   }
