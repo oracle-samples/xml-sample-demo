@@ -21,8 +21,8 @@ var xinha_editors = null;
 var xinha_config  = null;
 var xinha_plugins = null;
 
-_editor_url  = "/XFILES/Frameworks/Xinha/";  // (preferably absolute) URL (including trailing slash) where Xinha is installed 
-_editor_lang = "en";                         // And the language we need to use in the editor.
+var _editor_url  = "/XFILES/Frameworks/Xinha/";  // (preferably absolute) URL (including trailing slash) where Xinha is installed 
+var _editor_lang = "en";                         // And the language we need to use in the editor.
 
 function XinhaController (editorControl, htmlControl, viewerControls, editorControls, undoControls, saveControls) {
 
@@ -62,7 +62,7 @@ function XinhaController (editorControl, htmlControl, viewerControls, editorCont
     
   function getControlList(controls) {
 
-    controlList = [];
+    var controlList = [];
     if (controls != null) {
       if (( typeof controls === 'string' ) && (controls != "")) {
         controlList = [controls];

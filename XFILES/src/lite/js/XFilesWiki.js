@@ -46,7 +46,7 @@ function processUpdate(mgr, updatedContent, closeForm) {
     if (closeForm) {
       closeCurrentWindow();
     }
-    contentUpdatedFlag  = false;
+    // contentUpdatedFlag  = false;
     xinhaController.setContent(xinhaController.getContent());
    }
   catch (e) {
