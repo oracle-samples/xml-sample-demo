@@ -1571,7 +1571,7 @@ as
   V_INIT              TIMESTAMP WITH TIME ZONE := SYSTIMESTAMP;
   V_STATEMENT         VARCHAR2(4000) :=null;
 begin
-  V_STATEMENT := 'alter user "' || USER || '" identified by "' || P_PASSWORD || '"';
+  V_STATEMENT := 'alter user "' || USER || '" identified by ' || DBMS_ASSERT.ENQUOTE_NAME(P_PASSWORD,false);
   select xmlConcat(
            xmlElement("User",sys_context('USERENV', 'CURRENT_USER')),
            xmlElement("Password",V_STATEMENT)

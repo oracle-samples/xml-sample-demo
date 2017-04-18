@@ -10,6 +10,5 @@ REM  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS O
 REM  *
 REM  * ================================================ 
 REM  */
-set ORACLE_HOME=e:\app\oracle\product\12.1.0\dbhome_1
-set PATH=%ORACLE_HOME%\jdk\bin;%PATH%
-java -cp %CD%\XMLLoader.jar;%ORACLE_HOME%\lib\xmlparserv2.jar;%ORACLE_HOME%\jdbc\lib\ojdbc6.jar;%ORACLE_HOME%\jdbc\lib\ojdbc6dms.jar;%ORACLE_HOME%\rdbms\jlib\xdb6.jar -Dcom.oracle.st.xmldb.pm.ConnectionParameters=%1 com.oracle.st.xmldb.pm.saxLoader.XMLLoader
+set ORACLE_HOME=O:\oracle\rdbms\product\12.2.0\dbhome_1
+java -cp %CD%\XMLLoader.jar;%ORACLE_HOME%\lib\xmlparserv2.jar;%ORACLE_HOME%\jlib\orai18n-mapping.jar;%ORACLE_HOME%\jdbc\lib\ojdbc8.jar;%ORACLE_HOME%\jdbc\lib\ojdbc8dms.jar;%ORACLE_HOME%\rdbms\jlib\xdb6.jar;%ORACLE_HOME%\ucp\lib\ucp.jar -Dcom.oracle.st.xmldb.pm.ConnectionParameters=%1 com.oracle.st.xmldb.pm.saxLoader.XMLLoader

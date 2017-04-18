@@ -96,7 +96,7 @@ begin
     from dual;
 
   if (P_NEW_PASSWORD is not NULL) then
-    V_STATEMENT := 'alter user "' || USER || '" identified by "' || P_NEW_PASSWORD || '"';
+    V_STATEMENT := 'alter user "' || USER || '" identified by ' || DBMS_ASSERT.ENQUOTE_NAME(P_NEW_PASSWORD,false);
     execute immediate V_STATEMENT;
   end if;
 
@@ -271,13 +271,13 @@ begin
     from dual;
 
 	begin
-		execute immediate 'REVOKE XFILES_ADMINISTRATOR from "' || P_PRINCIPLE_NAME || '"';
+		execute immediate 'REVOKE XFILES_ADMINISTRATOR from ' || DBMS_ASSERT.ENQUOTE_NAME(P_PRINCIPLE_NAME,false);
 	exception
 	  when role_not_granted then
 	    null;
 	end;
 	begin
-		execute immediate 'REVOKE XFILES_USER from "' || P_PRINCIPLE_NAME || '"';
+		execute immediate 'REVOKE XFILES_USER from ' || DBMS_ASSERT.ENQUOTE_NAME(P_PRINCIPLE_NAME,false);
 	exception
 	  when role_not_granted then
 	    null;
@@ -311,12 +311,12 @@ begin
     from dual;
 
 	begin
-		execute immediate 'REVOKE XFILES_ADMINISTRATOR from "' || P_PRINCIPLE_NAME || '"';
+		execute immediate 'REVOKE XFILES_ADMINISTRATOR from ' || DBMS_ASSERT.ENQUOTE_NAME(P_PRINCIPLE_NAME,false);
 	exception
 	  when role_not_granted then
 	    null;
 	end;
-  execute immediate 'GRANT XFILES_USER to "' || P_PRINCIPLE_NAME  || '"';
+  execute immediate 'GRANT XFILES_USER to ' || DBMS_ASSERT.ENQUOTE_NAME(P_PRINCIPLE_NAME,false);
   writeLogRecord('GRANTXFILESUSER',V_INIT,V_PARAMETERS);
 exception
   when others then
@@ -345,13 +345,13 @@ begin
     from dual;
 
 	begin
-		execute immediate 'REVOKE XFILES_USER from "' || P_PRINCIPLE_NAME || '"';
+		execute immediate 'REVOKE XFILES_USER from ' || DBMS_ASSERT.ENQUOTE_NAME(P_PRINCIPLE_NAME,false);
 	exception
 	  when role_not_granted then
 	    null;
 	end;
 
-  execute immediate 'GRANT XFILES_ADMINISTRATOR to "' || P_PRINCIPLE_NAME || '"';
+  execute immediate 'GRANT XFILES_ADMINISTRATOR to ' || DBMS_ASSERT.ENQUOTE_NAME(P_PRINCIPLE_NAME,false);
   writeLogRecord('GRANTXFILESADMINISTRATOR',V_INIT,V_PARAMETERS);
 exception
   when others then
@@ -385,14 +385,14 @@ begin
     into V_PARAMETERS
     from dual;
 
-  V_STATEMENT := 'create user "' || P_PRINCIPLE_NAME || '" identified by "' || P_PASSWORD || '" account unlock';
+  V_STATEMENT := 'create user ' || DBMS_ASSERT.ENQUOTE_NAME(P_PRINCIPLE_NAME,false) || ' identified by ' || DBMS_ASSERT.ENQUOTE_NAME(P_PASSWORD,false) || ' account unlock';
   for u in checkUser loop
-    V_STATEMENT := 'alter user "' || P_PRINCIPLE_NAME || '" identified by "' || P_PASSWORD || '" account unlock';
+    V_STATEMENT := 'alter user ' || DBMS_ASSERT.ENQUOTE_NAME(P_PRINCIPLE_NAME,false) || ' identified by ' || DBMS_ASSERT.ENQUOTE_NAME(P_PASSWORD,false) || ' account unlock';
   end loop;
 
   execute immediate V_STATEMENT;
-  execute immediate 'grant connect to "' || P_PRINCIPLE_NAME || '"';
-  execute immediate 'grant XFILES_USER to "' || P_PRINCIPLE_NAME || '"';
+  execute immediate 'grant connect to ' || DBMS_ASSERT.ENQUOTE_NAME(P_PRINCIPLE_NAME,false);
+  execute immediate 'grant XFILES_USER to ' || DBMS_ASSERT.ENQUOTE_NAME(P_PRINCIPLE_NAME,false);
 
   writeLogRecord('CREATEUSER',V_INIT,V_PARAMETERS);
 exception

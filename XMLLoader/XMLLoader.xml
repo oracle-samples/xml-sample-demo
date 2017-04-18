@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='windows-1252'?>
+<?xml version='1.0' encoding='utf-8'?>
 <!--
 /* ================================================  
  *    
@@ -15,20 +15,19 @@
 -->
 <Connection>
   <Driver>Thin</Driver>
-  <Hostname>localhost</Hostname>
-  <Port>1521</Port>
-  <ServiceName>ORCL</ServiceName>
-  <ServerMode>DEDICATED</ServerMode>
+  <tnsAlias></tnsAlias>
+  <tnsAdmin></tnsAdmin>
   <Schema></Schema>
   <Password></Password>
+  <Pool>true</Pool>
   <!-- true Requires SELECT ANY DICTIONARY -->
-  <logServerStats>false</logServerStats>
+  <logServerStats>true</logServerStats>
   <clientSideEncoding>true</clientSideEncoding>
   <FileList>
     <File></File>
   </FileList>
   <Tables>
-    <Table name="TABLE_TABLE" path="/root/repeatingElement"/>
+    <Table name="" path="/Path/To/Repeating/Element"/>
   </Tables>
   <CommitCharge>100</CommitCharge>
   <ThreadCount>10</ThreadCount>

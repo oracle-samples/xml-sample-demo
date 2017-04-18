@@ -1,6 +1,6 @@
 
-/* ================================================  
- *    
+/* ================================================
+ *
  * Copyright (c) 2016 Oracle and/or its affiliates.  All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,296 +9,186 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * ================================================ 
+ * ================================================
  */
 
 package com.oracle.st.xmldb.pm.common.baseApp;
+
 import java.io.IOException;
-import java.io.PrintStream;
-import java.sql.DriverManager;
-import java.sql.Connection;
+
 import java.sql.SQLException;
 
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
+
 import java.util.Properties;
+
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OracleDriver;
-import oracle.jdbc.pool.OracleOCIConnectionPool;
-import oracle.jdbc.oci.OracleOCIConnection;
-import oracle.jdbc.pool.OracleConnectionPoolDataSource;
-
-import org.xml.sax.SAXException;
-
-import org.w3c.dom.Document;
 import oracle.jdbc.pool.OracleDataSource;
-import oracle.ucp.jdbc.PoolDataSource;
+
 import oracle.ucp.jdbc.PoolDataSourceFactory;
+import oracle.ucp.jdbc.PoolDataSource;
 
 
-public class ConnectionManager 
-{
-    protected OracleDataSource ods;
-    protected PoolDataSource pds;
-    protected OracleOCIConnectionPool ociPool;
+public class ConnectionManager {
+
+    public static final boolean DEBUG = false;
+
+    private PoolDataSource pds = PoolDataSourceFactory.getPoolDataSource();
+    private boolean connectionPoolReady = false;
+    private ApplicationSettings connectionProps;
     
-    protected ApplicationSettings settings;
-    protected LogManager log;
-    
-    public static final boolean DEBUG = true;
+    private Logger logger = new PrintStreamLogger();
 
-    protected OracleConnection connection;
-
-    protected OracleOCIConnectionPool connectionPool;
-
-    protected OracleConnectionPoolDataSource ds;
- 
-    public ConnectionManager getConnectionManager() {
-        return this;
+    public ConnectionManager() {
+        super();
     }
 
-    protected String getDatabaseURL()
-    {
-        // System.out.println("getDatabaseURL() : Driver = " + this.settings.getDriver());
-        if( this.settings.getDriver() != null) {
-          if( this.settings.getDriver().equalsIgnoreCase( ApplicationSettings.THIN_DRIVER ) ) {
-              return "jdbc:oracle:thin:@//" + this.settings.getHostname() + ":" + this.settings.getPort() + "/" + this.settings.getServiceName();
-          }
-          else {
-              return "jdbc:oracle:oci8:@(description=(address=(host=" + this.settings.getHostname() + ")(protocol=tcp)(port=" + this.settings.getPort() + "))(connect_data=(service_name=" + this.settings.getServiceName() + ")(server=" + this.settings.getServerMode() + ")))";
-          }
+    public static ConnectionManager getConnectionManager() throws IOException {
+        ConnectionManager mgr = new ConnectionManager();
+        mgr.setConnectionProperties(ApplicationSettings.getApplicationSettings());
+        return mgr;
+    }
+
+    public static ConnectionManager getConnectionManager(ApplicationSettings settings, Logger logger) throws IOException {
+        ConnectionManager mgr = new ConnectionManager();
+        mgr.setConnectionProperties(settings);
+        mgr.setLogger(logger);
+        return mgr;
+    }
+
+    public void setConnectionProperties(ApplicationSettings settings) {
+        this.connectionProps = settings;
+    }
+    
+    public void setLogger(Logger logger){
+        this.logger = logger;
+        this.connectionProps.setLogger(logger);
+    }
+
+    private String getDatabaseURL() {
+        if (this.connectionProps.getDriver().equalsIgnoreCase(ApplicationSettings.THIN_DRIVER)) {
+            return "jdbc:oracle:thin:@//" + this.connectionProps.getHostname() + ":" + this.connectionProps.getPort() + "/" +
+                   this.connectionProps.getServiceName();
+        } else {
+            return "jdbc:oracle:oci8:@(description=(address=(host=" + this.connectionProps.getHostname() +
+                   ")(protocol=tcp)(port=" + this.connectionProps.getPort() + "))(connect_data=(service_name=" +
+                   this.connectionProps.getServiceName() + ")(server=" + this.connectionProps.getServerMode() + ")))";
+        }
+    }
+
+    private String getOracleDataSourceURL() {
+        if (DEBUG) this.logger.log("getDatabaseURL() : Driver = " + this.connectionProps.getDriver());
+        if (this.connectionProps.getDriver() != null) {
+            if (this.connectionProps.getDriver().equalsIgnoreCase(ApplicationSettings.THIN_DRIVER)) {
+                return this.connectionProps.getHostname() + ":" + this.connectionProps.getPort() + "/" +
+                       this.connectionProps.getServiceName();
+            } else {
+                return "(description=(address=(host=" + this.connectionProps.getHostname() + ")(protocol=tcp)(port=" +
+                       this.connectionProps.getPort() + "))(connect_data=(service_name=" + this.connectionProps.getServiceName() +
+                       ")(server=" + this.connectionProps.getServerMode() + ")))";
+            }
+        } else {
+            return null;
+        }
+    }
+    
+    public OracleConnection getConnection() throws SQLException, IOException {
+        
+      if (this.connectionPoolReady) {
+        return (OracleConnection) this.pds.getConnection();   
+      } 
+               
+      String driver = this.connectionProps.getDriver();
+      if ((driver == null) || (driver.length() == 0)) {
+        throw new SQLException("Invalid driver specified in connection properties file.");
+      }
+
+      if (driver.equalsIgnoreCase(ApplicationSettings.INTERNAL_DRIVER)) {
+        if (DEBUG) this.logger.log("Attempting connection using \"" + driver + "\" driver." );
+        OracleDriver ora = new OracleDriver();
+        return (OracleConnection) ora.defaultConnection();
+      }
+    
+      String schema = this.connectionProps.getSchema();
+      if ((schema == null) || (schema.length() == 0)) {
+         throw new SQLException("[ConnectionManager.getConnectionDetails()]: Invalid schema specified in connection properties file.");
+      }
+
+      String password = this.connectionProps.getPassword();
+      if ((password == null) || (password.length() == 0)) {
+        throw new SQLException("[ConnectionManager.getConnectionDetails()]Invalid password specified in connection properties file.");
+      }
+
+      String tnsnamesLocation = this.connectionProps.getTNSAdmin();
+      if ((tnsnamesLocation != null) && (tnsnamesLocation.length() > 0)) {
+          System.setProperty("oracle.net.tns_admin", tnsnamesLocation);
+      }
+
+      if (System.getProperty("oracle.net.tns_admin") != null) {
+        if (DEBUG) this.logger.log("[ConnectionManager.getConnectionDetails()]: Using connection information from TNSNAMES.ora located in \"" + System.getProperty("oracle.net.tns_admin") + "\"." );
+      }
+        
+      String tnsAlias = this.connectionProps.getTNSAlias();
+      if (tnsAlias != null) {
+        if (DEBUG) this.logger.log("[ConnectionManager.getConnection()]: Attempting connection to \"" + tnsAlias + "\" using \"" + this.connectionProps.getDriver() + "\" driver as user \"" + schema +"\"." );
+        return createConnection(driver,schema,password,tnsAlias);
+      }
+      else {
+        String dataSourceURL = getDatabaseURL();
+        if (DEBUG) this.logger.log("[ConnectionManager.getConnection()]: Attempting connection using \"" + dataSourceURL + "\"." );
+        return createNewConnection(schema, password, dataSourceURL);
+      }
+    }  
+    
+    private OracleConnection createConnection(String driver, String schema, String password, String tnsAlias) throws SQLException,
+                                                                                                      IOException {
+        
+        if (this.connectionProps.useConnectionPool()) {
+          return initializeConnectionPool1(schema,password,tnsAlias);
         }
         else {
-          return null;
-        }
-    }   
-    
-    private OracleConnection createConnection()
-    throws SQLException, IOException {
-        OracleConnection conn = null;
-        try
-        {
-            if ( this.settings.getDriver().equalsIgnoreCase(ApplicationSettings.INTERNAL_DRIVER )) {
-              if ( DEBUG ) {
-                 this.log.log( "ConnectionManager.createConnection(): Connecting using Internal (KRPB) Driver " );
-              }
-              OracleDriver ora = new OracleDriver();
-              conn = (OracleConnection) ora.defaultConnection();
-            }
-            else {
-              String user = this.settings.getSchema();
-              String password = this.settings.getPassword();
-              String connectionString = user + "/" + "*********" + "@" + getDatabaseURL();
-              if ( DEBUG ) {
-                 this.log.log( "ConnectionManager.createConnection(): Connecting as " + connectionString );
-              }
-              conn = (OracleConnection) DriverManager.getConnection( getDatabaseURL(), user, password );
-            }
-            if( DEBUG ) {
-              this.log.log( "ConnectionManager.createConnection(): Database Connection Established" );
-            }
-        }
-        catch( SQLException sqle )
-        {
-            int err = sqle.getErrorCode();
-            this.log.log( "ConnectionManager.createConnection(): Failed to connect" );
-            this.log.log(sqle);
-            throw sqle;
-        }
-        return conn;
-    }
-    
-    private void openConnection()
-    throws SQLException, IOException {
-      DriverManager.registerDriver( new oracle.jdbc.driver.OracleDriver() );
-      if (this.settings.isPooled()) {
-        createConnectionPool();
-      }
-      else {
-        this.connection = createConnection();
-      }       
-    }
-    
-    public OracleConnection getNewConnection()
-    throws SQLException, 
-                                                      IOException {
-      return createConnection();
+          return createNewConnection(driver,schema,password,tnsAlias);        }
     }
 
-    public ConnectionManager(LogManager log)
-    throws SAXException, IOException, SQLException  {
-      this.log = log;
-      this.settings = new ApplicationSettings(this.log);
-      openConnection();
-    }
-    
-    public ConnectionManager()     
-    throws SAXException, IOException, SQLException {
-        this.log = new PrintStreamLogger();
-        this.settings = new ApplicationSettings(this.log);
-        openConnection();
-    }
-    
-    public ConnectionManager(Document connectionSettings)     
-    throws SAXException, IOException, SQLException {
-        this.log = new PrintStreamLogger();
-        this.settings = new ApplicationSettings(connectionSettings, this.log);
-        openConnection();
-    }
+    private OracleConnection initializeConnectionPool1(String schema, String password, String tnsAlias) throws SQLException, IOException {
 
-    public ConnectionManager(Document connectionSettings,LogManager log)     
-    throws SAXException, IOException, SQLException  {
-        this.log = log;
-        this.settings = new ApplicationSettings(connectionSettings,this.log);
-        openConnection();
+        pds.setConnectionFactoryClassName("oracle.jdbc.pool.OracleDataSource");
+        pds.setUser(schema);
+        pds.setPassword(password);
+        pds.setURL("jdbc:oracle:thin:@" + tnsAlias);
+        this.connectionPoolReady = true;
+        return (OracleConnection) pds.getConnection();
     }
-
-    public ConnectionManager(ApplicationSettings connectionSettings)     
-    throws SAXException, IOException, SQLException  {
-        this.log = new PrintStreamLogger();
-        this.settings = connectionSettings;
-        openConnection();
-    }
-
-    public ConnectionManager(ApplicationSettings connectionSettings,LogManager log)     
-    throws SAXException, IOException, SQLException  {
-        this.log = log;
-        this.settings = connectionSettings;
-        openConnection();
-    }
-
-    public ConnectionManager(String connectionLocation)     
-    throws SAXException, IOException, SQLException {
-        this.log = new PrintStreamLogger();
-        this.settings = new ApplicationSettings(connectionLocation,this.log);
-        openConnection();
-    }
-
-    public ConnectionManager(String connectionLocation, LogManager log)
-    throws SAXException, IOException, SQLException  {
-      this.log = log;
-      this.settings = new ApplicationSettings(connectionLocation,this.log);
-      openConnection();
-    }
-    
-   public void closeConnection(Connection conn)
-   throws SQLException {
-      if (this.settings.isPooled()) {
-       conn.close();
-      }
-    } 
-
-   public void resetConnection() 
-   throws SQLException, IOException  {
-     if (!this.connection.isClosed()) {
-         closeConnection(this.connection);                
-     }
-     openConnection();
-   }
    
+    private OracleConnection createNewConnection(String driver, String schema, String password, String tnsAlias) throws SQLException {
 
-    public Connection getPooledConnection(String schema, String passwd) 
-    throws SQLException {
-        return this.pds.getConnection(schema,passwd);
-    }
-
-
-    public Connection getConnection(String schema, String passwd) 
-    throws SQLException  {
-      if (this.settings.isPooled())  {
-        return this.getPooledConnection(schema,passwd);
-      }
-      else
-      {
-        return this.connection;
-      }
-    }
-
-    public Connection getConnection() 
-    throws SQLException  {
-      if (this.settings.isPooled())  {
-        return this.getPooledConnection(null,null);
-      }
-      else
-      {
-        return this.connection;
-      }
-    }
-
-
-    public void createConnectionPool() 
-    throws SQLException {
-        
-        if ( DEBUG ) {
-          this.log.log( "ConnectionManager.getConnection(): Creating PDS Connection Pool (UCP)." );
-        }
-
-        this.pds = PoolDataSourceFactory.getPoolDataSource();
-        this.pds.setConnectionFactoryClassName("oracle.jdbc.pool.OracleDataSource");
-        this.pds.setUser(this.settings.getSchema());
-        this.pds.setPassword(this.settings.getPassword());
-        this.pds.setURL(this.getDatabaseURL());
-
+       OracleDataSource ods = new OracleDataSource();
+       ods.setUser(schema);
+       ods.setPassword(password);
+       ods.setDriverType(driver);
+       ods.setTNSEntryName(tnsAlias);
+       return (OracleConnection) ods.getConnection();
     }
     
-    public Connection getODSPooledConnection(String schema, String passwd) 
-    throws SQLException {
-        return this.ods.getConnection();
+    private OracleConnection initializeConnectionPool2(String schema, String password, String dataSourceURL) throws SQLException, IOException {
+       pds.setConnectionFactoryClassName("oracle.jdbc.pool.OracleDataSource");
+       pds.setUser(schema);
+       pds.setPassword(password);
+       pds.setURL(dataSourceURL);
+       this.connectionPoolReady = true;
+       return (OracleConnection) pds.getConnection();
     }
 
-    public OracleConnection getConnectionODS(String schema, String passwd)
-    throws SQLException {
-      if (this.settings.isPooled()) {
-        return (OracleConnection) getODSPooledConnection(schema,passwd);
-      }
-      else {
-        return this.connection;
-      }
-    }
+    private OracleConnection createNewConnection(String schema, String password, String dataSourceURL) throws SQLException {
 
-    public void createODSConnectionPool() 
-    throws SQLException {
-        
-        if ( DEBUG ) {
-          this.log.log( "ConnectionManager.getConnection(): Creating ODS Connection Pool." );
-        }
-
-        this.ods = new OracleDataSource();
-        this.ods.setConnectionCachingEnabled(true);    // Turns on caching
-        this.ods.setUser(this.settings.getSchema());
-        this.ods.setPassword(this.settings.getPassword());
-        this.ods.setURL(this.getDatabaseURL());
+       OracleDataSource ods = new OracleDataSource();
+       ods.setUser(schema);
+       ods.setPassword(password);
+       ods.setURL(dataSourceURL);
+       return (OracleConnection) ods.getConnection();
 
     }
-    
-    public Connection getOCIPooledConnection(String schema, String passwd) 
-    throws SQLException {
-        return this.ociPool.getConnection(schema,passwd);
-    }
-
-    public Connection getOCIConnection(String schema, String passwd)
-    throws SQLException  {
-      if (this.settings.isPooled())  {
-        return (OracleOCIConnection) ociPool.getConnection(schema,passwd);
-      }
-      else
-      {
-        return this.connection;
-      }
-    }
-    
-    public void createOCIConnectionPool()
-    throws SQLException {
-
-        if ( DEBUG ) {
-          this.log.log( "ConnectionManager.getConnection(): Creating OCI Connection Pool." );
-        }
-
-       OracleOCIConnectionPool pool;
-       Properties poolConfig  = new Properties( );
-       poolConfig.put (OracleOCIConnectionPool.CONNPOOL_MIN_LIMIT, "1");
-       poolConfig.put (OracleOCIConnectionPool.CONNPOOL_MAX_LIMIT, "1");
-       poolConfig.put (OracleOCIConnectionPool.CONNPOOL_INCREMENT, "0");
-       this.ociPool = new OracleOCIConnectionPool(this.settings.getSchema(),this.settings.getPassword(), getDatabaseURL(),poolConfig);
-    }
-
 }
-

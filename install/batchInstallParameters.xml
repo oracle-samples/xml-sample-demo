@@ -1,4 +1,4 @@
-<InstallList tnsalias="PDB12201" host="localhost" http="80" ftp="21" driveLetter="O:" dba="MYDBA" dbaPassword="oracle" >
+<InstallList tnsalias="PDB12201" host="localhost" http="80" ftp="21" driveLetter="P:" dba="MYDBA" dbaPassword="oracle" >
 	<Demo name="XFILES"           user="XFILES" password="oracle"/>
  	<Demo name="ImageMetadata"    user="XDBEXT" password="oracle"/>
 	<Demo name="XMLSchemaWizard"  user="XFILES" password="oracle"/>

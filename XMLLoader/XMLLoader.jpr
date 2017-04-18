@@ -1,16 +1,14 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <jpr:project xmlns:jpr="http://xmlns.oracle.com/ide/project">
    <hash n="component-versions">
-      <value n="oracle.ide.model.Project" v="12.1.3.0.0;12.2.1.0.0"/>
+      <value n="oracle.ide.model.Project" v="12.1.3.0.0"/>
       <value n="oracle.ide.model.ResourcePathsMigrator" v="11.1.1.1.0"/>
-      <value n="oracle.ideimpl.model.TechnologyScopeUpdateMigrator" v="11.1.2.0.0.5;11.1.2.0.0.6"/>
+      <value n="oracle.ideimpl.model.TechnologyScopeUpdateMigrator" v="11.1.2.0.0.5"/>
       <value n="oracle.jdeveloper.dbmodeler.Migration" v="12.1.1.0.0"/>
       <value n="oracle.jdeveloper.library.ProjectLibraryMigrator" v="11.1.1.1.0"/>
-      <value n="oracle.jdeveloper.maven.migrator.POMNodeMigrator" v="12.2.1.0.0"/>
       <value n="oracle.jdeveloper.model.OutputDirectoryMigrator" v="11.1.1.1.0"/>
       <value n="oracle.jdevimpl.deploy.migrators.DeploymentMigrator" v="12.1.2.0.1"/>
       <value n="oracle.jdevimpl.offlinedb.migration.OfflineDBProjectMigrator" v="12.1.1.0.0"/>
-      <value n="oracle.jdevimpl.offlinedb.migration.SXMLOfflineDBProjectMigrator" v="12.1.4.0.0"/>
       <value n="oracle.modeler.bmmigrate.management.Migration" v="11.1.1.1.0"/>
    </hash>
    <list n="contentSets">
@@ -72,10 +70,24 @@
          <string v="XMLLoader"/>
       </list>
    </hash>
+   <hash n="oracle.jdeveloper.runner.RunConfigurations">
+      <hash n="runConfigurationDefinitions">
+         <hash n="Default">
+            <value n="custom" v="false"/>
+            <value n="javaOptions" v="-Dcom.oracle.st.xmldb.pm.ConnectionParameters=g:\xdb\customers\ddex\XMLLoader.xml"/>
+            <value n="name" v="Default"/>
+            <hash n="oracle.jdevimpl.runner.debug.DebugConfiguration">
+               <value n="tracingExclude" v="java;javax;sun;sunw;jdk;com.sun;apple;com.apple;com.evermind;com.orionserver;EDU.oswego;oracle.as;oracle.aurora;oracle.core;oracle.dms;oracle.gss;oracle.hooks;oracle.ide;oracle.ias;oracle.j2ee;oracle.jdbc;oracle.jdevimpl;oracle.jsp;oracle.oc4j;oracle.ojc;oracle.security;oracle.sql;oracle.webservices;oracle.xml;org.omg;org.w3c;org.xml;weblogic;org.codehaus.groovy;groovy.lang;oracle.jbo.script.groovy"/>
+            </hash>
+            <url n="runDirectoryURL" protocol="file" path="/G:/XDB/customers/DDEX/"/>
+            <value n="targetURL"/>
+         </hash>
+      </hash>
+   </hash>
    <hash n="oracle.jdevimpl.config.JProjectLibraries">
       <list n="exportedReferences">
          <hash>
-            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDMBS XDK.library"/>
+            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDBMS JDBC.library"/>
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
@@ -83,17 +95,22 @@
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
-            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDMBS JDBC 6.library"/>
+            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDMBS XDK.library"/>
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
-            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDBMS UCP.library"/>
+            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/UCP.library"/>
             <value n="isJDK" v="false"/>
          </hash>
       </list>
+      <hash n="jdkReference">
+         <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.2.1.0.42.151011.0031/o.jdeveloper/1.8.0_121.jdk"/>
+         <value n="isJDK" v="true"/>
+         <value n="jdkVersion" v="1.8.0_121"/>
+      </hash>
       <list n="libraryReferences">
          <hash>
-            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDMBS XDK.library"/>
+            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDBMS JDBC.library"/>
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
@@ -101,11 +118,11 @@
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
-            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDMBS JDBC 6.library"/>
+            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDMBS XDK.library"/>
             <value n="isJDK" v="false"/>
          </hash>
          <hash>
-            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/RDBMS UCP.library"/>
+            <url n="id" protocol="file" path="/C:/Users/Mark D Drake/AppData/Roaming/JDeveloper/system12.1.3.0.41.140521.1008/o.jdeveloper/UCP.library"/>
             <value n="isJDK" v="false"/>
          </hash>
       </list>
