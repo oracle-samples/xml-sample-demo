@@ -1514,7 +1514,7 @@ function processResponse(mgr, nodeMap, requestDate, id) {
     var responseDate = new Date();
     var elapsedTimeMS =  responseDate.getTime() - requestDate.getTime();
 
-    soapResponse = mgr.getSoapResponse("xmlSearch.processResponse");
+    var soapResponse = mgr.getSoapResponse("xmlSearch.processResponse");
 
     document.getElementById('searching').style.display="none";
     document.getElementById('searchResults').style.display="block";
@@ -1523,21 +1523,21 @@ function processResponse(mgr, nodeMap, requestDate, id) {
     namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
 
     if (mgr.getServiceNamespace() == "http://xmlns.oracle.com/orawsv/XFILES/XFILES_SEARCH_SERVICES/GETXMLINDEXROOTNODEMAP") {
-      nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/map:NodeMap",namespaces);
+      var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/map:NodeMap",namespaces);
       createNodeMap(nodeList.item(0),nodeMap);
       renderTreeControl(nodeMap);
       return;
     }
 
     if (mgr.getServiceNamespace() == "http://xmlns.oracle.com/orawsv/XFILES/XFILES_SEARCH_SERVICES/GETXMLSCHEMAROOTNODEMAP") {
-      nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/map:NodeMap",namespaces);
+      var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/map:NodeMap",namespaces);
       createNodeMap(nodeList.item(0),nodeMap);
       renderTreeControl(nodeMap);
       return;
     }
     
     if (mgr.getServiceNamespace() == "http://xmlns.oracle.com/orawsv/XFILES/XFILES_SEARCH_SERVICES/GETREPOSITORYNODEMAP") {
-      nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/map:NodeMap",namespaces);
+      var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/map:NodeMap",namespaces);
       createNodeMap(nodeList.item(0),nodeMap);
       setSchemaIDs(nodeMap);
       renderTreeControl(nodeMap);
@@ -1545,7 +1545,7 @@ function processResponse(mgr, nodeMap, requestDate, id) {
     }
         
     if (mgr.getServiceNamespace() == "http://xmlns.oracle.com/orawsv/XFILES/XFILES_SEARCH_SERVICES/GETXMLINDEXCHILDNODEMAP") {
-      nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/map:Element",namespaces);
+      var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/map:Element",namespaces);
       childNodeMap = nodeMap.getNodeMap().importNode(nodeList.item(0),true);
       expandNodeMap(nodeMap,childNodeMap);
       renderTreeControl(nodeMap);
@@ -1553,7 +1553,7 @@ function processResponse(mgr, nodeMap, requestDate, id) {
     }
     
     if (mgr.getServiceNamespace() == "http://xmlns.oracle.com/orawsv/XFILES/XFILES_SEARCH_SERVICES/GETXMLSCHEMACHILDNODEMAP") {
-	    nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/map:Element",namespaces);
+	    var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/map:Element",namespaces);
       childNodeMap = nodeMap.getNodeMap().importNode(nodeList.item(0),true);
       expandNodeMap(nodeMap,childNodeMap);
       renderTreeControl(nodeMap);
@@ -1561,7 +1561,7 @@ function processResponse(mgr, nodeMap, requestDate, id) {
     }
     
     if (mgr.getServiceNamespace() == "http://xmlns.oracle.com/orawsv/XFILES/XFILES_SEARCH_SERVICES/GETSUBSTITUTIONGROUP") {
-      nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/map:SubGroup",namespaces);
+      var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/map:SubGroup",namespaces);
       childNodeMap = nodeMap.getNodeMap().importNode(nodeList.item(0),true);
       expandSubstitionGroup(nodeMap,childNodeMap);
       toggleSubGroup(nodeMap,id)
@@ -1571,7 +1571,7 @@ function processResponse(mgr, nodeMap, requestDate, id) {
     	
     var outputTarget = document.getElementById("resultWindow");
     
-    nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/orawsv:ROWSET/orawsv:ROW/orawsv:COUNT",namespaces);
+    var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/orawsv:ROWSET/orawsv:ROW/orawsv:COUNT",namespaces);
     if (nodeList.length > 0) {
       result = nodeList.item(0);
       displayRowCount(nodeMap, result, outputTarget, elapsedTimeMS);

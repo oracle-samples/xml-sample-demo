@@ -40,7 +40,7 @@ function viewSource() {
   }
   else {
     try {
-      resourceContent = getDocumentContent(resourceURL);
+      var resourceContent = getDocumentContent(resourceURL);
       document.getElementById("sourcearea").value = resourceContent;
       if (displayName.substring(displayName.lastIndexOf(".")+1).toUpperCase() == "SQL") {
       	document.getElementById("executeQuery").style.display="block";

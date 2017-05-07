@@ -298,7 +298,7 @@ function chromeClearAuthenticationCache() {
 
   try {
   	showInfoMessage("Logoff not available for Chrome/Safari. Please cancel credential request inorder to end session.");
-    XHR = soapManager.createGetRequest(target, false, 'INVALID', 'CREDENTIAL');
+    var XHR = soapManager.createGetRequest(target, false, 'INVALID', 'CREDENTIAL');
     try {
     	XHR.mozBackgroundRequest = true;
    	}

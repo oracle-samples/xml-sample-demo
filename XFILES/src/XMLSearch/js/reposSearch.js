@@ -18,6 +18,8 @@
 // Generic dummy node map required to allow common fetchDocument function()
 
 var nodeMap
+var searchType
+var searchTerms
 
 function loadReposSearchXSL() {
 	stylesheetURL = '/XFILES/XMLSearch/xsl/reposSearch.xsl';
@@ -34,7 +36,7 @@ function repositorySearch(searchType, searchTerms) {
     targetFolder = resourceURL;
   }
  
-  sqlQuery = 'select ANY_PATH "resourcePath", score(1) RANK, r.*' + "\n" + 
+  var sqlQuery = 'select ANY_PATH "resourcePath", score(1) RANK, r.*' + "\n" + 
              '  from "PUBLIC"."RESOURCE_VIEW",' + "\n" +
              getResourceProperties() +   
              '  where under_path (RES,';

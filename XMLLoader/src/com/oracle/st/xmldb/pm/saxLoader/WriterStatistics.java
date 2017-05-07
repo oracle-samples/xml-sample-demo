@@ -16,12 +16,10 @@ package com.oracle.st.xmldb.pm.saxLoader;
 
 import com.oracle.st.xmldb.pm.common.baseApp.Logger;
 
-import java.util.Calendar;
-
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;

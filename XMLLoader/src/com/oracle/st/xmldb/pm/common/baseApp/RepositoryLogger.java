@@ -19,18 +19,14 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-
 import java.io.Writer;
 
-import java.sql.Blob;
 import java.sql.SQLException;
 
 import oracle.jdbc.OracleCallableStatement;
 import oracle.jdbc.OracleConnection;
-
 import oracle.jdbc.OraclePreparedStatement;
 
-import oracle.sql.BLOB;
 import oracle.sql.CLOB;
 
 import oracle.xml.parser.v2.XMLDocument;

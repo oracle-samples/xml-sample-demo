@@ -17,7 +17,6 @@ package com.oracle.st.xmldb.pm.saxLoader;
 import com.oracle.st.xmldb.pm.common.baseApp.ApplicationSettings;
 import com.oracle.st.xmldb.pm.common.baseApp.ConnectionManager;
 import com.oracle.st.xmldb.pm.common.baseApp.Logger;
-
 import com.oracle.st.xmldb.pm.common.baseApp.PrintStreamLogger;
 
 import java.io.FileOutputStream;
@@ -29,115 +28,40 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import java.text.DecimalFormat;
-
 import java.text.SimpleDateFormat;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Hashtable;
-
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Vector;
 
 import oracle.xml.binxml.BinXMLException;
-
 import oracle.xml.parser.v2.XMLParseException;
 
 import org.w3c.dom.Document;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
 import org.xml.sax.SAXException;
 
-public class XMLLoader {
+public class XMLLoader extends Logger {
 
-    public static final boolean DEBUG = false;
-
-    public static final String XML_NAMESPACE_NAMESPACE = "http://www.w3.org/2000/xmlns/";
-    public static final String XML_SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
-
-    public static final String SCHEMA_INSTANCE_PREFIX = "schemaInstancePrefix";
-    public static final String SCHEMA_LOCATION = "schemaLocation";
-    public static final String NO_NAMESPACE_SCHEMA_LOCATION = "noNamespaceSchemaLocation";
-
-    // Maximum Number of Documents to Insert
-    public static final String MAX_DOCUMENTS = "maxDocumentsToLoad";
-    // Maximum Number of Writer Thread Failures Permitted
-    public static final String MAX_ERRORS = "maxErrors";
-    // Maximum Number of SQL Failures before a Writer Thread Aborts. SQL Errors are logged to ERROR_TABLE
-    public static final String MAX_SQL_ERRORS = "maxSQLErrors";
-    public static final String MAX_SQL_INSERTS = "maxSQLInserts";
-
-    public static final String BUFFER_SIZE = "bufferSize";
-
-    public static final String LOG_FILE_NAME = "LogFileName";
-
-    public static final String THREAD_COUNT_ELEMENT = "ThreadCount";
-    public static final String COMMIT_CHARGE_ELEMENT = "CommitCharge";
-
-    public static final String ERROR_TABLE_ELEMENT = "ErrorTable";
-
-    public static final String FILE_LIST_ELEMENT = "FileList"; ;
-    public static final String FILE_ELEMENT = "File";
-
-    public static final String FOLDER_LIST_ELEMENT = "FolderList"; ;
-    public static final String FOLDER_ELEMENT = "Folder";
-
-    public static final String TABLE_LIST_ELEMENT = "Tables";
-    public static final String TABLE_ELEMENT = "Table";
-    public static final String COLUMN_ELEMENT = "Column";
-
-    public static final String PROCEDURE_LIST_ELEMENT = "Procedures";
-    public static final String PROCEDURE_ELEMENT = "Procedure";
-    public static final String ARGUMENT_ELEMENT = "Argument";
-
-    public static final String NAMESPACE_DEFINITIONS = "Namespaces";
-
-    public static final String NAME_ATTRIBUTE = "name";
-    public static final String PATH_ATTRIBUTE = "path";
-    public static final String TYPE_ATTRIBUTE = "type";
-    public static final String XML_SOURCE_TYPE = "xml";
-
-    public static final String COLUMN_NAME_ATTRIBUTE = "name";
-
-    public static final String PROCEDURE_NAME_ATTRIBUTE = "procedure";
-
-    public static final String CLIENT_SIDE_ENCODING_ELEMENT = "clientSideEncoding";
-
-    public static final String LOG_SERVER_STATS_ELEMENT = "logServerStats";
-    public static final String MODE_ELEMENT = "mode";
-
-    public static final String CURRENT_FILENAME = "#FILENAME";
-    public static final String CURRENT_PATH = "#PATH";
-    public static final String ORDINALITY = "#ORDINALITY";
+    public static final boolean DEBUG = true;
+    
+    private ConfigurationManager cfgMgr;
 
     protected ConnectionManager connectionManager;
     protected ApplicationSettings settings = ApplicationSettings.getApplicationSettings();
     protected SaxReader saxReader;
 
-    private Element namespaceMappings;
-
-    private ArrayList boundaryList = new ArrayList();
-
-    private ArrayList xmlSourceList = new ArrayList();
-    private ArrayList scalarSourceList = new ArrayList();
-
-    private Hashtable tableColumnMappings = new Hashtable();
-    private Hashtable tableColumnXPathMappings = new Hashtable();
-    private Hashtable xpathToTableNameMapping = new Hashtable();
-
-    private Hashtable procedureArgumentMappings = new Hashtable();
-    private Hashtable procedureArgumentXPathMappings = new Hashtable();
-    private Hashtable xpathToProcedureNameMapping = new Hashtable();
 
     protected int readCount = 0;
     protected int writeCount = 0;
 
     protected int dbWriterCount = 0;
     protected int dbWriterAborts = 0;
+
+    protected int maxErrors = 0;
 
     private Locale locale = new Locale(Locale.ENGLISH.toString(), "US");
     private static String XML_FORMAT_STRING = "yyyy-MM-dd'T'HH:mm:ss.SSS";
@@ -147,17 +71,7 @@ public class XMLLoader {
     private Calendar endTime;
 
     private Vector writerQueue = new Vector();
-
-    private int maxDocuments = 0;
-    private int maxErrors = 0;
-    private int maxSQLErrors = 0;
-    private int maxSQLInserts = 0;
-    private int bufferSize = 1;
-    private int commitCharge = 1;
-    private String errorTable = null;
-    private boolean clientSideEncoding = false;
-    private boolean logServerStats = false;
-
+    
     protected Logger logger = new PrintStreamLogger();
 
     public XMLLoader() throws SQLException, IOException, SAXException {
@@ -167,7 +81,7 @@ public class XMLLoader {
     }
 
     protected void setLogger() throws SQLException, IOException, SAXException {
-        String logFile = this.settings.getSetting(LOG_FILE_NAME);
+        String logFile = this.settings.getSetting(ConfigurationManager.LOG_FILE_NAME);
         if (logFile != null) {
             this.logger.log("Switching Log File to \"" + logFile + "\".");
             OutputStream os = new FileOutputStream(logFile);
@@ -177,57 +91,56 @@ public class XMLLoader {
         }
     }
 
-    protected void log(String string) {
+    public void log(String string) {
         synchronized (this.logger) {
-            this.logger.log(string);
+            this.logger.log(Thread.currentThread().getName() + ". " + string);
         }
     }
 
-    protected void log(Document doc) {
+    public void log(Document doc) {
         synchronized (this.logger) {
+            this.logger.log(Thread.currentThread().getName() + ". Document : " + this.writeCount);
             this.logger.log(doc);
         }
     }
 
-    protected void log(Exception e) {
-        synchronized (this.logger) {
-            this.logger.log(e);
-        }
-    }
-
-    protected void logThread(String message) {
-        synchronized (this.logger) {
-            this.logger.log(Thread.currentThread().getName() + ". " + message);
-        }
-    }
-
-    protected void logThread(Document xml) {
-        synchronized (this.logger) {
-            this.logger.log(Thread.currentThread().getName() + ". Document : " + this.writeCount);
-            this.logger.log(xml);
-        }
-    }
-
-    protected void logThread(Document xml, Exception e) {
-        synchronized (this.logger) {
-            this.logThread(e);
-            this.logger.log("Current Document :");
-            this.logger.log(xml);
-        }
-    }
-
-    protected void logThread(Exception e) {
+    public void log(Exception e) {
         synchronized (this.logger) {
             this.logger.log(Thread.currentThread().getName() + ". Exception : ");
             this.logger.log(e);
         }
     }
 
-    protected void logThread(String message, Exception e) {
+    public void log(Object object) {
+        synchronized (this.logger) {
+            this.logger.log(Thread.currentThread().getName() + ". Object : ");
+            this.logger.log(object);
+        }
+    }
+
+    public void close() {
+        synchronized (this.logger) {
+            this.logger.close();
+        }
+    }
+
+    protected void log(Document xml, Exception e) {
+        synchronized (this.logger) {
+            this.log(e);
+            this.logger.log("Current Document :");
+            this.logger.log(xml);
+        }
+    }
+
+    public void log(String message, Exception e) {
         synchronized (this.logger) {
             this.logger.log(Thread.currentThread().getName() + ". " + message + "Exception : ");
             this.logger.log(e);
         }
+    }
+    
+    protected ConfigurationManager getCfgMgr() {
+        return this.cfgMgr;
     }
 
     private void setStartTime() {
@@ -283,8 +196,7 @@ public class XMLLoader {
             String.format("%1$" + 13 + "s", "Elapsed Time") + " |" + String.format("%1$" + 8 + "s", "Tasks") + " |" +
             String.format("%1$" + 8 + "s", "Success") + " |" + String.format("%1$" + 8 + "s", "Failed") + " |" +
             String.format("%1$" + 8 + "s", "Docs/sec") + " |" + String.format("%1$" + 14 + "s", "Bytes Read") + " |" +
-            String.format("%1$" + 14 + "s", "Bytes Sent") + " |" + String.format("%1$" + 14 + "s", "Bytes Rcvd") +
-            " |" + String.format("%1$" + 8 + "s", "R/Trips") + " |" + String.format("%1$" + 12 + "s", "DB CPU") + " |" +
+            String.format("%1$" + 14 + "s", "Bytes Sent") + " |" + String.format("%1$" + 14 + "s", "Bytes Rcvd") + " |" + String.format("%1$" + 8 + "s", "R/Trips") + " |" + String.format("%1$" + 12 + "s", "DB CPU") + " |" +
             String.format("%1$" + 12 + "s", "Client CPU") + " |";
 
         this.log(horizontalBar);
@@ -320,50 +232,6 @@ public class XMLLoader {
         }
     }
 
-    public void processProcedureMappings(Element procedureList) throws IOException, SAXException {
-
-        if (procedureList != null && procedureList.hasChildNodes()) {
-            NodeList nlProcedure = procedureList.getElementsByTagName(XMLLoader.PROCEDURE_ELEMENT);
-            for (int i = 0; i < nlProcedure.getLength(); i++) {
-                String argumentList = null;
-                Element procedure = (Element) nlProcedure.item(i);
-                String procedureName = procedure.getAttributeNS("", XMLLoader.NAME_ATTRIBUTE);
-                String source = procedure.getAttributeNS("", XMLLoader.PATH_ATTRIBUTE);
-                if (!this.boundaryList.contains(source)) {
-                    this.boundaryList.add(source);
-                }
-                this.xpathToProcedureNameMapping.put(source, procedureName);
-                Hashtable argumentXPathMappings = new Hashtable();
-                NodeList nlArgument = procedure.getElementsByTagName(XMLLoader.ARGUMENT_ELEMENT);
-                for (int j = 0; j < nlArgument.getLength(); j++) {
-                    Element argument = (Element) nlArgument.item(j);
-                    String argumentName = argument.getAttributeNS("", XMLLoader.NAME_ATTRIBUTE);
-                    String argumentType = argument.getAttributeNS("", XMLLoader.TYPE_ATTRIBUTE);
-                    source = argument.getAttributeNS("", XMLLoader.PATH_ATTRIBUTE);
-                    argumentXPathMappings.put(argumentName, source);
-                    if (argumentList == null) {
-                        argumentList = "\"" + argumentName + "\"";
-                    } else {
-                        argumentList = argumentList + "," + "\"" + argumentList + "\"";
-                    }
-                    this.log("SaxProcessor : Procedure \"" + procedureName + "\" Argument \"" + argumentName +
-                             "\". Source = \"" + source + "\". Type = " + argumentType + ".");
-                    if (argumentType.equalsIgnoreCase(XMLLoader.XML_SOURCE_TYPE)) {
-                        if (!this.xmlSourceList.contains(source)) {
-                            this.xmlSourceList.add(source);
-                        }
-                    } else {
-                        if (!this.scalarSourceList.contains(source)) {
-                            this.scalarSourceList.add(source);
-                        }
-                    }
-                }
-                this.procedureArgumentMappings.put(procedureName, argumentList);
-                this.procedureArgumentXPathMappings.put(procedureName, argumentXPathMappings);
-            }
-        }
-    }
-
     public String stripNamespacePrefixes(String source) {
         while (source.indexOf(':') > 0) {
             String lhs = source.substring(0, source.indexOf(':') - 1);
@@ -373,80 +241,23 @@ public class XMLLoader {
         return source;
     }
 
-    public void processTableMappings(Element tableList) throws IOException, SAXException {
-
-        if (tableList != null && tableList.hasChildNodes()) {
-            NodeList nlTable = tableList.getElementsByTagName(XMLLoader.TABLE_ELEMENT);
-            for (int i = 0; i < nlTable.getLength(); i++) {
-                String columnList = null;
-                Element table = (Element) nlTable.item(i);
-                String tableName = table.getAttributeNS("", XMLLoader.NAME_ATTRIBUTE);
-                String source = table.getAttributeNS("", XMLLoader.PATH_ATTRIBUTE);
-                // source = stripNamespacePrefixes(source);
-                if (!this.boundaryList.contains(source)) {
-                    this.boundaryList.add(source);
-                }
-                this.xpathToTableNameMapping.put(source, tableName);
-                Hashtable columnXPathMappings = new Hashtable();
-                if (table.hasChildNodes()) {
-                    NodeList nlColumn = table.getElementsByTagName(XMLLoader.COLUMN_ELEMENT);
-                    for (int j = 0; j < nlColumn.getLength(); j++) {
-                        Element column = (Element) nlColumn.item(j);
-                        String columnName = column.getAttributeNS("", XMLLoader.NAME_ATTRIBUTE);
-                        String columnType = column.getAttributeNS("", XMLLoader.TYPE_ATTRIBUTE);
-                        source = column.getAttributeNS("", XMLLoader.PATH_ATTRIBUTE);
-                        columnXPathMappings.put(columnName, source);
-                        if (columnList == null) {
-                            columnList = "\"" + columnName + "\"";
-                        } else {
-                            columnList = columnList + "," + "\"" + columnName + "\"";
-                        }
-                        this.log("SaxProcessor : Table \"" + tableName + "\" Column \"" + columnName +
-                                 "\". Source = \"" + source + "\". Type = " + columnType + ".");
-                        if (columnType.equalsIgnoreCase(XMLLoader.XML_SOURCE_TYPE)) {
-                            if (!this.xmlSourceList.contains(source)) {
-                                this.xmlSourceList.add(source);
-                            }
-                        } else {
-                            if (!this.scalarSourceList.contains(source)) {
-                                this.scalarSourceList.add(source);
-                            }
-                        }
-                    }
-                } else {
-                    columnList = "OBJECT_VALUE";
-                    columnXPathMappings.put(columnList, source);
-                    this.log("SaxProcessor : XMLType Table \"" + tableName + "\". Source = \"" + source + "\".");
-                    if (!this.xmlSourceList.contains(source)) {
-                        this.xmlSourceList.add(source);
-                    }
-                }
-                this.tableColumnMappings.put(tableName, columnList);
-                this.tableColumnXPathMappings.put(tableName, columnXPathMappings);
-            }
-        }
-    }
-
-    protected Element processNamespacePrefixMappings() {
-        Element mappings = this.settings.getElement(NAMESPACE_DEFINITIONS);
-        if (mappings == null) {
-            mappings = this.settings.getParameterDocument().createElement(NAMESPACE_DEFINITIONS);
-        }
-        return mappings;
-    }
-
     protected SaxReader createSaxReader() throws SAXException, IOException {
         String threadName = "SaxReader";
         SaxReader saxReader = new SaxReader(threadName, this);
+        return saxReader;
+
+/*
         saxReader.setFileList(this.settings.getElement(FILE_LIST_ELEMENT));
-        saxReader.setXMLSourceList(this.xmlSourceList);
         saxReader.setNamespaceManager(this.namespaceMappings);
-        saxReader.setScalarSourceList(this.scalarSourceList);
-        saxReader.setBoundaryList(this.boundaryList);
+        saxReader.setRowXPathList(this.rowXPathList);
+        saxReader.createTableRowCounter(this.tableColumnXPathExpressions);
+        saxReader.setScalarXPathList(this.scalarXPathList);
+        saxReader.setXMLXPathList(this.xmlXPathList);
+   
         saxReader.setSchemaInformation(this.settings.getSetting(XMLLoader.SCHEMA_INSTANCE_PREFIX, null),
                                        this.settings.getSetting(XMLLoader.NO_NAMESPACE_SCHEMA_LOCATION, null),
                                        this.settings.getSetting(XMLLoader.SCHEMA_LOCATION, null));
-        return saxReader;
+*/
     }
 
     public void addToWriterQueue(Thread thread) {
@@ -458,19 +269,6 @@ public class XMLLoader {
         }
     }
 
-    private void setWriterSettings() {
-        this.commitCharge = Integer.parseInt(this.settings.getSetting(COMMIT_CHARGE_ELEMENT, "50"));
-        this.maxErrors = Integer.parseInt(this.settings.getSetting(MAX_ERRORS, "10"));
-        this.bufferSize = Integer.parseInt(this.settings.getSetting(BUFFER_SIZE, "32"));
-        this.maxSQLErrors = Integer.parseInt(this.settings.getSetting(MAX_SQL_ERRORS, "10"));
-        this.maxSQLInserts = Integer.parseInt(this.settings.getSetting(MAX_SQL_INSERTS, "0"));
-        this.maxDocuments = Integer.parseInt(this.settings.getSetting(MAX_DOCUMENTS, "-1"));
-        this.errorTable = this.settings.getSetting(ERROR_TABLE_ELEMENT);
-        this.clientSideEncoding =
-            this.settings.getSetting(CLIENT_SIDE_ENCODING_ELEMENT, "false").equalsIgnoreCase("true");
-        this.logServerStats = this.settings.getSetting(LOG_SERVER_STATS_ELEMENT, "false").equalsIgnoreCase("true");
-    }
-
     private DatabaseWriter createDatabaseWriter() throws SQLException, IOException, BinXMLException {
         DecimalFormat df = (DecimalFormat) DecimalFormat.getInstance();
         df.applyPattern("000000");
@@ -479,13 +277,14 @@ public class XMLLoader {
         this.log("Starting new DatabaseWriter thread : " + threadName);
         Connection conn = this.connectionManager.getConnection();
         conn.setAutoCommit(false);
-        DatabaseWriter writer = new DatabaseWriter(this);
-        writer.setName(threadName);
+        DatabaseWriter writer = new DatabaseWriter(threadName,this,conn);
+        /*
         writer.setParameters(conn, this.errorTable, this.commitCharge, this.maxSQLErrors, this.maxSQLInserts,
                              this.bufferSize, this.clientSideEncoding, this.logServerStats);
-        writer.setTableColumnMappings(tableColumnMappings);
         writer.setXPathToTableMappings(this.xpathToTableNameMapping);
-        writer.setTableColumnXPathMappings(this.tableColumnXPathMappings);
+        writer.setTableColumnMappings(this.tableColumnMappings);
+        writer.setTableColumnXPathExpressions(this.tableColumnXPathExpressions);
+        */
         this.threadPool.add(writer);
         return writer;
     }
@@ -497,7 +296,7 @@ public class XMLLoader {
                 this.dbWriterAborts = this.dbWriterAborts + 1;
                 if (this.dbWriterAborts >= this.maxErrors) {
                     setProcessingComplete();
-                    this.logThread("Maximum number of errors exceeded. Processing Complete.");
+                    this.log("Maximum number of errors exceeded. Processing Complete.");
                 }
             }
         }
@@ -550,7 +349,7 @@ public class XMLLoader {
         return dbw;
     }
 
-    protected void processValues(String path, Hashtable columnValues) throws SAXException, IOException, SQLException,
+    protected void processValues(String path, HashMap columnValues) throws SAXException, IOException, SQLException,
                                                                              BinXMLException {
         if (this.isProcessingComplete()) {
             throw new ParsingAbortedException();
@@ -564,8 +363,8 @@ public class XMLLoader {
                 dbw.setColumnValues(columnValues);
                 dbw.notify();
             }
-            if (readCount == this.maxDocuments) {
-                this.logThread("Maximum number of documents processed. Processing Complete.");
+            if (readCount == cfgMgr.maxDocuments) {
+                this.log("Maximum number of documents processed. Processing Complete.");
                 setProcessingComplete();
             }
         }
@@ -660,29 +459,25 @@ public class XMLLoader {
                                                ProcessingAbortedException, SAXException {
         FolderCrawler fc = new FolderCrawler();
         fc.setProcessor(this);
-        fc.setXMLSourceList(this.xmlSourceList);
         this.setReaderStarted();
-        fc.crawlFolderList(this.settings.getElement(FOLDER_LIST_ELEMENT));
+        fc.crawlFolderList(cfgMgr.getFolderList());
     }
 
     protected void startSAXReader() throws SAXException, IOException {
         this.saxReader = createSaxReader();
-        this.saxReader.setFileList(this.settings.getElement(FILE_LIST_ELEMENT));
+        this.saxReader.setFileList(cfgMgr.getFileList());
         this.setReaderStarted();
         this.saxReader.start();
     }
 
     public void processFiles() {
         try {
-            processTableMappings(this.settings.getElement(TABLE_LIST_ELEMENT));
-            processProcedureMappings(this.settings.getElement(PROCEDURE_LIST_ELEMENT));
-            this.namespaceMappings = this.processNamespacePrefixMappings();
+            this.cfgMgr = new ConfigurationManager(this,this.settings);      
             setProcessingStarted();
-            setWriterCount(Integer.parseInt(this.settings.getSetting(THREAD_COUNT_ELEMENT, "4")));
-            setWriterSettings();
+            setWriterCount(cfgMgr.getThreadCount());
             try {
                 this.setStartTime();
-                if (this.settings.getSetting(MODE_ELEMENT, "SAX").equalsIgnoreCase("SAX")) {
+                if (this.cfgMgr.runSaxProcessor()) {
                     startSAXReader();
                 } else {
                     startFolderCrawler();
@@ -693,7 +488,7 @@ public class XMLLoader {
             writeStatistics();
             this.logger.close();
         } catch (Exception e) {
-            this.logThread("SaxProcessor Aborted. ", e);
+            this.log("SaxProcessor Aborted. ", e);
             this.setProcessingComplete();
         }
     }
@@ -706,4 +501,5 @@ public class XMLLoader {
             e.printStackTrace();
         }
     }
+
 }

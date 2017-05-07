@@ -21,12 +21,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 import oracle.xml.binxml.BinXMLException;
-
 import oracle.xml.parser.v2.SAXParser;
-import oracle.xml.parser.v2.XMLDocument;
 import oracle.xml.parser.v2.XMLParseException;
 
 import org.w3c.dom.Element;
@@ -48,7 +47,7 @@ public class FolderCrawler {
 
     private ArrayList xmlSourceList;
 
-    public void setXMLSourceList(ArrayList list) {
+    public void setXMLXPathList(ArrayList list) {
         this.xmlSourceList = list;
     }
 
@@ -82,8 +81,8 @@ public class FolderCrawler {
         } else {
             filename = currentPath;
         }
-        setScalarValue(XMLLoader.CURRENT_PATH, currentPath);
-        setScalarValue(XMLLoader.CURRENT_FILENAME, filename);
+        setScalarValue(ConfigurationManager.DOCUMENT_URI, currentPath);
+        setScalarValue(ConfigurationManager.DOCUMENT_NAME, filename);
     }
 
     public String getRootElementName(String filename) throws IOException {
@@ -113,7 +112,7 @@ public class FolderCrawler {
                 String rootElementXPath = "/" + getRootElementName(filename);
                 if (isXMLSource(rootElementXPath)) {
                     setColumnValue(rootElementXPath, new FileInputStream(filename));
-                    this.processor.processValues(rootElementXPath, (Hashtable) this.columnValues.clone());
+                    this.processor.processValues(rootElementXPath, (HashMap) this.columnValues.clone());
                 }
             }
         } else {
@@ -126,7 +125,7 @@ public class FolderCrawler {
 
     public void crawlFolderList(Element folderList) throws SQLException, BinXMLException, XMLParseException,
                                                            IOException, ProcessingAbortedException, SAXException {
-        NodeList nl = folderList.getElementsByTagName(XMLLoader.FOLDER_ELEMENT);
+        NodeList nl = folderList.getElementsByTagName(ConfigurationManager.FOLDER_ELEMENT);
         for (int i = 0; i < nl.getLength(); i++) {
             Element e = (Element) nl.item(i);
             String foldername = e.getFirstChild().getNodeValue();

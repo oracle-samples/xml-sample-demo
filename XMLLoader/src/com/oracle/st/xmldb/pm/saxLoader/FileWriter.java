@@ -17,10 +17,6 @@ package com.oracle.st.xmldb.pm.saxLoader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Writer;
-
-import java.sql.CallableStatement;
-import java.sql.SQLException;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,7 +27,6 @@ import java.util.Locale;
 
 import oracle.xml.parser.v2.XMLDocument;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -122,7 +117,7 @@ public class FileWriter extends Thread {
                 }
             }
         } catch (Exception e) {
-            this.processor.logThread(e);
+            this.processor.log(e);
         }
         setEndTime();
         this.processor.log("Thread " + this.threadName + " completed at " + getStartTime());
@@ -142,7 +137,7 @@ public class FileWriter extends Thread {
         out.close();
 
         if (DEBUG) {
-            this.processor.logThread(xml);
+            this.processor.log(xml);
         }
         return 0;
     }

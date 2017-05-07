@@ -21,14 +21,9 @@ import java.io.StringWriter;
 
 import java.sql.SQLException;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
-
-import javax.annotation.processing.Processor;
-
-import oracle.sql.BFILE;
 
 import oracle.xml.binxml.BinXMLException;
 import oracle.xml.parser.v2.SAXParser;
@@ -37,7 +32,6 @@ import oracle.xml.parser.v2.XMLElement;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -55,11 +49,11 @@ public class SaxReader extends Thread implements ContentHandler {
     // TODO : Add support for Attributes as the source for a Column
 
     public static final boolean DEBUG = XMLLoader.DEBUG;
+    public static final boolean VERBOSE_TRACE = false;
 
     private String xsiPrefix = null;
     private String noNamespaceSchemaLocation = null;
     private String schemaLocation = null;
-    private Element namespaceMappings = null;
 
     boolean explicitSchemaLocation = false;
 
@@ -67,72 +61,21 @@ public class SaxReader extends Thread implements ContentHandler {
         return this.explicitSchemaLocation;
     }
 
-    public void setSchemaInformation(String xsiPrefix, String noNamespaceSchemaLocation, String schemaLocation) {
-        this.xsiPrefix = xsiPrefix;
-        this.noNamespaceSchemaLocation = noNamespaceSchemaLocation;
-        this.schemaLocation = schemaLocation;
-        this.explicitSchemaLocation = this.xsiPrefix != null;
-    }
-
-    protected void setNamespaceManager(Element namespaceMappings) {
-        this.namespaceMappings = namespaceMappings;
-    }
+    private HashMap absoluteOrdinality  = new HashMap();
+    private HashMap realtiveOrdinality  = new HashMap();
 
     private String currentPath = "/";
     private String currentFilename = null;
-
-    private ArrayList xmlSourceList;
-    private ArrayList scalarSourceList;
-    private ArrayList boundaryList;
-
-    public void setXMLSourceList(ArrayList list) {
-        this.xmlSourceList = list;
-    }
-
-    public void setScalarSourceList(ArrayList list) {
-        this.scalarSourceList = list;
-    }
-
-    public void setBoundaryList(ArrayList list) {
-        this.boundaryList = list;
-    }
-
-    private boolean isXMLSource() {
-        return this.xmlSourceList.contains(this.currentPath);
-    }
-
-    private boolean isScalarSource() {
-        return this.scalarSourceList.contains(this.currentPath);
-    }
-
-    private boolean isBoundary() {
-        return this.boundaryList.contains(this.currentPath);
-    }
 
     private boolean buildingDocument() {
         return this.currentDocument != null;
     }
 
-    private Hashtable columnValues = new Hashtable();
+    private HashMap columnValues = new HashMap();
 
-    private void setScalarValue(String value) {
-        setScalarValue(this.currentPath, value);
-    }
-
-    private void setScalarValue(String key, String value) {
-        this.processor.log("SaxReader : Scalar Value for \"" + key + "\" = \"" + value + "\".");
-        setColumnValue(key, value);
-    }
-
-    private void setColumnValue(XMLDocument xml) {
-        setColumnValue(this.currentPath, xml);
-    }
-
-    private void setColumnValue(String key, Object value) {
-        if (columnValues.containsKey(key)) {
-            columnValues.remove(key);
-        }
-        this.columnValues.put(key, value);
+    private void putColumnValue(String path, Object value) {
+        String columnName = (String) this.cfgManager.xpathColumnNameMappings.get(path);
+        columnValues.put(columnName,value);
     }
 
     private XMLDocument currentDocument;
@@ -155,73 +98,89 @@ public class SaxReader extends Thread implements ContentHandler {
 
     private Hashtable namespaceToPrefix = null;
     private Hashtable prefixToNamespace = null;
-    private XMLLoader processor;
+    private XMLLoader loader;
 
-    public SaxReader(String threadName, XMLLoader processor) {
+    private ConfigurationManager cfgManager;
+
+    public SaxReader(String threadName, XMLLoader loader) {
         super(threadName);
         this.namespaceToPrefix = new Hashtable();
         this.prefixToNamespace = new Hashtable();
-        this.processor = processor;
+        this.loader = loader;
+        this.cfgManager = loader.getCfgMgr();
+        
+        for (int i=0;i<this.cfgManager.tableList.size();i++) {
+           this.absoluteOrdinality.put(cfgManager.tableList.get(i),0);
+           this.realtiveOrdinality.put(cfgManager.tableList.get(i),0);
+        }
     }
 
-    public void setOrdinality(int ordinality) {
-
-        this.setScalarValue(XMLLoader.ORDINALITY, Integer.toString(ordinality));
+    private void incrementOrdinality(String xpathExpression) {
+      String tableName = (String) cfgManager.xpathTableNameMapping.get(xpathExpression);
+ 
+      int ordinality = (int) this.absoluteOrdinality.get(tableName);
+      ordinality++;
+      this.absoluteOrdinality.put(tableName,ordinality);
+      
+      ordinality = (int) this.realtiveOrdinality.get(tableName);
+      xpathExpression = xpathExpression + "/" + ConfigurationManager.POSITION;
+      if (this.cfgManager.isMappedXPathExpression(xpathExpression)) {
+        putColumnValue(xpathExpression,Integer.toString(ordinality));
+      }
+      ordinality++;
+      this.realtiveOrdinality.put(tableName,ordinality);
     }
 
     public void startDocument() throws SAXException {
         if (DEBUG) {
-            this.processor.log("SaxReader.startDocument() : Start Document Event");
+            this.loader.log("SaxReader.startDocument() : Start Document Event");
         }
     }
 
     public void endDocument() throws SAXException {
-        // this.processor.setParsingComplete();
+        // this.loader.setParsingComplete();
     }
-
 
     private void checkSchemaLocation(Attributes attrs) {
 
         // Check for SchemaLocation attributes on elements that are not included in the output..
         // NB Should really be managed via a stack..
 
-        String location = attrs.getValue(XMLLoader.XML_SCHEMA_INSTANCE_NAMESPACE, XMLLoader.SCHEMA_LOCATION);
+        String location = attrs.getValue(ConfigurationManager.XML_SCHEMA_INSTANCE_NAMESPACE, ConfigurationManager.SCHEMA_LOCATION);
         if (location != null) {
             this.schemaLocation = location;
             this.noNamespaceSchemaLocation = null;
-            this.xsiPrefix =
-                attrs.getQName(attrs.getIndex(XMLLoader.XML_SCHEMA_INSTANCE_NAMESPACE, XMLLoader.SCHEMA_LOCATION));
+            this.xsiPrefix = attrs.getQName(attrs.getIndex(ConfigurationManager.XML_SCHEMA_INSTANCE_NAMESPACE, ConfigurationManager.SCHEMA_LOCATION));
             this.xsiPrefix = this.xsiPrefix.substring(0, this.xsiPrefix.indexOf(':'));
-            this.processor.log("schemaLocation = \"" + this.schemaLocation + "\". Prefix = \"" + this.xsiPrefix +
-                               "\".");
+            this.loader.log("schemaLocation = \"" + this.schemaLocation + "\". Prefix = \"" + this.xsiPrefix + "\".");
             return;
         }
 
 
-        location = attrs.getValue(XMLLoader.XML_SCHEMA_INSTANCE_NAMESPACE, XMLLoader.NO_NAMESPACE_SCHEMA_LOCATION);
+        location = attrs.getValue(ConfigurationManager.XML_SCHEMA_INSTANCE_NAMESPACE, ConfigurationManager.NO_NAMESPACE_SCHEMA_LOCATION);
 
         if (location != null) {
             this.noNamespaceSchemaLocation = location;
             this.schemaLocation = null;
-            this.xsiPrefix =
-                attrs.getQName(attrs.getIndex(XMLLoader.XML_SCHEMA_INSTANCE_NAMESPACE,
-                                              XMLLoader.NO_NAMESPACE_SCHEMA_LOCATION));
+            this.xsiPrefix = attrs.getQName(attrs.getIndex(ConfigurationManager.XML_SCHEMA_INSTANCE_NAMESPACE,ConfigurationManager.NO_NAMESPACE_SCHEMA_LOCATION));
             this.xsiPrefix = this.xsiPrefix.substring(0, this.xsiPrefix.indexOf(':'));
-            this.processor.log("noNamespaceSchemaLocation = \"" + this.noNamespaceSchemaLocation + "\". Prefix = \"" +
-                               this.xsiPrefix + "\".");
+            this.loader.log("noNamespaceSchemaLocation = \"" + this.noNamespaceSchemaLocation + "\". Prefix = \"" + this.xsiPrefix + "\".");
             return;
         }
     }
 
     public void startElement(String namespaceURI, String localName, String elementName,
                              Attributes attrs) throws SAXException {
-        if (DEBUG) {
-            this.processor.log("SaxReader.startElement() : Namespace = " + namespaceURI + ",localName = " + localName +
-                               ",Name = " + elementName);
+        if (VERBOSE_TRACE) {
+            this.loader.log("SaxReader.startElement() : Namespace \"" + namespaceURI + "\", localName \"" + localName + "\", Name \"" + elementName + "\".");
         }
-
-        String prefix = this.namespaceMappings.lookupPrefix(namespaceURI);
-
+        
+        String prefix = this.cfgManager.namespaceMappings.lookupPrefix(namespaceURI);
+        
+        if (VERBOSE_TRACE) {
+            this.loader.log("SaxReader.startElement() : Namespace \"" + namespaceURI + "\", Prefix = " + prefix  + "\".");
+        }
+           
         String qname = localName;
         if ((prefix != null) & (prefix != "")) {
             qname = prefix + ":" + localName;
@@ -233,12 +192,30 @@ public class SaxReader extends Thread implements ContentHandler {
             this.currentPath = this.currentPath + qname;
         }
 
-        if (DEBUG) {
-            this.processor.log("SaxReader.startElement() : Current Path = " + this.currentPath);
+        if (VERBOSE_TRACE) {
+            this.loader.log("SaxReader.startElement() : Current Path = " + this.currentPath);
         }
-
-        if (isXMLSource()) {
+        
+        // TODO : Build new ColumnValues HashMap for each rowXpathExpression
+        
+        if (cfgManager.isMappedXPathExpression(this.currentPath)) {
+            if (VERBOSE_TRACE) {
+              this.loader.log("SaxReader.startElement() : matched XPath Expression \"" + this.currentPath + "\".");
+            } 
+            if (VERBOSE_TRACE) {
+                this.loader.log("Creating document using \"" + this.currentPath + "\"");
+            }
             createNewDocument();
+        }
+        
+        for (int i=0;i<attrs.getLength();i++) {
+          String localPath = this.currentPath + "/@" + attrs.getQName(i);
+          if (cfgManager.isMappedXPathExpression(localPath)) {
+             if (VERBOSE_TRACE) {
+               this.loader.log("SaxReader.startElement() : matched XPath Expression = \"" + localPath + "\".");
+             } 
+             putColumnValue(localPath,attrs.getValue(i)); 
+          } 
         }
 
         if (buildingDocument()) {
@@ -256,29 +233,30 @@ public class SaxReader extends Thread implements ContentHandler {
 
     public void endElement(String namespaceURI, String localName, String qName) throws SAXException {
         try {
-            if (DEBUG) {
-                this.processor.log("endElement   : Namespace = " + namespaceURI + ",localName = " + localName +
-                                   ",qName = " + qName);
+            if (VERBOSE_TRACE) {
+                this.loader.log("endElement   : Namespace = " + namespaceURI + ",localName = " + localName + ",qName = " + qName);
             }
 
             if (buildingDocument()) {
                 this.currentNode = this.currentNode.getParentNode();
 
                 if (this.currentNode == this.currentDocument) {
-                    setColumnValue(this.currentDocument);
-                    if (DEBUG) {
-                        this.processor.log("Document Complete");
-                        this.processor.log(this.currentDocument);
+                    putColumnValue(this.currentPath, this.currentDocument);
+                    if (VERBOSE_TRACE) {
+                        this.loader.log("Completed \"" + this.currentPath + "\"");
+                        this.loader.log(this.currentDocument);
                     }
                     setDocument(null);
                 }
             }
 
-            if (isBoundary()) {
+            if (cfgManager.isRowXPathExpression(this.currentPath)) {
                 if (this.currentDocument != null) {
-                    throw new ParsingAbortedException("SaxReader : Found Row Boundary while parsing document.");
+                    throw new ParsingAbortedException("SaxReader : Unexpected row boundary (\"" + this.currentPath + "\") detected while parsing document.");
                 }
-                this.processor.processValues(this.currentPath, (Hashtable) this.columnValues.clone());
+                incrementOrdinality(this.currentPath);
+                setFilename(this.currentPath);
+                this.loader.processValues(this.currentPath, (HashMap) this.columnValues.clone());
             }
 
             if (this.currentPath.lastIndexOf('/') > 1) {
@@ -297,17 +275,15 @@ public class SaxReader extends Thread implements ContentHandler {
         }
     }
 
-    protected Hashtable getColumnValues() {
-        Hashtable columnValues = new Hashtable();
+    protected  HashMap getColumnValues() {
+        HashMap columnValues = new HashMap();
         return columnValues;
     }
 
     private void addAttributes(Element element, Attributes attrs) {
         for (int i = 0; i < attrs.getLength(); i++) {
-            if (DEBUG) {
-                this.processor.log("processAttributes : Local Name = " + attrs.getLocalName(i) + ", Q Name = " +
-                                   attrs.getQName(i) + ",Type = " + attrs.getType(i) + ", URI = " + attrs.getURI(i) +
-                                   ", Value = " + attrs.getValue(i));
+            if (VERBOSE_TRACE) {
+                this.loader.log("processAttributes : Local Name = " + attrs.getLocalName(i) + ", Q Name = " + attrs.getQName(i) + ",Type = " + attrs.getType(i) + ", URI = " + attrs.getURI(i) + ", Value = " + attrs.getValue(i));
             }
             if (attrs.getURI(i).equals("http://www.w3.org/2000/xmlns/")) {
             } else {
@@ -340,18 +316,13 @@ public class SaxReader extends Thread implements ContentHandler {
         if (this.xsiPrefix != null) {
             // Remove any existing prefix definition for this prefix.
             root.removeAttribute("xmlns:" + this.xsiPrefix);
-            root.removeAttributeNS(XMLLoader.XML_SCHEMA_INSTANCE_NAMESPACE,
-                                   this.xsiPrefix + ":" + XMLLoader.SCHEMA_LOCATION);
-            root.removeAttributeNS(XMLLoader.XML_SCHEMA_INSTANCE_NAMESPACE,
-                                   this.xsiPrefix + ":" + XMLLoader.NO_NAMESPACE_SCHEMA_LOCATION);
+            root.removeAttributeNS(ConfigurationManager.XML_SCHEMA_INSTANCE_NAMESPACE, this.xsiPrefix + ":" + ConfigurationManager.SCHEMA_LOCATION);
+            root.removeAttributeNS(ConfigurationManager.XML_SCHEMA_INSTANCE_NAMESPACE, this.xsiPrefix + ":" + ConfigurationManager.NO_NAMESPACE_SCHEMA_LOCATION);
 
             if (this.schemaLocation != null) {
-                root.setAttributeNS(XMLLoader.XML_SCHEMA_INSTANCE_NAMESPACE,
-                                    this.xsiPrefix + ":" + XMLLoader.SCHEMA_LOCATION, this.schemaLocation);
+                root.setAttributeNS(ConfigurationManager.XML_SCHEMA_INSTANCE_NAMESPACE,this.xsiPrefix + ":" + ConfigurationManager.SCHEMA_LOCATION, this.schemaLocation);
             } else {
-                root.setAttributeNS(XMLLoader.XML_SCHEMA_INSTANCE_NAMESPACE,
-                                    this.xsiPrefix + ":" + XMLLoader.NO_NAMESPACE_SCHEMA_LOCATION,
-                                    this.noNamespaceSchemaLocation);
+                root.setAttributeNS(ConfigurationManager.XML_SCHEMA_INSTANCE_NAMESPACE,this.xsiPrefix + ":" + ConfigurationManager.NO_NAMESPACE_SCHEMA_LOCATION,this.noNamespaceSchemaLocation);
             }
         }
     }
@@ -375,31 +346,34 @@ public class SaxReader extends Thread implements ContentHandler {
     }
 
     public void characters(char[] p0, int p1, int p2) throws SAXException {
+
+        String textNodePath = this.currentPath + "/" + ConfigurationManager.TEXT_NODE;
+
         if (buildingDocument()) {
             StringWriter sw = new StringWriter();
             sw.write(p0, p1, p2);
             String value = sw.toString();
             Node textNode = this.currentDocument.createTextNode(value);
             this.currentNode.appendChild(textNode);
-            if (isScalarSource()) {
-                setScalarValue(value);
+            if (cfgManager.isMappedXPathExpression(textNodePath)) {
+                putColumnValue(textNodePath,value);
             }
         } else {
-            if (isScalarSource()) {
+            if (cfgManager.isMappedXPathExpression(textNodePath)) {
                 // Assume that the value for the key column is processed by a single call to this function
                 StringWriter sw = new StringWriter();
                 sw.write(p0, p1, p2);
                 String value = sw.toString();
-                setScalarValue(value);
+                putColumnValue(textNodePath,value);
             }
         }
     }
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        if (DEBUG) {
-            this.processor.log("startPrefixMapping() : Prefix = " + prefix + ", URI = " + uri);
+        if (VERBOSE_TRACE) {
+            this.loader.log("startPrefixMapping() : Prefix = " + prefix + ", URI = " + uri);
         }
-        if (uri.equals(XMLLoader.XML_SCHEMA_INSTANCE_NAMESPACE)) {
+        if (uri.equals(ConfigurationManager.XML_SCHEMA_INSTANCE_NAMESPACE)) {
             if (explicitSchemaLocation()) {
                 return;
             } else {
@@ -411,8 +385,8 @@ public class SaxReader extends Thread implements ContentHandler {
     }
 
     public void endPrefixMapping(String prefix) throws SAXException {
-        if (DEBUG) {
-            this.processor.log("endPrefixMapping() : Prefix = " + prefix);
+        if (VERBOSE_TRACE) {
+            this.loader.log("endPrefixMapping() : Prefix = " + prefix);
         }
         Enumeration e = prefixToNamespace.keys();
         while (e.hasMoreElements()) {
@@ -441,17 +415,24 @@ public class SaxReader extends Thread implements ContentHandler {
         throw new SAXException("Un-Implemented Method: skippedEntity");
     }
 
-    public void setFilename(String currentPath) {
+    public void setFilename(String rowXPathExpression) {
         String filename = null;
-        if (currentPath.indexOf(File.separatorChar) > -1) {
-            filename = currentPath.substring(currentPath.lastIndexOf(File.separatorChar) + 1);
+        if (this.currentFilename.indexOf(File.separatorChar) > -1) {
+            filename = this.currentFilename.substring(this.currentFilename.lastIndexOf(File.separatorChar) + 1);
         } else {
-            filename = currentPath;
+            filename = this.currentFilename;
         }
-        setScalarValue(XMLLoader.CURRENT_PATH, currentPath);
-        setScalarValue(XMLLoader.CURRENT_FILENAME, filename);
+        
+        String targetXPath = rowXPathExpression + "/" + ConfigurationManager.DOCUMENT_URI;
+        if (this.cfgManager.isMappedXPathExpression(targetXPath)) {
+          putColumnValue(targetXPath, currentPath);
+        }
+ 
+        targetXPath = rowXPathExpression + "/" + ConfigurationManager.DOCUMENT_NAME;
+        if (this.cfgManager.isMappedXPathExpression(targetXPath)) {
+          putColumnValue(targetXPath, filename);
+        }        
     }
-
 
     public void processFileList() throws IOException, SAXException, ProcessingAbortedException {
         SAXParser parser;
@@ -460,16 +441,18 @@ public class SaxReader extends Thread implements ContentHandler {
         parser.setValidationMode(SAXParser.NONVALIDATING);
         parser.setContentHandler(this);
 
-        NodeList nl = this.filelist.getElementsByTagName(XMLLoader.FILE_ELEMENT);
+        NodeList nl = this.filelist.getElementsByTagName(ConfigurationManager.FILE_ELEMENT);
         for (int i = 0; i < nl.getLength(); i++) {
             try {
                 Element e = (Element) nl.item(i);
                 this.currentFilename = e.getFirstChild().getNodeValue();
-                this.processor.log("SaxReader.processFileList() : Processing " + this.currentFilename);
-                setFilename(this.currentFilename);
+                this.loader.log("SaxReader.processFileList() : Processing " + this.currentFilename);
+                for (int j=0;j<this.cfgManager.tableList.size();j++) {
+                   this.realtiveOrdinality.put(cfgManager.tableList.get(j),0);
+                }
                 parser.parse(new FileInputStream(this.currentFilename));
             } catch (ParsingAbortedException pae) {
-                this.processor.log("SaxReader.processFileList() : Processing Complete - Parsing Aborted.");
+                this.loader.log("SaxReader.processFileList() : Processing Complete - Parsing Aborted.");
                 throw pae;
             }
         }
@@ -479,9 +462,9 @@ public class SaxReader extends Thread implements ContentHandler {
         try {
             processFileList();
         } catch (Exception e) {
-            this.processor.logThread(e);
+            this.loader.log(e);
         }
-        this.processor.setReaderComplete();
-        this.processor.setProcessingComplete();
+        this.loader.setReaderComplete();
+        this.loader.setProcessingComplete();
     }
 }
