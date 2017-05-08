@@ -19,11 +19,23 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class rootElementReader extends DefaultHandler {
-    public rootElementReader() {
+    
+    ConfigurationManager cfgManager;
+    
+    public rootElementReader(ConfigurationManager cfgmgr) {
         super();
+        this.cfgManager = cfgmgr;
     }
 
-    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        throw new SAXException(qName);
+    public void startElement(String namespaceURI, String localName, String qName, Attributes attributes) throws SAXException {
+
+        String prefix = this.cfgManager.namespaceMappings.lookupPrefix(namespaceURI);
+               
+        String qname = localName;
+        if ((prefix != null) & (prefix != "")) {
+            qname = prefix + ":" + localName;
+        }
+        
+        throw new SAXException(qname);
     }
 }

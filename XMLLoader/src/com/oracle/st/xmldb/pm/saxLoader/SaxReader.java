@@ -25,6 +25,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 
+import java.util.LinkedList;
+
 import oracle.xml.binxml.BinXMLException;
 import oracle.xml.parser.v2.SAXParser;
 import oracle.xml.parser.v2.XMLDocument;
@@ -70,8 +72,10 @@ public class SaxReader extends Thread implements ContentHandler {
     private boolean buildingDocument() {
         return this.currentDocument != null;
     }
+    
+    protected LinkedList rowsInProgress = new LinkedList();
 
-    private HashMap columnValues = new HashMap();
+    private HashMap columnValues = null; 
 
     private void putColumnValue(String path, Object value) {
         String columnName = (String) this.cfgManager.xpathColumnNameMappings.get(path);
@@ -196,7 +200,12 @@ public class SaxReader extends Thread implements ContentHandler {
             this.loader.log("SaxReader.startElement() : Current Path = " + this.currentPath);
         }
         
-        // TODO : Build new ColumnValues HashMap for each rowXpathExpression
+        // Build new ColumnValues HashMap for each rowXpathExpression
+        
+        if (cfgManager.isRowXPathExpression(this.currentPath)) {
+            this.rowsInProgress.addLast(this.columnValues);
+            this.columnValues = new HashMap();
+        }
         
         if (cfgManager.isMappedXPathExpression(this.currentPath)) {
             if (VERBOSE_TRACE) {
@@ -209,12 +218,22 @@ public class SaxReader extends Thread implements ContentHandler {
         }
         
         for (int i=0;i<attrs.getLength();i++) {
-          String localPath = this.currentPath + "/@" + attrs.getQName(i);
+          String uri = attrs.getURI(i);  
+          if (VERBOSE_TRACE) {
+             this.loader.log("SaxReader.startElement() : Attribute Namespace \"" + namespaceURI + "\", Prefix = " + prefix  + "\".");
+          }
+               
+          qname = attrs.getLocalName(i);
+          if ((prefix != null) & (prefix != "")) {
+            qname = prefix + ":" + localName;
+          }
+           
+          String localPath = this.currentPath + "/@" + qname;
           if (cfgManager.isMappedXPathExpression(localPath)) {
-             if (VERBOSE_TRACE) {
-               this.loader.log("SaxReader.startElement() : matched XPath Expression = \"" + localPath + "\".");
-             } 
-             putColumnValue(localPath,attrs.getValue(i)); 
+            if (VERBOSE_TRACE) {
+              this.loader.log("SaxReader.startElement() : matched XPath Expression = \"" + localPath + "\".");
+            } 
+            putColumnValue(localPath,attrs.getValue(i)); 
           } 
         }
 
@@ -256,8 +275,8 @@ public class SaxReader extends Thread implements ContentHandler {
                 }
                 incrementOrdinality(this.currentPath);
                 setFilename(this.currentPath);
-                this.loader.processValues(this.currentPath, (HashMap) this.columnValues.clone());
-            }
+                this.loader.processValues(this.currentPath, (HashMap) this.columnValues);
+                this.columnValues = (HashMap) this.rowsInProgress.removeLast();            }
 
             if (this.currentPath.lastIndexOf('/') > 1) {
                 this.currentPath = this.currentPath.substring(0, this.currentPath.lastIndexOf('/'));

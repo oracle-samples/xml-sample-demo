@@ -36,55 +36,46 @@ import org.xml.sax.SAXException;
 
 public class FolderCrawler {
 
-    private Hashtable columnValues = new Hashtable();
-    private XMLLoader processor;
+    public static final boolean DEBUG = XMLLoader.DEBUG;
+    public static final boolean VERBOSE_TRACE = false;
+
+    private HashMap columnValues = new HashMap();
+    private XMLLoader loader;
     private SAXParser p = new SAXParser();
-    private String xpathExpression;
+    
+    private ConfigurationManager cfgManager;
+    
+    // TODO: Add File Counter, File Counter by Root Element / Table.
 
-    public void setProcessor(XMLLoader loader) {
-        this.processor = loader;
-    }
-
-    private ArrayList xmlSourceList;
-
-    public void setXMLXPathList(ArrayList list) {
-        this.xmlSourceList = list;
-    }
-
-    private boolean isXMLSource(String xpathExpression) {
-        return this.xmlSourceList.contains(xpathExpression);
-    }
-
-    public FolderCrawler() {
+    public FolderCrawler(XMLLoader loader) {
         super();
+        this.loader = loader;
+        this.cfgManager = this.loader.getCfgMgr();
     }
 
-
-    private void setScalarValue(String key, String value) {
-        // this.processor.log("SaxReader : Scalar Value for \"" + key + "\" = \"" + value + "\".");
-        setColumnValue(key, value);
+    private void putColumnValue(String path, Object value) {
+        String columnName = (String) this.cfgManager.xpathColumnNameMappings.get(path);
+        this.columnValues.put(columnName,value);
     }
 
-
-    private void setColumnValue(String key, Object value) {
-        if (columnValues.containsKey(key)) {
-            columnValues.remove(key);
-        }
-        this.columnValues.put(key, value);
-    }
-
-
-    public void setFilename(String currentPath) {
+    public void setFilename(String rootNode, String currentPath) {
         String filename = null;
         if (currentPath.indexOf(File.separatorChar) > -1) {
             filename = currentPath.substring(currentPath.lastIndexOf(File.separatorChar) + 1);
         } else {
             filename = currentPath;
+        }        
+        String targetXPath = rootNode + "/" + ConfigurationManager.DOCUMENT_URI;
+        if (this.cfgManager.isMappedXPathExpression(targetXPath)) {
+          putColumnValue(targetXPath, currentPath);
         }
-        setScalarValue(ConfigurationManager.DOCUMENT_URI, currentPath);
-        setScalarValue(ConfigurationManager.DOCUMENT_NAME, filename);
+    
+        targetXPath = rootNode + "/" + ConfigurationManager.DOCUMENT_NAME;
+        if (this.cfgManager.isMappedXPathExpression(targetXPath)) {
+          putColumnValue(targetXPath, filename);
+        }        
     }
-
+    
     public String getRootElementName(String filename) throws IOException {
         try {
             p.parse(new FileInputStream(filename));
@@ -97,42 +88,50 @@ public class FolderCrawler {
     private void processFile(String filename) throws SQLException, BinXMLException, XMLParseException, IOException,
                                                      ProcessingAbortedException, SAXException {
 
-        if (processor.isProcessingComplete()) {
-            processor.log("FolderCrawler.processFile() : Processing Complete - Crawl Aborted.");
+         
+        if (this.loader.isProcessingComplete()) {
+            this.loader.log("FolderCrawler.processFile(): Processing Complete - Crawl Aborted.");
             throw new ProcessingAbortedException();
         }
-        // processor.log("Processing : " + filename);
-        ContentHandler c = new rootElementReader();
+        ContentHandler c = new rootElementReader(this.cfgManager);
         p.setContentHandler(c);
         File dir = new File(filename);
         String[] children = dir.list();
         if (children == null) {
             if (filename.endsWith(".xml")) {
-                setFilename(filename);
                 String rootElementXPath = "/" + getRootElementName(filename);
-                if (isXMLSource(rootElementXPath)) {
-                    setColumnValue(rootElementXPath, new FileInputStream(filename));
-                    this.processor.processValues(rootElementXPath, (HashMap) this.columnValues.clone());
+                if (VERBOSE_TRACE) {
+                  this.loader.log("FolderCrawler.processFile(): Processing xml file : \"" + filename + "\". Root Element = \"" + rootElementXPath + "\".");
+                }                                             
+                if (this.cfgManager.isMappedXPathExpression(rootElementXPath)) {
+                    this.columnValues = new HashMap();
+                    setFilename(rootElementXPath,filename);
+                    putColumnValue(rootElementXPath, new FileInputStream(filename));
+                    this.loader.processValues(rootElementXPath, this.columnValues);
                 }
             }
         } else {
             for (int i = 0; i < children.length; i++) {
+                if (VERBOSE_TRACE) {
+                  this.loader.log("FolderCrawler.processFile(): Processing folder : " + filename);
+                }                                             
                 processFile(dir.getAbsolutePath() + File.separator + children[i]);
             }
         }
 
     }
 
-    public void crawlFolderList(Element folderList) throws SQLException, BinXMLException, XMLParseException,
+    public void crawlFolderList() throws SQLException, BinXMLException, XMLParseException,
                                                            IOException, ProcessingAbortedException, SAXException {
+        Element folderList = this.cfgManager.getFolderList();
         NodeList nl = folderList.getElementsByTagName(ConfigurationManager.FOLDER_ELEMENT);
         for (int i = 0; i < nl.getLength(); i++) {
             Element e = (Element) nl.item(i);
             String foldername = e.getFirstChild().getNodeValue();
-            this.processor.log("FolderCrawler.crawlFolderList() : Processing " + foldername);
+            this.loader.log("FolderCrawler.crawlFolderList() : Processing " + foldername);
             processFile(foldername);
-            this.processor.setReaderComplete();
-            this.processor.setProcessingComplete();
+            this.loader.setReaderComplete();
+            this.loader.setProcessingComplete();
         }
     }
 }

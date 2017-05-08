@@ -31,8 +31,6 @@ public class ConfigurationManager {
     public static final String MAX_SQL_ERRORS = "maxSQLErrors";
     public static final String MAX_SQL_INSERTS = "maxSQLInserts";
 
-    public static final String BUFFER_SIZE = "bufferSize";
-
     public static final String LOG_FILE_NAME = "LogFileName";
 
     public static final String THREAD_COUNT_ELEMENT = "ThreadCount";
@@ -65,7 +63,6 @@ public class ConfigurationManager {
     public static final String CLIENT_SIDE_ENCODING_ELEMENT = "clientSideEncoding";
 
     public static final String LOG_SERVER_STATS_ELEMENT = "logServerStats";
-    public static final String MODE_ELEMENT = "mode";
 
     public static final String TEXT_NODE     = "text()";
     public static final String POSITION      = "position()";
@@ -97,7 +94,7 @@ public class ConfigurationManager {
         processTableMappings();
         processProcedureMappings();
         this.namespaceMappings = processNamespacePrefixMappings();
-        setWriterConfiguration();
+        readWriterConfiguration();
     }
 
     protected int maxDocuments = 0;
@@ -108,10 +105,8 @@ public class ConfigurationManager {
     protected boolean clientSideEncoding = false;
     protected boolean logServerStats = false;
     
-/*
-    protected int bufferSize = 1;
-*/
-    private void setWriterConfiguration() {
+
+    private void readWriterConfiguration() {
         this.maxDocuments = Integer.parseInt(this.settings.getSetting(ConfigurationManager.MAX_DOCUMENTS, "-1"));
         this.commitCharge = Integer.parseInt(this.settings.getSetting(ConfigurationManager.COMMIT_CHARGE_ELEMENT, "50"));
         this.maxSQLErrors = Integer.parseInt(this.settings.getSetting(ConfigurationManager.MAX_SQL_ERRORS, "10"));
@@ -119,9 +114,7 @@ public class ConfigurationManager {
         this.errorTable = this.settings.getSetting(ConfigurationManager.ERROR_TABLE_ELEMENT);
         this.clientSideEncoding = this.settings.getSetting(ConfigurationManager.CLIENT_SIDE_ENCODING_ELEMENT, "false").equalsIgnoreCase("true");
         this.logServerStats = this.settings.getSetting(ConfigurationManager.LOG_SERVER_STATS_ELEMENT, "false").equalsIgnoreCase("true");
-/*        
-        this.bufferSize = Integer.parseInt(this.settings.getSetting(ConfigurationManager.BUFFER_SIZE, "32"));
-*/
+
     }
     
     @SuppressWarnings("unchecked")
@@ -252,8 +245,16 @@ public class ConfigurationManager {
         return mappings;
     }
 
-    protected boolean runSaxProcessor() {
-      return this.settings.getSetting(MODE_ELEMENT, "SAX").equalsIgnoreCase("SAX");
+    protected boolean processFileList() {
+        Element fl = getFileList();
+        if (fl != null) {
+          NodeList nl = fl.getElementsByTagName(ConfigurationManager.FILE_ELEMENT);
+          return nl.getLength() > 0;
+        }
+        else {
+            return false;
+        
+        }
     }
     
     protected int getThreadCount() {

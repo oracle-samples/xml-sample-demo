@@ -205,7 +205,7 @@ public class XMLLoader extends Logger {
         synchronized (logger) {
             while (this.loaderStatistics.size() > 0) {
                 WriterStatistics stats = (WriterStatistics) this.loaderStatistics.remove(0);
-                stats.printStats(logger);
+                stats.printStats(this);
                 this.writeCount = this.writeCount + stats.getSuccessCount();
             }
         }
@@ -245,19 +245,6 @@ public class XMLLoader extends Logger {
         String threadName = "SaxReader";
         SaxReader saxReader = new SaxReader(threadName, this);
         return saxReader;
-
-/*
-        saxReader.setFileList(this.settings.getElement(FILE_LIST_ELEMENT));
-        saxReader.setNamespaceManager(this.namespaceMappings);
-        saxReader.setRowXPathList(this.rowXPathList);
-        saxReader.createTableRowCounter(this.tableColumnXPathExpressions);
-        saxReader.setScalarXPathList(this.scalarXPathList);
-        saxReader.setXMLXPathList(this.xmlXPathList);
-   
-        saxReader.setSchemaInformation(this.settings.getSetting(XMLLoader.SCHEMA_INSTANCE_PREFIX, null),
-                                       this.settings.getSetting(XMLLoader.NO_NAMESPACE_SCHEMA_LOCATION, null),
-                                       this.settings.getSetting(XMLLoader.SCHEMA_LOCATION, null));
-*/
     }
 
     public void addToWriterQueue(Thread thread) {
@@ -278,13 +265,6 @@ public class XMLLoader extends Logger {
         Connection conn = this.connectionManager.getConnection();
         conn.setAutoCommit(false);
         DatabaseWriter writer = new DatabaseWriter(threadName,this,conn);
-        /*
-        writer.setParameters(conn, this.errorTable, this.commitCharge, this.maxSQLErrors, this.maxSQLInserts,
-                             this.bufferSize, this.clientSideEncoding, this.logServerStats);
-        writer.setXPathToTableMappings(this.xpathToTableNameMapping);
-        writer.setTableColumnMappings(this.tableColumnMappings);
-        writer.setTableColumnXPathExpressions(this.tableColumnXPathExpressions);
-        */
         this.threadPool.add(writer);
         return writer;
     }
@@ -457,10 +437,9 @@ public class XMLLoader extends Logger {
 
     protected void startFolderCrawler() throws SQLException, BinXMLException, XMLParseException, IOException,
                                                ProcessingAbortedException, SAXException {
-        FolderCrawler fc = new FolderCrawler();
-        fc.setProcessor(this);
+        FolderCrawler fc = new FolderCrawler(this);
         this.setReaderStarted();
-        fc.crawlFolderList(cfgMgr.getFolderList());
+        fc.crawlFolderList();
     }
 
     protected void startSAXReader() throws SAXException, IOException {
@@ -477,7 +456,7 @@ public class XMLLoader extends Logger {
             setWriterCount(cfgMgr.getThreadCount());
             try {
                 this.setStartTime();
-                if (this.cfgMgr.runSaxProcessor()) {
+                if (this.cfgMgr.processFileList()) {
                     startSAXReader();
                 } else {
                     startFolderCrawler();
