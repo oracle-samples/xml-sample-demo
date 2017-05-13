@@ -87,6 +87,26 @@
    </hash>
    <hash n="oracle.jdeveloper.runner.RunConfigurations">
       <hash n="runConfigurationDefinitions">
+         <hash n="Copy of Default">
+            <value n="custom" v="false"/>
+            <value n="javaOptions" v="-Dcom.oracle.st.xmldb.pm.ConnectionParameters=g:\xdb\examples\XMLLoader\LOAD_TPOX.xml"/>
+            <value n="name" v="Copy of Default"/>
+            <hash n="oracle.jdevimpl.runner.debug.DebugConfiguration">
+               <value n="tracingExclude" v="java;javax;sun;sunw;jdk;com.sun;apple;com.apple;com.evermind;com.orionserver;EDU.oswego;oracle.as;oracle.aurora;oracle.core;oracle.dms;oracle.gss;oracle.hooks;oracle.ide;oracle.ias;oracle.j2ee;oracle.jdbc;oracle.jdevimpl;oracle.jsp;oracle.oc4j;oracle.ojc;oracle.security;oracle.sql;oracle.webservices;oracle.xml;org.omg;org.w3c;org.xml;weblogic;org.codehaus.groovy;groovy.lang;oracle.jbo.script.groovy"/>
+            </hash>
+            <url n="runDirectoryURL" protocol="file" path="/G:/XDB/examples/XMLLoader/"/>
+            <url n="targetURL" path="src/com/oracle/st/xmldb/pm/saxLoader/XMLLoader.java"/>
+         </hash>
+         <hash n="DDEX">
+            <value n="custom" v="false"/>
+            <value n="javaOptions" v="-Dcom.oracle.st.xmldb.pm.ConnectionParameters=DDEX_LOAD_AS_RELATIONAL.xml"/>
+            <value n="name" v="DDEX"/>
+            <hash n="oracle.jdevimpl.runner.debug.DebugConfiguration">
+               <value n="tracingExclude" v="java;javax;sun;sunw;jdk;com.sun;apple;com.apple;com.evermind;com.orionserver;EDU.oswego;oracle.as;oracle.aurora;oracle.core;oracle.dms;oracle.gss;oracle.hooks;oracle.ide;oracle.ias;oracle.j2ee;oracle.jdbc;oracle.jdevimpl;oracle.jsp;oracle.oc4j;oracle.ojc;oracle.security;oracle.sql;oracle.webservices;oracle.xml;org.omg;org.w3c;org.xml;weblogic;org.codehaus.groovy;groovy.lang;oracle.jbo.script.groovy"/>
+            </hash>
+            <url n="runDirectoryURL" protocol="file" path="/G:/XDB/customers/DDEX/"/>
+            <url n="targetURL" path="src/com/oracle/st/xmldb/pm/saxLoader/XMLLoader.java"/>
+         </hash>
          <hash n="Default">
             <value n="custom" v="false"/>
             <value n="javaOptions" v="-Dcom.oracle.st.xmldb.pm.ConnectionParameters=g:\xdb\customers\ddex\XMLLoader.xml"/>
@@ -98,6 +118,11 @@
             <value n="targetURL"/>
          </hash>
       </hash>
+      <list n="runConfigurationList">
+         <string v="Copy of Default"/>
+         <string v="DDEX"/>
+         <string v="Default"/>
+      </list>
    </hash>
    <hash n="oracle.jdevimpl.config.JProjectLibraries">
       <list n="exportedReferences">

@@ -10,7 +10,7 @@
 # *
 # * ================================================ 
 # */
-PATH=$ORACLE_HOME/jdk/bin:$PATH
+#PATH=$ORACLE_HOME/jdk/bin:$PATH
 which java
 java -version
-java -Xmx2048M -classpath XMLLoader.jar:$ORACLE_HOME/lib/xmlparserv2.jar:$ORACLE_HOME\jlib\orai18n-mapping.jar:$ORACLE_HOME/jdbc/lib/ojdbc8.jar:$ORACLE_HOME/rdbms/jlib/xdb6.jar:$ORACLE_HOME\ucp\lib\ucp.jar -Dcom.oracle.st.xmldb.pm.ConnectionParameters=$1 com.oracle.st.xmldb.pm.saxLoader.XMLLoader
+java -Xmx2048M -classpath XMLLoader.jar:$ORACLE_HOME/lib/xmlparserv2.jar:$ORACLE_HOME/jlib/orai18n-mapping.jar:$ORACLE_HOME/jdbc/lib/ojdbc8.jar:$ORACLE_HOME/jdbc/lib/ojdbc8dms.jar:$ORACLE_HOME/rdbms/jlib/xdb6.jar:$ORACLE_HOME/ucp/lib/ucp.jar -Dcom.oracle.st.xmldb.pm.ConnectionParameters=$1 com.oracle.st.xmldb.pm.saxLoader.XMLLoader

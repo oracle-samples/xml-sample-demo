@@ -64,6 +64,10 @@ public abstract class BaseApplication {
     public static final int BYTES_READ_BY_SERVER_12_2_0_1_0 = 1708;
     public static final int NETWORK_ROUNDTRIPS_12_2_0_1_0 = 1709;
 
+    public static final int BYTES_SENT_BY_SERVER_12_2_0_2_0 = 1707;
+    public static final int BYTES_READ_BY_SERVER_12_2_0_2_0 = 1708;
+    public static final int NETWORK_ROUNDTRIPS_12_2_0_2_0 = 1709;
+
     public Logger logger;
     public ConnectionManager connectionManager;
     public ApplicationSettings settings;

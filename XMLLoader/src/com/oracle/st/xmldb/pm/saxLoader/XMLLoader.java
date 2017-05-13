@@ -46,14 +46,13 @@ import org.xml.sax.SAXException;
 
 public class XMLLoader extends Logger {
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     
-    private ConfigurationManager cfgMgr;
+    private ConfigurationManager cfgManager;
 
     protected ConnectionManager connectionManager;
     protected ApplicationSettings settings = ApplicationSettings.getApplicationSettings();
-    protected SaxReader saxReader;
-
+    protected SAXReader saxReader;
 
     protected int readCount = 0;
     protected int writeCount = 0;
@@ -71,6 +70,8 @@ public class XMLLoader extends Logger {
     private Calendar endTime;
 
     private Vector writerQueue = new Vector();
+    protected Vector threadPool = new Vector();
+    protected int threadCount = 0;
     
     protected Logger logger = new PrintStreamLogger();
 
@@ -139,8 +140,8 @@ public class XMLLoader extends Logger {
         }
     }
     
-    protected ConfigurationManager getCfgMgr() {
-        return this.cfgMgr;
+    protected ConfigurationManager getCfgManager() {
+        return this.cfgManager;
     }
 
     private void setStartTime() {
@@ -158,18 +159,6 @@ public class XMLLoader extends Logger {
     public String getEndTime() {
         return (this.sdf.format(this.endTime.getTime()) + "000").substring(0, 23);
     }
-
-    private int threadCount;
-
-    protected void setWriterCount(int count) {
-        this.threadCount = count;
-    }
-
-    protected int getWriterCount() {
-        return this.threadCount;
-    }
-
-    protected Vector threadPool = new Vector();
 
     protected Object processorStatus = new Object();
     private boolean processingComplete = true;
@@ -241,9 +230,9 @@ public class XMLLoader extends Logger {
         return source;
     }
 
-    protected SaxReader createSaxReader() throws SAXException, IOException {
+    protected SAXReader createSaxReader() throws SAXException, IOException {
         String threadName = "SaxReader";
-        SaxReader saxReader = new SaxReader(threadName, this);
+        SAXReader saxReader = new SAXReader(threadName, SAXReader.FILE_LIST_MODE, this);
         return saxReader;
     }
 
@@ -288,63 +277,65 @@ public class XMLLoader extends Logger {
     public DatabaseWriter getDatabaseWriter() throws SQLException, IOException, BinXMLException {
         DatabaseWriter dbw = null;
         while ((dbw == null) && (!this.isProcessingComplete())) {
-            /*
-         *
-         * Check for Available Writer Thread
-         *
-         */synchronized (this.writerQueue) {
-                if (writerQueue.size() > 0) {
-                    /*
-             *
-             * Allocate an existing Writer from the Pool
-             *
-             */dbw = (DatabaseWriter) this.writerQueue.remove(0);
-                } else {
-                    /*
-             *
-             * No Writers Available. Check if maximum number of writer threads have already been created
-             *
-             */
-                    if (this.threadPool.size() < getWriterCount()) {
-                        /*
-               *
-               * Create and start a new Writer Thread
-               *
-               */dbw = createDatabaseWriter();
-                        dbw.start();
-                    } else {
-                        /*
-               *
-               * Wait for a writer thread to become available
-               *
-               */
-                        try {
-                            this.writerQueue.wait();
-                        } catch (InterruptedException ie) {
-                        }
-                    }
+          /*
+          **
+          ** Check for Available Writer Thread
+          **
+          */
+         synchronized (this.writerQueue) {
+           if (writerQueue.size() > 0) {
+             /*
+             **
+             ** Allocate an existing Writer from the Pool
+             **
+             */  
+             dbw = (DatabaseWriter) this.writerQueue.remove(0);
+           } else {
+              /*
+              **
+              ** No Writers Available. Check if maximum number of writer threads have already been created
+              **
+              */
+              if (this.threadPool.size() < this.threadCount) {
+                /*
+                **
+                ** Create and start a new Writer Thread
+                **
+                */
+                dbw = createDatabaseWriter();
+                dbw.start();
+              } else {
+                /*
+                **
+                ** Wait for a writer thread to become available
+                **
+                */
+                try {
+                  this.writerQueue.wait();
+                } catch (InterruptedException ie) {
                 }
+              }
             }
+          }
         }
         return dbw;
     }
 
-    protected void processValues(String path, HashMap columnValues) throws SAXException, IOException, SQLException,
+    protected void enqueueWriteOperation(String path, HashMap xpathTargetMappings, HashMap columnValues) throws SAXException, IOException, SQLException,
                                                                              BinXMLException {
         if (this.isProcessingComplete()) {
-            throw new ParsingAbortedException();
+            throw new ParsingAbortedException("XMLLoader.enqueueWriteOperation(): Unexpected Processing Complete Condition.");
         }
         this.readCount = this.readCount + 1;
         DatabaseWriter dbw;
         dbw = getDatabaseWriter();
         if (!isProcessingComplete()) {
             synchronized (dbw) {
-                dbw.setPath(path);
-                dbw.setColumnValues(columnValues);
+                dbw.setColumnValues(path, xpathTargetMappings, columnValues);
                 dbw.notify();
             }
-            if (readCount == cfgMgr.maxDocuments) {
-                this.log("Maximum number of documents processed. Processing Complete.");
+            if (readCount == cfgManager.maxDocuments) {
+                this.log("XMLLoader.enqueueWriteOperation(): Maximum number of documents processed. Processing Complete.");
                 setProcessingComplete();
             }
         }
@@ -444,19 +435,19 @@ public class XMLLoader extends Logger {
 
     protected void startSAXReader() throws SAXException, IOException {
         this.saxReader = createSaxReader();
-        this.saxReader.setFileList(cfgMgr.getFileList());
+        this.saxReader.setFileList(cfgManager.getFileList());
         this.setReaderStarted();
         this.saxReader.start();
     }
 
     public void processFiles() {
         try {
-            this.cfgMgr = new ConfigurationManager(this,this.settings);      
+            this.cfgManager = new ConfigurationManager(this,this.settings);      
             setProcessingStarted();
-            setWriterCount(cfgMgr.getThreadCount());
+            this.threadCount = cfgManager.getThreadCount();
             try {
                 this.setStartTime();
-                if (this.cfgMgr.processFileList()) {
+                if (this.cfgManager.processFileList()) {
                     startSAXReader();
                 } else {
                     startFolderCrawler();

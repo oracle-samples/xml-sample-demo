@@ -95,8 +95,9 @@ public class DatabaseWriter extends Thread {
     private Calendar endTime;
 
     private HashMap statementCache;
-    private String elementXPath;
+    private String rowXPathExpression;
     private HashMap columnValues;
+    private HashMap xpathTargetMappings;
 
     private long bytesSentByServer = 0;
     private long bytesReadByServer = 0;
@@ -108,7 +109,7 @@ public class DatabaseWriter extends Thread {
     public DatabaseWriter(String threadName, XMLLoader loader, Connection conn) {
         this.setName(threadName);
         this.loader = loader;
-        this.cfgManager = loader.getCfgMgr();
+        this.cfgManager = loader.getCfgManager();
         this.connection = conn;
     }
 
@@ -138,7 +139,7 @@ public class DatabaseWriter extends Thread {
                                                                                
            String rowXPathExpression = (String) cfgManager.rowXPathList.get(i);
            String columnList = (String) cfgManager.rowColumnLists.get(rowXPathExpression);
-           String tableName = (String) cfgManager.xpathTableNameMapping.get(rowXPathExpression);
+           String tableName = (String) cfgManager.rowXPathObjectMappings.get(rowXPathExpression);
            statementText = "insert into \"" + tableName + "\" (" + columnList + ")";
            String bindList = ":B_" + columnList.replace(",", ",:B_");
            bindList = bindList.replace("\"", "");
@@ -148,12 +149,10 @@ public class DatabaseWriter extends Thread {
            this.statementCache.put(rowXPathExpression, statement);
         }  
     }
-
-    protected void setPath(String xpath) {
-        this.elementXPath = xpath;
-    }
-
-    protected void setColumnValues(HashMap columnValues) {
+    
+    protected void setColumnValues(String rowXPathExpression, HashMap xpathTargetMappings, HashMap columnValues) {
+        this.rowXPathExpression = rowXPathExpression;
+        this.xpathTargetMappings = xpathTargetMappings;
         this.columnValues = columnValues;
     }
 
@@ -181,7 +180,7 @@ public class DatabaseWriter extends Thread {
         return this.connection;
     }
 
-    private XMLDocument makeErrorReport(String tableName, String columns, HashMap xpathColumnNameMappings,
+    private XMLDocument makeErrorReport(String tableName, String columns, HashMap xpathTargetMappings,
                                         Exception err) throws IOException {
         XMLDocument doc = new XMLDocument();
         Element root = doc.createElementNS("", DatabaseWriter.ERROR_REPORT);
@@ -213,8 +212,8 @@ public class DatabaseWriter extends Thread {
 
         XMLElement mappings = (XMLElement) doc.createElementNS("", DatabaseWriter.XPATH_COLUMN_MAPPINGS_ELEMENT);
         root.appendChild(mappings);
-        if (xpathColumnNameMappings != null) {
-            Iterator keys = xpathColumnNameMappings.keySet().iterator();
+        if (xpathTargetMappings != null) {
+            Iterator keys = xpathTargetMappings.keySet().iterator();
             while (keys.hasNext()) {
                 String key = (String) keys.next();
                 e = doc.createElementNS("", ConfigurationManager.COLUMN_ELEMENT);
@@ -223,7 +222,7 @@ public class DatabaseWriter extends Thread {
                 a.setNodeValue(key);
                 e.setAttributeNode(a);
                 a = doc.createAttributeNS("", ConfigurationManager.PATH_ATTRIBUTE);
-                a.setNodeValue((String) xpathColumnNameMappings.get(key));
+                a.setNodeValue((String) xpathTargetMappings.get(key));
                 e.setAttributeNode(a);
             }
         }
@@ -274,11 +273,11 @@ public class DatabaseWriter extends Thread {
     }
 
 
-    private void logError(String tableName, String columns, HashMap columnXPathMappings,
+    private void logError(String tableName, String columns, HashMap xpathTargetMappings,
                           Exception e) throws SQLException, IOException {
         doCommit();
         this.errorCount++;
-        XMLDocument errorReport = makeErrorReport(tableName, columns, columnXPathMappings, e);
+        XMLDocument errorReport = makeErrorReport(tableName, columns, xpathTargetMappings, e);
         this.loader.log(errorReport);
         CallableStatement s = (CallableStatement) this.statementCache.get(DatabaseWriter.ERROR_HANDLER);
         XMLType xml = new XMLType(this.getConnection(), errorReport);
@@ -290,7 +289,6 @@ public class DatabaseWriter extends Thread {
 
     protected void insertValues(String rowXPathExpression, HashMap columnValues) throws Exception {
         
-        String tableName = null;
         CallableStatement statement = null;
         String columns = null;
         try {
@@ -298,7 +296,7 @@ public class DatabaseWriter extends Thread {
             this.batchCount++;
             Vector xmlTypeCache = new Vector();
             
-            tableName = (String) this.cfgManager.xpathTableNameMapping.get(rowXPathExpression);
+           
             statement = (CallableStatement) this.statementCache.get(rowXPathExpression);
             columns = (String) this.cfgManager.rowColumnLists.get(rowXPathExpression);
             
@@ -336,7 +334,8 @@ public class DatabaseWriter extends Thread {
             }
             this.successCount++;
         } catch (SQLException SQLe) {
-            logError(tableName, columns, this.cfgManager.xpathColumnNameMappings, SQLe);
+            String  objectName = (String) this.cfgManager.rowXPathObjectMappings.get(rowXPathExpression);
+            logError(objectName, columns, xpathTargetMappings, SQLe);
             if (this.errorCount > cfgManager.maxSQLErrors) {
                 Exception e = new Exception("Max SQL Errors Exceeded");
                 throw e;
@@ -383,13 +382,13 @@ public class DatabaseWriter extends Thread {
             getStats.setInt(2, BaseApplication.BYTES_READ_BY_SERVER_12_1_0_2_0);
             getStats.setInt(3, BaseApplication.NETWORK_ROUNDTRIPS_12_1_0_2_0);
         } else if (dbVersion.equals("12.2.0.1.0")) {
-            getStats.setInt(1, BaseApplication.BYTES_SENT_BY_SERVER_12_1_0_2_0);
-            getStats.setInt(2, BaseApplication.BYTES_READ_BY_SERVER_12_1_0_2_0);
-            getStats.setInt(3, BaseApplication.NETWORK_ROUNDTRIPS_12_1_0_2_0);
+            getStats.setInt(1, BaseApplication.BYTES_SENT_BY_SERVER_12_2_0_1_0);
+            getStats.setInt(2, BaseApplication.BYTES_READ_BY_SERVER_12_2_0_1_0);
+            getStats.setInt(3, BaseApplication.NETWORK_ROUNDTRIPS_12_2_0_1_0);
         } else if (dbVersion.equals("12.2.0.2.0")) {
-            getStats.setInt(1, BaseApplication.BYTES_SENT_BY_SERVER_12_1_0_2_0);
-            getStats.setInt(2, BaseApplication.BYTES_READ_BY_SERVER_12_1_0_2_0);
-            getStats.setInt(3, BaseApplication.NETWORK_ROUNDTRIPS_12_1_0_2_0);
+            getStats.setInt(1, BaseApplication.BYTES_SENT_BY_SERVER_12_2_0_2_0);
+            getStats.setInt(2, BaseApplication.BYTES_READ_BY_SERVER_12_2_0_2_0);
+            getStats.setInt(3, BaseApplication.NETWORK_ROUNDTRIPS_12_2_0_2_0);
         }
 
         rs = (OracleResultSet) getStats.executeQuery();
@@ -407,11 +406,11 @@ public class DatabaseWriter extends Thread {
 
     }
 
-    private void waitForDocument() throws Exception {
+    private void waitForRow() throws Exception {
         while (!this.loader.isProcessingComplete()) {
             synchronized (this) {
                 if (this.columnValues != null) {
-                    insertValues(this.elementXPath, this.columnValues);
+                    insertValues(this.rowXPathExpression, this.columnValues);
                     this.columnValues = null;
                     if ((cfgManager.maxSQLInserts > 0) && ((this.successCount % cfgManager.maxSQLInserts) == 0)) {
                         this.loader.log("Initiating Connection Refresh. " + this.successCount + " Records Processed.");
@@ -432,7 +431,7 @@ public class DatabaseWriter extends Thread {
             }
         }
         if (this.columnValues != null) {
-            insertValues(this.elementXPath, this.columnValues);
+            insertValues(this.rowXPathExpression, this.columnValues);
         }
     }
 
@@ -446,7 +445,7 @@ public class DatabaseWriter extends Thread {
             this.loader.log("Started.");
 
             try {
-                waitForDocument();
+                waitForRow();
                 doCommit();
                 closeInsertStatements();
                 normalCompletion = true;

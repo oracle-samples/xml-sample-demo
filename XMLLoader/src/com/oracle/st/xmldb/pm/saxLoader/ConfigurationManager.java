@@ -15,6 +15,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class ConfigurationManager {
+    
+    private static final boolean TRACE_XPATH_EXPRESSIONS = false;
 
     public static final String XML_NAMESPACE_NAMESPACE = "http://www.w3.org/2000/xmlns/";
     public static final String XML_SCHEMA_INSTANCE_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
@@ -71,19 +73,27 @@ public class ConfigurationManager {
     
     protected Element namespaceMappings;
 
-    protected ArrayList tableList               = new ArrayList();
-    protected ArrayList rowXPathList            = new ArrayList();
-    protected ArrayList mappedXPathList         = new ArrayList();
+    // List of Tables
+    protected ArrayList<String> tableList = new ArrayList();
     
-    protected HashMap xpathColumnNameMappings   = new HashMap();
-    protected HashMap xpathArgumentNameMappings = new HashMap();
+    // List of Procedures
+    protected ArrayList<String> procedureList = new ArrayList();
+
+    // XPath Expressions that mark the start of a row
+    protected ArrayList<String> rowXPathList = new ArrayList();
+
+    // Tables indexed by row XPath Expression
+    protected HashMap<String,String> rowXPathObjectMappings = new HashMap();
+
+    // Column Lists indexed by row XPath Expression
+    protected HashMap<String,String> rowColumnLists = new HashMap();
+
+    // XPath to Column Mappings indexed by row XPath Expression
+    protected HashMap<String,HashMap<String,String>> rowXPathTargetMappings = new HashMap();
     
-    protected HashMap rowColumnLists            = new HashMap();
-    protected HashMap xpathTableNameMapping     = new HashMap();
-
-    protected HashMap procedureArgumentLists = new HashMap();
-    protected HashMap xpathProcedureNameMapping = new HashMap();
-
+    // XPath Expressions that populate columns from nodes that are sibings or parents of the current row
+    protected HashMap<String,ArrayList<String>> rowParentXPathLists = new HashMap();
+    
     private Logger logger;
     private ApplicationSettings settings;
 
@@ -95,6 +105,23 @@ public class ConfigurationManager {
         processProcedureMappings();
         this.namespaceMappings = processNamespacePrefixMappings();
         readWriterConfiguration();
+    
+        if (TRACE_XPATH_EXPRESSIONS) {
+            this.logger.log("Table List:");
+            this.logger.log(this.tableList);
+            this.logger.log("Procedure List:");
+            this.logger.log(this.procedureList);
+            this.logger.log("Row XPath Expressions:");
+            this.logger.log(this.rowXPathList);
+            this.logger.log("XPath to Table/Procedure Mappings:");
+            this.logger.log(this.rowXPathObjectMappings);
+            this.logger.log("XPath to Column/Argument Lists:");
+            this.logger.log(this.rowColumnLists);
+            this.logger.log("XPath to Column/Argument Mappings:");
+            this.logger.log(this.rowXPathTargetMappings);
+            this.logger.log("Parent XPath to Column/Argument Mappings:");
+            this.logger.log(this.rowParentXPathLists);
+        }
     }
 
     protected int maxDocuments = 0;
@@ -142,28 +169,37 @@ public class ConfigurationManager {
         Element tables = this.settings.getElement(TABLE_LIST_ELEMENT);
         if (tables != null && tables.hasChildNodes()) {
             NodeList nlTable = tables.getElementsByTagName(ConfigurationManager.TABLE_ELEMENT);
+            
             for (int i = 0; i < nlTable.getLength(); i++) {
                 String columnList = null;
-                // Hashtable columnXPathExpressions = new Hashtable();
+                ArrayList mappedXPathList     = new ArrayList();
+                ArrayList parentXPathList     = new ArrayList();
+                HashMap<String,String> xpathColumnMappings = new HashMap(); 
 
                 Element table = (Element) nlTable.item(i);
                 
+                // Get the Table name and it to the set of known tables.
                 String tableName    = table.getAttributeNS("", ConfigurationManager.NAME_ATTRIBUTE);
                 if (!this.tableList.contains(tableName)) {
                     this.tableList.add(tableName);
                 }
-
+                
+                // Get the XPath Expression that identifies the start of a new row.
                 String rowXPathExpression = table.getAttributeNS("", ConfigurationManager.PATH_ATTRIBUTE);
+                this.logger.log("ConfigurationManager.processTableMappings(): Table \"" + tableName + "\" Row Boundary \"" + rowXPathExpression + "\".");
                 if (!this.rowXPathList.contains(rowXPathExpression)) {
                     this.rowXPathList.add(rowXPathExpression);
                 }
                 
-                if (table.hasChildNodes()) {
+                // Check if there are column mappings for this table.
+                if (table.hasChildNodes()) {  
+                    // Mapping a relational table. Process the set of column mappings for this table.
                     NodeList nlColumn = table.getElementsByTagName(ConfigurationManager.COLUMN_ELEMENT);
                     for (int j = 0; j < nlColumn.getLength(); j++) {
                         Element column = (Element) nlColumn.item(j);
-                        String columnXPathExpression = rowXPathExpression;
+                        String columnXPathExpression = null;
 
+                        // Get the column name and add it the list of columns for this row.
                         String columnName = column.getAttributeNS("", ConfigurationManager.NAME_ATTRIBUTE);
                         if (columnList == null) {
                             columnList = "\"" + columnName + "\"";
@@ -171,32 +207,58 @@ public class ConfigurationManager {
                             columnList = columnList + "," + "\"" + columnName + "\"";
                         }
 
-                        String relativeXPath = column.getAttributeNS("", ConfigurationManager.PATH_ATTRIBUTE);
-                        if (!relativeXPath.equals("")) {
-                            columnXPathExpression = columnXPathExpression + "/" + relativeXPath;
+                        // Get the Xpath expression for this column.
+                        String columnXPath = column.getAttributeNS("", ConfigurationManager.PATH_ATTRIBUTE);
+                        if (!columnXPath.equals("")) {
+                            if (columnXPath.startsWith("/")) {
+                                parentXPathList.add(columnXPath);
+                                columnXPathExpression = columnXPath;
+                            }
+                            // TODO: Relative Path Support for parent XPath Expressions
+                            else {
+                              columnXPathExpression = rowXPathExpression + "/" + columnXPath;
+                            }
                         }
-                        this.xpathColumnNameMappings.put(columnXPathExpression, columnName);
-                        if (!this.mappedXPathList.contains(columnXPathExpression)) {
-                            this.mappedXPathList.add(columnXPathExpression);
-                        }                        
-                        this.logger.log("ConfigurationManager.processTableMappings(): Table \"" + tableName + "\" Column \"" + columnName + "\". Row  = \"" + columnXPathExpression + "\".");
+                        else {
+                          columnXPathExpression = rowXPathExpression;
+                        }
+                        xpathColumnMappings.put(columnXPathExpression, columnName);
+                        this.logger.log("ConfigurationManager.processTableMappings(): Table \"" + tableName + "\" Column \"" + columnName + "\". XPath \"" + columnXPathExpression + "\".");
                     }
                 } else {
+                    // Mapping a XMLTYPE table
                     columnList = "OBJECT_VALUE";
-                    this.xpathColumnNameMappings.put(rowXPathExpression, "OBJECT_VALUE");
-                    if (!this.mappedXPathList.contains(rowXPathExpression)) {
-                        this.mappedXPathList.add(rowXPathExpression);
-                    }                        
-                    this.logger.log("ConfigurationManager.processTableMappings(): XMLType Table \"" + tableName + "\". Row = \"" + rowXPathExpression + "\".");
+                    xpathColumnMappings.put(rowXPathExpression, "OBJECT_VALUE");
+                    this.logger.log("ConfigurationManager.processTableMappings(): XMLType Table \"" + tableName + "\". XML = \"" + rowXPathExpression + "\".");
                 }
-                this.xpathTableNameMapping.put(rowXPathExpression, tableName);                
                 this.rowColumnLists.put(rowXPathExpression, columnList);
+                this.rowXPathObjectMappings.put(rowXPathExpression, tableName);  
+                this.rowXPathTargetMappings.put(rowXPathExpression, xpathColumnMappings);
+                this.rowParentXPathLists.put(rowXPathExpression,parentXPathList);
             }
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void processProcedureMappings() throws IOException, SAXException {
+        
+        /*
+         * 
+         * Process the set of Table Elements. 
+         * 
+         * A Table Element consists of an XPath Expression that identifies the Element that contains the node that will be 
+         * used to generate a rown in a particular table. Note that a given table may be referenced by more than one Table Element.
+         * The table element may contain  one or more column elements.
+         * 
+         * If the Table Element has no children, it assumed that the target table is an XMLType table and the element
+         * identified by the XPath expression will be be inserted as the value of row.
+         * 
+         * If the Table Element contains column elements then each one specifies the mapping between an XPath Expression
+         * and a column of the table. The XPath expressions associated with column elements are relative to the XPath Expression
+         * specifed in the parent table element. XPath expressions that terminate in functions such as position() or text()) or 
+         * atrributes are mapped to scalar columns. XPath expressions that map to elements are mapped to XMLType columns. 
+         * 
+         * This function configures the column list need to insert a row into the specified table. 
+         */
 
         Element procedureList = this.settings.getElement(PROCEDURE_LIST_ELEMENT);
 
@@ -204,35 +266,62 @@ public class ConfigurationManager {
             NodeList nlProcedure = procedureList.getElementsByTagName(ConfigurationManager.PROCEDURE_ELEMENT);
             for (int i = 0; i < nlProcedure.getLength(); i++) {
                 String argumentList = null;
-                Hashtable argumentXPathExpressions = new Hashtable();
+        
+                ArrayList mappedXPathList       = new ArrayList();
+                ArrayList parentXPathList       = new ArrayList();
+                HashMap   xpathArgumentMappings = new HashMap(); 
 
                 Element procedure = (Element) nlProcedure.item(i);
-
+                
+                // Get the Procedure name and it to the set of known tables.
                 String procedureName = procedure.getAttributeNS("", ConfigurationManager.NAME_ATTRIBUTE);
-                String procedureXPathExpression = procedure.getAttributeNS("", ConfigurationManager.PATH_ATTRIBUTE);
-                if (!this.rowXPathList.contains(procedureXPathExpression)) {
-                    this.rowXPathList.add(procedureXPathExpression);
+                if (!this.procedureList.contains(procedureName)) {
+                    this.procedureList.add(procedureName);
                 }
-
-                NodeList nlArgument = procedure.getElementsByTagName(ConfigurationManager.ARGUMENT_ELEMENT);
-                for (int j = 0; j < nlArgument.getLength(); j++) {
-                    Element argument = (Element) nlArgument.item(j);
-                    String argumentXPathExpression = procedureXPathExpression;
-                    String argumentName = argument.getAttributeNS("", ConfigurationManager.NAME_ATTRIBUTE);
-                    String relativeXPath = argument.getAttributeNS("", ConfigurationManager.PATH_ATTRIBUTE);
-                    if (!relativeXPath.equals("")) {
-                        argumentXPathExpression = argumentXPathExpression + "/" + relativeXPath;
-                    }
-                    this.xpathArgumentNameMappings.put(argumentXPathExpression, argumentName);
-                    if (!this.mappedXPathList.contains(argumentXPathExpression)) {
-                        this.mappedXPathList.add(argumentXPathExpression);
-                    }
-
-                    this.logger.log("ConfigurationManager.processProcedureMappings(): Procedure \"" + procedureName + "\" Argument \"" + argumentName + "\". Source = \"" + argumentXPathExpression + "\".");
+                
+                // Get the XPath Expression that identifies the start of a new row.
+                String rowXPathExpression = procedure.getAttributeNS("", ConfigurationManager.PATH_ATTRIBUTE);
+                this.logger.log("ConfigurationManager.processTableMappings(): Table \"" + procedureName + "\" Row Boundary \"" + rowXPathExpression + "\".");
+                if (!this.rowXPathList.contains(rowXPathExpression)) {
+                    this.rowXPathList.add(rowXPathExpression);
                 }
-                this.xpathProcedureNameMapping.put(procedureXPathExpression, procedureName);
-                this.procedureArgumentLists.put(procedureXPathExpression, argumentList);
-                // this.procedureXPathExpressions.put(procedureXPathExpression, argumentXPathExpressions);
+                
+                // Mapping a relational table. Process the set of column mappings for this table.
+                NodeList nlColumn = procedure.getElementsByTagName(ConfigurationManager.COLUMN_ELEMENT);
+                for (int j = 0; j < nlColumn.getLength(); j++) {
+                  Element column = (Element) nlColumn.item(j);
+                  String columnXPathExpression = null;
+
+                  // Get the column name and add it the list of columns for this row.
+                  String columnName = column.getAttributeNS("", ConfigurationManager.NAME_ATTRIBUTE);
+                  if (argumentList == null) {
+                    argumentList = "\"" + columnName + "\"";
+                  } else {
+                    argumentList = argumentList + "," + "\"" + columnName + "\"";
+                  }
+
+                  // Get the Xpath expression for this column.
+                  String columnXPath = column.getAttributeNS("", ConfigurationManager.PATH_ATTRIBUTE);
+                  if (!columnXPath.equals("")) {
+                    if (columnXPath.startsWith("/")) {
+                      parentXPathList.add(columnXPath);
+                      columnXPathExpression = columnXPath;
+                    }
+                    // TODO: Relative Path Support for parent XPath Expressions
+                    else {
+                      columnXPathExpression = rowXPathExpression + "/" + columnXPath;
+                    }
+                  }
+                  else {
+                    columnXPathExpression = rowXPathExpression;
+                  }
+                  xpathArgumentMappings.put(columnXPathExpression, columnName);
+                  this.logger.log("ConfigurationManager.processTableMappings(): Table \"" + procedureName + "\" Column \"" + columnName + "\". XPath \"" + columnXPathExpression + "\".");
+                }
+                this.rowColumnLists.put(rowXPathExpression, argumentList);
+                this.rowXPathObjectMappings.put(rowXPathExpression, procedureName);  
+                this.rowXPathTargetMappings.put(rowXPathExpression,xpathArgumentMappings);
+                this.rowParentXPathLists.put(rowXPathExpression,parentXPathList);
             }
         }
     }
@@ -268,13 +357,38 @@ public class ConfigurationManager {
     protected Element getFolderList() {
       return this.settings.getElement(FOLDER_LIST_ELEMENT);
     } 
-     
+
     protected boolean isRowXPathExpression(String path) {
+        if (TRACE_XPATH_EXPRESSIONS) {
+            this.logger.log("ConfigurationManager.isRowXpathExpression(): XPath Expression \"" + path + "\".");
+            this.logger.log("ConfigurationManager.isRowXpathExpression(): Row XPath List");
+            this.logger.log(this.rowXPathList);
+            this.logger.log("\"ConfigurationManager.isRowXpathExpression():" + (this.rowXPathList.contains(path)? true: false));
+        }
         return this.rowXPathList.contains(path);
     }
+    
+    /*
 
     protected boolean isMappedXPathExpression(String path) {
-      return this.mappedXPathList.contains(path);
+        if (TRACE_XPATH_EXPRESSIONS) {
+            this.logger.log("ConfigurationManager.isMappedXPathExpression(): XPath Expression \"" + path + "\".");
+            this.logger.log("ConfigurationManager.isMappedXPathExpression(): Column XPath List");
+            this.logger.log(this.xpathTargetMappings.keySet());
+            this.logger.log("\"ConfigurationManager.isMappedXPathExpression():" + (this.xpathTargetMappings.containsKey(path)? true: false));
+        }
+      return this.xpathTargetMappings.containsKey(path);
     }
     
+    protected boolean isParentXPathExpression(String path) {
+        if (TRACE_XPATH_EXPRESSIONS) {
+            this.logger.log("ConfigurationManager.isParentXPathExpression(): XPath Expression \"" + path + "\".");
+            this.logger.log("ConfigurationManager.isParentXPathExpression(): Parent XPath List");
+            this.logger.log(this.parentXPathList);
+            this.logger.log("\"ConfigurationManager.isParentXPathExpression():" + (this.parentXPathList.contains(path)? true: false));
+        }
+      return parentXPathList.contains(path);
+    }
+   
+    */
 }
