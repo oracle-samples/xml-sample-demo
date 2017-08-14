@@ -23,18 +23,6 @@
 	<xsl:include href="/XFILES/lite/xsl/FolderFileListing.xsl"/>
 	<xsl:template name="actionBar">
 		<xsl:if test="xfiles:xfilesParameters/xfiles:user!='ANONYMOUS'">
-			<xsl:call-template name="newFolderDialog"/>
-			<xsl:call-template name="uploadFilesDialog"/>
-			<xsl:call-template name="newWikiPageDialog"/>
-			<xsl:call-template name="newZipFileDialog"/>
-			<xsl:call-template name="setACLDialog"/>
-			<xsl:call-template name="setViewerDialog"/>
-			<xsl:call-template name="setPrincipleDialog"/>
-			<xsl:call-template name="deepOperationDialog"/>
-			<xsl:call-template name="publishDialog"/>
-			<xsl:call-template name="deleteDialog"/>
-			<xsl:call-template name="checkInDialog"/>
-			<xsl:call-template name="folderPickerDialog"/>
 			<span style="float:right;">
 				<img id="btnDoAction" src="/XFILES/lib/icons/doAction.png" alt="doAction" border="0" align="absmiddle" width="16" height="16" onclick="openActionMenu(event,document.getElementById('btnDoAction'));return false;" data-toggle="tooltip" data-placement="top" title="Actions"/>
 				<span style="width:10px; display: inline-block;"/>
@@ -84,5 +72,18 @@
 			<xsl:with-param name="height" select="'12px'"/>
 		</xsl:call-template>
 		<xsl:call-template name="XFilesFooter"/>
+		<xsl:call-template name="manualLoginDialog"/>
+		<xsl:call-template name="newFolderDialog"/>
+		<xsl:call-template name="uploadFilesDialog"/>
+		<xsl:call-template name="newWikiPageDialog"/>
+		<xsl:call-template name="newZipFileDialog"/>
+		<xsl:call-template name="setACLDialog"/>
+		<xsl:call-template name="setViewerDialog"/>
+		<xsl:call-template name="setPrincipleDialog"/>
+		<xsl:call-template name="deepOperationDialog"/>
+		<xsl:call-template name="publishDialog"/>
+		<xsl:call-template name="deleteDialog"/>
+		<xsl:call-template name="checkInDialog"/>
+		<xsl:call-template name="folderPickerDialog"/>
 	</xsl:template>
 </xsl:stylesheet>

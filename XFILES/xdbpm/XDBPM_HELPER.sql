@@ -335,6 +335,262 @@ $ELSE
 $END
 end;
 --
+procedure CLEAN_UP_XMLSCHEMA(P_SCHEMA_URL VARCHAR2, P_OWNER VARCHAR2 DEFAULT SYS_CONTEXT('USERENV','CURRENT_SCHEMA'), P_LOCAL VARCHAR2 DEFAULT 'YES')
+as
+begin
+$IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
+  INVALID_OPERATION EXCEPTION;
+  PRAGMA EXCEPTION_INIT( INVALID_OPERATION, -20001 );
+
+  V_RESOURCE_PATH VARCHAR2(4000) := P_SCHEMA_URL;
+  V_OBJECT_COUNT  NUMBER(5);
+  V_SCHEMA_ID     RAW(16);
+
+  V_SCHEMA_REF    REF XMLTYPE;
+  
+  cursor CLEAN_UP_SCHEMAS
+  is 
+  select ref(x) SCHEMA_REF
+    from XDB.XDB$SCHEMA x
+   where x.XMLDATA.SCHEMA_URL   = P_SCHEMA_URL
+     and x.XMLDATA.SCHEMA_OWNER = P_OWNER;
+   
+begin
+
+  if (instr(P_SCHEMA_URL,'://') > 0) then
+    V_RESOURCE_PATH := substr(V_RESOURCE_PATH,INSTR(P_SCHEMA_URL,'://')+3);
+  end if;
+  
+  if (P_LOCAL = 'YES') then
+    V_RESOURCE_PATH := '/sys/schemas/' || SYS_CONTEXT('USERENV','CURRENT_SCHEMA') || '/' || V_RESOURCE_PATH;
+  end if;
+  
+  if (P_LOCAL = 'NO') then
+    V_RESOURCE_PATH := '/sys/schemas/PUBLIC/' || V_RESOURCE_PATH;
+  end if;
+ 
+  DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': Checking for existance of resource "' || V_RESOURCE_PATH || '"');
+  
+  if DBMS_XDB.existsResource(V_RESOURCE_PATH) then
+    DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': Resource exists.');
+    RAISE_APPLICATION_ERROR( -20001, 'XMLSchema "' || P_SCHEMA_URL || '": Still present in XDB Repository as resource "' || V_RESOURCE_PATH || '". Please use DBMS_XMLSCHEMA.deleteSchema().');
+  end if;
+  
+  DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": no longer found in the XDB Repository as resource "' || V_RESOURCE_PATH || '". Attempting direct clean-up of schema artifacts.' );
+
+  select count(*) 
+    into V_OBJECT_COUNT
+    from XDB.XDB$SCHEMA x
+   where x.XMLDATA.SCHEMA_URL   = P_SCHEMA_URL
+     and x.XMLDATA.SCHEMA_OWNER = P_OWNER;
+  
+  if (V_OBJECT_COUNT > 0) then
+    DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Located 1 or more entries in XDB.XDB$SCHEMA.');
+   
+    for s in CLEAN_UP_SCHEMAS loop
+
+      -- XDB.XDB$ANY
+
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$ANY x
+       where X.XMLDATA.PROPERTY.PARENT_SCHEMA = s.SCHEMA_REF;
+
+
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$ANY.');
+         delete 
+           from XDB.XDB$ANY x
+          where X.XMLDATA.PROPERTY.PARENT_SCHEMA = s.SCHEMA_REF;
+        commit;
+       end if;
+
+      -- XDB.XDB$ALL_MODEL
+
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$ALL_MODEL x
+       where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$ALL_MODEL.');
+         delete 
+           from XDB.XDB$ALL_MODEL x
+          where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+         commit;
+       end if;
+       
+      -- XDB.XDB$ANYATTR
+
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$ANYATTR x
+       where X.XMLDATA.PROPERTY.PARENT_SCHEMA = s.SCHEMA_REF;
+
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$ANYATTR.');
+         delete 
+           from XDB.XDB$ANYATTR x
+          where X.XMLDATA.PROPERTY.PARENT_SCHEMA = s.SCHEMA_REF;
+         commit;
+       end if;
+  
+      -- XDB.XDB$ATTRGROUP_DEF
+      
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$ATTRGROUP_DEF x
+       where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+         
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$ATTRGROUP_DEF.');
+         delete 
+           from XDB.XDB$ATTRGROUP_DEF x
+          where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+         commit;
+       end if;
+
+      -- XDB.XDB$ATTRGROUP_REF
+      
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$ATTRGROUP_REF x
+       where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+         
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$ATTRGROUP_REF.');
+         delete 
+           from XDB.XDB$ATTRGROUP_REF x
+          where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+         commit;
+       end if;
+       
+       -- XDB$XDB.XDB$ATTRIBUTE
+
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$ATTRIBUTE x
+       where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$ATTRIBUTE.');
+         delete 
+           from XDB.XDB$ATTRIBUTE x
+          where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+         commit;
+       end if;
+    
+      -- XDB.XDB$CHOICE_MODEL
+
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$CHOICE_MODEL x
+       where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$CHOICE_MODEL.');
+         delete 
+           from XDB.XDB$CHOICE_MODEL x
+          where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+         commit;
+       end if;
+
+      -- XDB.XDB$COMPLEX_TYPE
+
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$COMPLEX_TYPE x
+       where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$COMPLEX_TYPE.');
+         delete 
+           from XDB.XDB$COMPLEX_TYPE x
+          where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+         commit;
+       end if;
+
+      -- XDB.XDB$ELEMENT
+
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$ELEMENT x
+       where X.XMLDATA.PROPERTY.PARENT_SCHEMA = s.SCHEMA_REF;
+
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$ELEMENT.');
+         delete 
+           from XDB.XDB$ELEMENT x
+          where X.XMLDATA.PROPERTY.PARENT_SCHEMA = s.SCHEMA_REF;
+         commit;
+       end if;
+
+      -- XDB.XDB$GROUP_DEF
+
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$GROUP_DEF x
+       where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$GROUP_DEF.');
+         delete 
+           from XDB.XDB$GROUP_DEF x
+          where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+         commit;
+       end if;
+
+      -- XDB.XDB$GROUP_REF
+
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$GROUP_REF x
+       where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$GROUP_REF.');
+         delete 
+           from XDB.XDB$GROUP_REF x
+          where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+         commit;
+       end if;
+
+      -- XDB.XDB$SEQUENCE_MODEL
+
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$SEQUENCE_MODEL x
+       where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$SEQUENCE_MODEL.');
+         delete 
+           from XDB.XDB$SEQUENCE_MODEL x
+          where X.XMLDATA.PARENT_SCHEMA = s.SCHEMA_REF;
+         commit;
+       end if;
+
+      -- XDB.XDB$SCHEMA
+
+      select count(*) 
+        into V_OBJECT_COUNT
+        from XDB.XDB$SCHEMA x
+       where ref(x) = s.SCHEMA_REF;
+
+       if (V_OBJECT_COUNT > 0) then
+         DBMS_OUTPUT.put_line(SYSTIMESTAMP || ': XMLSchema "' || P_SCHEMA_URL ||'": Removing ' || V_OBJECT_COUNT || ' entries from XDB.XDB$SCHEMA.');
+         delete 
+           from XDB.XDB$SCHEMA x
+          where ref(x) = s.SCHEMA_REF;
+         commit;
+       end if;
+    end loop;
+  end if;
+$ELSE
+  raise UNIMPLEMENTED_FEATURE;
+$END
+end;
+--
 procedure cleanupSchema(P_OWNER VARCHAR2)
 as
   V_OBJECT_COUNT number;

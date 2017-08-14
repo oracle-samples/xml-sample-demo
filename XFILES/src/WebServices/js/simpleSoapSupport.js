@@ -58,9 +58,9 @@ function formatResults(soapResponse, target) {
 function getOwnerList() {
 
   var SQLQuery = 
-  'select distinct OWNER ' + "\n" + 
-  '  from ALL_OBJECTS ' + "\n" + 
-  ' where object_type in (\'PACKAGE\',\'PROCEDURE\',\'FUNCTION\')' + "\n" +
+  'select distinct OWNER ' + '\n' + 
+  '  from ALL_OBJECTS ' + '\n' + 
+  ' where object_type in (\'PACKAGE\',\'PROCEDURE\',\'FUNCTION\')' + '\n' +
   ' order by OWNER';
   
   var selectControl = document.getElementById('ownerList');
@@ -103,10 +103,10 @@ function loadObjectLists() {
 function getProcedureList(owner) {
 
   var SQLQuery = 
-  'select distinct OBJECT_NAME ' + "\n" + 
-  '  from ALL_OBJECTS ' + "\n" + 
-  ' where object_type in (\'PROCEDURE\',\'FUNCTION\')' + "\n" +
-  '   and owner = \'' + owner + '\'' + "\n" +
+  'select distinct OBJECT_NAME ' + '\n' + 
+  '  from ALL_OBJECTS ' + '\n' + 
+  ' where object_type in (\'PROCEDURE\',\'FUNCTION\')' + '\n' +
+  '   and owner = \'' + owner + '\'' + '\n' +
   ' order by OBJECT_NAME';
                           
   var selectControl = document.getElementById('procedureList');
@@ -119,10 +119,10 @@ function getProcedureList(owner) {
 function getPackageList(owner) {
 
   var SQLQuery = 
-  'select distinct OBJECT_NAME ' + "\n" + 
-  '  from ALL_OBJECTS ' + "\n" + 
-  ' where object_type = \'PACKAGE\' ' + "\n" +
-  '   and owner = \'' + owner + '\'' + "\n" +
+  'select distinct OBJECT_NAME ' + '\n' + 
+  '  from ALL_OBJECTS ' + '\n' + 
+  ' where object_type = \'PACKAGE\' ' + '\n' +
+  '   and owner = \'' + owner + '\'' + '\n' +
   ' order by OBJECT_NAME';
                           
   var selectControl = document.getElementById('packageList');
@@ -167,7 +167,7 @@ function loadMethodList() {
   
 	var ownerList = document.getElementById("ownerList");		
 	var procedureList = document.getElementById("procedureList");
-  var packageList = document.getElementById("packageList")
+    var packageList = document.getElementById("packageList")
 	var methodList = document.getElementById("methodList");
  	methodList.disabled = true;
 
@@ -179,15 +179,15 @@ function loadMethodList() {
 	    procedureList.selectedIndex = 0;
 	  }
 	
-		var owner = ownerList.value;	
+	var owner = ownerList.value;	
     var packageName = packageList.value;	
 
     var SQLQuery = 
-    'select distinct PROCEDURE_NAME ' + "\n" + 
-    '  from ALL_PROCEDURES ' + "\n" + 
-    ' where object_name = \'' + package + '\'' + "\n" +
-    '   and owner = \'' + owner + '\'' + "\n" +
-    '   and PROCEDURE_NAME is not NULL' + "\n" +
+    'select distinct PROCEDURE_NAME ' + '\n' + 
+    '  from ALL_PROCEDURES ' + '\n' + 
+    ' where object_name = \'' + packageName + '\'' + '\n' +
+    '   and owner = \'' + owner + '\'' + '\n' +
+    '   and PROCEDURE_NAME is not NULL' + '\n' +
     ' order by PROCEDURE_NAME';
                           
     var selectControl = document.getElementById('methodList');

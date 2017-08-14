@@ -75,6 +75,44 @@
 			</div>
 		</span>
 	</xsl:template>
+	<xsl:template name="manualLoginDialog">
+    <div class="modal fade" id="dialog_ManualLogin" tabindex="-1" role="dialog" aria-labelledby="title_manualLoginDialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">								
+          <div class="modal-header">
+          	<div>
+            	<span class="h4 modal-title" id="title_manualLoginDialog">Manual Login</span>
+  			</div>
+  	      </div>
+          <div class="modal-body">
+			<div class="form-horizontal">
+  	      	<div class="form-group">
+  	      		<label for="loginUsername" class="col-sm-2">Username</label>
+  	      		<div class="col-sm-4">
+		    		      <input id="loginUsername"  type="text" class="form-control" name="loginUsername"/>
+  	      		</div>
+  	      	</div>
+  	      	<div class="form-group">
+  	      		<label for="loginPassword" class="col-sm-2">Password</label>
+  	      		<div class="col-sm-4">
+		    		      <input id="loginPassword"  type="password" class="form-control" name="loginPassword"/>
+  	      		</div>
+  	      	</div>
+  	      </div>	        	
+          </div>
+          <div class="modal-footer">
+  					<button id="btn_cancelLogin" type="button" class="btn btn-default btn-med" data-dismiss="modal">
+  						<span class="glyphicon glyphicon-ban-circle"></span>
+  					</button>
+  					<button id= "btn_doLogin" type="button" class="btn btn-default btn-med"
+					        onclick="doManualAuthentication('loginUsername','loginPassword')">
+  						<span class="glyphicon glyphicon-search"></span>
+  					</button>
+          </div>
+        </div>
+      </div>
+    </div>
+	</xsl:template>
 	<xsl:template name="newFolderDialog">
 		<div class="modal fade" id="newFolderDialog" tabindex="-1" role="dialog" aria-labelledby="newFolderDialogTitle" aria-hidden="true">
 			<div class="modal-dialog">

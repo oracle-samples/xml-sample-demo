@@ -17,6 +17,18 @@
           
 var authStatusURL = '/XFILES/authenticationStatus.xml';
 
+function isBrokenEdgeBrowser() {
+
+  /*
+  **
+  ** https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/13029031/
+  **
+  */
+
+  return (navigator.userAgent.indexOf('Edge/15.15063') > 0);
+  
+}
+
 function getHttpUsername() {
 
   /* 
@@ -31,7 +43,7 @@ function getHttpUsername() {
   ** 
   */
 
-	var l_httpUsername = "ANONYMOUS";
+  var l_httpUsername = "ANONYMOUS";
   var whoAmIURL = '/XFILES/whoami.xml';
   
   if (useMSXML) {
@@ -160,6 +172,35 @@ function isAuthenticatedUser() {
 
 }
 
+function doManualAuthentication(usernameID, passwordID) {
+ 
+  var username = document.getElementById(usernameID).value; 
+  var passwd = document.getElementById(passwordID).value;
+
+  var targetURL = '/XFILES/whoami.xml';
+  var XHR = soapManager.createGetRequest(targetURL,false,username,passwd);
+  try {
+  	XHR.mozBackgroundRequest = false;
+	}
+	catch (e) {
+  }
+  XHR.send();
+  if (XHR.status == 200) {
+	closeModalDialog('dialog_ManualLogin');
+  	getHttpUsername();
+	reloadForm();
+  }
+  else {
+	alert('Invalid Credentials. Please try again or use a different browser.');
+  }  
+}
+
+function openAuthenticationDialog() {
+
+  openModalDialog('dialog_ManualLogin');
+
+}
+
 function doHttpAuthentication() {
 	
 	/*
@@ -167,7 +208,7 @@ function doHttpAuthentication() {
 	** Use an XMLHTTPRequest to access the who am i document. This will cause the browser to request HTTP authentication for 
 	** an unauthenticated user.
 	**
-	** Safari does not appear to respond to a 401 with a request for credentials. This breaks the XFILES
+	** Safari and Edge/15 do not appear to respond to a 401 with a request for credentials. This breaks the XFILES
 	** login process.
 	**
 	*/
@@ -185,8 +226,13 @@ function doHttpAuthentication() {
   }
   else{
   	if (XHR.status == 401) {
-      var error = new xfilesException('userManagement.doHttpAuthentication',1,targetURL,null);
-      throw error;
+	  if (isBrokenEdgeBrowser()) {
+		openAuthenticationDialog()
+      }		
+	  else {
+        var error = new xfilesException('userManagement.doHttpAuthentication',1,targetURL,null);
+        throw error;
+	  }
     }
     else {
       var error = new xfilesException('userManagement.doHttpAuthentication',14,targetURL,null);
@@ -322,10 +368,10 @@ function chromeClearAuthenticationCache() {
 
 function clearAuthenticationCache() {
 
-  if (useMSXML) {
+  try {
     self.document.execCommand("ClearAuthenticationCache");
   }
-  else {
+  catch (e) {
   	if (!window.chrome) {
     	ffxClearAuthenticationCache();
     }

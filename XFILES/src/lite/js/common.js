@@ -22,7 +22,6 @@ var stylesheetURL;
 // Cache the current XSL to allow local sorting without refetching the XSL.
 
 var folderXSL;
-var dialogList = new Object;
                   
 var xfilesNamespaces ;
 var xfilesPrefixList = orawsvPrefixList;
@@ -56,145 +55,144 @@ function initXFilesCommon(target) {
     
   initCommon();
   loadXFilesNamespaces();
-	loadFixedWSDLCache()
+    loadFixedWSDLCache()
   
 }
 
 function showHTML(result,target) {
-	
-	  var nodeList = result.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/tns:Transformation",namespaces);
+    
+      var nodeList = result.selectNodes(mgr.getOutputXPath() + "/tns:RETURN/tns:Transformation",namespaces);
     var output = new xmlDocument().parse(nodeList.item(0).firstChild.nodeValue);
     alert(output.serialize());
 
 }
 
 function getCacheGuid(resource) {
-	
-	var cacheGUID = resource.selectNodes("/res:Resource/xfiles:xfilesParameters/xfiles:cacheGUID",xfilesNamespaces).item(0)
-	if (cacheGUID == null) {
+    
+    var cacheGUID = resource.selectNodes("/res:Resource/xfiles:xfilesParameters/xfiles:cacheGUID",xfilesNamespaces).item(0)
+    if (cacheGUID == null) {
     var error = new xfilesException('common.getCacheGuid',12,resource.sourceURL, null);
     error.setDescription('Unable to locate GUID');
     throw error;
   }
   var GUID = cacheGUID.firstChild.nodeValue;
-	return GUID;
+    return GUID;
 }
 
      
 function renderResourceAsHTML(target,resource,stylesheetURL) {
-	 
-	/*
-	**
-	** Only use with Resource Documents. If working with Chrome perform the transformation 
-	** Server Side. 
-	**
-	*/
-	
-  // Remove any DIV objects that have been relocated outside of the outputWindow as a result of being used as a Bootstrap Modal Dialog.
+     
+    /*
+    **
+    ** Only use with Resource Documents. If working with Chrome perform the transformation 
+    ** Server Side. 
+    **
+    */
+    
+  // Remove any "modal" objects that have been relocated to the BODY element as a result of being used as a Bootstrap Modal Dialog.
 
-  if (typeof dialogList == 'object') {
-	  var openDialogList = Object.keys(dialogList);
-	  for (var i=0;i<openDialogList.length;i++) {
-	  	var dialogName = openDialogList[i];
-	    document.body.removeChild(document.getElementById(dialogName));
-	  }
-    dialogList = new Object;  
-	}
- 
-	var stylesheet = loadXSLDocument(stylesheetURL);	
+  var body = document.body;
+  var children = body.children
+  for (var i=0 ; i < children.length; i++) {
+    if (children[i].classList.contains('modal')) {
+      body.removeChild(children[i]);
+    }     
+  }
+  
+  var stylesheet = loadXSLDocument(stylesheetURL);  
   transformXMLtoXHTML(resource,stylesheet,target);
   loadScripts();
 
 }
 
 function xfilesforceLogon(event) {
-	try {
-		doLogon(event);   
-	  reloadForm();
-	}
-	catch (e) {
-   	if (e.rootCauseAccessDenied()) {
-   		/*
-   		**
-   		** User cancelled the HTTP Authorization Dialog. 
-   		** 
-   		*/
-  		abortAccessDenied('common.xfilesforceLogon',null);
+    try {
+        doLogon(event);   
+      reloadForm();
     }
-   	else {
+    catch (e) {
+    if (e.rootCauseAccessDenied()) {
+        /*
+        **
+        ** User cancelled the HTTP Authorization Dialog. 
+        ** 
+        */
+        abortAccessDenied('common.xfilesforceLogon',null);
+    }
+    else {
       handleException('common.xfilesforceLogon',e,resourceURL);
     }
   }
 }
 
 function hasCreateResource(resourcePath) {
-	
-	var hasPermission = false;
-	
-	var targetFolder = resourcePath.substring(0,resourcePath.lastIndexOf('/')-1);
-	
+    
+  var hasPermission = false;
+   
+  var targetFolder = resourcePath.substring(0,resourcePath.lastIndexOf('/')-1);
+    
   var schema          = "XFILES";
   var packageName = "XFILES_SOAP_SERVICES";
   var method      = "GETPRIVILEGES";
-	
-	var mgr = soapManager.getRequestManager(schema,packageName,method);
-  	
-	var namespaces = xfilesNamespaces
-	namespaces.redefinePrefix("lite",mgr.getServiceNamespace());
-	
-	var XHR = mgr.createPostRequest(false);
+    
+  var mgr = soapManager.getRequestManager(schema,packageName,method);
+    
+  var namespaces = xfilesNamespaces
+  namespaces.redefinePrefix("lite",mgr.getServiceNamespace());
+    
+  var XHR = mgr.createPostRequest(false);
 
-	var parameters = new Object;
-	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = targetPath;
+  var parameters = new Object;
+  parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = targetPath;
   mgr.sendSoapRequest(parameters);    
   
   var permissions = logRequestManager.getSoapResponse(logRequestManager);
      
   var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:P_PRIVILEGES/acl:privilege/acl:link",xfilesNamespaces);
-	return nodeList.length == 1;
+    return nodeList.length == 1;
 
 }
 
 function xfilesDoLogon(event) {
-	try {
-		doLogon(event);   
-	  reloadForm();
-	}
-	catch (e) {
-   	if (e.rootCauseAccessDenied()) {
-   		/*
-   		**
-   		** User cancelled the HTTP Authorization Dialog. 
-   		** Login Button is only displayed when logged in as ANONYMOUS
-   		** Therefore ANONYMOUS access must be permitted.
-   		** 
-   		*/
-   		getHttpUsername();
-   		if (cacheResult && window.chrome) {
-     	}
-     	else {
-     		showErrorMessage('Unable to complete Authentication process with Safari Browser : Please try Chrome or Firefox');
-   	  }	
-			reloadForm();
+    try {
+        doLogon(event);   
+      reloadForm();
     }
-   	else {
+    catch (e) {
+    if (e.rootCauseAccessDenied()) {
+        /*
+        **
+        ** User cancelled the HTTP Authorization Dialog. 
+        ** Login Button is only displayed when logged in as ANONYMOUS
+        ** Therefore ANONYMOUS access must be permitted.
+        ** 
+        */
+        getHttpUsername();
+        if (cacheResult && window.chrome) {
+        }
+        else {
+            showErrorMessage('Unable to complete Authentication process with Safari Browser : Please try Chrome or Firefox');
+      } 
+            reloadForm();
+    }
+    else {
       handleException('common.xfilesDoLogon',e,resourceURL);
     }
   }
 }
 
 function xfilesDoLogoff(event) {
-	try {
-		doLogoff(event);   
-		if (isAuthorizedUser()) {
+    try {
+        doLogoff(event);   
+        if (isAuthorizedUser()) {
       var target="/XFILES/lite/Folder.html?target=/";
       window.location.href = target;
-    }  	
-  	else {
-  		xfilesforceLogon();
-  	}
-	}
-	catch (e) {
+    }   
+    else {
+        xfilesforceLogon();
+    }
+    }
+    catch (e) {
     handleException('common.xfilesDoLogoff',e,resourceURL);
   }
 }
@@ -248,10 +246,10 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
    this.isWritableFolder = function() {
      var node = self.treeState.selectNodes('//*[@isOpen="open"]',self.treeNamespaces).item(0);
      if (!node) {
-     	 return false;
+         return false;
      }
      else {
-     	 return node.getAttribute('isWriteable') == "true";
+         return node.getAttribute('isWriteable') == "true";
      }
    }
    
@@ -285,22 +283,22 @@ function xmlTreeControl(name,tree,namespaces,XSL,target) {
      folderPath = folderPath.substring(1);
      
      while (folderPath.length > 0) {
-     	 var seperator = folderPath.indexOf("/");
-     	 var folderName;
-     	 if (seperator < 0) {
-     	 	 folderName = folderPath;
-     	 	 folderPath = "";
-     	 }
-     	 else {
-     	 	 folderName = folderPath.substring(0,folderPath.indexOf("/"));
-     	 	 folderPath = folderPath.substring(folderPath.indexOf("/") + 1);
+         var seperator = folderPath.indexOf("/");
+         var folderName;
+         if (seperator < 0) {
+             folderName = folderPath;
+             folderPath = "";
+         }
+         else {
+             folderName = folderPath.substring(0,folderPath.indexOf("/"));
+             folderPath = folderPath.substring(folderPath.indexOf("/") + 1);
        }
        targetNode =  new xmlElement( targetNode.selectNodes('*[@name="' + folderName + '"]',self.treeNamespaces).item(0));
-  	 }
-  	 var id = targetNode.baseElement.getAttribute('id')
-  	 this.makeOpen(id);
+     }
+     var id = targetNode.baseElement.getAttribute('id')
+     this.makeOpen(id);
    }
-  		    
+            
    this.selectBranch = function ( id ) { 
      unimplementedFunction('selectBranch ' + id);
    }
@@ -345,9 +343,9 @@ function validateUploadPath(fileControl,targetFolderTree) {
   }
 
   if (!targetFolderTree.isWritableFolder()) {
-  	showUserErrorMessage("Cannot upload to folder \"" + repositoryFolder + "\" [READ-ONLY].");
-  	fileControl.focus();
-  	return null;
+    showUserErrorMessage("Cannot upload to folder \"" + repositoryFolder + "\" [READ-ONLY].");
+    fileControl.focus();
+    return null;
   }
 
   if (repositoryFolder != "/") {
@@ -359,35 +357,35 @@ function validateUploadPath(fileControl,targetFolderTree) {
     showUserErrorMessage("Please select file to be uploaded");
     fileControl.focus();
     return null;
-  }  	
+  }     
 
   var filename = stripPathInformation(sourceFilePath);
   
-	var repositoryPath = repositoryFolder + filename;
+    var repositoryPath = repositoryFolder + filename;
 
   try {
-  	var XHR = soapManager.createHeadRequest(repositoryPath,false);
+    var XHR = soapManager.createHeadRequest(repositoryPath,false);
     XHR.send();
   
     if (XHR.status != 404) {
 
       if (XHR.status == 200) {
-      	showErrorMessage("Upload Failed: File \"" + filename + "\" already exists in Folder \"" + repositoryFolder + "\".");
-      	fileControl.focus();
-    	  return null;
+        showErrorMessage("Upload Failed: File \"" + filename + "\" already exists in Folder \"" + repositoryFolder + "\".");
+        fileControl.focus();
+          return null;
       }
       else {
-	    var error = new xfilesException("common.validateUploadPath",14,repositoryPath);
-				error.setDescription("HTTP HEAD Failed : " + XHR.statusText);
-				error.setNumber(XHR.status);
-				throw error;
+        var error = new xfilesException("common.validateUploadPath",14,repositoryPath);
+                error.setDescription("HTTP HEAD Failed : " + XHR.statusText);
+                error.setNumber(XHR.status);
+                throw error;
       }
     }
   } catch (e) {
     var error = new xfilesException("common.validateUploadPath",14,repositoryPath,e);
-		error.setDescription("HTTP HEAD Error : " + XHR.statusText);
-		error.setNumber(XHR.status);
-		throw error;
+        error.setDescription("HTTP HEAD Error : " + XHR.statusText);
+        error.setNumber(XHR.status);
+        throw error;
   }
   
   return repositoryPath
@@ -396,15 +394,15 @@ function validateUploadPath(fileControl,targetFolderTree) {
 
 function validateUploadFile(XHR, repositoryPath, callback) {
 
-	try {
-		if (XHR.status == 201) {
-   	  callback(XHR,repositoryPath);
+    try {
+        if (XHR.status == 201) {
+      callback(XHR,repositoryPath);
     }
     else {
-			var error = new xfilesException("common.validateUploadFile",14,repositoryPath);
-    	error.setDescription("File Upload Operation Failed : " + XHR.statusText);
-   		error.setNumber(XHR.status);
-   		throw error;
+            var error = new xfilesException("common.validateUploadFile",14,repositoryPath);
+        error.setDescription("File Upload Operation Failed : " + XHR.statusText);
+        error.setNumber(XHR.status);
+        throw error;
     }
   } 
   catch (e) {
@@ -420,31 +418,31 @@ function uploadFile(repositoryPath, fileControlname, callback) {
    var fileControl = document.getElementById(fileControlname)
    var XHR = soapManager.createPutRequest(repositoryPath,true);
    XHR.onreadystatechange = function() { 
-   	                          if( XHR.readyState==4 ) { 
-   	                          	validateUploadFile(XHR,repositoryPath,callback);
-   	                          } 
-   	                        };
-   	                        
+                              if( XHR.readyState==4 ) { 
+                                validateUploadFile(XHR,repositoryPath,callback);
+                              } 
+                            };
+                            
    XHR.send(fileControl.files[0]);
 
 }
 
 function validateUploadToFolder(XHR, repositoryPath, callback) {
 
-	try {
-		if (XHR.status == 200) {
-			var uploadStatus = JSON.parse(XHR.responseText);
-			if (uploadStatus.status == 1) {
-			  callback(XHR, repositoryPath);
-			}
-			else {
-	    	showUserErrorMessage("File Upload Failed. Status: " + uploadStatus.status + ", SQL Error Code: " + uploadStatus.SQLError + ", SQL Error Message: " + uploadStatus.SQLErrorMessage);
-	    }
-	  }
-	  else {
+    try {
+        if (XHR.status == 200) {
+            var uploadStatus = JSON.parse(XHR.responseText);
+            if (uploadStatus.status == 1) {
+              callback(XHR, repositoryPath);
+            }
+            else {
+            showUserErrorMessage("File Upload Failed. Status: " + uploadStatus.status + ", SQL Error Code: " + uploadStatus.SQLError + ", SQL Error Message: " + uploadStatus.SQLErrorMessage);
+        }
+      }
+      else {
       showUserErrorMessage("File Upload Failed. HTTP Status: " + XHR.status + "[" + XHR.statusText + "]");
-  	}
-	}
+    }
+    }
   catch (e) {
     handleException("common.validateUploadToFolder",e,null);
   }
@@ -452,13 +450,13 @@ function validateUploadToFolder(XHR, repositoryPath, callback) {
 
 function stripPathInformation(filename) {
 
-	  // Deal with Directory Names in path 
-  	if (filename.lastIndexOf('/') > 0 ) {
-  	  filename = filename.substr(filename.lastIndexOf('/') + 1);
-  	}
-  	if (filename.lastIndexOf('\\') > 0 ) {
-  	  filename = filename.substr(filename.lastIndexOf('\\') + 1);
-  	}
+      // Deal with Directory Names in path 
+    if (filename.lastIndexOf('/') > 0 ) {
+      filename = filename.substr(filename.lastIndexOf('/') + 1);
+    }
+    if (filename.lastIndexOf('\\') > 0 ) {
+      filename = filename.substr(filename.lastIndexOf('\\') + 1);
+    }
     return filename;
 }
  
@@ -466,16 +464,16 @@ function uploadToFolder(targetFolder, fileControlId, callback) {
 
 /*
     <form id="uploadImageForm" name="upload" action="/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.SINGLE_DOC_UPLOAD" method="post" enctype="multipart/form-data">
-			<input type="hidden"  id="targetFolder"            name="TARGET_FOLDER"/>
-			<input type="hidden"  id="duplicatePolicy"         name="DUPLICATE_POLICY" value="RAISE"/>
-			<input type="hidden"  id="resourceName"            name="RESOURCE_NAME"/>
-			<input type="hidden"  id="description"             name="DESCRIPTION"/>
-			<input type="hidden"  id="language"                name="LANGUAGE"/>
-			<input type="hidden"  id="characterSet"            name="CHARACTER_SET"/>
- 			<div class="form-group" style="margin-left:20px">
-	  		<input id="FILE" name="FILE" title="FILE"  type="file">
-		  </div>
-		</form>	
+            <input type="hidden"  id="targetFolder"            name="TARGET_FOLDER"/>
+            <input type="hidden"  id="duplicatePolicy"         name="DUPLICATE_POLICY" value="RAISE"/>
+            <input type="hidden"  id="resourceName"            name="RESOURCE_NAME"/>
+            <input type="hidden"  id="description"             name="DESCRIPTION"/>
+            <input type="hidden"  id="language"                name="LANGUAGE"/>
+            <input type="hidden"  id="characterSet"            name="CHARACTER_SET"/>
+            <div class="form-group" style="margin-left:20px">
+            <input id="FILE" name="FILE" title="FILE"  type="file">
+          </div>
+        </form> 
 */
 
   var fileControl = document.getElementById(fileControlId)
@@ -493,13 +491,13 @@ function uploadToFolder(targetFolder, fileControlId, callback) {
 
   var XHR = soapManager.createPostRequest('/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.XMLHTTPREQUEST_DOC_UPLOAD',true);
   XHR.onreadystatechange = function() { 
-   	                          if( XHR.readyState==4 ) { 
-   	                          	validateUploadToFolder(XHR,repositoryPath,callback);
-   	                          } 
-   	                        };
+                              if( XHR.readyState==4 ) { 
+                                validateUploadToFolder(XHR,repositoryPath,callback);
+                              } 
+                            };
   XHR.send(formData);
 
-}	
+}   
 
 function loadLocalXMLFile(fileControlId, callback) {
 
@@ -507,21 +505,21 @@ function loadLocalXMLFile(fileControlId, callback) {
   var formData = new FormData();
 
   if (fileControl.files[0].type != 'text/xml') {
-  	showUserErrorMessage("Please select file of type \"text/xml\", not \"" + fileControl.files[0].type + "\".");
-  	return
+    showUserErrorMessage("Please select file of type \"text/xml\", not \"" + fileControl.files[0].type + "\".");
+    return
   }
 
   formData.append(fileControl.name,fileControl.files[0]);
 
   var XHR = soapManager.createPostRequest('/sys/servlets/XFILES/FileUpload/XFILES.XFILES_DOCUMENT_UPLOAD.VIEW_LOCAL_XML',true);
   XHR.onreadystatechange = function() { 
-   	                          if( XHR.readyState==4 ) { 
-   	                          	callback(XHR);
-   	                          } 
-   	                        };
+                              if( XHR.readyState==4 ) { 
+                                callback(XHR);
+                              } 
+                            };
   XHR.send(formData);
 
-}	
+}   
 
 function displayFolderTree(namespaces,loading,tree,folderList,openFolder,focusTarget) {
 
@@ -530,7 +528,7 @@ function displayFolderTree(namespaces,loading,tree,folderList,openFolder,focusTa
   targetFolderTree = new xmlTreeControl("treeControl",folderList,namespaces,TargetTreeXSL,tree)
 
   if (openFolder) {
-  	targetFolderTree.setOpenFolder(openFolder);
+    targetFolderTree.setOpenFolder(openFolder);
   }
   
   if (focusTarget) {
@@ -543,7 +541,7 @@ function processFolderTreeList(mgr,namespaces,loading,tree,openFolder,focusTarge
 
   try {
     var soapResponse = mgr.getSoapResponse("common.processFolderList");
-	  namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
+      namespaces.redefinePrefix("tns",mgr.getServiceNamespace());
 
     var nodeList = soapResponse.selectNodes(mgr.getOutputXPath() + "/tns:P_TREE/tns:root",namespaces);
     if (nodeList.length == 1) {
@@ -570,13 +568,13 @@ function loadFolderTree(namespaces,loading,tree,openFolder, focusTarget) {
   var packageName = "XFILES_SOAP_SERVICES";
   var method      =  "GETTARGETFOLDERTREE";
 
-	var mgr = soapManager.getRequestManager(schema,packageName,method);
-	var XHR = mgr.createPostRequest();
+    var mgr = soapManager.getRequestManager(schema,packageName,method);
+    var XHR = mgr.createPostRequest();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processFolderTreeList(mgr, namespaces, loading, tree, openFolder, focusTarget) } };
 
-	var parameters = new Object;
-	var xparameters = new Object;
-			
+    var parameters = new Object;
+    var xparameters = new Object;
+            
   mgr.sendSoapRequest(parameters,xparameters); 
 
 }
@@ -587,15 +585,15 @@ function doSearch(searchType,searchTerms) {
   var criteria = searchTerms.value;
    
   if (!isAuthenticatedUser()) {
-  	showUserErrorMessage("Search restricted to authenticated users - please log in.");
-  	return;
+    showUserErrorMessage("Search restricted to authenticated users - please log in.");
+    return;
   }
   
   if ((action == 'FOLDER') || (action == 'TREE') || (action == 'ROOT')) {
-  	 if (isEmptyString(criteria)) {
-  	 	 showErrorMessage('Enter Search Criteria');
-  	 	 return;
-  	 }
+     if (isEmptyString(criteria)) {
+         showErrorMessage('Enter Search Criteria');
+         return;
+     }
      window.location='/XFILES/XMLSearch/reposSearch.html?target=' + escape(resourceURL) + '&searchType=' + action + '&searchTerms=' + escape(criteria);   
   }
  
@@ -618,40 +616,40 @@ function toggleSearchTerms(searchType,searchTerms) {
   var action = searchType.value;
 
   if ((action == 'FOLDER') || (action == 'TREE') || (action == 'ROOT') ) {
-   	searchTerms.disabled = false;
+    searchTerms.disabled = false;
   }
   else {
-   	searchTerms.disabled = true;
-  }	
+    searchTerms.disabled = true;
+  } 
 }
 
 function abortAccessDenied(module,e) {
-	
-	div = document.getElementById("greyLoading");
-	if (div != null) {
-		div.style.display="none";
-	}
-	
-	div = document.getElementById("pageLoading");
-	if (div != null) {
-		div.style.display="none";
-	}
+    
+    div = document.getElementById("greyLoading");
+    if (div != null) {
+        div.style.display="none";
+    }
+    
+    div = document.getElementById("pageLoading");
+    if (div != null) {
+        div.style.display="none";
+    }
 
-	div = document.getElementById("pageContent");
-	if (div != null) {
-		div.style.display="none";
-	}
+    div = document.getElementById("pageContent");
+    if (div != null) {
+        div.style.display="none";
+    }
 
   errorWindow = document.getElementById("fatalError");
   errorMessage = 'Application unavailable. Access Denied for user : "' + httpUsername + "\". Please contact your administrator for further information."
   if (errorWindow != null) {
-  	var error = new xfilesException(module,12,null,e);
+    var error = new xfilesException(module,12,null,e);
     error.setDescription(errorMessage);
     exceptionToHTML(error,errorWindow);
   }
   else {
-  	alert(errorMessage);
- 	}
+    alert(errorMessage);
+    }
 }
 
 function displayResource(resource, outputWindow, stylesheetURL) {
@@ -672,9 +670,9 @@ function importResource(resource) {
 function processResourceREST(newResource, outputWindow, stylesheetURL) {
 
   try {
-  	newResource.checkParsing();
-	  resource = newResource;
-  	displayResource(resource,outputWindow,stylesheetURL);
+    newResource.checkParsing();
+      resource = newResource;
+    displayResource(resource,outputWindow,stylesheetURL);
   }
   catch (e) {
     handleException('common.processResourceREST',e,resourceURL);
@@ -725,22 +723,22 @@ function getResourceSOAP(resourceURL, outputWindow, stylesheetURL, includeConten
   var method;
 
   if (includeContent) {
-	  method =  "GETRESOURCEWITHCONTENT";
-	}
+      method =  "GETRESOURCEWITHCONTENT";
+    }
   else {
-	  method =  "GETRESOURCE";
-	}
-	
-	var mgr = soapManager.getRequestManager(schema,packageName,method);
-  	
-	var namespaces = xfilesNamespaces
-	namespaces.redefinePrefix("lite",mgr.getServiceNamespace());
-	
-	var XHR = mgr.createPostRequest();
+      method =  "GETRESOURCE";
+    }
+    
+    var mgr = soapManager.getRequestManager(schema,packageName,method);
+    
+    var namespaces = xfilesNamespaces
+    namespaces.redefinePrefix("lite",mgr.getServiceNamespace());
+    
+    var XHR = mgr.createPostRequest();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processResourceSOAP(mgr, outputWindow, stylesheetURL) } };
 
-	var parameters = new Object;
-	parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = resourceURL;
+    var parameters = new Object;
+    parameters["P_RESOURCE_PATH-VARCHAR2-IN"]   = resourceURL;
   parameters["P_TIMEZONE_OFFSET-NUMBER-IN"] = timezoneOffset;
   parameters["P_CACHE_RESULT-NUMBER-IN"] = cacheResult;
   mgr.sendSoapRequest(parameters);    
@@ -766,13 +764,13 @@ function displayFolder(resource, outputWindow, stylesheetURL) {
 
   var rssEnabled = (resource.selectNodes("/res:Resource/rss:enableRSS",xfilesNamespaces).length > 0);
   if (rssEnabled) {
-  	// RSS Feed is enabled for this folder. Check if the HTML Page contains the rss Link
+    // RSS Feed is enabled for this folder. Check if the HTML Page contains the rss Link
     var rssLinkPresent = document.getElementById('rssEnabled');
     if (! rssLinkPresent) {
-    	// Redirect to the ENABLERSSICON servlet. Servlet regenerates the HTML Page with the RSS Link and sends it back to browser. <HEAD> element must contain an element as follows : <link id="enableRSSIcon"/>
-    	var doAuthentication = getParameter("forceAuthentication");
-    	if ((!doAuthentication) || (doAuthentication.toLowerCase != "true")) {
-    		doAuthentication = "false";
+        // Redirect to the ENABLERSSICON servlet. Servlet regenerates the HTML Page with the RSS Link and sends it back to browser. <HEAD> element must contain an element as follows : <link id="enableRSSIcon"/>
+        var doAuthentication = getParameter("forceAuthentication");
+        if ((!doAuthentication) || (doAuthentication.toLowerCase != "true")) {
+            doAuthentication = "false";
       }
       if (isAuthenticatedUser()) {
         window.location.href = "/sys/servlets/XFILES/Protected/XFILES.XFILES_REST_SERVICES.ENABLERSSICON?P_RESOURCE_PATH=" + encodeURIComponent(resourceURL) + "&P_TEMPLATE_PATH=" + encodeURIComponent("/XFILES/lite/FolderRSS.html") + "&P_STYLESHEET_PATH=" + escape(stylesheetURL) + "&P_FORCE_AUTHENTICATION=" + doAuthentication;
@@ -786,7 +784,7 @@ function displayFolder(resource, outputWindow, stylesheetURL) {
 
   // Cache folderXSL to enable local sorting.
 
-	folderXSL = loadXSLDocument(stylesheetURL);	   
+    folderXSL = loadXSLDocument(stylesheetURL);    
   renderResourceAsHTML(outputWindow,resource,stylesheetURL);
 
  
@@ -795,13 +793,13 @@ function displayFolder(resource, outputWindow, stylesheetURL) {
 function processFolderREST(newResource, outputWindow, stylesheetURL) {
 
   try {
-  	newResource.checkParsing();
+    newResource.checkParsing();
     resource = newResource;
     displayFolder(resource,outputWindow,stylesheetURL);
   }
   catch (e) {
-  	if ((e.rootCauseAccessDenied) && (e.rootCauseAccessDenied())) {
-  		abortAccessDenied('common.processFolderREST',e);
+    if ((e.rootCauseAccessDenied) && (e.rootCauseAccessDenied())) {
+        abortAccessDenied('common.processFolderREST',e);
     }
     else {
       handleException('common.processFolderREST',e,newResource.sourceURL);
@@ -845,12 +843,12 @@ function showFolderSOAP(folderURL, outputWindow, stylesheetURL) {
   var packageName = "XFILES_SOAP_SERVICES";
   var method      =  "GETFOLDERLISTING";
 
-	var mgr = soapManager.getRequestManager(schema,packageName,method);
-	var XHR = mgr.createPostRequest();
+    var mgr = soapManager.getRequestManager(schema,packageName,method);
+    var XHR = mgr.createPostRequest();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processFolderSOAP(mgr, outputWindow, stylesheetURL) } };
 
-	var parameters = new Object;
-	parameters["P_FOLDER_PATH-VARCHAR2-IN"]   = folderURL;
+    var parameters = new Object;
+    parameters["P_FOLDER_PATH-VARCHAR2-IN"]   = folderURL;
   parameters["P_TIMEZONE_OFFSET-NUMBER-IN"] = timezoneOffset;
   parameters["P_CACHE_RESULT-NUMBER-IN"] = cacheResult;
   
@@ -861,7 +859,7 @@ function showFolderSOAP(folderURL, outputWindow, stylesheetURL) {
     parameters["P_INCLUDE_METADATA-VARCHAR2-IN"] = 'FALSE'
   }
   
-	mgr.sendSoapRequest(parameters);
+    mgr.sendSoapRequest(parameters);
 
 }
 
@@ -882,10 +880,10 @@ function showFolder(folderURL, outputWindow, stylesheetURL) {
 }
 
 function getFolderWithMetadata(newFolderPath,newStylesheetURL) {
-	
-	includeMetadata = true
-	doFolderJump(newFolderPath,newStylesheetURL)
-	
+    
+    includeMetadata = true
+    doFolderJump(newFolderPath,newStylesheetURL)
+    
 }
     
 function doFolderJump(newFolderPath,newStylesheetURL) {
@@ -899,13 +897,13 @@ function doFolderJump(newFolderPath,newStylesheetURL) {
   // If the current Page is RSS enabled we must do the jump via a reload to ensure the Browser's RSS Icon registers the change of location / RSS status
 
   var rssEnabled = (resource.selectNodes("/res:Resource/rss:enableRSS",xfilesNamespaces).length > 0);
-  if (rssEnabled)	{
-  	window.location.href = "/XFILES/lite/Folder.html?target=" + escape(newFolderPath) + "&stylesheet="+ escape(stylesheetURL);
+  if (rssEnabled)   {
+    window.location.href = "/XFILES/lite/Folder.html?target=" + escape(newFolderPath) + "&stylesheet="+ escape(stylesheetURL);
   }
   else {
-	  resourceURL = newFolderPath
-	  showFolder(resourceURL,document.getElementById('pageContent'),stylesheetURL,false);
-	}
+      resourceURL = newFolderPath
+      showFolder(resourceURL,document.getElementById('pageContent'),stylesheetURL,false);
+    }
 }
 
 function displayVersionHistory(resource, outputWindow, stylesheetURL) {
@@ -916,9 +914,9 @@ function displayVersionHistory(resource, outputWindow, stylesheetURL) {
 }
 
 function processVersionHistoryREST(newResource, outputWindow, stylesheetURL) {
-	
+    
   try {
-  	newResource.checkParsing();
+    newResource.checkParsing();
     resource = newResource;
     displayVersionHistory(resource,outputWindow,stylesheetURL);
   }
@@ -952,13 +950,13 @@ function getVersionHistorySOAP(resourceURL, outputWindow, stylesheetURL) {
   var packageName = "XFILES_SOAP_SERVICES";
   var method      =  "GETVERSIONHISTORY";
 
-	var mgr = soapManager.getRequestManager(schema,packageName,method);
-	var XHR = mgr.createPostRequest();
+    var mgr = soapManager.getRequestManager(schema,packageName,method);
+    var XHR = mgr.createPostRequest();
   XHR.onreadystatechange=function() { if( XHR.readyState==4 ) { processVersionHistorySOAP(mgr, outputWindow, stylesheetURL) } };
 
   var parameters = new Object;
-	parameters["P_RESOURCE_PATH-VARCHAR2-IN"] = resourceURL;
-	parameters["P_TIMEZONE_OFFSET-NUMBER-IN"] = timezoneOffset;
+    parameters["P_RESOURCE_PATH-VARCHAR2-IN"] = resourceURL;
+    parameters["P_TIMEZONE_OFFSET-NUMBER-IN"] = timezoneOffset;
   parameters["P_CACHE_RESULT-NUMBER-IN"] = cacheResult;
   mgr.sendSoapRequest(parameters);
 
@@ -983,13 +981,13 @@ function getVersionHistory(resourceURL, outputWindow, stylesheetURL) {
 }
 
 function showAboutXFiles(evt) {
-	
-	openModalDialog("aboutXFilesDialog");
-	
+    
+    openModalDialog("aboutXFilesDialog");
+    
 }
 
 function doShowHomeFolder(evt,user) {
-	
+    
   if (document.getElementById("folderListing")) {
     doFolderJump('/home/' + user);
   }
@@ -999,13 +997,13 @@ function doShowHomeFolder(evt,user) {
 }
 
 function xfilesHelpMenu(evt) {
-	var dialog = document.getElementById("xfilesHelpMenu");
+    var dialog = document.getElementById("xfilesHelpMenu");
   openPopupDialog(evt, dialog)
 
 }
-     	
+        
 function closeCurrentWindow(currentURL) {
-	showParentFolder(currentURL);
+    showParentFolder(currentURL);
 }
 
 function showParentFolder(currentURL) {
@@ -1030,13 +1028,13 @@ function showParentFolder(currentURL) {
 }
 
 function isErrorDialogOpen() {
-	
-	errorDialog = document.getElementById("genericErrorDialog");
-	if (errorDialog) {
-		return errorDialog.style.display != "none";
-	}
-	
-	return false;
+    
+    errorDialog = document.getElementById("genericErrorDialog");
+    if (errorDialog) {
+        return errorDialog.style.display != "none";
+    }
+    
+    return false;
 
 }
 
@@ -1048,89 +1046,89 @@ function reportUploadError(module,repositoryPath,SQLCODE,SQLERRM) {
 }
 
 var xfilesCloseCurrentForm = function() {
-	history.back();
+    history.back();
 }
 
 var xfilesViewXML = function () {
-	closePopupDialog();
+    closePopupDialog();
   showSourceCode(resource);
 }
 
 var xfilesViewXSL = function () {
-	closePopupDialog();
+    closePopupDialog();
   showSourceCode(loadXMLDocument(stylesheetURL));
 }
 
 var xfilesViewSOAPRequest = function () {
 
-	closePopupDialog();
-	var requestXML = soapManager.getRequestXML();
-	if (requestXML == null) {
-		showWarningMessage("Request object not available");		
+    closePopupDialog();
+    var requestXML = soapManager.getRequestXML();
+    if (requestXML == null) {
+        showWarningMessage("Request object not available");     
   }
-	else {
+    else {
     showSourceCode(requestXML);
-	}
+    }
 
 }
 
 var xfilesViewSOAPResponse = function () {
 
-	closePopupDialog();
-	var responseXML = soapManager.getResponseXML();
-	if (responseXML == null) {
- 		showWarningMessage("Response object not yet available");		
+    closePopupDialog();
+    var responseXML = soapManager.getResponseXML();
+    if (responseXML == null) {
+        showWarningMessage("Response object not yet available");        
   }
-	else {
- 	  showSourceCode(responseXML);
+    else {
+      showSourceCode(responseXML);
   }
 }
 
 var xfilesShowSourceCode = function (xml) {
-	
-	var xmlOutputArea = document.getElementById('xmlWindow');
-	xmlOutputArea.innerHTML = "";
-	xmlPP.print(xml,xmlOutputArea);
-	openModalDialog('currentXML');
-    	
-}	
+    
+    var xmlOutputArea = document.getElementById('xmlWindow');
+    xmlOutputArea.innerHTML = "";
+    xmlPP.print(xml,xmlOutputArea);
+    openModalDialog('currentXML');
+        
+}   
 
 var xfilesOpenDialog = function (dialog) {
-	
-	if (typeof dialog == "string") {
-		dialog = document.getElementById(dialog)
-	}
-		
-	dialog.style.display = "block";
+    
+    if (typeof dialog == "string") {
+        dialog = document.getElementById(dialog)
+    }
+        
+    dialog.style.display = "block";
 
 }
 
 
 var xfilesCloseDialog = function (dialog) {
-	
-	if (typeof dialog == "string") {
-		dialog = document.getElementById(dialog)
-	} 
-	
-	dialog.style.display = "none";
+    
+    if (typeof dialog == "string") {
+        dialog = document.getElementById(dialog)
+    } 
+    
+    dialog.style.display = "none";
 
 }
 
 var xfilesOpenPopupDialog = function (evt, dialog, dialogCloser) {
-	
-	if (typeof dialog == "string") {
-		dialog = document.getElementById(dialog)
-	}
+    
+    if (typeof dialog == "string") {
+        dialog = document.getElementById(dialog)
+    }
 
   if ((!dialogCloser) || (typeof dialogCloser != "function")) {
     dialogCloser = function() {dialog.style.display="none";}
   }
 
-	setDialogCloser(dialogCloser);
+    setDialogCloser(dialogCloser);
   dialog.style.display = "block";
 
   stopBubble(evt);
-	
+    
 }
 
 var xfilesClosePopupDialog = function() {
@@ -1146,18 +1144,18 @@ var xfilesClosePopupDialog = function() {
 var xfilesReloadForm = function() {
 
   if (useMSXML) {
-  	 window.location.reload(false);
+     window.location.reload(false);
   }
   else {
-  	window.location.reload();
+    window.location.reload();
   }
 }
 
 function loadFixedWSDLCache() {
-	
-	fixedWSDLCache = new Array()
-	
-	var WSDL = '<definitions name="CREATEXFILESUSER"'
+    
+    fixedWSDLCache = new Array()
+    
+    var WSDL = '<definitions name="CREATEXFILESUSER"'
            + '    targetNamespace="http://xmlns.oracle.com/orawsv/XFILES/XFILES_ADMIN_SERVICES/CREATEXFILESUSER"'
            + '    xmlns="http://schemas.xmlsoap.org/wsdl/"'
            + '    xmlns:tns="http://xmlns.oracle.com/orawsv/XFILES/XFILES_ADMIN_SERVICES/CREATEXFILESUSER"'

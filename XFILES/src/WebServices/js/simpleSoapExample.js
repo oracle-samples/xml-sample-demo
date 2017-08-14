@@ -103,11 +103,11 @@ function callWS(form) {
     schema  = document.getElementById("ownerList").value;
     
     if (document.getElementById("procedureList").value == "") {
-    	package = document.getElementById("packageList").value;
+    	packageName = document.getElementById("packageList").value;
     	method = document.getElementById("methodList").value;
     }
     else {
-    	package = document.getElementById("procedureList").value;
+    	packageName = document.getElementById("procedureList").value;
     }
   
     document.getElementById('d_results').innerHTML = "";
@@ -182,6 +182,8 @@ function onPageLoaded() {
 
 function init(target) {
 
+  var resourceXML
+  
   try { 
     initXFilesCommon();
     loadWebServicesXSL();

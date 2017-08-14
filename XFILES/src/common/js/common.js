@@ -2332,10 +2332,7 @@ function xfilesException(module,id,target,exception) {
 function openModalDialog(dialogName) {
 
   $('#' + dialogName).modal('show');
-  if (typeof dialogList == 'object') {
-  	dialogList[dialogName] = 1;
- 	}
-
+  
 }
 
 function closeModalDialog(dialogName) {
@@ -3083,9 +3080,16 @@ function RequestManager(manager,wsdl) {
 
 $(document)  
   .on('show.bs.modal', '.modal', function(event) {
+	// Appears to duplicate 'this' in the DOM tree.
     $(this).appendTo($('body'));
   })
   .on('shown.bs.modal', '.modal.in', function(event) {
+	var targetId = this.id;
+	duplicateDialog = document.getElementById(targetId);
+	// If the id identifies a node with a different parent remove the duplicate from the DOM tree.
+	if (!(this.parentNode.id == duplicateDialog.parentNode.id)) {
+	  duplicateDialog.parentNode.removeChild(duplicateDialog);
+	}
     setModalsAndBackdropsOrder();
   })
   .on('hidden.bs.modal', '.modal', function(event) {

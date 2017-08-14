@@ -147,7 +147,7 @@ function XMLPrettyPrinter() {
   	
   	var span;
   	var text;
-  	var piDefinitiont;
+  	var piDefinition;
 
     piDefinition = document.createElement('div');
     piDefinition.className = "simpleContent";
@@ -269,11 +269,11 @@ function XMLPrettyPrinter() {
     pre.className = "cdata";
         
     var lines = cdataNode.data.split('\n');
-    for ( i=0; i<lines.length; i++) {
-    	textContent = lines[i];
-    	text = document.createTextNode(textContent);
+    for (var i=0; i<lines.length; i++) {
+    	var textContent = lines[i];
+    	var text = document.createTextNode(textContent);
       pre.appendChild(text);
-      br = document.createElement('br');
+      var br = document.createElement('br');
       pre.appendChild(br);;
     }
     
