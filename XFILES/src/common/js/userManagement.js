@@ -29,6 +29,12 @@ function isBrokenEdgeBrowser() {
   
 }
 
+function isRealSafariBrowser() {
+	
+  return (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1);
+  
+}
+
 function getHttpUsername() {
 
   /* 
@@ -226,7 +232,7 @@ function doHttpAuthentication() {
   }
   else{
   	if (XHR.status == 401) {
-	  if (isBrokenEdgeBrowser()) {
+	  if (isBrokenEdgeBrowser() || isRealSafariBrowser()  ) {
 		openAuthenticationDialog()
       }		
 	  else {

@@ -24,15 +24,29 @@ alter session set current_schema = XDBPM
 /
 grant delete on XDB.XDB$SCHEMA         to XDBPM
 /
+grant delete on XDB.XDB$ANY            to XDBPM
+/
+grant delete on XDB.XDB$ALL_MODEL      to XDBPM
+/
+grant delete on XDB.XDB$ANYATTR        to XDBPM
+/
+grant delete on XDB.XDB$ATTRGROUP_DEF  to XDBPM
+/
+grant delete on XDB.XDB$ATTRGROUP_REF  to XDBPM
+/
+grant delete on XDB.XDB$ATTRIBUTE      to XDBPM
+/
+grant delete on XDB.XDB$CHOICE_MODEL   to XDBPM
+/
 grant delete on XDB.XDB$COMPLEX_TYPE   to XDBPM
 /
 grant delete on XDB.XDB$ELEMENT        to XDBPM
 /
-grant delete on XDB.XDB$ANY            to XDBPM
+grant delete on XDB.XDB$GROUP_DEF      to XDBPM
 /
-grant delete on XDB.XDB$ATTRIBUTE      to XDBPM
+grant delete on XDB.XDB$GROUP_REF      to XDBPM
 /
-grant delete on XDB.XDB$ANYATTR        to XDBPM
+grant delete on XDB.XDB$SEQUENCE_MODEL to XDBPM
 /
 --
 -- Explicit grants on XDB Owned objects. Requires use of USER SYSTEM or SYSDBA connection.

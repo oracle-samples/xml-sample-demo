@@ -13,11 +13,11 @@
 set echo on
 spool configureDatabase.log
 --
+def TARGET_PDB = &1
+--
 prompt "Please enter password for SYS/ as SYSDBA when prompted"
 --
 @@connect.sql
---
-def TARGET_PDB = &1
 --
 def DBA = &2
 --

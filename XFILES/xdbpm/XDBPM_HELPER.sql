@@ -144,11 +144,13 @@ show errors
 --
 @@&XDBPM_SYSDBA_INTERNAL
 --
+show user
+--
 create or replace package XDBPM_SYSDBA_INTERNAL
 as
   C_WRITE_TO_TRACE_FILE constant binary_integer := 1;
 
-	procedure resetResConfigs(P_RESID RAW);
+  procedure resetResConfigs(P_RESID RAW);
   procedure resetLobLocator(P_RESID RAW);
   procedure setBinaryContent(P_RESID RAW, P_SCHEMA_OID RAW, P_BINARY_ELEMENT_ID NUMBER);
   procedure setTextContent(P_RESID RAW, P_SCHEMA_OID RAW, P_TEXT_ELEMENT_ID NUMBER);
@@ -159,6 +161,7 @@ as
   procedure releaseDavLocks;
   procedure updateRootInfoRCList(P_NEW_OIDLIST VARCHAR2);  
   procedure cleanupSchema(P_OWNER VARCHAR2);
+  procedure CLEAN_UP_XMLSCHEMA(P_SCHEMA_URL VARCHAR2, P_OWNER VARCHAR2 DEFAULT SYS_CONTEXT('USERENV','CURRENT_SCHEMA'), P_LOCAL VARCHAR2 DEFAULT 'YES');
   
   procedure writeToTraceFile(P_COMMENT VARCHAR2);
   procedure flushTraceFile;
@@ -337,7 +340,6 @@ end;
 --
 procedure CLEAN_UP_XMLSCHEMA(P_SCHEMA_URL VARCHAR2, P_OWNER VARCHAR2 DEFAULT SYS_CONTEXT('USERENV','CURRENT_SCHEMA'), P_LOCAL VARCHAR2 DEFAULT 'YES')
 as
-begin
 $IF XDBPM_INSTALLER_PERMISSIONS.HAS_SYSDBA $THEN	
   INVALID_OPERATION EXCEPTION;
   PRAGMA EXCEPTION_INIT( INVALID_OPERATION, -20001 );
@@ -586,10 +588,12 @@ begin
        end if;
     end loop;
   end if;
-$ELSE
-  raise UNIMPLEMENTED_FEATURE;
-$END
 end;
+$ELSE
+begin
+  raise UNIMPLEMENTED_FEATURE;
+end;
+$END
 --
 procedure cleanupSchema(P_OWNER VARCHAR2)
 as

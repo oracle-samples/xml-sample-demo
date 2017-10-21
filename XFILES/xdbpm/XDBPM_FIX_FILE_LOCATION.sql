@@ -29,8 +29,8 @@ set pages 0 lines 256 long 1000000 trimspool on
 -- 
 GET &SCRIPT_LOCATION./XDBPM_SOURCE_FILES.inp
 .
-0 begin select '
-21 ' into :FILELIST from dual;;
+0 begin :FILELIST := '
+21 ';;
 22 end;;
 .
 L

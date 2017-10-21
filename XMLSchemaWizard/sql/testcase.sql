@@ -168,6 +168,6 @@ select ANY_PATH
   from RESOURCE_VIEW
  where under_path(RES,:REPOS_FOLDER) = 1
 /
-@&TARGET_DIRECTORY/registerSchema.sql
+@&TARGET_DIRECTORY/registerSchemas.sql
 --
 quit
