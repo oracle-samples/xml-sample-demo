@@ -25,11 +25,6 @@ declare
   V_CONTROL_FILE_LOCATION varchar2(120);
 begin
   V_APPINFO := SYS_CONTEXT('USERENV','MODULE');
-declare
-  V_APPINFO               varchar2(256);
-  V_CONTROL_FILE_LOCATION varchar2(120);
-begin
-  V_APPINFO := SYS_CONTEXT('USERENV','MODULE');
   if (INSTR(V_APPINFO,'\',-1) > 0) then
      V_CONTROL_FILE_LOCATION := '&SCRIPT_LOCATION' || '\';
   else

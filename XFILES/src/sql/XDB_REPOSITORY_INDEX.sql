@@ -21,7 +21,7 @@ spool XDB_REPOSITORY_INDEX.log
 var REPOS_INDEX_SCRIPT VARCHAR2(120)
 --
 declare
-  V_REPOS_INDEX_SCRIPT VARCHAR2(120);
+  V_REPOS_INDEX_SCRIPT VARCHAR2(120) := 'XDB_REPOSITORY_INDEX_12100.sql';
 begin
 	begin
     select 'XFILES_DO_NOTHING.sql'
@@ -34,8 +34,6 @@ begin
     when no_data_found then
       $IF DBMS_DB_VERSION.VER_LE_11_2 $THEN
          V_REPOS_INDEX_SCRIPT := 'XDB_REPOSITORY_INDEX_11200.sql';
-      $ELSE
-         V_REPOS_INDEX_SCRIPT := 'XDB_REPOSITORY_INDEX_12100.sql';
       $END
     when others then
       RAISE;
