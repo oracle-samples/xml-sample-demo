@@ -380,4 +380,3 @@ function doSave() {
 function doSaveAndClose() {
   saveChanges(true);
 }
-

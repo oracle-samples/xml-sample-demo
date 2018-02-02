@@ -76,11 +76,6 @@
   		</action>
   		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  		  <local>%DEMODIRECTORY%\src\jquery-2.1.1.min.zip</local>
-  			<remote>%BASEFOLDER%/src/jquery-2.1.1.min.zip</remote>
-  		</action>
-  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
-  			<mode>FORCE</mode>
   		  <local>%DEMODIRECTORY%\src\jssor.zip</local>
   			<remote>%BASEFOLDER%/src/jssor.zip</remote>
   		</action>
@@ -764,7 +759,12 @@
   		</action>
   		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
-  			<remote>%BASEFOLDER%/Frameworks/jquery-2.1.1</remote>
+  			<remote>%BASEFOLDER%/Frameworks/jquery-3.3.1</remote>
+  		</action>
+  		<action type="PUT" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
+  			<mode>FORCE</mode>
+  		  	<local>%DEMODIRECTORY%\src\jquery-3.3.1.min.js</local>
+  			<remote>%BASEFOLDER%/Frameworks/jquery-3.3.1/jquery-3.3.1.min.js</remote>
   		</action>
   		<action type="MKCOL" serverURL="%SERVERURL%" user="%USER%" password="%PASSWORD%">
   			<mode>FORCE</mode>
@@ -776,7 +776,6 @@
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/Xinha-0.96.1.zip              %BASEFOLDER%/Frameworks               %BASEFOLDER%/Frameworks/Xinha-0.96.1.log</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/bootstrap3-dialog-master.zip  %BASEFOLDER%/Frameworks               %BASEFOLDER%/Frameworks/bootstrap3-dialog-master.log</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/bootstrap-3.2.0-dist.zip      %BASEFOLDER%/Frameworks               %BASEFOLDER%/Frameworks/bootstrap-3.2.0-dist.log</action>
-		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/jquery-2.1.1.min.zip          %BASEFOLDER%/Frameworks/jquery-2.1.1  %BASEFOLDER%/Frameworks/jquery-2.1.1.min.log</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\XFILES_UNZIP_ARCHIVE.sql %BASEFOLDER%/src/jssor.zip                     %BASEFOLDER%/Frameworks               %BASEFOLDER%/Frameworks/jssor.log</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\WebDemo\sql\XFILES_WEBDEMO_SERVICES.sql %USER%</action>
 		<action type="RUNSQL" user="%USER%" password="%PASSWORD%">%DEMODIRECTORY%\src\sql\PUBLISH_XFILES.sql %LOGO%</action>

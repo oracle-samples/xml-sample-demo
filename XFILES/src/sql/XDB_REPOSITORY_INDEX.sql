@@ -34,6 +34,8 @@ begin
     when no_data_found then
       $IF DBMS_DB_VERSION.VER_LE_11_2 $THEN
          V_REPOS_INDEX_SCRIPT := 'XDB_REPOSITORY_INDEX_11200.sql';
+      $ELSE
+		 V_REPOS_INDEX_SCRIPT := 'XDB_REPOSITORY_INDEX_12100.sql';
       $END
     when others then
       RAISE;
