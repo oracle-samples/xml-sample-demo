@@ -95,19 +95,6 @@ doInstall() {
     echo "Installation Failed: See $logfilename for details."
     exit 5
   fi
-  if [ -e "$ORDS_ROOT/home/$USER/src/jquery-2.1.1.min.zip" ] 
-  then
-    rm "$ORDS_ROOT/home/$USER/src/jquery-2.1.1.min.zip"
-  fi
-  cp  "$demohome/src/jquery-2.1.1.min.zip" "$ORDS_ROOT/home/$USER/src/jquery-2.1.1.min.zip"
-  rc=$?
-  echo "COPY:"$demohome/src/jquery-2.1.1.min.zip" --> "$ORDS_ROOT/home/$USER/src/jquery-2.1.1.min.zip" : $rc" >> $logfilename
-  if [ $rc != "0" ] 
-  then
-    echo "Operation Failed [$rc]: Installation Aborted." >> $logfilename
-    echo "Installation Failed: See $logfilename for details."
-    exit 5
-  fi
   if [ -e "$ORDS_ROOT/home/$USER/src/jssor.zip" ] 
   then
     rm "$ORDS_ROOT/home/$USER/src/jssor.zip"
@@ -1737,14 +1724,27 @@ doInstall() {
     echo "Installation Failed: See $logfilename for details."
     exit 7
   fi
-  mkdir -p "$ORDS_ROOT/home/$USER/Frameworks/jquery-2.1.1"
+  mkdir -p "$ORDS_ROOT/home/$USER/Frameworks/jquery-3.3.1"
   rc=$?
-  echo "MKDIR "$ORDS_ROOT/home/$USER/Frameworks/jquery-2.1.1" : $rc" >> $logfilename
+  echo "MKDIR "$ORDS_ROOT/home/$USER/Frameworks/jquery-3.3.1" : $rc" >> $logfilename
   if [ $rc != "0" ] 
   then
     echo "Operation Failed [$rc]: Installation Aborted." >> $logfilename
     echo "Installation Failed: See $logfilename for details."
     exit 7
+  fi
+  if [ -e "$ORDS_ROOT/home/$USER/Frameworks/jquery-3.3.1/jquery-3.3.1.min.js" ] 
+  then
+    rm "$ORDS_ROOT/home/$USER/Frameworks/jquery-3.3.1/jquery-3.3.1.min.js"
+  fi
+  cp  "$demohome/src/jquery-3.3.1.min.js" "$ORDS_ROOT/home/$USER/Frameworks/jquery-3.3.1/jquery-3.3.1.min.js"
+  rc=$?
+  echo "COPY:"$demohome/src/jquery-3.3.1.min.js" --> "$ORDS_ROOT/home/$USER/Frameworks/jquery-3.3.1/jquery-3.3.1.min.js" : $rc" >> $logfilename
+  if [ $rc != "0" ] 
+  then
+    echo "Operation Failed [$rc]: Installation Aborted." >> $logfilename
+    echo "Installation Failed: See $logfilename for details."
+    exit 5
   fi
   mkdir -p "$ORDS_ROOT/home/$USER/Frameworks/jssor"
   rc=$?
@@ -1763,8 +1763,6 @@ doInstall() {
   unzip "$ORDS_ROOT/home/$USER/src/bootstrap3-dialog-master.zip" -d "$ORDS_ROOT/home/$USER/Frameworks" > "$ORDS_ROOT/home/$USER/Frameworks/bootstrap3-dialog-master.log"
   mkdir -p "$ORDS_ROOT/home/$USER/Frameworks"
   unzip "$ORDS_ROOT/home/$USER/src/bootstrap-3.2.0-dist.zip" -d "$ORDS_ROOT/home/$USER/Frameworks" > "$ORDS_ROOT/home/$USER/Frameworks/bootstrap-3.2.0-dist.log"
-  mkdir -p "$ORDS_ROOT/home/$USER/Frameworks/jquery-2.1.1"
-  unzip "$ORDS_ROOT/home/$USER/src/jquery-2.1.1.min.zip" -d "$ORDS_ROOT/home/$USER/Frameworks/jquery-2.1.1" > "$ORDS_ROOT/home/$USER/Frameworks/jquery-2.1.1.min.log"
   mkdir -p "$ORDS_ROOT/home/$USER/Frameworks"
   unzip "$ORDS_ROOT/home/$USER/src/jssor.zip" -d "$ORDS_ROOT/home/$USER/Frameworks" > "$ORDS_ROOT/home/$USER/Frameworks/jssor.log"
   shellscriptName="$demohome/XFILES_Application.sh"

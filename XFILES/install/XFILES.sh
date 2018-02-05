@@ -239,28 +239,6 @@ doInstall() {
     echo "PUT \"$SERVER/home/$USER/src/bootstrap-3.2.0-dist.zip\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
     exit 5
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/jquery-2.1.1.min.zip" | head -1)
-  if [ $HttpStatus != "404" ] 
-  then
-    if [ $HttpStatus == "200" ] 
-    then
-      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/jquery-2.1.1.min.zip" | head -1)
-      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
-      then
-        echo "PUT[DELETE] \"$SERVER/home/$USER/src/jquery-2.1.1.min.zip\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
-        exit 5
-      fi
-    else
-      echo "PUT[HEAD] \"$SERVER/home/$USER/src/jquery-2.1.1.min.zip\":$HttpStatus - Operation Failed. See $logfilename for details."
-      exit 5
-    fi
-  fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/jquery-2.1.1.min.zip" "$SERVER/home/$USER/src/jquery-2.1.1.min.zip" | head -1)
-  if [ $HttpStatus != "201" ] 
-  then
-    echo "PUT \"$SERVER/home/$USER/src/jquery-2.1.1.min.zip\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
-    exit 5
-  fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/src/jssor.zip" | head -1)
   if [ $HttpStatus != "404" ] 
   then
@@ -3891,16 +3869,38 @@ doInstall() {
       exit 6
     fi
   fi
-  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Frameworks/jquery-2.1.1" | head -1)
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Frameworks/jquery-3.3.1" | head -1)
   if [ $HttpStatus == "404" ] 
   then
-    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Frameworks/jquery-2.1.1" | head -1)
-    echo "MKCOL \"$SERVER/home/$USER/Frameworks/jquery-2.1.1\":$HttpStatus"
+    HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X MKCOL --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Frameworks/jquery-3.3.1" | head -1)
+    echo "MKCOL \"$SERVER/home/$USER/Frameworks/jquery-3.3.1\":$HttpStatus"
     if [ $HttpStatus != "201" ]
     then
       echo "Operation Failed [$HttpStatus] - Installation Aborted. See $logfilename for details."
       exit 6
     fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Frameworks/jquery-3.3.1/jquery-3.3.1.min.js" | head -1)
+  if [ $HttpStatus != "404" ] 
+  then
+    if [ $HttpStatus == "200" ] 
+    then
+      HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X DELETE --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home/$USER/Frameworks/jquery-3.3.1/jquery-3.3.1.min.js" | head -1)
+      if [ $HttpStatus != "200" ] && [ $HttpStatus != "202" ] && [ $HttpStatus != "204" ]
+      then
+        echo "PUT[DELETE] \"$SERVER/home/$USER/Frameworks/jquery-3.3.1/jquery-3.3.1.min.js\":$HttpStatus - Delete Operation Failed. See $logfilename for details."
+        exit 5
+      fi
+    else
+      echo "PUT[HEAD] \"$SERVER/home/$USER/Frameworks/jquery-3.3.1/jquery-3.3.1.min.js\":$HttpStatus - Operation Failed. See $logfilename for details."
+      exit 5
+    fi
+  fi
+  HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD -X PUT --write-out "%{http_code}\n"  -s --output /dev/null --upload-file "$demohome/src/jquery-3.3.1.min.js" "$SERVER/home/$USER/Frameworks/jquery-3.3.1/jquery-3.3.1.min.js" | head -1)
+  if [ $HttpStatus != "201" ] 
+  then
+    echo "PUT \"$SERVER/home/$USER/Frameworks/jquery-3.3.1/jquery-3.3.1.min.js\":$HttpStatus - Operation Failed: Installation Aborted. See $logfilename for details."
+    exit 5
   fi
   HttpStatus=$(curl --noproxy '*' --digest -u $USER:$USERPWD --head --write-out "%{http_code}\n" -s --output /dev/null "$SERVER/home" | head -1)
   if [ $HttpStatus == "404" ] 
@@ -3950,7 +3950,6 @@ doInstall() {
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/Xinha-0.96.1.zip              /home/$USER/Frameworks               /home/$USER/Frameworks/Xinha-0.96.1.log
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/bootstrap3-dialog-master.zip  /home/$USER/Frameworks               /home/$USER/Frameworks/bootstrap3-dialog-master.log
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/bootstrap-3.2.0-dist.zip      /home/$USER/Frameworks               /home/$USER/Frameworks/bootstrap-3.2.0-dist.log
-  sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/jquery-2.1.1.min.zip          /home/$USER/Frameworks/jquery-2.1.1  /home/$USER/Frameworks/jquery-2.1.1.min.log
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/XFILES_UNZIP_ARCHIVE.sql /home/$USER/src/jssor.zip                     /home/$USER/Frameworks               /home/$USER/Frameworks/jssor.log
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/WebDemo/sql/XFILES_WEBDEMO_SERVICES.sql $USER
   sqlplus $USER/$USERPWD@$ORACLE_SID @$demohome/src/sql/PUBLISH_XFILES.sql OracleTransparent3d.png
