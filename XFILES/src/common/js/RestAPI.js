@@ -13,13 +13,12 @@
  * ================================================
  */
  
- "use strict";
 
 var restAPI = new RestAPI();
 
 function RestAPI() {
 
-  var isORDS = false;
+  var isORDS = true;
 
   var schema     
   var collectionName
@@ -396,7 +395,7 @@ function RestAPI() {
   this.setSchema = function(newSchema) {
     schema = newSchema;
     if (isORDS) {
-    	servletPath = "/ords/" + schema + "/dbjson/latest/"
+    	servletPath = "http://localhost:8080/ords/" +  schema.toLowerCase()  + "/soda/latest/"
     }
     else {
     	servletPath = servletRoot + "/" + schema + "/";
