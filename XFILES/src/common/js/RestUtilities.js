@@ -13,7 +13,6 @@
  * ================================================
  */
  
- "use strict";
 
 /**
  * Generates a GUID string, according to RFC4122 standards.
