@@ -4,8 +4,8 @@ This is an example of how to split a large XML file without a
 delimiter using the streaming features of the Oracle XQuery Processor
 for Java.
 
-1. Install Java (this was tested with JDK 8)
-   https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html
+1. Install Java (this was tested with [JDK 8](https://github.com/oracle/xml-sample-demo/tree/master/SplitXml))
+   
 
 2. Setup the environment 
 ``` 
@@ -92,7 +92,6 @@ sqlldr scott/tiger control=test.ctl readsize=10000000
 
 # References
 
-* Oracle XQuery Processor For Java
-  https://docs.oracle.com/en/database/oracle/oracle-database/19/adxdk/using-xquery-processor-for-Java.html
+* [Oracle XQuery Processor For Java] (https://docs.oracle.com/en/database/oracle/oracle-database/19/adxdk/using-xquery-processor-for-Java.html)
 
 
