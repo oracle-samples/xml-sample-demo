@@ -26,8 +26,11 @@ import oracle.xml.xquery.OXQDataSource;
  *    
  * Usage:
  * 
- *    java -cp $CP SplitXml xpath/to/elements inputFile.xml  
+ *    java -cp $CP SplitXml inputFile.xml xpath/to/elements 64
  *
+ *    The first argument is the input XML file
+ *    The second argument is the XPath or XQuery expression that select XML values within the XML file
+ *    The third argument is the approximate maximum size (in megabytes) of output files
  */
 public class SplitXml {
 
