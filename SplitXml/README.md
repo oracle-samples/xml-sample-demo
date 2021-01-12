@@ -92,6 +92,6 @@ sqlldr scott/tiger control=test.ctl readsize=10000000
 
 # References
 
-* [Oracle XQuery Processor For Java] (https://docs.oracle.com/en/database/oracle/oracle-database/19/adxdk/using-xquery-processor-for-Java.html)
+* [Oracle XQuery Processor For Java](https://docs.oracle.com/en/database/oracle/oracle-database/19/adxdk/using-xquery-processor-for-Java.html)
 
 
