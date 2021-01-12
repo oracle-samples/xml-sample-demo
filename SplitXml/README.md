@@ -59,7 +59,7 @@ ORGANIZATION external
     (c CHAR(100000000))
   )
   LOCATION ('*.split')
-)REJECT LIMIT UNLIMITED
+) PARALLEL 10 REJECT LIMIT UNLIMITED
 ;
 
 CREATE TABLE xmltab 
@@ -70,16 +70,19 @@ CREATE TABLE xmltab
 
 # Loading using sqlldr
 
-You can load the split files using SQL*Loader
+You can load the split files using SQL*Loader.
 
+First, create a target table:
+```
+CREATE TABLE testxml (c xmltype);
+```
+
+Create a control file `test.ctl':
 ```
  LOAD DATA 
  CHARACTERSET UTF8
- INFILE "big_file.xml.0.split" "STR x'03'"
- INFILE "big_file.xml.1.split" "STR x'03'"
- INFILE "big_file.xml.2.split" "STR x'03'"
- INFILE "big_file.xml.3.split" "STR x'03'"
- INFILE "big_file.xml.4.split" "STR x'03'"
+ BYTEORDERMARK NOCHECK
+ INFILE 'big_file.xml.*.split' "STR x'03'"
  INTO TABLE testxml APPEND
  FIELDS TERMINATED BY X'02'
  (x char(6000000))
@@ -87,11 +90,12 @@ You can load the split files using SQL*Loader
 
 Pass it to sqlldr:
 ```
-sqlldr scott/tiger control=test.ctl readsize=10000000
+sqlldr scott/tiger control=test.ctl readsize=10000000 direct=y
 ```
 
 # References
 
 * [Oracle XQuery Processor For Java](https://docs.oracle.com/en/database/oracle/oracle-database/19/adxdk/using-xquery-processor-for-Java.html)
-
+* [SQL*Loader](https://docs.oracle.com/en/database/oracle/oracle-database/19/sutil/oracle-sql-loader.html)
+* [External Tables](https://docs.oracle.com/en/database/oracle/oracle-database/19/sutil/oracle-external-tables-concepts.html#GUID-44323E01-7D72-45EC-915A-99E596769D9E)
 
