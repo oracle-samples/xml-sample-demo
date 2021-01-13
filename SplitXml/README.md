@@ -74,7 +74,7 @@ You can load the split files using SQL*Loader.
 
 First, create a target table:
 ```
-CREATE TABLE testxml (c xmltype);
+CREATE TABLE testxml (x xmltype);
 ```
 
 Create a control file `test.ctl':
