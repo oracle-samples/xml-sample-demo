@@ -4,7 +4,7 @@ This is an example of how to split a large XML file without a
 delimiter using the streaming features of the Oracle XQuery Processor
 for Java.
 
-1. Install Java (this was tested with [JDK 8](https://github.com/oracle/xml-sample-demo/tree/master/SplitXml))
+1. Install Java (this was tested with [JDK 8](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html))
    
 
 2. Setup the environment 
@@ -30,11 +30,33 @@ for Java.
   Completed split in 743 ms
 ```
 
-The example uses a streaming XPath over the input and writes out the
-nested values with a delimiter character (0x3).  0x3 is chosen to
-avoid a delimiter that can occur naturally within XML.
+The example uses a streaming
+[XPath](https://www.w3schools.com/xml/xpath_intro.asp) evaluation over
+the input file.  It writes the values returned by the XPath expression
+to a file with a delimiter character (0x3) between each value.  0x3 is
+chosen to avoid a chacater that will occur in the content of the XML
+values.  While control characters can occur in XML, the serialization
+process will escape them rather than writing them directly. 
 
-# Loading using an External Table
+# Loading the files into Oracle Database
+
+The output of the above example produces one or more files.  These
+files can be loaded into Oracle Database using either an external
+table or SQL*Loader.  
+
+- *SQL Loader* has the advantage that it can be run using the Oracle
+  instant client from outside the database.  External tables require
+  that the data is located in a storage system that is visible to the
+  databse.
+
+- *External tables* have the advantage that - they can process the input
+  files in parallel.  That is, they can load multiple values *within*
+  and across files at once.  - they expose the data to SQL without
+  actually loading it.  For example, you may wish to query the data
+  without loading it.  Or, you may wish to transform the data using
+  SQL/XML before storing it.  
+
+## Loading using an External Table
 
 You can load the split files using an external table. For example:
 
@@ -68,7 +90,7 @@ CREATE TABLE xmltab
   FROM xmltab_external; 
 ```
 
-# Loading using sqlldr
+## Loading using sqlldr
 
 You can load the split files using SQL*Loader.
 
