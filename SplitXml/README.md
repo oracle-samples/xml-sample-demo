@@ -44,17 +44,20 @@ The output of the above example produces one or more files.  These
 files can be loaded into Oracle Database using either an external
 table or SQL*Loader.  
 
-- *SQL Loader* has the advantage that it can be run using the Oracle
+- **SQL Loader** has the advantage that it can be run using the Oracle
   instant client from outside the database.  External tables require
   that the data is located in a storage system that is visible to the
   databse.
 
-- *External tables* have the advantage that - they can process the input
-  files in parallel.  That is, they can load multiple values *within*
-  and across files at once.  - they expose the data to SQL without
-  actually loading it.  For example, you may wish to query the data
-  without loading it.  Or, you may wish to transform the data using
-  SQL/XML before storing it.  
+- **External tables** have the advantage that they can process the
+  input files in parallel.  That is, they can load multiple values
+  **within** and across files at once.  And external tables expose the
+  data to SQL without actually loading it.  For example, you may wish
+  to query the data without storing it in the database.  Or, you may
+  wish to transform the data using SQL/XML before storing it.
+
+The next two examples show how data produced by this example can be
+loaded into Oracle Database.
 
 ## Loading using an External Table
 
