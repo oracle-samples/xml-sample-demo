@@ -70,9 +70,9 @@ public class SplitXml {
       ByteArrayOutputStream buffer = new ByteArrayOutputStream();
       XQSequence seq = expr.executeQuery();
       while (seq.next()) {
-        seq.writeItem(buffer, null);
+        seq.writeItem(buffer, null); //UTF-8
         docs++;
-        buffer.write('\3');
+        buffer.write(3); // write 0x3 as a separator
         if (buffer.size() > filesize) {
           writeFile(file, fileCt++, docs, buffer);
         }        
