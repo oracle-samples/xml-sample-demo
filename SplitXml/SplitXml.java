@@ -20,7 +20,7 @@ import oracle.xml.xquery.OXQDataSource;
  * Description:
  * 
  *    Splits a large XML file into many small XML files based on 
- *    an XQuery expression that identifies a sequence of XML elements.
+ *    an XPath expression that identifies a sequence of XML elements.
  *    Values are written to files where each document is on a single 
  *    line.
  *    
