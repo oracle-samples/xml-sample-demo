@@ -60,7 +60,7 @@ public class SplitXml {
     ctx.setBindingMode(XQConstants.BINDING_MODE_DEFERRED);
     con.setStaticContext(ctx);
     
-    double filesize = splitSize * 1024d * 1024d; // approximate size per file (16M)
+    double filesize = splitSize * 1024d * 1024d; // approximate size per file
     int fileCt = 0; // number of files
     int docs = 0;
     long start = System.currentTimeMillis();
