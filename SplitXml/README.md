@@ -102,7 +102,7 @@ First, create a target table:
 CREATE TABLE testxml (x xmltype);
 ```
 
-Create a control file `test.ctl':
+Create a control file test.ctl:
 ```
  LOAD DATA 
  CHARACTERSET UTF8
