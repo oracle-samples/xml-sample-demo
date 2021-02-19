@@ -34,7 +34,7 @@ The example uses a streaming
 [XPath](https://www.w3schools.com/xml/xpath_intro.asp) evaluation over
 the input file.  It writes the values returned by the XPath expression
 to a file with a delimiter character (0x3) between each value.  0x3 is
-chosen to avoid a chacater that will occur in the content of the XML
+chosen to avoid a character that will occur in the content of the XML
 values.  While control characters can occur in XML, the serialization
 process will escape them rather than writing them directly. 
 
